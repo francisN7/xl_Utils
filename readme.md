@@ -26,7 +26,9 @@ Unifica planilhas que possuam o mesmo cabeçalho.
 
 #### Idéias relacionados com todos os scripts:
 
--  Integrar com GUI. **Possibilidades:**
+**Possibilidades:**
+
+-  Integrar com GUI.
    -  Flet;
    -  Tkinter;
    -  Textual;
@@ -40,9 +42,5 @@ Unifica planilhas que possuam o mesmo cabeçalho.
 Falta validar o funcionamento no windows.
 
 ### cut
-
-Falta validar o funcionamento no windows.
-
-### merge
 
 Falta validar o funcionamento no windows.
