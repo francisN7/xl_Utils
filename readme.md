@@ -4,7 +4,7 @@ Uma série de mini scrpits python para resolução de pequenos problemas diário
 
 ## Descrições
 
-### all_str
+### all\_str
 
 Resolve o problema de números serem lidos como notação científica.
 
@@ -28,12 +28,15 @@ Unifica planilhas que possuam o mesmo cabeçalho.
 
 **Possibilidades:**
 
--  Integrar com GUI.
-   -  Flet;
-   -  Tkinter;
-   -  Textual;
-   -  etc.
--  Distribuir com pyinstaller.
+* Integrar com GUI.
+
+  * Flet;
+  * Tkinter;
+  * Textual;
+  * Slint;
+  * etc.
+
+* Distribuir com pyinstaller.
 
 ## Específicos
 
@@ -44,3 +47,4 @@ Falta validar o funcionamento no windows.
 ### cut
 
 Falta validar o funcionamento no windows.
+
