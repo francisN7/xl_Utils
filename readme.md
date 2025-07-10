@@ -4,7 +4,7 @@ Uma série de mini scrpits python para resolução de pequenos problemas diário
 
 ## Descrições
 
-### all\_str
+### all_str
 
 Resolve o problema de números serem lidos como notação científica.
 
@@ -19,6 +19,10 @@ Recorta planilhas com base na quantidade de linhas desejadas por arquivo.
 ### merge
 
 Unifica planilhas que possuam o mesmo cabeçalho.
+
+### remove_emoji
+
+Rapidamente substitui emojis por strings, nesse caso, por uma string em branco: (" ")
 
 # Futuro
 
