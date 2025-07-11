@@ -36,7 +36,7 @@ class EmojiRemover:
     def __remove_emojis(self, texto) -> str:
         try:
             if isinstance(texto, str):
-                return demoji.replace(texto, " ")
+                return demoji.replace(texto, "")
             else:
                 return texto
         except Exception as e:
