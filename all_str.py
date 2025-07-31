@@ -4,7 +4,8 @@ from pathlib import Path
 from time import sleep
 import os
 
-class StrConverter():
+
+class StrConverter:
     def __init__(self):
         self.files_paths: list[Path] = []
         self.df: pd.DataFrame = None
@@ -20,16 +21,19 @@ class StrConverter():
         print("Salvando novos arquivos...")
         for file in self.files_paths:
             self.__read_df(file)
-            new_file = file.parent.absolute().joinpath("new_files").joinpath(f"{file.stem}.xlsx")
+            new_file = (
+                file.parent.absolute()
+                .joinpath("new_files")
+                .joinpath(f"{file.stem}.xlsx")
+            )
             self.__save_new_df(new_file)
         self.__clear()
         self.__title()
         print(
             f"Novos arquivos salvos.\
-            \nLocal: {self.files_paths[0].parent.absolute().joinpath(Path("new_files"))}"
+            \nLocal: {self.files_paths[0].parent.absolute().joinpath(Path('new_files'))}"
         )
 
-    
     def __title(self) -> None:
         print("__________Converter para Texto Simples__________\n\n\n")
 
@@ -48,11 +52,19 @@ class StrConverter():
         self.df = pd.read_excel(file, dtype=str)
 
     def __save_new_df(self, new_file: Path) -> None:
-        self.df.to_excel(new_file, engine='xlsxwriter', index=False)
+        self.df.to_excel(new_file, engine="xlsxwriter", index=False)
 
     def __check_path(self) -> None:
-        if not self.files_paths[0].parent.absolute().joinpath(Path("new_files")).exists():
-            Path.mkdir(self.files_paths[0].parent.absolute().joinpath(Path("new_files")))
+        if (
+            not self.files_paths[0]
+            .parent.absolute()
+            .joinpath(Path("new_files"))
+            .exists()
+        ):
+            Path.mkdir(
+                self.files_paths[0].parent.absolute().joinpath(Path("new_files"))
+            )
+
 
 if __name__ == "__main__":
     converter = StrConverter()
