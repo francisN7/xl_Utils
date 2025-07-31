@@ -20,6 +20,10 @@ Recorta planilhas com base na quantidade de linhas desejadas por arquivo.
 
 Unifica planilhas que possuam o mesmo cabeçalho.
 
+### quick_replace
+
+Substitui nomes com base em uma lista de pares.
+
 ### remove_emoji
 
 Rapidamente substitui emojis por strings, nesse caso, por uma string em branco: (" ")
