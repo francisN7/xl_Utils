@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 from file_picker_py import pick_file_blocking
 from pathlib import Path
 
@@ -12,7 +13,7 @@ class QuickReplace:
     def get_replacements(self) -> None:
         replacement_path = Path(pick_file_blocking()).absolute()
         df = pd.read_excel(replacement_path, dtype=str)
-        original_name = df.iloc[:, 0].to_list()
+        original_name = [re.escape(name) for name in df.iloc[:, 0].to_list()]
         new_name = df.iloc[:, 1].to_list()
         self.replacements = dict(zip(original_name, new_name))
 
