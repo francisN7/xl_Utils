@@ -1,7 +1,8 @@
 from file_picker_py import pick_files_blocking
-import pandas as pd
 from pathlib import Path
 from time import sleep
+import subprocess
+import pandas as pd
 import os
 
 
@@ -49,7 +50,22 @@ class StrConverter:
             self.files_paths.append(Path(file))
 
     def __read_df(self, file: Path) -> None:
-        self.df = pd.read_excel(file, dtype=str)
+        try:
+            self.df = pd.read_excel(file, dtype=str)
+        except Exception as e:  # noqa: F841
+            print(f"Erro ao ler {file.name}, tentando reparar...")
+            self.df = pd.read_csv(
+                self.__repair_df(file),
+                dtype=str,
+                encoding="utf-8",
+                quotechar='"',
+                sep=",",
+            )
+
+    def __repair_df(self, file: Path) -> Path:
+        new_file = file.parent / f"{file.stem}_repaired.csv"
+        subprocess.run(f"xlsx2csv -q all {file} {new_file}", shell=True, check=True)
+        return Path(new_file)
 
     def __save_new_df(self, new_file: Path) -> None:
         self.df.to_excel(new_file, engine="xlsxwriter", index=False)
