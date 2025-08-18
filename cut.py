@@ -34,7 +34,17 @@ class Cutter:
         self.__save_files()
 
     def __load_df(self) -> None:  # Carrega o Dataframe original
-        self.__df = pd.read_excel(self.__file_path)
+        first_df = pd.read_excel(self.__file_path)
+        for col in first_df.columns:
+            first_df[col] = first_df[col].apply(
+                lambda x: x.replace("_x000D__x000A_", "\n")
+                .replace("_x000A__x000D_", "\n")
+                .replace("_x000D_", "\n")
+                .replace("_x000A_", "\n")
+                if isinstance(x, str)
+                else x
+            )
+        self.__df = first_df
 
     def __save_files(self) -> None:  # Salva os recortes
         n = 1  # Contador de arquivos
