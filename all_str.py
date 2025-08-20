@@ -50,17 +50,20 @@ class StrConverter:
             self.files_paths.append(Path(file))
 
     def __read_df(self, file: Path) -> None:
-        try:
-            self.df = pd.read_excel(file, dtype=str)
-        except Exception as e:  # noqa: F841
-            print(f"Erro ao ler {file.name}, tentando reparar...")
-            self.df = pd.read_csv(
-                self.__repair_df(file),
-                dtype=str,
-                encoding="utf-8",
-                quotechar='"',
-                sep=",",
-            )
+        if file.suffix.lower() == ".xls":
+            self.df = pd.read_excel(file, dtype=str, engine="xlrd")
+        else:
+            try:
+                self.df = pd.read_excel(file, dtype=str)
+            except Exception as e:  # noqa: F841
+                print(f"Erro ao ler {file.name}, tentando reparar...")
+                self.df = pd.read_csv(
+                    self.__repair_df(file),
+                    dtype=str,
+                    encoding="utf-8",
+                    quotechar='"',
+                    sep=",",
+                )
 
     def __repair_df(self, file: Path) -> Path:
         new_file = file.parent / f"{file.stem}_repaired.csv"
