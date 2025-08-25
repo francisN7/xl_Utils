@@ -34,10 +34,10 @@ class JsonConverter:
 
     def __save_df(self):
         new_path = Path(f"{self.json.parent}").joinpath("process.xlsx")
-        self.df.to_excel(new_path)
+        self.df.to_excel(new_path, index=False)
         print(f"Planilha salva em {new_path}")
 
 
 if __name__ == "__main__":
     json_converter = JsonConverter()
-    json_converter.run("copy")
+    json_converter.run("save")
