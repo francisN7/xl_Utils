@@ -40,4 +40,4 @@ class JsonConverter:
 
 if __name__ == "__main__":
     json_converter = JsonConverter()
-    json_converter.run("save")
+    json_converter.run("copy")
