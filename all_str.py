@@ -67,7 +67,7 @@ class StrConverter:
 
     def __repair_df(self, file: Path) -> Path:
         new_file = file.parent / f"{file.stem}_repaired.csv"
-        subprocess.run(f"xlsx2csv -q all {file} {new_file}", shell=True, check=True)
+        subprocess.run(f'xlsx2csv -q all "{file}" "{new_file}"', shell=True, check=True)
         return Path(new_file)
 
     def __save_new_df(self, new_file: Path) -> None:
