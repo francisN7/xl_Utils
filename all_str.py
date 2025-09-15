@@ -52,6 +52,8 @@ class StrConverter:
     def __read_df(self, file: Path) -> None:
         if file.suffix.lower() == ".xls":
             self.df = pd.read_excel(file, dtype=str, engine="xlrd")
+        elif file.suffix.lower() == ".html":
+            self.df = pd.read_html(file)[0]
         else:
             try:
                 self.df = pd.read_excel(file, dtype=str)
