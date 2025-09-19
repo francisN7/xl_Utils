@@ -10,7 +10,7 @@ class CnjProcessor:
         self.caminho: Path = None
         self.planilhas: list = None
         self.cnjs_extraidos: list = []
-        self.cnjs_padronizados: list = []
+        self.cnjs_padronizados: set = set()
 
     def extract_cnjs(self) -> None:
         title = ":__________Extrair CNJs de Planilhas__________:\n\n"
@@ -42,7 +42,7 @@ class CnjProcessor:
             raise ValueError(
                 f"Formato de CNJ inválido.\n A extração retornou um padrão com {len(cnj)} caracteres, mas o esperado é 20 ou 25."
             )
-        self.cnjs_padronizados.append(cnj)
+        self.cnjs_padronizados.add(cnj)
 
     def __read_colums(self, df: pd.DataFrame) -> list[str]:
         textos = []
@@ -53,7 +53,7 @@ class CnjProcessor:
     def save_list_cnjs(self) -> None:
         file_name = f"{self.caminho.stem.replace('pesquisa', '')} lista cnj.xlsx"
         output = Path(f"{self.caminho.parent}")
-        pd.DataFrame(self.cnjs_padronizados, columns=["PROCESSOS"]).to_excel(
+        pd.DataFrame(list(self.cnjs_padronizados), columns=["PROCESSOS"]).to_excel(
             f"{Path.joinpath(output, file_name)}", index=False, engine="xlsxwriter"
         )
 
