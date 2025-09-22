@@ -8,6 +8,9 @@ Uma série de mini scrpits python para resolução de pequenos problemas diário
 Resolve o problema de números serem lidos como notação científica, convertendo todos os dados da planilha para texto simples ( ou str a nível de código).
 Em paralelo, está apto a corrigir arquivos com problemas de metadados (isso anteriormente impedia a leitura via pandas).
 
+### cnjs
+Percorre todo um arquivo.xlsx em busca de numerações no formato CNJ, após retorna um novo arquivo contendo todos os CNJs únicos encontrados.
+
 ### convert
 
 Transforma o json da api em uma planilha.

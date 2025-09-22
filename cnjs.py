@@ -41,7 +41,7 @@ class CnjProcessor:
         print(
             f"{len(self.cnjs_extraidos) - len(self.cnjs_padronizados)} CNJs duplicados removidos.\n\nTotal de CNJs únicos extraídos: {len(self.cnjs_padronizados)}\n"
         )
-        self.save_list_cnjs()
+        self.__save_list_cnjs()
 
     # Leitura do arquivo Excel:
     def __ler_arquivo(self) -> None:
@@ -76,7 +76,7 @@ class CnjProcessor:
         return textos
 
     # Salvando a lista de CNJs em um arquivo Excel:
-    def save_list_cnjs(self) -> None:
+    def __save_list_cnjs(self) -> None:
         file_name = f"{self.caminho.stem.replace(' pesquisa', '')} lista cnj.xlsx"
         output = Path(f"{self.caminho.parent}")
         pd.DataFrame(list(self.cnjs_padronizados), columns=["PROCESSOS"]).to_excel(
