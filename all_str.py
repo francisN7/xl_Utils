@@ -3,6 +3,7 @@ from pathlib import Path
 from time import sleep
 import subprocess
 import pandas as pd
+import magic
 import os
 
 
@@ -21,7 +22,7 @@ class StrConverter:
         self.__title()
         print("Salvando novos arquivos...")
         for file in self.files_paths:
-            self.__read_df(file)
+            self.__read_df(self.__corret_file_type(file))
             new_file = (
                 file.parent.absolute()
                 .joinpath("new_files")
@@ -38,16 +39,21 @@ class StrConverter:
     def __title(self) -> None:
         print("__________Converter para Texto Simples__________\n\n\n")
 
-    def __clear(self) -> None:
-        if os.name == "nt":
-            os.system("cls")
-        else:
-            os.system("clear")
-
     def __pick_files(self) -> None:
         sleep(0.5)
         for file in pick_files_blocking():
             self.files_paths.append(Path(file))
+
+    def __check_path(self) -> None:
+        if (
+            not self.files_paths[0]
+            .parent.absolute()
+            .joinpath(Path("new_files"))
+            .exists()
+        ):
+            Path.mkdir(
+                self.files_paths[0].parent.absolute().joinpath(Path("new_files"))
+            )
 
     def __read_df(self, file: Path) -> None:
         if file.suffix.lower() == ".xls":
@@ -75,16 +81,26 @@ class StrConverter:
     def __save_new_df(self, new_file: Path) -> None:
         self.df.to_excel(new_file, engine="xlsxwriter", index=False)
 
-    def __check_path(self) -> None:
-        if (
-            not self.files_paths[0]
-            .parent.absolute()
-            .joinpath(Path("new_files"))
-            .exists()
-        ):
-            Path.mkdir(
-                self.files_paths[0].parent.absolute().joinpath(Path("new_files"))
+    def __corret_file_type(self, file: Path) -> Path:
+        file_type = magic.from_file(str(file), mime=True)
+        new_file_name = str(file)
+        if f".{file_type.split('/')[1].split('.')[-1]}" == ".sheet":
+            pass
+        elif f".{file_type.split('/')[1]}" != file.suffix:
+            new_file_name = (
+                f"{str(file).replace(file.suffix, f'.{file_type.split("/")[1]}')}"
             )
+            print(
+                f"Formato real detectado como: {file_type}\nRenomeando arquivo em {file}"
+            )
+            os.rename(file, new_file_name)
+        return Path(new_file_name)
+
+    def __clear(self) -> None:
+        if os.name == "nt":
+            os.system("cls")
+        else:
+            os.system("clear")
 
 
 if __name__ == "__main__":
