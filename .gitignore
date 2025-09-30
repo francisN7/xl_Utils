@@ -1,6 +1,11 @@
-/venv
-/advbox_venv
-process.json
-captureds.py
+#=============#
+# ENVIRONMENT #
+#=============#
+.venv
+.env
+
+#=================#
+# TEMPORARY FILES #
+#=================#
 *temp*
-PJE.py
+__pycache__
