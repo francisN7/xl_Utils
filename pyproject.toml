@@ -5,10 +5,15 @@
 [project]
 name = "xl_Utils"
 version = "0.1.0"
-description = "Add your description here"
+description = "A series of mini-scripts focused on the objective resolution of minor daily problems in spreadsheet handling."
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "demoji>=1.1.0",
+    "file-picker-py>=0.2.0",
+    "pandas>=2.3.3",
+    "python-magic>=0.4.27",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
