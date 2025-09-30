@@ -13,6 +13,8 @@ dependencies = [
     "file-picker-py>=0.2.0",
     "pandas>=2.3.3",
     "python-magic>=0.4.27",
+    "xlsx2csv>=0.8.4",
+    "xlsxwriter>=3.2.9",
 ]
 
 [tool.setuptools.packages.find]
