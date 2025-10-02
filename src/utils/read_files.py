@@ -38,7 +38,7 @@ class FileReader:
                     print(
                         f'O arquivo "{file}" não foi processado, pois o tipo "{file.suffix}" ainda não é suportado.'
                     )
-            except:  # noqa: E722
+            except (ValueError, TypeError):
                 new_file = self.__repair_df(file)
                 self.dfs[file] = {"Página1": pd.read_csv(new_file, dtype=str)}
                 new_file.unlink()
