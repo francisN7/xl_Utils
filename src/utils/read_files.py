@@ -1,3 +1,4 @@
+import subprocess
 from pathlib import Path
 
 import magic
@@ -13,7 +14,7 @@ class FileReader:
     def run(self) -> dict[Path, dict[str, pd.DataFrame]]:
         self.__pick_files()
         self.__corret_file_type()
-        # self.__read_files()
+        self.__read_files()
         return self.dfs
 
     def __pick_files(self) -> None:
@@ -21,7 +22,26 @@ class FileReader:
 
     def __read_files(self) -> None:
         for file in self.files_paths:
-            self.dfs[file] = pd.read_excel(file, dtype=str, sheet_name=None)
+            try:
+                if file.suffix.lower() == ".html":
+                    for n, df in enumerate(pd.read_html(file), start=1):
+                        self.dfs[file] = {f"Página{n}": df}
+                elif file.suffix.lower() == ".xls":
+                    self.dfs[file] = pd.read_excel(
+                        file, dtype=str, engine="xlrd", sheet_name=None
+                    )
+                elif file.suffix.lower() == ".csv":
+                    self.dfs[file] = {"Página1": pd.read_csv(file, dtype=str)}
+                elif file.suffix.lower() == ".xlsx":
+                    self.dfs[file] = pd.read_excel(file, dtype=str, sheet_name=None)
+                else:
+                    print(
+                        f'O arquivo "{file}" não foi processado, pois o tipo "{file.suffix}" ainda não é suportado.'
+                    )
+            except:  # noqa: E722
+                new_file = self.__repair_df(file)
+                self.dfs[file] = {"Página1": pd.read_csv(new_file, dtype=str)}
+                new_file.unlink()
 
     def __corret_file_type(self) -> None:
         convert = {
@@ -31,7 +51,7 @@ class FileReader:
             "application/vnd.ms-excel": ".xls",
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
         }
-        for file in self.files_paths:
+        for n, file in enumerate(self.files_paths):
             file_type = magic.from_file(str(file), mime=True)
             if file_type not in convert.keys():
                 raise NotImplementedError(
@@ -41,4 +61,11 @@ class FileReader:
                 print(
                     f'O formato real de "{file.name}" é "{convert[file_type]}".\nCorrigindo extensão..\n\n'
                 )
-                file.rename(file.with_suffix(convert[file_type]))
+                new_file = file.with_suffix(convert[file_type])
+                file.rename(new_file)
+                self.files_paths[n] = new_file
+
+    def __repair_df(self, file: Path) -> Path:
+        new_file = f"{file.with_suffix('')}_repaired.csv"
+        subprocess.run(f'xlsx2csv -q all "{file}" "{new_file}"', shell=True, check=True)
+        return Path(new_file)
