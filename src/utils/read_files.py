@@ -38,10 +38,13 @@ class FileReader:
                     print(
                         f'O arquivo "{file}" não foi processado, pois o tipo "{file.suffix}" ainda não é suportado.'
                     )
-            except (ValueError, TypeError):
-                new_file = self.__repair_df(file)
-                self.dfs[file] = {"Página1": pd.read_csv(new_file, dtype=str)}
-                new_file.unlink()
+            except (ValueError, TypeError) as e:
+                if "No tables found" in str(e):
+                    print(f"Ignorando o arquivo {file}, nenhuma planilha encontrada.")
+                else:
+                    new_file = self.__repair_df(file)
+                    self.dfs[file] = {"Página1": pd.read_csv(new_file, dtype=str)}
+                    new_file.unlink()
 
     def __corret_file_type(self) -> None:
         convert = {

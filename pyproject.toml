@@ -9,8 +9,11 @@ description = "A series of mini-scripts focused on the objective resolution of m
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "beautifulsoup4>=4.14.2",
     "demoji>=1.1.0",
     "file-picker-py>=0.2.0",
+    "html5lib>=1.1",
+    "lxml>=6.0.2",
     "pandas>=2.3.3",
     "python-magic>=0.4.27",
     "xlrd>=2.0.2",
