@@ -3,7 +3,7 @@ from pathlib import Path
 
 import magic
 import pandas as pd
-from file_picker_py import pick_files_blocking
+from file_picker_py import pick_file_blocking, pick_files_blocking
 
 
 class FileReader:
@@ -11,14 +11,17 @@ class FileReader:
         self.files_paths: list[Path] = []
         self.dfs: dict[Path, dict[str, pd.DataFrame]] = {}
 
-    def run(self) -> dict[Path, dict[str, pd.DataFrame]]:
-        self.__pick_files()
+    def run(self, one_file: bool = False) -> dict[Path, dict[str, pd.DataFrame]]:
+        self.__pick_files(one_file)
         self.__corret_file_type()
         self.__read_files()
         return self.dfs
 
-    def __pick_files(self) -> None:
-        self.files_paths.extend([Path(file) for file in pick_files_blocking()])
+    def __pick_files(self, one_file: bool = False) -> None:
+        if one_file:
+            self.files_paths.append(Path(pick_file_blocking()))
+        else:
+            self.files_paths.extend([Path(file) for file in pick_files_blocking()])
 
     def __read_files(self) -> None:
         for file in self.files_paths:

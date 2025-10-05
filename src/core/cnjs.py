@@ -1,53 +1,36 @@
-from pathlib import Path
-from file_picker_py import pick_file_blocking
-import pandas as pd
 import re
-import os
-from time import sleep
+from pathlib import Path
+
+import pandas as pd
 
 
 class CnjProcessor:
-    def __init__(self):
-        # Caminho do arquivo Excel:
-        self.caminho: Path = None
-        # Planilhas do arquivo Excel:
-        self.planilhas: dict = None
-        # CNJs extraídos e padronizados:
-        self.cnjs_extraidos: list = []
-        self.cnjs_padronizados: set = set()
+    def __init__(self, dfs: dict[Path, dict[str, pd.DataFrame]]):
+        self.dfs = dfs
+        self.path: Path = None
+        self.cnjs_extraidos: list[str] = []
+        self.cnjs_padronizados: set[str] = set()
 
     # Execução principal:
-    def extract_cnjs(self) -> None:
-        # Título
-        title = ":__________Extrair CNJs de Planilhas__________:\n\n"
-        self.__clear()
-        # Instrução inicial:
-        print(f"{title}Selecione a planilha para extrair os CNJs:")
-        sleep(2)
-        self.__clear()
-        self.__ler_arquivo()
-        # Iterar sobre as planilhas e extrair os CNJs:
-        for name, df in self.planilhas.items():
-            # Quantidade de CNJs antes da extração:
-            x = len(self.cnjs_extraidos)
-            self.__extrair_cnjs(self.__read_colums(df))
-            # Exibindo a quantidade de CNJs extraídos:
-            print(f'{len(self.cnjs_extraidos) - x} CNJs extraídos da aba "{name}"')
-        # Padronizando e removendo duplicados:
+    def run(self) -> dict[Path, dict[str, pd.DataFrame]]:
+        self.path = list(self.dfs.keys())[0]
+        for file in self.dfs.values():
+            for sheet_name, df in file.items():
+                n_cnjs = len(self.cnjs_extraidos)
+                self.__extrair_cnjs(self.__read_colums(df))
+                n_cnjs_new = len(self.cnjs_extraidos)
+                print(f"{(n_cnjs_new - n_cnjs):03} CNJs extraídos de {sheet_name}.")
         for cnj in self.cnjs_extraidos:
             self.__padronizar_cnj(cnj)
-        # Resultados finais:
-        print("-" * 50)
-        print(
-            f"{len(self.cnjs_extraidos) - len(self.cnjs_padronizados)} CNJs duplicados removidos.\n\nTotal de CNJs únicos extraídos: {len(self.cnjs_padronizados)}\n"
-        )
-        self.__save_list_cnjs()
+        new_file = f"{self.path.stem.replace('pesquisa', '')}lista cnjs.xlsx"
+        return {self.path.parent.joinpath(new_file): {"Lista CNJs": self.__create_df()}}
 
-    # Leitura do arquivo Excel:
-    def __ler_arquivo(self) -> None:
-        self.caminho = Path(pick_file_blocking()).absolute()
-        self.planilhas = pd.read_excel(self.caminho, sheet_name=None)
-        print(f'\nArquivo "{self.caminho.stem}" carregado com sucesso.\n\n')
+    # Leitura do texto de todas as colunas do DataFrame:
+    def __read_colums(self, df: pd.DataFrame) -> list[str]:
+        textos = []
+        for coluna in df.columns:
+            textos.extend(df[coluna].astype(str).tolist())
+        return textos
 
     # Extração dos cnjs:
     def __extrair_cnjs(self, textos: list[str]) -> None:
@@ -68,32 +51,6 @@ class CnjProcessor:
         # Adicionando a um set para evitar duplicatas:
         self.cnjs_padronizados.add(cnj)
 
-    # Leitura do texto de todas as colunas do DataFrame:
-    def __read_colums(self, df: pd.DataFrame) -> list[str]:
-        textos = []
-        for coluna in df.columns:
-            textos.extend(df[coluna].astype(str).tolist())
-        return textos
-
-    # Salvando a lista de CNJs em um arquivo Excel:
-    def __save_list_cnjs(self) -> None:
-        file_name = f"{self.caminho.stem.replace(' pesquisa', '')} lista cnj.xlsx"
-        output = Path(f"{self.caminho.parent}")
-        pd.DataFrame(list(self.cnjs_padronizados), columns=["PROCESSOS"]).to_excel(
-            f"{Path.joinpath(output, file_name)}", index=False, engine="xlsxwriter"
-        )
-        print(f'Lista salva como "{file_name}" em "{output}".\n')
-
-    # Limpa o terminal:
-    def __clear(self) -> None:  # Limpa o terminal
-        # Para Windows
-        if os.name == "nt":
-            os.system("cls")
-        # Para Mac e Linux
-        else:
-            os.system("clear")
-
-
-if __name__ == "__main__":
-    processor = CnjProcessor()
-    processor.extract_cnjs()
+    def __create_df(self) -> pd.DataFrame:
+        df = pd.DataFrame({"PROCESSOS": list(self.cnjs_padronizados)})
+        return df
