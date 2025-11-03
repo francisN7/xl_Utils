@@ -1,15 +1,12 @@
-from core import CnjProcessor
-from utils import FileReader, save, set_root_dir
+import click
+
+from commands import extract_cnj
 
 
+@click.group()
 def xl_run() -> None:
-    print("xl_run funcional!")
+    # set_root_dir()
+    pass
 
 
-if __name__ == "__main__":
-    set_root_dir()
-    reader = FileReader()
-    df = reader.run(True)
-    cnj_processor = CnjProcessor(df)
-    cnjs_df = cnj_processor.run()
-    save(cnjs_df)
+xl_run.add_command(extract_cnj)
