@@ -19,6 +19,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4>=4.14.2",
+    "click>=8.3.0",
     "demoji>=1.1.0",
     "file-picker-py>=0.2.0",
     "html5lib>=1.1",
