@@ -9,6 +9,7 @@
 #=================#
 *temp*
 __pycache__
+*.egg-info
 
 #================#
 # TEST DIRECTORY #
