@@ -3,8 +3,8 @@ from pathlib import Path
 import click
 import pandas as pd
 
-from core import CnjProcessor
-from utils import FileReader, save
+from xl_Utils.core import CnjProcessor
+from xl_Utils.utils import FileReader, save
 
 
 def read(one_file: bool = False) -> dict[Path, dict[str, pd.DataFrame]]:
