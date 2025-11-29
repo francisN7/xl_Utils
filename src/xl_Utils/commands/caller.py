@@ -9,7 +9,7 @@ from xl_Utils.utils import FileReader, save
 
 def read(one_file: bool = False) -> dict[Path, dict[str, pd.DataFrame]]:
     reader = FileReader()
-    return reader.run()
+    return reader.run(one_file)
 
 
 @click.command()

@@ -1,8 +1,8 @@
 import subprocess
 from pathlib import Path
 
-import magic
 import pandas as pd
+import puremagic
 from file_picker_py import pick_file_blocking, pick_files_blocking
 
 
@@ -50,24 +50,23 @@ class FileReader:
                     new_file.unlink()
 
     def __corret_file_type(self) -> None:
-        convert = {
-            "text/plain": ".csv",
-            "text/html": ".html",
-            "application/pdf": ".pdf",
-            "application/vnd.ms-excel": ".xls",
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
-        }
+        supported_formats = [".csv", ".html", ".xls", ".xlsx", ".json"]
         for n, file in enumerate(self.files_paths):
-            file_type = magic.from_file(str(file), mime=True)
-            if file_type not in convert.keys():
+            file_type = f".{puremagic.what(file)}"
+            print(f"\n\n\n\n{file_type}\n\n\n\n")
+            if file_type == ".":
+                print(
+                    "\nNão foi possível detectar o real tipo de arquivo.\nSeguindo com a extensão original.\n"
+                )
+            elif file_type not in supported_formats:
                 raise NotImplementedError(
                     f'O tipo detectado "{file_type}" ainda não é suportado.'
                 )
-            elif file.suffix != convert[file_type]:
+            elif file.suffix != file_type:
                 print(
-                    f'O formato real de "{file.name}" é "{convert[file_type]}".\nCorrigindo extensão..\n\n'
+                    f'O formato real de "{file.name}" é "{file_type}".\nCorrigindo extensão..\n\n'
                 )
-                new_file = file.with_suffix(convert[file_type])
+                new_file = file.with_suffix(file_type)
                 file.rename(new_file)
                 self.files_paths[n] = new_file
 

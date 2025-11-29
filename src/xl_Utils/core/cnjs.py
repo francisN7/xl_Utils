@@ -24,7 +24,7 @@ class CnjProcessor:
             self.__padronizar_cnj(cnj)
         new_file = f"{self.path.stem.replace('pesquisa', '')}lista cnjs.xlsx"
         print(
-            f"{len(self.cnjs_padronizados):03} CNJs únicos encontrados. {len(self.cnjs_extraidos) - len(self.cnjs_padronizados)} duplicidades removidas."
+            f"{len(self.cnjs_padronizados):03} CNJs únicos encontrados.\n{len(self.cnjs_extraidos) - len(self.cnjs_padronizados)} duplicidades removidas."
         )
         return {self.path.parent.joinpath(new_file): {"Lista CNJs": self.__create_df()}}
 
