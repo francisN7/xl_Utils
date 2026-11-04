@@ -88,6 +88,9 @@ decisões nos ADRs.
 - Recorte por quantidade de arquivos: a página alterna entre linhas por arquivo
   e arquivos por aba; a quantidade vale por aba, os blocos ficam equilibrados e
   o modo antigo continua igual.
+- Mesclagem: `ORIGEM` agora é `<arquivo> - <aba>` (sem extensão) e a nova
+  `LINHA_ORIGEM` numera as linhas de dados do resultado inteiro com zeros à
+  esquerda, preservando a ordenação. Ver adendo do ADR 0005.
 
 ### Changed
 

@@ -85,3 +85,16 @@ colunas de mesmo significado que chegam com nomes diferentes.
   por padrão (`group_by_name`), mas podem ser separadas manualmente.
 - O quadro vive em `ToolState.options["column_groups"]` e é refeito quando os
   arquivos ou as abas mudam.
+
+## Adendo — ORIGEM e LINHA_ORIGEM (2026-11-04)
+
+- `ORIGEM` deixa de carregar a linha e passa a ser `<stem do arquivo> - <aba>`.
+  O nome do arquivo entra sem extensão.
+- Uma nova coluna `LINHA_ORIGEM` vem logo depois e numera as linhas de dados do
+  resultado mesclado inteiro, com zeros à esquerda na largura do total. Isso
+  mantém a ordem lexical e permite separar arquivo/aba da posição da linha.
+- `LINHA_ORIGEM` e `ORIGEM` são reservados: uma coluna de origem com esses nomes
+  vira `<nome>_original`.
+- O formato de três partes (`arquivo - aba - linha`) deixa de existir; testes,
+  prévia e documentação acompanham.
+

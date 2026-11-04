@@ -2,7 +2,8 @@
 
 Entrada: sequência ``(arquivo, aba, DataFrame)`` e, opcionalmente, os grupos de
 colunas montados na UI.
-Saída: um único DataFrame com ``ORIGEM`` como primeira coluna.
+Saída: um único DataFrame com ``ORIGEM`` e ``LINHA_ORIGEM`` nas duas primeiras
+colunas.
 Erros: ``ValueError`` para coluna repetida, aba contribuindo duas vezes para a
 mesma saída ou ausência de dados.
 """
@@ -97,10 +98,10 @@ def merge_sheets(
     as demais alimentam a mesma coluna. Sem ``groups``, colunas de mesmo nome
     são agrupadas automaticamente.
 
-    Valores ausentes viram ``pd.NA``; a saída segue a ordem dos grupos. O
-    ``ORIGEM`` usa ``<arquivo> - <aba> - <linha>``, onde ``linha`` conta só as
-    linhas de dados (1 é a primeira linha depois do cabeçalho), não a linha
-    física da planilha.
+    Valores ausentes viram ``pd.NA``; a saída segue a ordem dos grupos.
+    ``ORIGEM`` usa ``<stem> - <aba>``. ``LINHA_ORIGEM`` numera as linhas de
+    dados do resultado inteiro, com zeros à esquerda na largura do total, para
+    preservar a ordenação lexical.
     """
     active = [
         (source, sheet_name, frame)
@@ -127,15 +128,21 @@ def merge_sheets(
     _validate(selected)
 
     headers = _unique_headers(group.header for group in selected)
+    total_rows = sum(len(frame) for _, _, frame in active)
+    width = len(str(total_rows))
     frames: list[pd.DataFrame] = []
+    offset = 0
     for source, sheet_name, frame in active:
         frame = frame.copy(deep=False)
         frame.columns = [str(column) for column in frame.columns]
+        origin = f"{source.stem} - {sheet_name}"
+        lines = [
+            f"{number:0{width}d}"
+            for number in range(offset + 1, offset + len(frame) + 1)
+        ]
         data: dict[str, object] = {
-            "ORIGEM": [
-                f"{source.name} - {sheet_name} - {row}"
-                for row in range(1, len(frame) + 1)
-            ]
+            "ORIGEM": [origin] * len(frame),
+            "LINHA_ORIGEM": lines,
         }
         for header, group in zip(headers, selected, strict=True):
             column = _column_for(group, source, sheet_name)
@@ -143,6 +150,7 @@ def merge_sheets(
                 frame[column].tolist() if column is not None else [pd.NA] * len(frame)
             )
         frames.append(pd.DataFrame(data))
+        offset += len(frame)
 
     return pd.concat(frames, ignore_index=True, sort=False)
 
@@ -193,15 +201,16 @@ def _validate(groups: Iterable[ColumnGroup]) -> None:
 
 
 def _unique_headers(names: Iterable[str]) -> list[str]:
-    """Desempata cabeçalhos repetidos com ``_2`` e protege o ``ORIGEM``.
+    """Desempata cabeçalhos repetidos com ``_2`` e protege os rótulos gerados.
 
-    Se o usuário já tem uma coluna ``ORIGEM``, ela vira ``ORIGEM_original``
-    para não disputar o rótulo com a coluna gerada pela mesclagem.
+    Se o usuário já tem uma coluna ``ORIGEM`` ou ``LINHA_ORIGEM``, ela vira
+    ``<nome>_original`` para não disputar o rótulo com a coluna da mesclagem.
     """
-    used = {"ORIGEM"}
+    reserved = {"ORIGEM", "LINHA_ORIGEM"}
+    used = set(reserved)
     headers: list[str] = []
     for name in names:
-        candidate = "ORIGEM_original" if name == "ORIGEM" else name
+        candidate = f"{name}_original" if name in reserved else name
         if candidate in used:
             counter = 2
             while f"{candidate}_{counter}" in used:

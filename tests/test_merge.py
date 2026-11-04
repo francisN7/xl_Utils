@@ -34,13 +34,27 @@ def test_merge_sheets_preserves_order_and_labels_origin() -> None:
 
     merged = merge_sheets(entries)
 
-    assert list(merged.columns) == ["ORIGEM", "nome"]
+    assert list(merged.columns) == ["ORIGEM", "LINHA_ORIGEM", "nome"]
     assert merged["nome"].tolist() == ["A1", "A2", "B1", "C1"]
     assert merged["ORIGEM"].tolist() == [
-        "a.xlsx - Uma - 1",
-        "a.xlsx - Uma - 2",
-        "a.xlsx - Outra - 1",
-        "b.xlsx - Dados - 1",
+        "a - Uma",
+        "a - Uma",
+        "a - Outra",
+        "b - Dados",
+    ]
+    assert merged["LINHA_ORIGEM"].tolist() == ["1", "2", "3", "4"]
+
+
+def test_merge_sheets_pads_line_numbers_to_the_total_width() -> None:
+    entries = [
+        (Path("a.xlsx"), "Uma", _frame(nome=[f"A{i}" for i in range(1, 8)])),
+        (Path("b.xlsx"), "Dados", _frame(nome=[f"B{i}" for i in range(1, 6)])),
+    ]
+
+    merged = merge_sheets(entries)
+
+    assert merged["LINHA_ORIGEM"].tolist() == [
+        f"{number:02d}" for number in range(1, 13)
     ]
 
 
@@ -52,7 +66,7 @@ def test_merge_sheets_fills_missing_columns_and_appends_extra() -> None:
 
     merged = merge_sheets(entries)
 
-    assert list(merged.columns) == ["ORIGEM", "id", "nome", "extra"]
+    assert list(merged.columns) == ["ORIGEM", "LINHA_ORIGEM", "id", "nome", "extra"]
     assert merged.loc[0, "id"] == "1"
     assert pd.isna(merged.loc[1, "nome"])
     assert pd.isna(merged.loc[0, "extra"])
@@ -75,7 +89,7 @@ def test_merge_sheets_joins_names_with_an_explicit_group() -> None:
 
     merged = merge_sheets(entries, groups)
 
-    assert list(merged.columns) == ["ORIGEM", "documento"]
+    assert list(merged.columns) == ["ORIGEM", "LINHA_ORIGEM", "documento"]
     assert merged["documento"].tolist() == ["111", "222"]
 
 
@@ -104,7 +118,7 @@ def test_merge_sheets_can_split_equal_names_into_two_columns() -> None:
 
     merged = merge_sheets(entries, groups)
 
-    assert list(merged.columns) == ["ORIGEM", "TAREFA", "TAREFA_2"]
+    assert list(merged.columns) == ["ORIGEM", "LINHA_ORIGEM", "TAREFA", "TAREFA_2"]
     assert merged["TAREFA"].iloc[0] == "A"
     assert pd.isna(merged["TAREFA"].iloc[1])
     assert pd.isna(merged["TAREFA_2"].iloc[0])
@@ -170,7 +184,7 @@ def test_merge_sheets_matches_numeric_headers_as_text() -> None:
 
     merged = merge_sheets(entries)
 
-    assert list(merged.columns) == ["ORIGEM", "2024"]
+    assert list(merged.columns) == ["ORIGEM", "LINHA_ORIGEM", "2024"]
     assert merged["2024"].tolist() == ["A", "B"]
 
 
@@ -183,7 +197,8 @@ def test_merge_sheets_skips_empty_sheets_but_keeps_rows() -> None:
 
     merged = merge_sheets(entries)
 
-    assert merged["ORIGEM"].tolist() == ["a.xlsx - Cheia - 1"]
+    assert merged["ORIGEM"].tolist() == ["a - Cheia"]
+    assert merged["LINHA_ORIGEM"].tolist() == ["1"]
     assert merged["nome"].tolist() == ["A"]
 
 
@@ -214,8 +229,31 @@ def test_merge_sheets_protects_an_existing_origem_column() -> None:
 
     merged = merge_sheets(entries)
 
-    assert list(merged.columns) == ["ORIGEM", "ORIGEM_original", "nome"]
+    assert list(merged.columns) == [
+        "ORIGEM",
+        "LINHA_ORIGEM",
+        "ORIGEM_original",
+        "nome",
+    ]
     assert merged["ORIGEM_original"].tolist()[0] == "antiga"
+
+
+def test_merge_sheets_protects_an_existing_linha_origem_column() -> None:
+    entries = [
+        (Path("a.xlsx"), "Uma", _frame(LINHA_ORIGEM=["antiga"], nome=["A"])),
+        (Path("b.xlsx"), "Uma", _frame(nome=["B"])),
+    ]
+
+    merged = merge_sheets(entries)
+
+    assert list(merged.columns) == [
+        "ORIGEM",
+        "LINHA_ORIGEM",
+        "LINHA_ORIGEM_original",
+        "nome",
+    ]
+    assert merged["LINHA_ORIGEM_original"].tolist()[0] == "antiga"
+    assert merged["LINHA_ORIGEM"].tolist() == ["1", "2"]
 
 
 def test_inspect_columns_keeps_order_and_only_selected_sheets(
@@ -275,18 +313,19 @@ def test_run_merge_prepares_one_workbook_and_keeps_the_sources(
     assert outcome.rows == 3
     assert outcome.sheets == 2
     assert outcome.merged["ORIGEM"].tolist() == [
-        "a.xlsx - Uma - 1",
-        "a.xlsx - Uma - 2",
-        "b.xlsx - Dados - 1",
+        "a - Uma",
+        "a - Uma",
+        "b - Dados",
     ]
+    assert outcome.merged["LINHA_ORIGEM"].tolist() == ["1", "2", "3"]
 
     saved_path = save_to_output([outcome.item])[0]
     assert saved_path == tmp_path / "output" / "Merge.xlsx"
     saved = read_workbook(saved_path, dtype=str)
     assert list(saved) == ["Mesclado"]
     assert saved["Mesclado"]["ORIGEM"].tolist() == outcome.merged["ORIGEM"].tolist()
-    assert any("Arquivo: a.xlsx" in line for line in outcome.log)
-    assert any("Arquivo: b.xlsx" in line for line in outcome.log)
+    assert any("a.xlsx" in line for line in outcome.log)
+    assert any("b.xlsx" in line for line in outcome.log)
 
 
 def test_run_merge_accepts_two_sheets_of_one_file(tmp_path: Path) -> None:

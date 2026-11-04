@@ -234,11 +234,12 @@ lista de `ColumnGroup`, concatena na mesma ordem e descarta apenas abas sem
 linhas. Cada grupo vira uma coluna de saída: o primeiro `ColumnRef` define o
 cabeçalho e os demais alimentam a mesma coluna; `group_by_name` agrupa
 automaticamente colunas de mesmo nome. O núcleo valida que uma aba contribui com
-no máximo uma coluna por saída, preenche lacunas com `pd.NA`, insere `ORIGEM`
-como primeira coluna e desempata cabeçalhos repetidos com sufixo `_2`. O valor
-de `ORIGEM` é `<arquivo> - <aba> - <linha>`, onde `linha` conta só as linhas de
-dados: `1` é a primeira linha depois do cabeçalho, não a linha física da
-planilha.
+no máximo uma coluna por saída, preenche lacunas com `pd.NA`, insere `ORIGEM` e
+`LINHA_ORIGEM` como duas primeiras colunas e desempata cabeçalhos repetidos com
+sufixo `_2`. `ORIGEM` é `<stem do arquivo> - <aba>`. `LINHA_ORIGEM` numera as
+linhas de dados do resultado inteiro, com zeros à esquerda na largura do total
+(12 linhas → `01`..`12`), preservando a ordenação lexical. Uma coluna de origem
+com esses nomes vira `<nome>_original`.
 
 `controllers/merge.py` lê cada fonte pelo `prepare_workbook`, filtra as abas com
 `filter_sheets` e chama `merge_sheets`; exige ao menos duas abas com dados e

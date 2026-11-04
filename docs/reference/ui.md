@@ -100,8 +100,9 @@ ignorada na execução. Colunas com o mesmo nome já nascem juntas; para separar
 uma correspondência automática, crie uma coluna vazia e arraste um dos chips
 para ela. Cada aba pode contribuir com no máximo uma coluna por saída. O quadro
 é refeito quando os arquivos ou as abas mudam e o estado vive em
-`ToolState.options`. A saída `Merge.xlsx` mostra `ORIGEM` como primeira coluna,
-com arquivo, aba e linha.
+`ToolState.options`. A saída `Merge.xlsx` mostra `ORIGEM` (arquivo sem extensão
+e aba) e `LINHA_ORIGEM` (posição da linha no resultado, com zeros à esquerda)
+como primeiras colunas.
 
 ## Início
 

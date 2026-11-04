@@ -123,9 +123,10 @@ def test_merge_runs_with_mixed_formats(
     assert outcome.rows == 12
     assert outcome.merged["codigo"].tolist() == sample_rows["codigo"] * 4
     assert outcome.merged["ORIGEM"].tolist() == [
-        f"{path.name} - {sheet} - {row}"
-        for path, sheet in sources
-        for row in range(1, 4)
+        f"{path.stem} - {sheet}" for path, sheet in sources for _ in range(3)
+    ]
+    assert outcome.merged["LINHA_ORIGEM"].tolist() == [
+        f"{row:02d}" for row in range(1, 13)
     ]
     assert all(path.read_bytes() == data for path, data in before.items())
     saved = read_workbook(saved_path, dtype=str)["Mesclado"]
@@ -165,7 +166,12 @@ def test_merge_aligns_columns_across_formats(tmp_path: Path) -> None:
         groups,
     )
 
-    assert list(outcome.merged.columns) == ["ORIGEM", "codigo", "cnj"]
+    assert list(outcome.merged.columns) == [
+        "ORIGEM",
+        "LINHA_ORIGEM",
+        "codigo",
+        "cnj",
+    ]
     assert outcome.merged["codigo"].tolist() == ["0001", "0002"]
     assert outcome.merged["cnj"].tolist() == ["AAA", "BBB"]
     assert not outcome.merged["cnj"].isna().any()

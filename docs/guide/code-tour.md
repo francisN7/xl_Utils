@@ -105,7 +105,8 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 - `cut.py`: `split_frame`/`split_workbook` e `split_frame_by_parts`/
   `split_workbook_by_parts`, sem tocar no disco.
 - `merge.py`: `ColumnRef`/`ColumnGroup`, `move_column` e `merge_sheets`; o
-  `ORIGEM` conta linhas de dados, não linhas físicas da planilha.
+  resultado abre com `ORIGEM` (stem · aba) e `LINHA_ORIGEM` (linha de dados
+  numerada no total, com zeros à esquerda).
 
 **Observe:** nenhum módulo daqui importa Flet ou abre diálogo.
 
