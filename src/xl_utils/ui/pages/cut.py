@@ -1,5 +1,7 @@
 """Ligação da página com a ferramenta de recorte de planilhas."""
 
+import contextlib
+
 import flet as ft
 
 from xl_utils.controllers.cut import run_cut
@@ -15,29 +17,58 @@ from xl_utils.ui.pages.batch import (
 from xl_utils.ui.state import ToolState
 
 DEFAULT_ROWS = "1000"
+DEFAULT_PARTS = "2"
+MODE_ROWS = "rows"
+MODE_PARTS = "parts"
 
 
 def options(state: ToolState) -> ft.Control:
-    """Monta o campo editável de linhas por arquivo e o guarda no estado."""
-    field = ft.TextField(
-        label="Linhas por arquivo",
-        value=DEFAULT_ROWS,
+    """Monta o seletor de modo e o campo numérico correspondente."""
+    mode = ft.Dropdown(
+        label="Modo de recorte",
+        value=MODE_ROWS,
         dense=True,
         text_size=theme.FONT_SM,
         label_style=ft.TextStyle(size=theme.FONT_XS),
-    )
-    state.options["rows_per_file"] = field
-    return ft.Column(
-        controls=[
-            field,
-            ft.Text(
-                "O resto final fica no último arquivo.",
-                size=theme.FONT_XS,
-                color=theme.MUTED,
-            ),
+        options=[
+            ft.DropdownOption(key=MODE_ROWS, text="Linhas por arquivo"),
+            ft.DropdownOption(key=MODE_PARTS, text="Arquivos por aba"),
         ],
+    )
+    rows_field = _number_field("Linhas por arquivo", DEFAULT_ROWS)
+    parts_field = _number_field(
+        "Arquivos por aba",
+        DEFAULT_PARTS,
+        visible=False,
+    )
+    hint = ft.Text(
+        "O resto final fica no último arquivo.",
+        size=theme.FONT_XS,
+        color=theme.MUTED,
+    )
+    state.options["cut_mode"] = mode
+    state.options["rows_per_file"] = rows_field
+    state.options["files_per_sheet"] = parts_field
+
+    column = ft.Column(
+        controls=[mode, rows_field, parts_field, hint],
         spacing=8,
     )
+
+    def mode_changed(_event=None) -> None:
+        uses_parts = mode.value == MODE_PARTS
+        rows_field.visible = not uses_parts
+        parts_field.visible = uses_parts
+        hint.value = (
+            "Divide cada aba em N arquivos; a quantidade vale por aba."
+            if uses_parts
+            else "O resto final fica no último arquivo."
+        )
+        with contextlib.suppress(RuntimeError):
+            column.update()
+
+    mode.on_select = mode_changed
+    return column
 
 
 def run(
@@ -58,7 +89,7 @@ def run(
     if pending is None:
         return
 
-    rows_per_file = _rows_per_file(state)
+    mode, value = _split_settings(state)
     outcomes = []
     cancelled = False
     for source, selected in pending:
@@ -66,7 +97,10 @@ def run(
             cancelled = True
             break
         progress.file_started(source.name)
-        outcome = run_cut(source, rows_per_file, selected=selected)
+        if mode == MODE_PARTS:
+            outcome = run_cut(source, parts=value, selected=selected)
+        else:
+            outcome = run_cut(source, value, selected=selected)
         outcomes.append(outcome)
         progress.file_done(source.name)
         progress.log(outcome.log)
@@ -96,18 +130,50 @@ def run(
     result.set_ready(
         frames,
         title,
-        f"{state.message} · {rows_per_file} linha(s) por arquivo",
+        f"{state.message} · {_rule_text(mode, value)}",
     )
 
 
-def _rows_per_file(state: ToolState) -> int:
-    control = state.options.get("rows_per_file")
-    raw = control.value if isinstance(control, ft.TextField) else DEFAULT_ROWS
-    try:
-        value = int(raw.strip())
-    except AttributeError, ValueError:
-        raise ValueError("Informe um número inteiro de linhas por arquivo.") from None
+def _number_field(label: str, value: str, *, visible: bool = True) -> ft.TextField:
+    return ft.TextField(
+        label=label,
+        value=value,
+        dense=True,
+        text_size=theme.FONT_SM,
+        label_style=ft.TextStyle(size=theme.FONT_XS),
+        visible=visible,
+    )
 
+
+def _split_settings(state: ToolState) -> tuple[str, int]:
+    mode = _mode(state)
+    if mode == MODE_PARTS:
+        value = _int_option(state, "files_per_sheet", DEFAULT_PARTS, "arquivos por aba")
+        problem = "A quantidade de arquivos por aba deve ser maior que zero."
+    else:
+        value = _int_option(state, "rows_per_file", DEFAULT_ROWS, "linhas por arquivo")
+        problem = "O número de linhas por arquivo deve ser maior que zero."
     if value <= 0:
-        raise ValueError("O número de linhas por arquivo deve ser maior que zero.")
-    return value
+        raise ValueError(problem)
+    return mode, value
+
+
+def _mode(state: ToolState) -> str:
+    control = state.options.get("cut_mode")
+    raw = control.value if isinstance(control, ft.Dropdown) else MODE_ROWS
+    return MODE_PARTS if raw == MODE_PARTS else MODE_ROWS
+
+
+def _int_option(state: ToolState, key: str, default: str, label: str) -> int:
+    control = state.options.get(key)
+    raw = control.value if isinstance(control, ft.TextField) else default
+    try:
+        return int(raw.strip())
+    except AttributeError, ValueError:
+        raise ValueError(f"Informe um número inteiro de {label}.") from None
+
+
+def _rule_text(mode: str, value: int) -> str:
+    if mode == MODE_PARTS:
+        return f"{value} arquivo(s) por aba"
+    return f"{value} linha(s) por arquivo"

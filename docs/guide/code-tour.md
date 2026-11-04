@@ -102,7 +102,8 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 
 - `sheets.py`: `filter_sheets` e `default_selection`.
 - `cnj.py`: regex com lookarounds, normalização e `summarize_cnjs` em uma passada.
-- `cut.py`: `split_frame`/`split_workbook`, sem tocar no disco.
+- `cut.py`: `split_frame`/`split_workbook` e `split_frame_by_parts`/
+  `split_workbook_by_parts`, sem tocar no disco.
 - `merge.py`: `ColumnRef`/`ColumnGroup`, `move_column` e `merge_sheets`; o
   `ORIGEM` conta linhas de dados, não linhas físicas da planilha.
 
@@ -141,6 +142,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | mudar nome de arquivo de saída | `controllers/cut.py` ou `core/paths.py` |
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |
 | mudar a regra do merge | `core/tools/merge.py` |
+| mudar a regra do recorte | `core/tools/cut.py` + `controllers/cut.py` + `ui/pages/cut.py` |
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
 | mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |
 | mudar o log ao vivo ou o cancelamento | `shared/progress.py` + `ui/components/tool_layout.py` + páginas |

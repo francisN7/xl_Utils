@@ -85,6 +85,9 @@ decisões nos ADRs.
   e caracteres invisíveis não impedem o achado; CPF e números maiores continuam
   fora. O dígito verificador não é validado e o valor inválido não é descartado.
   Ver ADR 0012.
+- Recorte por quantidade de arquivos: a página alterna entre linhas por arquivo
+  e arquivos por aba; a quantidade vale por aba, os blocos ficam equilibrados e
+  o modo antigo continua igual.
 
 ### Changed
 

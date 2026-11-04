@@ -216,13 +216,16 @@ coluna `PROCESSOS` e registra encontrados, duplicados e únicos no log.
 
 ## Recorte
 
-`core/tools/cut.py` divide cada aba em blocos sequenciais de N linhas; o resto
-fica no último bloco e uma aba vazia ainda gera um arquivo. `controllers/cut.py`
-lê pelo `prepare_workbook`, filtra as abas escolhidas e prepara um `SaveItem`
-por bloco, com `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx`
-com várias abas processadas). O nome da aba passa por
-`core/paths.safe_file_part`, que troca caracteres inválidos de arquivo. O campo
-de linhas é editável na página e vive em `ToolState.options`.
+`core/tools/cut.py` divide cada aba de dois modos: blocos de N linhas
+(`split_frame`) ou uma quantidade de arquivos por aba (`split_frame_by_parts`).
+No modo por quantidade, os blocos são equilibrados com diferença de no máximo
+uma linha; quantidade acima do total de linhas é reduzida para não gerar arquivo
+vazio, e uma aba vazia ainda gera um arquivo. `controllers/cut.py` lê pelo
+`prepare_workbook`, filtra as abas escolhidas e prepara um `SaveItem` por bloco,
+com `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx` com várias
+abas processadas). O nome da aba passa por `core/paths.safe_file_part`, que troca
+caracteres inválidos de arquivo. O seletor de modo e os dois campos numéricos
+vivem em `ToolState.options`; só o campo do modo ativo aparece.
 
 ## Mesclagem
 

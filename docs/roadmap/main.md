@@ -22,8 +22,9 @@ comportamento atual.
   travessões e invisíveis, aceita separadores flexíveis e mantém a rejeição a
   CPF e números maiores. Extrai mesmo com dígito verificador inválido. Ver
   ADR 0012.
-- [ ] **S5d — Recorte por quantidade de arquivos.** Alternar entre linhas por
-  arquivo e quantidade de arquivos; a quantidade vale **por aba**. Custo M.
+- [x] **S5d — Recorte por quantidade de arquivos.** Alterna entre linhas por
+  arquivo e quantidade de arquivos; a quantidade vale **por aba**, com blocos
+  equilibrados e redução quando passa do total de linhas.
 
 ## Backlog
 
@@ -68,6 +69,8 @@ comportamento atual.
   termina antes da parada, e o parcial não libera salvar.
 - A S5c saneia só a cópia usada na busca; o texto da planilha continua intacto.
   Dígito verificador inválido não descarta o CNJ (ADR 0012).
+- A S5d fechou a Fase 2: o recorte tem dois modos, e a quantidade de arquivos é
+  aplicada separadamente a cada aba.
 - A S4c fechou o ciclo 0003; o resumo está em
   [`0003-qualidade.md`](0003-qualidade.md).
 - O template de spec foi versionado e o `docs:check` voltou a passar no CI.

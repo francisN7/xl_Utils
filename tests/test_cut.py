@@ -7,7 +7,17 @@ from xl_utils.controllers.cut import run_cut
 from xl_utils.core.io import read_workbook
 from xl_utils.core.paths import safe_file_part
 from xl_utils.core.save import save_to_output
-from xl_utils.core.tools.cut import split_frame, split_workbook
+from xl_utils.core.tools.cut import (
+    split_frame,
+    split_frame_by_parts,
+    split_workbook,
+    split_workbook_by_parts,
+)
+from xl_utils.shared.progress import CancelToken, NullReporter
+from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.pages.cut import options as cut_options
+from xl_utils.ui.pages.cut import run as run_cut_page
+from xl_utils.ui.state import ToolState
 
 
 def _frame(rows: int, column: str = "numero") -> pd.DataFrame:
@@ -62,6 +72,48 @@ def test_split_workbook_cuts_every_sheet() -> None:
     assert list(parts) == ["Uma", "Outra"]
     assert [len(part) for part in parts["Uma"]] == [2, 2, 1]
     assert [len(part) for part in parts["Outra"]] == [2]
+
+
+def test_split_frame_by_parts_balances_the_remainder() -> None:
+    parts = split_frame_by_parts(_frame(10), 3)
+
+    assert [len(part) for part in parts] == [4, 3, 3]
+    assert [value for part in parts for value in part["numero"]] == _frame(10)[
+        "numero"
+    ].tolist()
+
+
+def test_split_frame_by_parts_returns_exactly_the_requested_count() -> None:
+    parts = split_frame_by_parts(_frame(10), 4)
+
+    assert [len(part) for part in parts] == [3, 3, 2, 2]
+
+
+def test_split_frame_by_parts_caps_at_the_number_of_rows() -> None:
+    parts = split_frame_by_parts(_frame(3), 10)
+
+    assert [len(part) for part in parts] == [1, 1, 1]
+
+
+def test_split_frame_by_parts_of_empty_frame_returns_one_empty_part() -> None:
+    parts = split_frame_by_parts(_frame(0), 4)
+
+    assert len(parts) == 1
+    assert parts[0].empty
+
+
+@pytest.mark.parametrize("parts", [0, -1])
+def test_split_frame_by_parts_rejects_non_positive_parts(parts: int) -> None:
+    with pytest.raises(ValueError, match="maior que zero"):
+        split_frame_by_parts(_frame(3), parts)
+
+
+def test_split_workbook_by_parts_applies_the_count_per_sheet() -> None:
+    parts = split_workbook_by_parts({"Uma": _frame(5), "Outra": _frame(2)}, 2)
+
+    assert list(parts) == ["Uma", "Outra"]
+    assert [len(part) for part in parts["Uma"]] == [3, 2]
+    assert [len(part) for part in parts["Outra"]] == [1, 1]
 
 
 def test_safe_file_part_replaces_invalid_characters() -> None:
@@ -216,3 +268,105 @@ def test_run_cut_does_not_overwrite_existing_files(tmp_path: Path) -> None:
 
     assert first_paths[0] != second_paths[0]
     assert all(path.is_file() for path in first_paths + second_paths)
+
+
+def test_run_cut_by_parts_applies_the_count_per_sheet(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    with pd.ExcelWriter(source) as writer:
+        _frame(5).to_excel(writer, sheet_name="Uma", index=False)
+        _frame(2).to_excel(writer, sheet_name="Outra", index=False)
+
+    outcome = run_cut(source, parts=2)
+
+    assert outcome.files == 4
+    assert outcome.suggested_names == [
+        "entrada_Uma_Recorte_001.xlsx",
+        "entrada_Uma_Recorte_002.xlsx",
+        "entrada_Outra_Recorte_001.xlsx",
+        "entrada_Outra_Recorte_002.xlsx",
+    ]
+    lengths = []
+    for output in save_to_output(outcome.items):
+        frame = next(iter(read_workbook(output, dtype=str).values()))
+        lengths.append(len(frame))
+    assert lengths == [3, 2, 1, 1]
+    assert any("Arquivos por aba: 2" in line for line in outcome.log)
+
+
+def test_run_cut_by_parts_caps_the_count_at_the_rows(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    _frame(3).to_excel(source, index=False)
+
+    outcome = run_cut(source, parts=10)
+
+    assert outcome.files == 3
+    assert outcome.suggested_names == [
+        "entrada_Recorte_001.xlsx",
+        "entrada_Recorte_002.xlsx",
+        "entrada_Recorte_003.xlsx",
+    ]
+
+
+def test_run_cut_rejects_both_modes(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    _frame(3).to_excel(source, index=False)
+
+    with pytest.raises(ValueError, match="só linhas por arquivo ou quantidade"):
+        run_cut(source, 2, parts=2)
+
+
+def test_run_cut_rejects_no_mode(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    _frame(3).to_excel(source, index=False)
+
+    with pytest.raises(ValueError, match="Informe linhas por arquivo"):
+        run_cut(source)
+
+
+def test_page_options_switch_between_the_two_modes() -> None:
+    state = ToolState()
+
+    cut_options(state)
+
+    mode = state.options["cut_mode"]
+    rows = state.options["rows_per_file"]
+    parts = state.options["files_per_sheet"]
+    assert mode.value == "rows"
+    assert rows.visible
+    assert not parts.visible
+
+    mode.value = "parts"
+    mode.on_select(None)
+
+    assert parts.visible
+    assert not rows.visible
+
+
+def test_page_runs_the_cut_by_parts(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    _frame(5).to_excel(source, index=False)
+    state = ToolState(files=[source])
+    panel = ResultPanel()
+
+    cut_options(state)
+    state.options["cut_mode"].value = "parts"
+    state.options["files_per_sheet"].value = "3"
+    run_cut_page(state, panel, NullReporter(), CancelToken())
+
+    assert panel.kind == "ready"
+    assert len(state.save_items) == 3
+    assert state.message == "1 arquivo(s), 3 arquivo(s) gerado(s), 5 linha(s)"
+
+
+def test_page_rejects_zero_parts(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    _frame(5).to_excel(source, index=False)
+    state = ToolState(files=[source])
+    panel = ResultPanel()
+
+    cut_options(state)
+    state.options["cut_mode"].value = "parts"
+    state.options["files_per_sheet"].value = "0"
+
+    with pytest.raises(ValueError, match="quantidade de arquivos por aba"):
+        run_cut_page(state, panel, NullReporter(), CancelToken())

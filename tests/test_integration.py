@@ -77,6 +77,29 @@ def test_cut_runs_on_every_format(
     assert values == sample_rows["codigo"]
 
 
+@pytest.mark.parametrize("fixture_name", _FORMATS)
+def test_cut_by_parts_runs_on_every_format(
+    fixture_name: str,
+    request: pytest.FixtureRequest,
+    sample_rows: dict[str, list[str]],
+) -> None:
+    source = request.getfixturevalue(fixture_name)
+    before = source.read_bytes()
+
+    outcome = run_cut(source, parts=2)
+
+    assert source.read_bytes() == before
+    assert outcome.files == 2
+    values: list[str] = []
+    lengths: list[int] = []
+    for output in save_to_output(outcome.items):
+        frame = next(iter(read_workbook(output, dtype=str).values()))
+        lengths.append(len(frame))
+        values.extend(frame["codigo"].tolist())
+    assert lengths == [2, 1]
+    assert values == sample_rows["codigo"]
+
+
 def test_merge_runs_with_mixed_formats(
     xlsx_file: Path,
     csv_file: Path,
