@@ -3,10 +3,15 @@
 import flet as ft
 
 from xl_utils.controllers.cut import run_cut
-from xl_utils.shared.progress import NullReporter, ProgressReporter
+from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
-from xl_utils.ui.pages.batch import append_outcomes, pending_files, prefixed_frames
+from xl_utils.ui.pages.batch import (
+    append_outcomes,
+    pending_files,
+    prefixed_frames,
+    report_cancelled,
+)
 from xl_utils.ui.state import ToolState
 
 DEFAULT_ROWS = "1000"
@@ -39,6 +44,7 @@ def run(
     state: ToolState,
     result: ResultPanel,
     progress: ProgressReporter | NullReporter,
+    token: CancelToken,
 ) -> None:
     """Recorta cada arquivo selecionado e mostra os arquivos gerados."""
     if not state.files:
@@ -54,13 +60,23 @@ def run(
 
     rows_per_file = _rows_per_file(state)
     outcomes = []
+    cancelled = False
     for source, selected in pending:
+        if token.cancelled:
+            cancelled = True
+            break
         progress.file_started(source.name)
-        outcomes.append(run_cut(source, rows_per_file, selected=selected))
+        outcome = run_cut(source, rows_per_file, selected=selected)
+        outcomes.append(outcome)
         progress.file_done(source.name)
+        progress.log(outcome.log)
     append_outcomes(state, outcomes)
 
     items = [item for outcome in outcomes for item in outcome.items]
+    frames = prefixed_frames(outcomes, lambda outcome: outcome.preview)
+    if cancelled:
+        report_cancelled(state, result, frames, len(outcomes), len(pending))
+        return
     state.save_items = items
     total_outputs = len(items)
     total_rows = sum(outcome.rows for outcome in outcomes)
@@ -71,7 +87,6 @@ def run(
         )
         return
 
-    frames = prefixed_frames(outcomes, lambda outcome: outcome.preview)
     state.result = frames
     state.message = (
         f"{len(outcomes)} arquivo(s), {total_outputs} arquivo(s) gerado(s), "

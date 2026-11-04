@@ -52,13 +52,16 @@ def test_layout_with_options_keeps_the_options_card() -> None:
 
 def test_run_handler_leaves_the_ui_thread(xlsx_file: Path, monkeypatch) -> None:
     handler_threads: list[threading.Thread] = []
+    tokens = []
 
     def handler(
         state: ToolState,
         result: ResultPanel,
         progress,
+        token,
     ) -> None:
         handler_threads.append(threading.current_thread())
+        tokens.append(token)
         progress.file_started(state.files[0].name)
         progress.file_done(state.files[0].name)
         result.set_ready({}, "Concluído")
@@ -84,8 +87,36 @@ def test_run_handler_leaves_the_ui_thread(xlsx_file: Path, monkeypatch) -> None:
 
     assert handler_threads
     assert handler_threads[0] is not threading.main_thread()
+    assert tokens == [layout._token]
     assert all(thread is threading.main_thread() for thread in update_threads)
     assert layout.result.status == "Concluído"
     assert not layout.state.running
     assert not layout._running
     assert "1 de 1 arquivo(s) concluído(s)" in " ".join(_texts(layout.result.control))
+
+
+def test_execute_button_becomes_cancel_while_running(xlsx_file: Path) -> None:
+    layout = ToolLayout(
+        "Cancelamento",
+        "Teste",
+        run_handler=lambda *_args: None,
+    )
+    layout.state.select_files([xlsx_file])
+
+    layout._begin([])
+
+    assert layout._cancel_button.visible
+    assert not layout._run_button.visible
+    assert not layout._cancel_button.disabled
+
+    layout._cancel_clicked()
+
+    assert layout._token is not None
+    assert layout._token.cancelled
+    assert layout._cancel_button.disabled
+
+    layout._finish()
+
+    assert layout._run_button.visible
+    assert not layout._cancel_button.visible
+    assert not layout._run_button.disabled

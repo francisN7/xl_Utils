@@ -191,7 +191,7 @@ class ResultPanel:
 
     @property
     def kind(self) -> str:
-        """Devolve o estado: idle, info, running, ready, success ou error."""
+        """Devolve o estado: idle, info, running, ready, success, cancelled ou error."""
         return self._kind
 
     @property
@@ -219,6 +219,9 @@ class ResultPanel:
 
     def apply_progress(self, event: ProgressEvent) -> None:
         """Atualiza a barra e o contador; o resultado final esconde os dois."""
+        if event.kind == "log":
+            self.append_log(event.text)
+            return
         visible = self._kind == "running"
         self._progress_bar.value = event.value
         self._progress_bar.visible = visible
@@ -264,6 +267,11 @@ class ResultPanel:
         self._status.value = message
         self._detail.value = ""
         self._save_row.visible = False
+        self._refresh()
+
+    def set_cancelling(self) -> None:
+        """Avisa que a parada só acontece quando o item atual terminar."""
+        self._detail.value = "Cancelando após o item atual..."
         self._refresh()
 
     def set_ready(
@@ -330,6 +338,27 @@ class ResultPanel:
         self._open_button.visible = False
         self._save_row.visible = True
         self._hide_progress()
+        self._refresh()
+
+    def set_cancelled(
+        self,
+        frames: dict[str, pd.DataFrame] | None = None,
+        message: str = "Execução cancelada",
+        detail: str = "",
+    ) -> None:
+        """Mostra o que já foi calculado, sem liberar a gravação incompleta."""
+        self._output = None
+        self._kind = "cancelled"
+        self._icon.name = ft.Icons.CANCEL
+        self._icon.color = theme.YELLOW
+        self._status.value = message
+        self._detail.value = detail
+        self._path.value = ""
+        self._path.visible = False
+        self._open_button.visible = False
+        self._save_row.visible = False
+        self._hide_progress()
+        self.preview.set_frames(frames)
         self._refresh()
 
     def set_error(

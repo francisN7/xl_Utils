@@ -12,10 +12,10 @@ from xl_utils.core.tools.merge import (
     group_by_name,
     move_column,
 )
-from xl_utils.shared.progress import NullReporter, ProgressReporter
+from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
-from xl_utils.ui.pages.batch import append_outcomes, pending_files
+from xl_utils.ui.pages.batch import append_outcomes, pending_files, report_cancelled
 from xl_utils.ui.state import ToolState
 
 _DRAG_GROUP = "merge-columns"
@@ -335,6 +335,7 @@ def run(
     state: ToolState,
     result: ResultPanel,
     progress: ProgressReporter | NullReporter,
+    token: CancelToken,
 ) -> None:
     """Mescla cada arquivo e aba selecionados em uma única pasta de trabalho."""
     if not state.files:
@@ -348,10 +349,15 @@ def run(
     if pending is None:
         return
 
+    if token.cancelled:
+        report_cancelled(state, result, {}, 0, len(pending))
+        return
+
     progress.start(1)
     progress.file_started(f"mesclagem de {len(pending)} arquivo(s)")
     outcome = run_merge(pending, _groups(state) or None)
     progress.file_done()
+    progress.log(outcome.log)
     append_outcomes(state, [outcome])
     frames = {"Mesclado": outcome.merged}
     state.result = frames

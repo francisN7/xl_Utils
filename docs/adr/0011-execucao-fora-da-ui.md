@@ -54,3 +54,21 @@ pesado deve sair dele.
   mudança nesta fase.
 - **Cancelar no meio do arquivo:** não dá para interromper pandas com segurança;
   o cancelamento cooperativo entre arquivos fica na S5b.
+
+## Adendo (S5b) — log ao vivo e cancelamento cooperativo
+
+- A mesma fila da S5a passou a transportar `ProgressEvent(kind="log", line=...)`.
+  A página emite o `RunLog` de cada resultado assim que o arquivo termina, e o
+  painel anexa as linhas no loop; o texto final continua sendo o log canônico do
+  `ToolState`, sem duplicar a linha de encerramento. Nenhuma linha carrega
+  conteúdo de célula.
+- `CancelToken` em `shared/progress.py` expõe `cancel()` e `cancelled`. O layout
+  cria um token por execução e o entrega ao handler como quarto parâmetro; o
+  botão “Executar” dá lugar a “Cancelar” enquanto a execução dura.
+- O cancelamento é cooperativo: as páginas checam o token **entre arquivos**.
+  A chamada do controller em curso termina, o que já foi calculado fica em
+  memória e o painel mostra “Execução cancelada” com a prévia parcial, sem
+  liberar as ações de salvar e sem gravar nada.
+- Merge continua como etapa única: não há ponto de parada dentro do controller,
+  então o pedido só teria efeito antes de começar.
+

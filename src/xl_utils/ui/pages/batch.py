@@ -52,6 +52,27 @@ def append_outcomes(state: ToolState, outcomes: Sequence[Outcome]) -> None:
     state.log = log
 
 
+def report_cancelled(
+    state: ToolState,
+    result: ResultPanel,
+    frames: dict[str, pd.DataFrame],
+    processed: int,
+    total: int,
+) -> None:
+    """Mantém o que já foi calculado e fecha sem liberar a gravação."""
+    log = state.log or RunLog()
+    log.warning(f"Cancelado: {processed} de {total} arquivo(s) processado(s)")
+    state.log = log
+    state.result = frames or None
+    state.save_items.clear()
+    state.message = f"Cancelado após {processed} de {total} arquivo(s)"
+    result.set_cancelled(
+        frames,
+        "Execução cancelada",
+        f"{processed} de {total} arquivo(s) processado(s) · nada foi gravado",
+    )
+
+
 def prefixed_frames(
     outcomes: Sequence[Outcome],
     frames_of: Callable[[Outcome], dict[str, pd.DataFrame]],

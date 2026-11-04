@@ -50,9 +50,10 @@ entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 `_run` é o coração: valida o `ToolState`, chama `_check_formats`, bloqueia
 formato não identificado e entrega o handler a `_execute_async`. Com página, o
 trabalho vai para `asyncio.to_thread`; sem página, roda no próprio loop. Os
-marcos de `shared/progress.py` voltam por uma fila e atualizam a barra no loop.
-A gravação fica em `_save_clicked`/`_pick_and_save`, que só gravam depois da
-escolha.
+marcos de `shared/progress.py` e as linhas de log voltam por uma fila e
+atualizam barra, contador e log no loop. O botão vira “Cancelar” durante a
+execução e aciona o `CancelToken` entregue ao handler. A gravação fica em
+`_save_clicked`/`_pick_and_save`, que só gravam depois da escolha.
 
 **Observe:** `_check_formats` é o gate de formato; ele não renomeia o arquivo.
 `_fail` separa `WorkbookReadError`, `ValueError` e falha inesperada. Nenhum
@@ -62,7 +63,9 @@ o dispatcher do loop.
 ### 3. Uma página — `ui/pages/all_str.py`
 
 A página só coleta a entrada, chama o controller e mostra o resultado. Em
-ferramentas de lote, `ui/pages/batch.py` junta logs e prévias de vários arquivos.
+ferramentas de lote, `ui/pages/batch.py` junta logs e prévias de vários arquivos;
+cada página checa o `CancelToken` entre arquivos e emite o log do resultado
+assim que ele termina.
 
 **Observe:** nenhuma regra de planilha mora aqui.
 
@@ -125,7 +128,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_merge.py` | ordem, `ORIGEM`, lacunas e colunas repetidas |
 | `test_save.py` | nada é gravado antes da escolha e o lote usa pasta |
 | `test_format_check.py` | conteúdo vence o nome e `.xlsm` não é divergência |
-| `test_progress.py` | a contagem por arquivo para no total e isola callback |
+| `test_progress.py` | contagem, log ao vivo, token e cancelamento entre arquivos |
 | `test_integration.py` | as quatro ferramentas rodam nos quatro formatos |
 
 ## Onde mexer para…
@@ -140,6 +143,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | mudar a regra do merge | `core/tools/merge.py` |
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
 | mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |
+| mudar o log ao vivo ou o cancelamento | `shared/progress.py` + `ui/components/tool_layout.py` + páginas |
 
 ## Invariantes
 

@@ -15,6 +15,7 @@ from xl_utils.core.save import SaveError, SaveItem, save_chosen, save_to_output
 from xl_utils.core.tools.all_str import WorkbookReadError
 from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.shared.progress import (
+    CancelToken,
     NullReporter,
     ProgressEvent,
     ProgressReporter,
@@ -26,7 +27,7 @@ from xl_utils.ui.components.sheet_selector import SheetSelector
 from xl_utils.ui.state import ToolState
 
 RunHandler = Callable[
-    [ToolState, ResultPanel, ProgressReporter | NullReporter],
+    [ToolState, ResultPanel, ProgressReporter | NullReporter, CancelToken],
     None,
 ]
 
@@ -71,6 +72,7 @@ class ToolLayout:
         self._formats: dict[Path, FormatCheck] = {}
         self._sheet_loading = False
         self._running = False
+        self._token: CancelToken | None = None
         self._save_picker = ft.FilePicker()
         self._save_picker_attached = False
         self.sheet_selector = SheetSelector(
@@ -91,6 +93,12 @@ class ToolLayout:
             icon=ft.Icons.PLAY_ARROW,
             disabled=True,
             on_click=self._run,
+        )
+        self._cancel_button = ft.OutlinedButton(
+            "Cancelar",
+            icon=ft.Icons.CANCEL,
+            visible=False,
+            on_click=self._cancel_clicked,
         )
 
         header = ft.Container(
@@ -191,7 +199,7 @@ class ToolLayout:
                 controls=[
                     ft.Divider(height=1, color=theme.BORDER),
                     ft.Row(
-                        controls=[self._summary, self._run_button],
+                        controls=[self._summary, self._cancel_button, self._run_button],
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                         vertical_alignment=ft.CrossAxisAlignment.CENTER,
                     ),
@@ -329,6 +337,7 @@ class ToolLayout:
     def _begin(self, checks: list[FormatCheck]) -> None:
         """Prepara o estado e o painel antes de entregar o trabalho à thread."""
         self._running = True
+        self._token = CancelToken()
         self.state.running = True
         self.state.message = ""
         self.state.error = None
@@ -345,9 +354,20 @@ class ToolLayout:
                 log.info(f"{check.path.name}: lido como {check.effective}")
         log.info(f"Lendo {len(self.state.files)} arquivo(s)...")
         self.state.log = log
+        self.result.set_log(log)
         self.result.set_running(f"Executando {len(self.state.files)} arquivo(s)...")
         self.result.start_progress(len(self.state.files))
         self._set_busy(True)
+
+    def _cancel_clicked(self, _event=None) -> None:
+        """Pede a parada cooperativa; o item em curso termina antes."""
+        if not self._running or self._token is None:
+            return
+        self._token.cancel()
+        self._cancel_button.disabled = True
+        self._summary.value = "Cancelando após o item atual..."
+        self.result.set_cancelling()
+        self._refresh()
 
     def _execute_sync(self) -> None:
         """Executa no próprio loop quando não há página (testes headless)."""
@@ -402,9 +422,10 @@ class ToolLayout:
         """Chama o handler e registra o resultado da execução."""
         progress.start(len(self.state.files))
         log = self.state.log or RunLog()
+        token = self._token or CancelToken()
         failure: BaseException | None = None
         try:
-            self._run_handler(self.state, self.result, progress)
+            self._run_handler(self.state, self.result, progress, token)
         except WorkbookReadError as error:
             failure = error
             self._fail(error, "Não foi possível ler a planilha")
@@ -429,10 +450,20 @@ class ToolLayout:
         """Devolve o controle à janela depois da execução."""
         self._running = False
         self.state.running = False
+        if self.state.files:
+            self._summary.value = (
+                f"{len(self.state.files)} arquivo(s), "
+                f"{self.state.selected_count} aba(s)."
+            )
+        else:
+            self._summary.value = "Nenhum arquivo selecionado."
         self._set_busy(False)
 
     def _set_busy(self, busy: bool) -> None:
+        self._run_button.visible = not busy
         self._run_button.disabled = busy or self._sheet_loading or not self.state.files
+        self._cancel_button.visible = busy
+        self._cancel_button.disabled = not busy
         self.file_input.set_busy(busy)
         self.sheet_selector.set_busy(busy)
         self._refresh()

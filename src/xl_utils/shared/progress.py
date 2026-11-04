@@ -1,11 +1,11 @@
-"""Progresso por arquivo durante a execução, sem conteúdo de célula."""
+"""Progresso, log ao vivo e cancelamento cooperativo, sem conteúdo de célula."""
 
 import contextlib
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Literal
 
-ProgressKind = Literal["start", "file_started", "file_done", "finish"]
+ProgressKind = Literal["start", "file_started", "file_done", "finish", "log"]
 
 ProgressHandler = Callable[["ProgressEvent"], None]
 ErrorHandler = Callable[[str], None]
@@ -20,10 +20,13 @@ class ProgressEvent:
     completed: int
     index: int = 0
     name: str = ""
+    line: str = ""
 
     @property
     def text(self) -> str:
         """Devolve o texto exibido no painel, sem dados de célula."""
+        if self.kind == "log":
+            return self.line
         if self.kind == "start":
             return f"Arquivo 0 de {self.total}"
         if self.kind == "file_started":
@@ -40,6 +43,24 @@ class ProgressEvent:
         return min(max(self.completed / self.total, 0.0), 1.0)
 
 
+class CancelToken:
+    """Pedido cooperativo de parada: só vale no próximo ponto de checagem."""
+
+    __slots__ = ("_cancelled",)
+
+    def __init__(self) -> None:
+        self._cancelled = False
+
+    @property
+    def cancelled(self) -> bool:
+        """Diz se o usuário já pediu para cancelar."""
+        return self._cancelled
+
+    def cancel(self) -> None:
+        """Registra o pedido; a execução para ao terminar o item atual."""
+        self._cancelled = True
+
+
 class NullReporter:
     """Ignora os marcos de progresso (testes e execução síncrona)."""
 
@@ -51,6 +72,9 @@ class NullReporter:
 
     def file_done(self, name: str = "") -> None:
         """Marca o fim do processamento de um arquivo."""
+
+    def log(self, lines: Iterable[str] | str) -> None:
+        """Ignora linhas de log no caminho síncrono."""
 
     def finish(self) -> None:
         """Marca o fim da execução."""
@@ -97,6 +121,13 @@ class ProgressReporter(NullReporter):
             self._completed = min(self._completed + 1, self._total)
         self._send("file_done", name=name)
 
+    def log(self, lines: Iterable[str] | str) -> None:
+        """Emite linhas de log já formatadas, sem dados de célula."""
+        if isinstance(lines, str):
+            lines = [lines]
+        for line in lines:
+            self._send("log", line=str(line))
+
     def finish(self) -> None:
         """Emite o encerramento com a contagem real."""
         self._send("finish")
@@ -107,6 +138,7 @@ class ProgressReporter(NullReporter):
         *,
         index: int = 0,
         name: str = "",
+        line: str = "",
     ) -> None:
         if self._emit is None:
             return
@@ -116,6 +148,7 @@ class ProgressReporter(NullReporter):
             completed=self._completed,
             index=index,
             name=name,
+            line=line,
         )
         try:
             self._emit(event)

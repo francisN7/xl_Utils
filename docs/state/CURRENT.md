@@ -4,42 +4,45 @@
 
 ## Sessão
 
-- **Última concluída:** S5a — execução fora da UI thread e barra de progresso
-- **Próxima:** S5b — log ao vivo e cancelamento
-  (`docs/sessions/S5b-log-ao-vivo-e-cancelamento.md`) — spec pronta
-- **Ciclo:** 0004 — Execução e robustez, Fase 1
-- **Decisões:** ADR 0011 (thread → Flet); merge reporta uma etapa
+- **Última concluída:** S5b — log ao vivo e cancelamento cooperativo
+- **Próxima:** S5c — extração de CNJ em texto sujo
+  (`docs/sessions/S5c-cnj-texto-sujo.md`) — spec pronta
+- **Ciclo:** 0004 — Execução e robustez, Fase 2
+- **Decisões:** ADR 0011 com adendo de S5b (log na fila, token cooperativo)
 
 ## Pronto
 
-- S5a: handler roda em `asyncio.to_thread`; eventos de
-  `shared/progress.py` chegam por fila ao loop e atualizam barra e contador.
-- Entrada, chips de abas e “Executar” ficam bloqueados durante a execução.
-- `ResultPanel`/`PreviewTable` só chamam `update` no loop; caminho síncrono
-  preservado para testes headless.
-- `tests/test_progress.py` cobre contagem e falha de callback; teste de layout
-  confirma que o handler sai da thread da UI.
-- S4c: tradução de `ui/`/`shared/` e revisão do diagnóstico.
-- S4b: CSV/HTML fiéis, `.xlsm` equivalente a `.xlsx` e code tour publicado.
+- S5b: a fila transporta linhas de log; cada arquivo aparece no painel assim que
+  termina. “Executar” vira “Cancelar” durante a execução.
+- Cancelamento entre arquivos: a chamada em curso termina, a prévia parcial fica
+  em memória e “Execução cancelada” não libera salvar nem grava nada.
+- `CancelToken` em `shared/progress.py` entregue ao handler como 4º parâmetro;
+  merge só cancela antes de começar (etapa única).
+- S5a: handler em `asyncio.to_thread`, barra e contador via fila, entrada
+  bloqueada; UI atualizada só no loop.
+- S4c/S4b: UI e `shared/` em PT-BR, leitura fiel de CSV/HTML, code tour.
 
 ## Próximo passo
 
-Executar a S5b: exibir eventos do log conforme são produzidos e permitir
-cancelar entre arquivos/abas/células, sem gravar nada.
+Executar a S5c: extrair CNJ de texto sujo com normalização de espaços, quebras,
+travessões e invisíveis, aceitando separadores flexíveis e mantendo a rejeição a
+CPF e números maiores.
 
 ## Arquivos-chave
 
-- `shared/progress.py`, `ui/components/tool_layout.py`
-- `ui/components/result_panel.py`, `ui/components/preview_table.py`
-- `ui/pages/*.py`, `docs/adr/0011-execucao-fora-da-ui.md`
+- `shared/progress.py` (`CancelToken`, evento `log`)
+- `ui/components/tool_layout.py` (fila, botão Cancelar, token)
+- `ui/components/result_panel.py` (`apply_progress`, `set_cancelled`)
+- `ui/pages/batch.py` (`report_cancelled`), `ui/pages/*.py`
 - `tests/test_progress.py`, `tests/test_layout.py`, `tests/test_integration.py`
+- `docs/adr/0011-execucao-fora-da-ui.md`
 
 ## Armadilhas
 
 - Flet não é thread-safe: UI só no loop da página, via dispatcher e fila.
 - `page.run_task` pode não existir em teste headless; manter o caminho síncrono.
-- Merge é uma única chamada de controller; a contagem por origem exigiria mudar
-  a regra.
+- Cancelar não interrompe pandas: só vale entre arquivos, nunca no meio da chamada.
+- Merge é uma única chamada de controller; não há ponto de parada por origem.
 - `keep_default_na=False`: célula vazia vira `""`, não `NaN`; merge usa `pd.NA`.
 - `.xls` não tem leitor alternativo; falha do calamine é final.
 - Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir”.

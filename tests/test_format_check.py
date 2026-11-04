@@ -150,7 +150,7 @@ def test_unidentified_format_blocks_the_run(tmp_path: Path) -> None:
     layout = ToolLayout(
         "Teste",
         "Teste",
-        run_handler=lambda state, result, _progress: calls.append(state.files),
+        run_handler=lambda state, result, _progress, _token: calls.append(state.files),
     )
 
     layout.file_input.set_files([source])
@@ -182,7 +182,7 @@ def test_divergence_is_logged_and_does_not_block(
     layout = ToolLayout(
         "Teste",
         "Teste",
-        run_handler=lambda state, result, _progress: calls.append(state.files),
+        run_handler=lambda state, result, _progress, _token: calls.append(state.files),
     )
 
     layout.file_input.set_files([renamed])

@@ -77,6 +77,10 @@ decisões nos ADRs.
 - Execução em segundo plano nas quatro ferramentas: o handler roda fora do loop
   da página, com barra de progresso e “Arquivo X de Y”, entrada e chips
   bloqueados e atualizações de UI sempre no loop. Ver ADR 0011.
+- Log ao vivo e cancelamento cooperativo: as linhas de cada arquivo chegam ao
+  painel durante a execução, “Executar” vira “Cancelar” e a parada acontece
+  entre arquivos, mantendo a prévia parcial sem liberar a gravação. Ver adendo
+  do ADR 0011.
 
 ### Changed
 

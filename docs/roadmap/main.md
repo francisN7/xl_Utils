@@ -9,9 +9,9 @@ Objetivo: manter a janela responsiva e mostrar o andamento em execuções longas
 
 - [x] **S5a — Execução fora da UI thread e barra de progresso.** Handler em
   segundo plano, barra e contador por arquivo, entrada bloqueada. Ver ADR 0011.
-- [ ] **S5b — Log ao vivo e cancelamento.** Exibir os eventos conforme são
-  produzidos e permitir cancelar entre arquivos/abas/células, sem gravar nada.
-  Depende de S5a. Custo M.
+- [x] **S5b — Log ao vivo e cancelamento.** Log por arquivo durante a execução,
+  botão “Cancelar” e parada cooperativa entre arquivos, sem gravar o parcial.
+  Ver adendo do ADR 0011.
 
 ## Fase 2 — Robustez das ferramentas
 
@@ -64,6 +64,8 @@ comportamento atual.
 
 - A S5a deixou a fila de progresso pronta; a S5b reusa o mesmo caminho para log
   ao vivo e cancelamento entre arquivos.
+- A S5b manteve o cancelamento cooperativo: a chamada do controller em curso
+  termina antes da parada, e o parcial não libera salvar.
 - A S4c fechou o ciclo 0003; o resumo está em
   [`0003-qualidade.md`](0003-qualidade.md).
 - O template de spec foi versionado e o `docs:check` voltou a passar no CI.
