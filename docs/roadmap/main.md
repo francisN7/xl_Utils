@@ -44,6 +44,20 @@ duplicação e com teste.
   prévia e salvar só ao clicar em “Salvar”, escolhendo arquivo (saída única) ou
   pasta (lote), com “Salvar em output/” como atalho. Custo G.
 
+## Fase 3 — Publicação
+
+Objetivo: promover a versão com UI a `main` e manter a `main` antiga como
+branch `legacy`, apenas para histórico.
+
+- [ ] **S3a — Promover a UI a `main`.** A `main` atual é ancestral de
+  `feat/ui`; avançar `main` até `feat/ui`, criar `legacy` no commit antigo,
+  trocar o README da `legacy` por um aviso de descontinuação e publicar as duas.
+  Remover `feat/ui` depois. Custo S.
+- [ ] **S3b — Sinalizar a `legacy` no GitHub.** Não há selo nativo de “legacy”
+  no seletor de branches; usar o nome `legacy`, uma tag `legacy-v1` e
+  ruleset/proteção para travar a branch, documentando o aviso no README.
+  Custo S.
+
 ## Backlog
 
 | Item | Valor | Custo | Pré-requisito |
