@@ -4,10 +4,10 @@
 
 ## Sessão
 
-- **Última concluída:** S2a — integração do fluxo
+- **Última concluída:** S2a — integração, calamine e merge por arraste
 - **Próxima:** S2b — logging e erros (`docs/sessions/S2b-logging-e-erros.md`)
 - **Ciclo:** 0002 — Fase 2 — Consolidação
-- **Retorno:** `tests/test_formats.py`, `tests/test_integration.py`, `core/io.py`
+- **Retorno:** `result_panel.py`, `tool_layout.py` e `shared/system.py`
 - **Decisões abertas:** nenhuma
 
 ## Pronto
