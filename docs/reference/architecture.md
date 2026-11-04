@@ -63,13 +63,21 @@ Falha de leitura sobe como `ValueError` com o nome do arquivo.
 `core/tools/sheets.filter_sheets(sheets, selected)` mantém apenas as abas
 escolhidas, na ordem original e com os mesmos nomes. `None` significa todas;
 conjunto vazio ou nome inexistente levanta `ValueError`.
-`default_selection` define o padrão: um arquivo marca todas as abas; vários
-arquivos marcam a primeira de cada um.
+`default_selection` define o padrão conforme a ferramenta: no lote (texto, CNJ
+e recorte) todas as abas de todos os arquivos; no merge, a primeira de cada um.
+Ver ADR 0006.
 
 A seleção vive em `ToolState.sheet_names` e `ToolState.selected_sheets`, por
 arquivo; trocar a lista de arquivos recarrega os nomes e reaplica o padrão. Os
 controllers recebem `selected` e filtram logo depois do `prepare_workbook`,
 antes da regra da ferramenta.
+
+## Lote de arquivos
+
+Texto, CNJ e recorte aceitam vários arquivos. A página monta a lista de
+`(origem, abas)` com `ui/pages/batch.py`, chama o controller uma vez por arquivo
+e junta logs e prévias; cada saída fica no `output/` da própria origem. O merge
+continua sendo o único que produz uma saída única. Ver ADR 0006.
 
 ## Detecção de formato
 

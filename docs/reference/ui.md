@@ -55,17 +55,20 @@ O conteúdo abre em uma das duas formas:
 
 O Flet 1.0 não expõe arrastar e soltar arquivos do sistema operacional. O
 dropzone é uma área clicável que abre o `FilePicker` nativo; o texto "clique
-para selecionar" substitui a promessa de drop.
+para selecionar" substitui a promessa de drop. Todas as ferramentas aceitam
+vários arquivos: depois do primeiro, o dropzone vira “Adicionar outro arquivo” e
+a lista permite remover cada um.
 
 ### Seleção de abas
 
 Abaixo da lista de arquivos, o card “1. Entrada” mostra chips com o nome de cada
-aba. O padrão marca todas as abas de um único arquivo e a primeira de cada
-quando há vários; “Todas” e “Limpar” mudam tudo de uma vez e o contador mostra
-“N de M”. Os chips quebram linha (`Row(wrap=True)`) e a seleção é guardada por
-arquivo no `ToolState`. Se a listagem falhar, o seletor mostra o erro do arquivo
-e a execução reporta a falha de leitura; sem nenhuma aba marcada, a ferramenta
-não executa e pede uma seleção.
+aba. No lote, o padrão marca todas as abas de todos os arquivos; no merge, a
+primeira de cada um. “Todas” e “Limpar” mudam tudo de uma vez e o contador
+mostra “N de M”. Os chips quebram linha (`Row(wrap=True)`) e a seleção é
+guardada por arquivo no `ToolState`. Se a listagem falhar, o seletor mostra o
+erro do arquivo e a execução reporta a falha de leitura; sem nenhuma aba
+marcada, a ferramenta não executa e pede uma seleção. Enquanto as abas são
+lidas, aparece um spinner e o botão Executar fica desabilitado.
 
 ## Início
 

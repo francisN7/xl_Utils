@@ -6,6 +6,7 @@ import pandas as pd
 from xl_utils.controllers.cnj import run_cnj
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.pages.batch import join_logs, pending_files, prefixed_frames
 from xl_utils.ui.state import ToolState
 
 
@@ -21,7 +22,7 @@ def options(_state: ToolState) -> ft.Control:
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Extract CNJs from the selected file and show the outcome."""
+    """Extract CNJs from every selected file and show the batch outcome."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",
@@ -29,39 +30,43 @@ def run(state: ToolState, result: ResultPanel) -> None:
         )
         return
 
-    source = state.files[0]
-    selected = state.selected_sheets.get(source)
-    if selected is not None and not selected:
-        result.set_info(
-            "Selecione ao menos uma aba",
-            "Marque uma aba em “1. Entrada” antes de executar.",
-        )
+    pending = pending_files(state, result)
+    if pending is None:
         return
 
-    result.set_log([f"Lendo {source.name}..."])
-
-    outcome = run_cnj(source, selected=selected)
-    frames = {"PROCESSOS": pd.DataFrame({"PROCESSOS": outcome.cnjs})}
+    result.set_log([f"Lendo {len(pending)} arquivo(s)..."])
+    outcomes = [run_cnj(source, selected=selected) for source, selected in pending]
+    frames = prefixed_frames(
+        outcomes,
+        lambda outcome: {"PROCESSOS": pd.DataFrame({"PROCESSOS": outcome.cnjs})},
+    )
     state.result = frames
 
-    if outcome.cnjs:
-        state.message = f"{len(outcome.cnjs)} CNJ(s) único(s)"
+    unique = sum(len(outcome.cnjs) for outcome in outcomes)
+    duplicates = sum(outcome.duplicates for outcome in outcomes)
+    if unique:
+        state.message = f"{len(outcomes)} arquivo(s), {unique} CNJ(s) único(s)"
+        title = (
+            "Listas de CNJs geradas" if len(outcomes) > 1 else "Lista de CNJs gerada"
+        )
         result.set_success(
-            outcome.output,
+            outcomes[0].output,
             frames,
-            "Lista de CNJs gerada",
-            f"{state.message} · {outcome.duplicates} duplicado(s)",
+            title,
+            f"{state.message} · {duplicates} duplicado(s)",
         )
     else:
         state.message = "Nenhum CNJ encontrado"
         result.set_success(
-            outcome.output,
+            outcomes[0].output,
             frames,
             state.message,
-            "A planilha não contém numeração no padrão CNJ.",
+            "A planilha não contém numeração no padrão CNJ."
+            if len(outcomes) == 1
+            else "As planilhas não contêm numeração no padrão CNJ.",
         )
 
-    result.set_log(outcome.log)
+    result.set_log(join_logs(outcomes))
 
 
 def _check(label: str, value: bool = True) -> ft.Checkbox:

@@ -35,6 +35,7 @@ def _tool(
     options: Callable[[ToolState], ft.Control],
     *,
     multiple_files: bool = False,
+    default_all_sheets: bool = False,
     run_handler: RunHandler | None = None,
 ) -> ToolPage:
     def build() -> ft.Control:
@@ -43,6 +44,7 @@ def _tool(
             description,
             options=options,
             multiple_files=multiple_files,
+            default_all_sheets=default_all_sheets,
             run_handler=run_handler,
         ).control
 
@@ -87,22 +89,28 @@ TOOLS: tuple[ToolPage, ...] = (
         ft.Icons.TEXT_FIELDS,
         "Converte tudo para texto, remove emojis e repara metadados.",
         all_str_options,
+        multiple_files=True,
+        default_all_sheets=True,
         run_handler=run_all_str,
     ),
     _tool(
         "cnj",
         "Extrair CNJs",
         ft.Icons.SEARCH,
-        "Encontra e padroniza numerações CNJ em uma planilha.",
+        "Encontra e padroniza numerações CNJ em uma ou mais planilhas.",
         cnj_options,
+        multiple_files=True,
+        default_all_sheets=True,
         run_handler=run_cnj,
     ),
     _tool(
         "cut",
         "Recortar Planilha",
         ft.Icons.CONTENT_CUT,
-        "Divide uma planilha em vários arquivos por quantidade de linhas.",
+        "Divide planilhas em vários arquivos por quantidade de linhas.",
         cut_options,
+        multiple_files=True,
+        default_all_sheets=True,
         run_handler=run_cut,
     ),
     _tool(

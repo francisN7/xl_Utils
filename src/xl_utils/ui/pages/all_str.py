@@ -5,6 +5,7 @@ import flet as ft
 from xl_utils.controllers.all_str import run_all_str
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.pages.batch import join_logs, pending_files, prefixed_frames
 from xl_utils.ui.state import ToolState
 
 
@@ -25,7 +26,7 @@ def options(_state: ToolState) -> ft.Control:
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Run the pipeline for the selected file and show its outcome."""
+    """Run the pipeline for every selected file and show the batch outcome."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",
@@ -33,28 +34,32 @@ def run(state: ToolState, result: ResultPanel) -> None:
         )
         return
 
-    source = state.files[0]
-    selected = state.selected_sheets.get(source)
-    if selected is not None and not selected:
-        result.set_info(
-            "Selecione ao menos uma aba",
-            "Marque uma aba em “1. Entrada” antes de executar.",
-        )
+    pending = pending_files(state, result)
+    if pending is None:
         return
 
-    result.set_log([f"Lendo {source.name}..."])
+    result.set_log([f"Lendo {len(pending)} arquivo(s)..."])
+    outcomes = [run_all_str(source, selected=selected) for source, selected in pending]
+    frames = prefixed_frames(outcomes, lambda outcome: outcome.sheets)
+    state.result = frames
 
-    outcome = run_all_str(source, selected=selected)
-    state.result = outcome.sheets
-    state.message = f"{len(outcome.sheets)} aba(s), {outcome.rows} linha(s)"
-
+    total_sheets = sum(len(outcome.sheets) for outcome in outcomes)
+    total_rows = sum(outcome.rows for outcome in outcomes)
+    state.message = (
+        f"{len(outcomes)} arquivo(s), {total_sheets} aba(s), {total_rows} linha(s)"
+    )
+    title = (
+        "Planilhas convertidas para texto"
+        if len(outcomes) > 1
+        else "Planilha convertida para texto"
+    )
     result.set_success(
-        outcome.output,
-        outcome.sheets,
-        "Planilha convertida para texto",
+        outcomes[0].output,
+        frames,
+        title,
         f"{state.message} · emojis removidos",
     )
-    result.set_log(outcome.log)
+    result.set_log(join_logs(outcomes))
 
 
 def _check(label: str, value: bool = True) -> ft.Checkbox:

@@ -27,7 +27,9 @@ class FileInput:
         self._picker_attached = False
 
         self._dropzone_text = ft.Text(
-            "Clique para selecionar a planilha",
+            "Clique para selecionar as planilhas"
+            if multiple
+            else "Clique para selecionar a planilha",
             size=theme.FONT_SM,
             weight=ft.FontWeight.BOLD,
         )
@@ -67,8 +69,9 @@ class FileInput:
         )
 
     def _open_picker(self, _event=None) -> None:
-        page = self.control.page
-        if page is None:
+        try:
+            page = self.control.page
+        except RuntimeError:
             return
         if not self._picker_attached:
             page.services.append(self._picker)
@@ -110,7 +113,11 @@ class FileInput:
             )
         else:
             self._hint.value = "Nenhum arquivo selecionado."
-            self._dropzone_text.value = "Clique para selecionar a planilha"
+            self._dropzone_text.value = (
+                "Clique para selecionar as planilhas"
+                if self._multiple
+                else "Clique para selecionar a planilha"
+            )
         self._dropzone.visible = self._multiple or not self._files
         self._refresh()
 

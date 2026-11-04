@@ -16,13 +16,15 @@
 - `prepare_workbook(path)` lê tudo com `dtype=str`, remove emojis e preserva
   quebras de linha; falha de leitura tenta reparo e pode levantar
   `WorkbookReadError`.
-- Texto, CNJ e recorte prontos e salvando em `output/`; a lista de CNJs sai como
-  `PROCESSOS` em `<nome> lista cnj.xlsx` e o recorte usa `_Recorte_NNN`.
+- Texto, CNJ e recorte prontos e salvando em `output/`; aceitam vários arquivos
+  e processam cada origem separadamente. CNJ sai como `PROCESSOS` e recorte usa
+  `_Recorte_NNN`.
 - `list_sheets` lista abas pelo tipo real; `filter_sheets` aplica a seleção e
-  `default_selection` marca todas (1 arquivo) ou a primeira de cada (vários).
+  `default_selection` marca todas no lote e a primeira de cada no merge.
 - Seletor de chips no card “1. Entrada” com “Todas”/“Limpar”, contador e
   spinner de leitura; tipografia mínima de 12 px em toda a UI.
-- `all_str`, `cnj` e `cut` filtram as abas escolhidas; seleção vazia não executa.
+- `all_str`, `cnj` e `cut` filtram as abas escolhidas; seleção vazia bloqueia o
+  lote inteiro.
 - `all_str.py`, `cnjs.py` e `cut.py` removidos da raiz; resta `merge.py`.
 
 ## Próximo passo
@@ -43,11 +45,9 @@ apagar `merge.py` e criar core + controller + página com testes.
 ## Armadilhas
 
 - Flet 1.0 não suporta drop de arquivos do SO; o dropzone é clicável.
-- `puremagic` detecta HTML como `.txt`; `resolve_suffix` cai para a extensão
-  original quando o detectado não é suportado.
+- `puremagic` lê HTML como `.txt`; `resolve_suffix` usa a extensão original.
 - Quebras de linha são preservadas; `prepare_workbook` ainda não ajusta `.html`.
-- `list_sheets` em HTML lê o arquivo inteiro em thread; erro de listagem fica
-  fora de `selected_sheets` e a execução reporta a falha de leitura.
+- `list_sheets` em HTML lê tudo em thread; erro de listagem reporta a falha.
 - `cut` usa o nome da aba no arquivo só com mais de uma aba processada.
 
 ## Como rodar

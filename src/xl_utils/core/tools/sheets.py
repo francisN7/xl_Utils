@@ -32,8 +32,14 @@ def filter_sheets(
 
 def default_selection(
     sheets: Mapping[Path, Sequence[str]],
+    *,
+    all_sheets: bool = False,
 ) -> dict[Path, set[str]]:
-    """Pick every sheet for one file and the first sheet for several files."""
-    if len(sheets) <= 1:
+    """Pick every sheet for one file and the first sheet for several files.
+
+    ``all_sheets=True`` marks every sheet of every file instead; the batch
+    tools use it so adding files never hides sheets without telling the user.
+    """
+    if all_sheets or len(sheets) <= 1:
         return {path: set(names) for path, names in sheets.items()}
     return {path: set(names[:1]) for path, names in sheets.items()}

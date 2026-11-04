@@ -63,6 +63,23 @@ def test_set_sheet_names_picks_the_first_sheet_for_many_files() -> None:
     assert state.sheet_count == 3
 
 
+def test_set_sheet_names_can_keep_every_sheet_for_many_files() -> None:
+    state = ToolState(files=[Path("a.xlsx"), Path("b.xlsx")])
+    state.set_sheet_names(
+        {
+            Path("a.xlsx"): ["Uma", "Outra"],
+            Path("b.xlsx"): ["Terceira"],
+        },
+        all_sheets=True,
+    )
+
+    assert state.selected_sheets == {
+        Path("a.xlsx"): {"Uma", "Outra"},
+        Path("b.xlsx"): {"Terceira"},
+    }
+    assert state.selected_count == 3
+
+
 def test_reset_clears_everything() -> None:
     state = ToolState(
         files=[Path("a.xlsx")],

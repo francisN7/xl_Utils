@@ -5,6 +5,7 @@ import flet as ft
 from xl_utils.controllers.cut import run_cut
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.pages.batch import join_logs, pending_files, prefixed_frames
 from xl_utils.ui.state import ToolState
 
 DEFAULT_ROWS = "1000"
@@ -34,7 +35,7 @@ def options(state: ToolState) -> ft.Control:
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Cut the selected file and show the generated files."""
+    """Cut every selected file and show the generated files."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",
@@ -42,36 +43,41 @@ def run(state: ToolState, result: ResultPanel) -> None:
         )
         return
 
-    source = state.files[0]
-    selected = state.selected_sheets.get(source)
-    if selected is not None and not selected:
-        result.set_info(
-            "Selecione ao menos uma aba",
-            "Marque uma aba em “1. Entrada” antes de executar.",
-        )
+    pending = pending_files(state, result)
+    if pending is None:
         return
 
     rows_per_file = _rows_per_file(state)
-    result.set_log([f"Lendo {source.name}..."])
+    result.set_log([f"Lendo {len(pending)} arquivo(s)..."])
+    outcomes = [
+        run_cut(source, rows_per_file, selected=selected)
+        for source, selected in pending
+    ]
 
-    outcome = run_cut(source, rows_per_file, selected=selected)
-    if not outcome.outputs:
+    total_outputs = sum(outcome.files for outcome in outcomes)
+    total_rows = sum(outcome.rows for outcome in outcomes)
+    if not total_outputs:
         result.set_info(
             "Nenhuma aba encontrada",
-            "A planilha não tem abas para recortar.",
+            "As planilhas não têm abas para recortar.",
         )
-        result.set_log(outcome.log)
+        result.set_log(join_logs(outcomes))
         return
 
-    state.result = outcome.preview
-    state.message = f"{outcome.files} arquivo(s), {outcome.rows} linha(s)"
+    frames = prefixed_frames(outcomes, lambda outcome: outcome.preview)
+    state.result = frames
+    state.message = (
+        f"{len(outcomes)} arquivo(s), {total_outputs} arquivo(s) gerado(s), "
+        f"{total_rows} linha(s)"
+    )
+    title = "Planilhas recortadas" if len(outcomes) > 1 else "Planilha recortada"
     result.set_success(
-        outcome.outputs[0],
-        outcome.preview,
-        "Planilha recortada",
+        outcomes[0].outputs[0],
+        frames,
+        title,
         f"{state.message} · {rows_per_file} linha(s) por arquivo",
     )
-    result.set_log(outcome.log)
+    result.set_log(join_logs(outcomes))
 
 
 def _rows_per_file(state: ToolState) -> int:

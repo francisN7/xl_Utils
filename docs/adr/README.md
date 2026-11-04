@@ -10,6 +10,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0003](0003-ui-sidebar-e-inicio.md) | Sidebar com Início e anatomia de ferramenta | Aceita |
 | [0004](0004-leitura-segura-e-emojis.md) | Leitura segura e limpeza compartilhada | Aceita |
 | [0005](0005-selecao-de-abas-e-merge.md) | Seleção de abas e mesclagem com origem | Aceita |
+| [0006](0006-lote-de-arquivos.md) | Lote de arquivos nas ferramentas | Aceita |
 
 ## Como ler
 

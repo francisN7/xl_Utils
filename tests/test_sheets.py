@@ -101,3 +101,18 @@ def test_default_selection_uses_the_first_sheet_for_many_files() -> None:
         Path("a.xlsx"): {"Uma"},
         Path("b.xlsx"): {"Terceira"},
     }
+
+
+def test_default_selection_can_keep_every_sheet_for_many_files() -> None:
+    selection = default_selection(
+        {
+            Path("a.xlsx"): ["Uma", "Outra"],
+            Path("b.xlsx"): ["Terceira"],
+        },
+        all_sheets=True,
+    )
+
+    assert selection == {
+        Path("a.xlsx"): {"Uma", "Outra"},
+        Path("b.xlsx"): {"Terceira"},
+    }

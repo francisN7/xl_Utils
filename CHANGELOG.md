@@ -35,6 +35,8 @@ decisões nos ADRs.
   preservando os nomes na saída.
 - Tipografia mínima de 12 px, sidebar de 260 px e fontes maiores em rótulos,
   ícones, logs e prévia.
+- Lote de arquivos em todas as ferramentas: texto, CNJ e recorte processam cada
+  origem e salvam saídas separadas, com prévia e log identificando o arquivo.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 

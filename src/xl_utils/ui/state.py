@@ -46,11 +46,16 @@ class ToolState:
         self.error = None
         self.running = False
 
-    def set_sheet_names(self, sheets: Mapping[Path, Sequence[str]]) -> None:
+    def set_sheet_names(
+        self,
+        sheets: Mapping[Path, Sequence[str]],
+        *,
+        all_sheets: bool = False,
+    ) -> None:
         """Store the sheets of the current files and apply the default rule."""
         names = {path: list(values) for path, values in sheets.items()}
         self.sheet_names = names
-        self.selected_sheets = default_selection(names)
+        self.selected_sheets = default_selection(names, all_sheets=all_sheets)
 
     def reset(self) -> None:
         """Clear everything for this tool."""

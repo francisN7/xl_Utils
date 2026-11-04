@@ -28,10 +28,12 @@ class ToolLayout:
         *,
         options: OptionsFactory | ft.Control | None = None,
         multiple_files: bool = False,
+        default_all_sheets: bool = False,
         run_handler: RunHandler | None = None,
     ) -> None:
         self.state = ToolState()
         self._run_handler = run_handler
+        self._default_all_sheets = default_all_sheets
         self.file_input = FileInput(
             self._files_changed,
             multiple=multiple_files,
@@ -176,7 +178,10 @@ class ToolLayout:
         self._sheet_loading = True
         self.sheet_selector.set_loading(True)
         self._run_button.disabled = True
-        page = self.control.page
+        try:
+            page = self.control.page
+        except RuntimeError:
+            page = None
         if page is None:
             names, failures = self._read_sheet_names(list(self.state.files))
             self._apply_sheet_names(names, failures)
@@ -208,7 +213,10 @@ class ToolLayout:
         names: dict[Path, list[str]],
         failures: list[str],
     ) -> None:
-        self.state.set_sheet_names(names)
+        self.state.set_sheet_names(
+            names,
+            all_sheets=self._default_all_sheets,
+        )
         self.sheet_selector.set_failures(failures)
         self._sheet_loading = False
         self.sheet_selector.set_loading(False)
