@@ -51,7 +51,7 @@ branch `legacy`, apenas para histórico.
   `feat/ui`; avançar `main` até `feat/ui`, criar `legacy` no commit antigo,
   trocar o README da `legacy` por um aviso de descontinuação e publicar as duas.
   Remover `feat/ui` depois. Custo S.
-- [ ] **S3b — Sinalizar a `legacy` no GitHub.** Não há selo nativo de “legacy”
+- [x] **S3b — Sinalizar a `legacy` no GitHub.** Não há selo nativo de “legacy”
   no seletor de branches; usar o nome `legacy`, uma tag `legacy-v1` e
   ruleset/proteção para travar a branch, documentando o aviso no README.
   Custo S.

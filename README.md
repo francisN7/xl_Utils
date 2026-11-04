@@ -64,7 +64,11 @@ projeto, leia [`AGENTS.md`](AGENTS.md) e
 
 A versão anterior, sem interface gráfica, fica na branch
 [`legacy`](https://github.com/francisN7/xl_Utils/tree/legacy), mantida apenas
-como registro histórico. Ela não recebe manutenção.
+como registro histórico. Ela não recebe manutenção e está protegida contra
+alterações.
+
+O ponto estável é a tag
+[`legacy-v1`](https://github.com/francisN7/xl_Utils/tree/legacy-v1).
 
 ## Licença
 

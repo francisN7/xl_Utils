@@ -4,11 +4,11 @@
 
 ## Sessão
 
-- **Última concluída:** S3a — publicação (`main` com UI, `legacy` histórica)
-- **Próxima:** S3b — sinalizar a `legacy` no GitHub
-  (`docs/sessions/S3b-legacy-github.md`)
-- **Ciclo:** 0002 — Fase 3 — Publicação
-- **Decisões abertas:** tag e proteção da `legacy` (S3b)
+- **Última concluída:** S3b — `legacy` travada no GitHub
+- **Próxima:** S4a — fechar ciclo 0002 e abrir a Fase 4
+  (`docs/sessions/S4a-fechar-ciclo.md`)
+- **Ciclo:** 0002 — Fase 3 — Publicação (concluída)
+- **Decisões abertas:** item que abre a Fase 4 (S4a)
 
 ## Pronto
 
@@ -26,27 +26,27 @@
 - `FormatCheck` mostra o tipo real, avisa divergência e bloqueia quando nada é
   identificável; texto e CNJ usam `note`, e “2. Opções” só aparece quando há o
   que editar.
-- `main` é a versão com UI (fast-forward de `feat/ui`) e a branch padrão;
-  `feat/ui` foi removida local e remotamente.
-- `legacy` parte de `68ce5e0` e só acrescenta o aviso de descontinuação; o
-  README da `main` aponta para ela.
+- `main` é a versão com UI e a branch padrão (`feat/ui` removida); `legacy`
+  parte de `68ce5e0`, só acrescenta o aviso e é citada no README da `main`.
+- Tag `legacy-v1` e rulesets ativos (branch `26547015`, tag `26547017`)
+  bloqueiam push, force-push e exclusão, sem bypass.
 
 ## Próximo passo
 
-S3b: criar a tag `legacy-v1`, aplicar ruleset/proteção na `legacy` e registrar o
-aviso no README/desenvolvimento.
+S4a: revisar o backlog com o dono, fechar o ciclo 0002, criar o roadmap da
+Fase 4 e a spec da primeira sessão.
 
 ## Arquivos-chave
 
 - `README.md`, `docs/adr/0009-publicacao-main-legacy.md` e
-  `docs/sessions/S3b-legacy-github.md`.
+  `docs/sessions/S4a-fechar-ciclo.md`.
 - Saída: `core/save.py`, `ui/components/result_panel.py`,
   `ui/components/tool_layout.py` e `tests/test_save.py`.
 
 ## Armadilhas
 
-- Nunca `push --force` na `main` (fast-forward) nem recriar `feat/ui`; o GitHub
-  não tem selo de “legacy”, então restam nome, tag, README e ruleset.
+- Nunca `push --force` na `main` nem recriar `feat/ui`; a `legacy` é somente
+  leitura e o GitHub não tem selo nativo de branch.
 - Flet 1.0 não suporta drop do SO; merge usa `Draggable`/`DragTarget`.
 - `FilePicker` fica em `page.services`; salvar/cancelar é assíncrono e `None`.
 - Cabeçalhos repetidos ganham sufixo `_2`; uma aba dá no máximo uma coluna por

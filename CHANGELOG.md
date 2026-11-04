@@ -67,6 +67,8 @@ decisões nos ADRs.
 - Publicação: a `main` passa a ser a versão com UI, a `main` antiga vira a
   branch `legacy` com aviso de descontinuação e `feat/ui` é removida depois de
   publicada; o README aponta para as duas.
+- Branch `legacy` travada no GitHub: tag `legacy-v1` e rulesets que bloqueiam
+  push, force-push e exclusão da branch e da tag.
 
 ### Removed
 
