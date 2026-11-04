@@ -21,6 +21,7 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 arquivo escolhido
   → controller
   → all_str.prepare_workbook (leitura segura + emojis)
+  → sheets.filter_sheets (abas escolhidas)
   → regra da ferramenta em core/tools/
   → save_workbook / resultado em memória
   → result panel (status, caminho, log e prévia)
@@ -51,6 +52,24 @@ do usuário.
 O objetivo é não perder zeros à esquerda, CNJ/CPF e valores que o Excel
 converteria em notação científica. A ferramenta “Tratamento de texto” também
 expõe esse pipeline sozinha, para conversão e reparo explícitos.
+
+## Seleção de abas
+
+`core/io.list_sheets(path)` devolve os nomes na ordem do arquivo. Excel lê só os
+metadados com `pd.ExcelFile` e o engine do formato real; CSV devolve
+`["Planilha1"]`; HTML precisa ser lido, porque cada tabela vira `PáginaN`.
+Falha de leitura sobe como `ValueError` com o nome do arquivo.
+
+`core/tools/sheets.filter_sheets(sheets, selected)` mantém apenas as abas
+escolhidas, na ordem original e com os mesmos nomes. `None` significa todas;
+conjunto vazio ou nome inexistente levanta `ValueError`.
+`default_selection` define o padrão: um arquivo marca todas as abas; vários
+arquivos marcam a primeira de cada um.
+
+A seleção vive em `ToolState.sheet_names` e `ToolState.selected_sheets`, por
+arquivo; trocar a lista de arquivos recarrega os nomes e reaplica o padrão. Os
+controllers recebem `selected` e filtram logo depois do `prepare_workbook`,
+antes da regra da ferramenta.
 
 ## Detecção de formato
 
@@ -88,10 +107,10 @@ percorre todas as abas e célula a célula, remove duplicatas e ordena a lista.
 
 `core/tools/cut.py` divide cada aba em blocos sequenciais de N linhas; o resto
 fica no último bloco e uma aba vazia ainda gera um arquivo. `controllers/cut.py`
-lê pelo `prepare_workbook`, salva cada bloco em `output/` e usa
-`<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx` com várias abas),
-saneando caracteres inválidos de nome de arquivo. O campo de linhas é editável
-na página e vive em `ToolState.options`.
+lê pelo `prepare_workbook`, filtra as abas escolhidas, salva cada bloco em
+`output/` e usa `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx`
+com várias abas processadas), saneando caracteres inválidos de nome de arquivo.
+O campo de linhas é editável na página e vive em `ToolState.options`.
 
 ## Testes
 

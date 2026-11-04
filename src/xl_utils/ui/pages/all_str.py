@@ -32,9 +32,17 @@ def run(state: ToolState, result: ResultPanel) -> None:
         return
 
     source = state.files[0]
+    selected = state.selected_sheets.get(source)
+    if selected is not None and not selected:
+        result.set_info(
+            "Selecione ao menos uma aba",
+            "Marque uma aba em “1. Entrada” antes de executar.",
+        )
+        return
+
     result.set_log([f"Lendo {source.name}..."])
 
-    outcome = run_all_str(source)
+    outcome = run_all_str(source, selected=selected)
     state.result = outcome.sheets
     state.message = f"{len(outcome.sheets)} aba(s), {outcome.rows} linha(s)"
 

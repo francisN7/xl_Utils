@@ -1,5 +1,6 @@
 """Run CNJ extraction and save the unique list beside the source file."""
 
+from collections.abc import Collection
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cnj import collect_cnjs, count_cnjs
+from xl_utils.core.tools.sheets import filter_sheets
 
 
 @dataclass(frozen=True, slots=True)
@@ -27,9 +29,12 @@ class CnjOutcome:
         return self.found - len(self.cnjs)
 
 
-def run_cnj(source: Path) -> CnjOutcome:
-    """Read, extract, deduplicate and save the CNJ list into ``output/``."""
-    sheets = prepare_workbook(source)
+def run_cnj(
+    source: Path,
+    selected: Collection[str] | None = None,
+) -> CnjOutcome:
+    """Extract CNJs from the selected sheets and save them into ``output/``."""
+    sheets = filter_sheets(prepare_workbook(source), selected)
     cnjs = collect_cnjs(sheets)
     found = count_cnjs(sheets)
 

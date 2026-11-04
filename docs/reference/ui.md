@@ -45,6 +45,7 @@ O conteúdo abre em uma das duas formas:
 |---|---|
 | `sidebar` | Logo, Início e as quatro ferramentas, com item ativo destacado. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
+| `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
 | `options_panel` | Controles específicos; campos editáveis guardam o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
@@ -55,6 +56,16 @@ O conteúdo abre em uma das duas formas:
 O Flet 1.0 não expõe arrastar e soltar arquivos do sistema operacional. O
 dropzone é uma área clicável que abre o `FilePicker` nativo; o texto "clique
 para selecionar" substitui a promessa de drop.
+
+### Seleção de abas
+
+Abaixo da lista de arquivos, o card “1. Entrada” mostra chips com o nome de cada
+aba. O padrão marca todas as abas de um único arquivo e a primeira de cada
+quando há vários; “Todas” e “Limpar” mudam tudo de uma vez e o contador mostra
+“N de M”. Os chips quebram linha (`Row(wrap=True)`) e a seleção é guardada por
+arquivo no `ToolState`. Se a listagem falhar, o seletor mostra o erro do arquivo
+e a execução reporta a falha de leitura; sem nenhuma aba marcada, a ferramenta
+não executa e pede uma seleção.
 
 ## Início
 
@@ -100,6 +111,7 @@ fora do escopo inicial.
 |---|---|
 | Vazio | Dropzone e botão desabilitado. |
 | Selecionado | Arquivos, opções e botão habilitado. |
+| Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
 | Executando | Progresso, botão “Cancelar” e log ao vivo. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |
 | Erro | Status vermelho, mensagem tipada e log copiável. |

@@ -1,5 +1,6 @@
 """Run the row cut and save every part into the output folder."""
 
+from collections.abc import Collection
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -10,6 +11,7 @@ from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cut import split_workbook
+from xl_utils.core.tools.sheets import filter_sheets
 
 _INVALID_FILE_CHARS = frozenset('<>:"/\\|?*')
 _MAX_FILE_PART = 80
@@ -34,9 +36,13 @@ class CutOutcome:
         return sum(len(frame) for frames in self.parts.values() for frame in frames)
 
 
-def run_cut(source: Path, rows_per_file: int) -> CutOutcome:
-    """Cut every sheet of ``source`` and save the parts into ``output/``."""
-    sheets = prepare_workbook(source)
+def run_cut(
+    source: Path,
+    rows_per_file: int,
+    selected: Collection[str] | None = None,
+) -> CutOutcome:
+    """Cut the selected sheets of ``source`` into ``output/``."""
+    sheets = filter_sheets(prepare_workbook(source), selected)
     parts = split_workbook(sheets, rows_per_file)
     output_dir = default_output_dir(source)
     multiple_sheets = len(parts) > 1

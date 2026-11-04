@@ -1,14 +1,17 @@
 """Common page anatomy: header, input/options, result and action bar."""
 
+import asyncio
 import contextlib
 from collections.abc import Callable
 from pathlib import Path
 
 import flet as ft
 
+from xl_utils.core.io import list_sheets
 from xl_utils.ui import theme
 from xl_utils.ui.components.file_input import FileInput
 from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.components.sheet_selector import SheetSelector
 from xl_utils.ui.state import ToolState
 
 RunHandler = Callable[[ToolState, ResultPanel], None]
@@ -34,6 +37,10 @@ class ToolLayout:
             multiple=multiple_files,
         )
         self.result = ResultPanel()
+        self.sheet_selector = SheetSelector(
+            self.state,
+            on_change=self._selection_changed,
+        )
 
         self._summary = ft.Text(
             "Nenhum arquivo selecionado.",
@@ -87,11 +94,20 @@ class ToolLayout:
             padding=ft.Padding.only(bottom=16),
         )
 
+        entrada = ft.Column(
+            controls=[
+                self.file_input.control,
+                ft.Divider(height=1, color=theme.BORDER),
+                self.sheet_selector.control,
+            ],
+            spacing=10,
+        )
+
         left = ft.Column(
             controls=[
                 _card(
                     "1. Entrada",
-                    self.file_input.control,
+                    entrada,
                 ),
                 _card(
                     "2. Opções",
@@ -139,6 +155,8 @@ class ToolLayout:
 
     def _files_changed(self, files: list[Path]) -> None:
         self.state.select_files(files)
+        self.sheet_selector.set_failures([])
+        self.sheet_selector.refresh()
         if files:
             self._summary.value = f"{len(files)} arquivo(s) selecionado(s)."
             self._run_button.disabled = False
@@ -146,6 +164,52 @@ class ToolLayout:
             self._summary.value = "Nenhum arquivo selecionado."
             self._run_button.disabled = True
         self.result.set_idle()
+        self._refresh()
+        self._start_sheet_load()
+
+    def _start_sheet_load(self) -> None:
+        page = self.control.page
+        if page is None:
+            names, failures = self._read_sheet_names(list(self.state.files))
+            self._apply_sheet_names(names, failures)
+            return
+        page.run_task(self._load_sheet_names)
+
+    async def _load_sheet_names(self) -> None:
+        files = list(self.state.files)
+        names, failures = await asyncio.to_thread(self._read_sheet_names, files)
+        if list(self.state.files) != files:
+            return
+        self._apply_sheet_names(names, failures)
+
+    @staticmethod
+    def _read_sheet_names(
+        files: list[Path],
+    ) -> tuple[dict[Path, list[str]], list[str]]:
+        names: dict[Path, list[str]] = {}
+        failures: list[str] = []
+        for path in files:
+            try:
+                names[path] = list_sheets(path)
+            except Exception as error:  # noqa: BLE001 - shown in the selector
+                failures.append(f"{path.name}: {error}")
+        return names, failures
+
+    def _apply_sheet_names(
+        self,
+        names: dict[Path, list[str]],
+        failures: list[str],
+    ) -> None:
+        self.state.set_sheet_names(names)
+        self.sheet_selector.set_failures(failures)
+        self.sheet_selector.refresh()
+        self._selection_changed(self.state.selected_sheets)
+
+    def _selection_changed(self, selection: dict[Path, set[str]]) -> None:
+        if not self.state.files:
+            return
+        total = sum(len(names) for names in selection.values())
+        self._summary.value = f"{len(self.state.files)} arquivo(s), {total} aba(s)."
         self._refresh()
 
     def _run(self, _event=None) -> None:

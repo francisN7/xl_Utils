@@ -41,10 +41,18 @@ def run(state: ToolState, result: ResultPanel) -> None:
         return
 
     source = state.files[0]
+    selected = state.selected_sheets.get(source)
+    if selected is not None and not selected:
+        result.set_info(
+            "Selecione ao menos uma aba",
+            "Marque uma aba em “1. Entrada” antes de executar.",
+        )
+        return
+
     rows_per_file = _rows_per_file(state)
     result.set_log([f"Lendo {source.name}..."])
 
-    outcome = run_cut(source, rows_per_file)
+    outcome = run_cut(source, rows_per_file, selected=selected)
     if not outcome.outputs:
         result.set_info(
             "Nenhuma aba encontrada",

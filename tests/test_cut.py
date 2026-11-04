@@ -117,6 +117,48 @@ def test_run_cut_names_parts_by_sheet_when_there_are_many(
     ]
 
 
+def test_run_cut_processes_only_the_selected_sheet(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    with pd.ExcelWriter(source) as writer:
+        _frame(3).to_excel(writer, sheet_name="Uma", index=False)
+        _frame(3).to_excel(writer, sheet_name="Outra", index=False)
+
+    outcome = run_cut(source, 2, selected={"Outra"})
+
+    assert outcome.rows == 3
+    assert [path.name for path in outcome.outputs] == [
+        "entrada_Recorte_001.xlsx",
+        "entrada_Recorte_002.xlsx",
+    ]
+    assert list(read_workbook(outcome.outputs[0], dtype=str)) == ["Outra"]
+
+
+def test_run_cut_names_parts_by_sheet_for_many_selected(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "entrada.xlsx"
+    with pd.ExcelWriter(source) as writer:
+        _frame(2).to_excel(writer, sheet_name="Uma", index=False)
+        _frame(2).to_excel(writer, sheet_name="Outra", index=False)
+
+    outcome = run_cut(source, 1, selected={"Uma", "Outra"})
+
+    assert [path.name for path in outcome.outputs] == [
+        "entrada_Uma_Recorte_001.xlsx",
+        "entrada_Uma_Recorte_002.xlsx",
+        "entrada_Outra_Recorte_001.xlsx",
+        "entrada_Outra_Recorte_002.xlsx",
+    ]
+
+
+def test_run_cut_rejects_an_empty_selection(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    _frame(3).to_excel(source, index=False)
+
+    with pytest.raises(ValueError, match="ao menos uma aba"):
+        run_cut(source, 2, selected=set())
+
+
 def test_run_cut_with_rows_above_total_writes_one_file(tmp_path: Path) -> None:
     source = tmp_path / "entrada.xlsx"
     _frame(5).to_excel(source, index=False)

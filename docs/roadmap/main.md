@@ -17,7 +17,7 @@ duplicação e com teste.
   pipeline do `all_str`. Apagar `cnjs.py`. Custo M.
 - [x] **S1c — `cut`.** Recorte por quantidade de linhas, com prévia.
   Apagar `cut.py`. Custo M.
-- [ ] **S1d — Seleção de abas.** Chips por aba com “Todas”/“Limpar”, nomes no
+- [x] **S1d — Seleção de abas.** Chips por aba com “Todas”/“Limpar”, nomes no
   core e filtro em `all_str`, `cnj` e `cut`, preservando as abas escolhidas na
   saída. Custo M.
 - [ ] **S1e — `merge`.** Um único modo: concatena as abas selecionadas de todos

@@ -4,55 +4,55 @@
 
 ## Sessão
 
-- **Última concluída:** S1c — recorte de planilha
-- **Próxima:** S1d — seleção de abas (`docs/sessions/S1d-sheet-selection.md`)
+- **Última concluída:** S1d — seleção de abas
+- **Próxima:** S1e — merge (`docs/sessions/S1e-merge.md`)
 - **Ciclo:** 0002 — Fase 1 — Migração dos scripts
-- **Retorno:** `src/xl_utils/ui/components/tool_layout.py` e `core/io.py`
+- **Retorno:** `ui/components/sheet_selector.py` e `core/tools/sheets.py`
 
 ## Pronto
 
-- Ambiente uv no Python 3.15, Flet desktop, pandas 3.1, puremagic e emoji.
-- Estrutura MVC híbrida, app navegável e tema Dracula.
-- `prepare_workbook(path)` lê todas as abas com `dtype=str`, remove emojis e
-  preserva quebras de linha; falha de leitura tenta reparo e pode levantar
+- Ambiente uv no Python 3.15, Flet desktop, pandas 3.1; MVC híbrido, app
+  navegável e tema Dracula.
+- `prepare_workbook(path)` lê tudo com `dtype=str`, remove emojis e preserva
+  quebras de linha; falha de leitura tenta reparo e pode levantar
   `WorkbookReadError`.
-- Tratamento de Texto executa pela página e salva em `output/`.
-- Extração de CNJs padroniza, deduplica, ordena e salva `PROCESSOS` em
-  `output/<nome> lista cnj.xlsx`.
-- Recorte divide cada aba em blocos de N linhas, salva em `output/` com nomes
-  `_Recorte_NNN` e usa campo de linhas editável em `ToolState.options`.
+- Texto, CNJ e recorte prontos e salvando em `output/`; a lista de CNJs sai como
+  `PROCESSOS` em `<nome> lista cnj.xlsx` e o recorte usa `_Recorte_NNN`.
+- `list_sheets` lista abas pelo tipo real; `filter_sheets` aplica a seleção e
+  `default_selection` marca todas (1 arquivo) ou a primeira de cada (vários).
+- Seletor de chips no card “1. Entrada” com “Todas”/“Limpar” e contador; a
+  seleção vive em `ToolState` e recarrega quando a lista de arquivos muda.
+- `all_str`, `cnj` e `cut` filtram as abas escolhidas; seleção vazia não executa.
 - `all_str.py`, `cnjs.py` e `cut.py` removidos da raiz; resta `merge.py`.
 
 ## Próximo passo
 
-S1d: seletor de abas com chips + “Todas”/“Limpar”, `list_sheets` e
-`filter_sheets` no core, e filtro em `all_str`, `cnj` e `cut` preservando os
-nomes das abas na saída.
+S1e: migrar `merge` para um único modo — concatenar as abas selecionadas de
+todos os arquivos na ordem, com coluna `ORIGEM` e alinhamento de colunas;
+apagar `merge.py` e criar core + controller + página com testes.
 
 ## Decisões abertas
 
-- S1e: merge em um único modo, coluna `ORIGEM` e alinhamento manual de colunas; ver ADR 0005.
+- S1e: alinhamento por dropdown (Flet 1.0 não tem drag); confirmar. ADR 0005.
 
 ## Arquivos-chave
 
-- `src/xl_utils/core/io.py` — `list_sheets` e leitura/escrita.
-- `src/xl_utils/ui/components/tool_layout.py` — integra o seletor.
-- `src/xl_utils/ui/state.py` — abas por arquivo.
-- `src/xl_utils/controllers/` — filtro em all_str, cnj e cut.
+- `core/io.py` (`list_sheets`) e `core/tools/sheets.py` (`filter_sheets`).
+- `sheet_selector.py`, `state.py` e `tool_layout.py` — chips e seleção.
 
 ## Armadilhas
 
 - Flet 1.0 não suporta drop de arquivos do SO; o dropzone é clicável.
 - `puremagic` detecta HTML como `.txt`; `resolve_suffix` cai para a extensão
   original quando o detectado não é suportado.
-- Não normalizar quebras de linha: o texto da célula deve ser preservado.
-- `prepare_workbook` não converte tipos de `.html` para texto; revisar na S2a.
-- Seleção vazia precisa de erro claro, não execução silenciosa.
+- Quebras de linha são preservadas; `prepare_workbook` ainda não ajusta `.html`.
+- `list_sheets` em HTML lê o arquivo inteiro em thread; erro de listagem fica
+  fora de `selected_sheets` e a execução reporta a falha de leitura.
+- `cut` usa o nome da aba no arquivo só com mais de uma aba processada.
 
 ## Como rodar
 
 ```bash
-uv sync
 uv run xl-utils
 uv run ruff check src tests
 uv run pytest

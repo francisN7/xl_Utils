@@ -1,5 +1,6 @@
 """Run the text pipeline and save the result beside the source file."""
 
+from collections.abc import Collection
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from xl_utils.core.io import save_workbook
 from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
+from xl_utils.core.tools.sheets import filter_sheets
 
 
 @dataclass(frozen=True, slots=True)
@@ -25,9 +27,12 @@ class AllStrOutcome:
         return sum(len(frame) for frame in self.sheets.values())
 
 
-def run_all_str(source: Path) -> AllStrOutcome:
-    """Read, clean and save every sheet of ``source`` into ``output/``."""
-    sheets = prepare_workbook(source)
+def run_all_str(
+    source: Path,
+    selected: Collection[str] | None = None,
+) -> AllStrOutcome:
+    """Read, clean and save the selected sheets of ``source`` into ``output/``."""
+    sheets = filter_sheets(prepare_workbook(source), selected)
     destination = default_output_dir(source) / f"{source.stem}.xlsx"
     output = save_workbook(sheets, destination)
 

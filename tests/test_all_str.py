@@ -66,6 +66,28 @@ def test_prepare_workbook_raises_typed_error_for_corrupt_file(
         prepare_workbook(source)
 
 
+def test_run_all_str_saves_only_the_selected_sheets(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    with pd.ExcelWriter(source) as writer:
+        pd.DataFrame({"nome": ["Ana"]}).to_excel(writer, sheet_name="Uma", index=False)
+        pd.DataFrame({"nome": ["Bia"]}).to_excel(
+            writer, sheet_name="Outra", index=False
+        )
+
+    outcome = run_all_str(source, selected={"Outra"})
+
+    assert list(outcome.sheets) == ["Outra"]
+    assert list(read_workbook(outcome.output, dtype=str)) == ["Outra"]
+
+
+def test_run_all_str_rejects_an_empty_selection(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    pd.DataFrame({"nome": ["Ana"]}).to_excel(source, index=False)
+
+    with pytest.raises(ValueError, match="ao menos uma aba"):
+        run_all_str(source, selected=set())
+
+
 def test_run_all_str_saves_in_output_folder(tmp_path: Path) -> None:
     source = tmp_path / "entrada.xlsx"
     pd.DataFrame({"codigo": ["000123"], "nome": ["Ana 🙂"]}).to_excel(

@@ -40,6 +40,25 @@ def read_workbook(
     raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
 
 
+def list_sheets(path: Path) -> list[str]:
+    """Return the sheet names of a supported file, in their original order.
+
+    Excel only reads the workbook metadata. CSV has a single synthetic sheet
+    and HTML has to be parsed, because each table becomes a sheet.
+    """
+    suffix = resolve_suffix(path)
+
+    if suffix == ".csv":
+        return ["Planilha1"]
+    if suffix in {".html", ".htm"}:
+        return _list_html_sheets(path)
+    if suffix in {".xlsx", ".xlsm", ".xls"}:
+        engine = "xlrd" if suffix == ".xls" else "openpyxl"
+        return _excel_sheet_names(path, engine=engine)
+
+    raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
+
+
 def save_workbook(sheets: Mapping[str, pd.DataFrame], destination: Path) -> Path:
     """Write a dataframe mapping to one xlsx file and return its path."""
     destination = unique_path(
@@ -58,6 +77,25 @@ def save_workbook(sheets: Mapping[str, pd.DataFrame], destination: Path) -> Path
             )
 
     return destination
+
+
+def _excel_sheet_names(path: Path, *, engine: str) -> list[str]:
+    try:
+        with pd.ExcelFile(path, engine=engine) as workbook:
+            return [str(name) for name in workbook.sheet_names]
+    except Exception as error:  # noqa: BLE001 - report one clear failure
+        raise ValueError(
+            f"Não foi possível listar as abas de {path.name}: {error}"
+        ) from error
+
+
+def _list_html_sheets(path: Path) -> list[str]:
+    try:
+        return list(read_workbook(path, dtype=str))
+    except Exception as error:  # noqa: BLE001 - report one clear failure
+        raise ValueError(
+            f"Não foi possível listar as abas de {path.name}: {error}"
+        ) from error
 
 
 def _read_excel(

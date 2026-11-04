@@ -80,6 +80,21 @@ def test_run_cnj_writes_a_sorted_unique_list(tmp_path: Path) -> None:
     assert saved["PROCESSOS"].tolist() == [FIRST, SECOND]
 
 
+def test_run_cnj_ignores_unselected_sheets(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    with pd.ExcelWriter(source) as writer:
+        pd.DataFrame({"texto": [FIRST]}).to_excel(writer, sheet_name="Uma", index=False)
+        pd.DataFrame({"processo": [SECOND]}).to_excel(
+            writer, sheet_name="Outra", index=False
+        )
+
+    outcome = run_cnj(source, selected={"Uma"})
+
+    assert outcome.cnjs == [FIRST]
+    assert outcome.found == 1
+    assert outcome.duplicates == 0
+
+
 def test_run_cnj_without_matches_saves_an_empty_list(tmp_path: Path) -> None:
     source = tmp_path / "vazia.xlsx"
     pd.DataFrame({"texto": ["nada aqui", None]}).to_excel(
