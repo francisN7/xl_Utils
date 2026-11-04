@@ -44,12 +44,6 @@ duplicação e com teste.
   prévia e salvar só ao clicar em “Salvar”, escolhendo arquivo (saída única) ou
   pasta (lote), com “Salvar em output/” como atalho. Custo G.
 
-## Fase 3 — Distribuição
-
-- [ ] **S3a — Empacotamento.** `flet pack`/PyInstaller, ícone e teste em
-  máquina limpa.
-- [ ] **S3b — Release.** Notas em `docs/releases/` e tag no GitHub.
-
 ## Backlog
 
 | Item | Valor | Custo | Pré-requisito |
@@ -67,7 +61,8 @@ duplicação e com teste.
 ## Gatilhos (não são backlog)
 
 - Suporte a macOS/Linux — só entra quando houver máquina para testar.
-- Instalador nativo (MSI) — só entra se o PyInstaller não bastar.
+- Empacotamento, instalador e release — só entram quando o dono decidir
+  distribuir.
 - Internacionalização — só entra se aparecer usuário fora do PT-BR.
 - Drag & drop real de arquivos — só entra se migrar para PySide6 ou houver hook
   Windows-only.

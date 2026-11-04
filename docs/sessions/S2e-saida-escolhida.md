@@ -79,4 +79,5 @@ Ler `AGENTS.md`, `docs/state/CURRENT.md`, esta spec, `reference/architecture.md`
 
 ## Próximo depois desta
 
-S3a — empacotamento: `flet pack`/PyInstaller, ícone e teste em máquina limpa.
+Nenhuma sessão definida. Distribuição, instalador e release ficam fora do
+roadmap até o dono decidir.
