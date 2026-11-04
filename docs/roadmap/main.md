@@ -13,7 +13,7 @@ duplicação e com teste.
 - [x] **S1a — `all_str`.** Pipeline de leitura segura (texto + emojis, sem
   tocar em quebras de linha), reparo sem `xlsx2csv`/`shell=True` e página
   própria. Apagar `all_str.py`. Custo M.
-- [ ] **S1b — `cnj`.** Regex pura, padronização e deduplicação, usando o
+- [x] **S1b — `cnj`.** Regex pura, padronização e deduplicação, usando o
   pipeline do `all_str`. Apagar `cnjs.py`. Custo M.
 - [ ] **S1c — `cut`.** Recorte por quantidade de linhas, com prévia.
   Apagar `cut.py`. Custo M.

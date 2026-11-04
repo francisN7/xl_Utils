@@ -71,9 +71,18 @@ alterado.
 | Ferramenta | Módulo | Estado |
 |---|---|---|
 | Tratamento de texto | `core/tools/all_str.py` | pronta |
-| Extrair CNJs | `core/tools/cnj.py` | a migrar |
+| Extrair CNJs | `core/tools/cnj.py` | pronta |
 | Recortar planilha | `core/tools/cut.py` | a migrar |
 | Mesclar planilhas | `core/tools/merge.py` | a migrar |
+
+## Extração de CNJ
+
+`core/tools/cnj.py` reconhece o formato pontuado
+(`NNNNNNN-DD.AAAA.J.TR.OOOO`) e 20 dígitos consecutivos, sem aceitar trecho de
+número maior. `normalize_cnj` devolve sempre o formato pontuado; `collect_cnjs`
+percorre todas as abas e célula a célula, remove duplicatas e ordena a lista.
+`controllers/cnj.py` grava `output/<nome> lista cnj.xlsx` com a coluna
+`PROCESSOS` e registra encontrados, duplicados e únicos no log.
 
 ## Testes
 

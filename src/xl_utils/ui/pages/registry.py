@@ -8,6 +8,8 @@ import flet as ft
 from xl_utils.ui.components.tool_layout import RunHandler, ToolLayout
 from xl_utils.ui.pages.all_str import options as all_str_options
 from xl_utils.ui.pages.all_str import run as run_all_str
+from xl_utils.ui.pages.cnj import options as cnj_options
+from xl_utils.ui.pages.cnj import run as run_cnj
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,20 +48,6 @@ def _tool(
         icon=icon,
         description=description,
         build=build,
-    )
-
-
-def _check(label: str, value: bool = True) -> ft.Checkbox:
-    return ft.Checkbox(label=label, value=value, disabled=True)
-
-
-def _cnj_options() -> ft.Control:
-    return ft.Column(
-        controls=[
-            _check("Padronizar para o formato CNJ", True),
-            _check("Remover duplicados", True),
-        ],
-        spacing=4,
     )
 
 
@@ -115,7 +103,8 @@ TOOLS: tuple[ToolPage, ...] = (
         "Extrair CNJs",
         ft.Icons.SEARCH,
         "Encontra e padroniza numerações CNJ em uma planilha.",
-        _cnj_options,
+        cnj_options,
+        run_handler=run_cnj,
     ),
     _tool(
         "cut",

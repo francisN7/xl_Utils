@@ -4,10 +4,10 @@
 
 ## Sessão
 
-- **Última concluída:** S1a — pipeline do `all_str`
-- **Próxima:** S1b — extração de CNJ (`docs/sessions/S1b-cnj.md`)
+- **Última concluída:** S1b — extração de CNJ
+- **Próxima:** S1c — recorte (`docs/sessions/S1c-cut.md`)
 - **Ciclo:** 0002 — Fase 1 — Migração dos scripts
-- **Retorno:** `src/xl_utils/core/tools/all_str.py` e `src/xl_utils/ui/pages/all_str.py`
+- **Retorno:** `src/xl_utils/core/tools/cnj.py` e `src/xl_utils/ui/pages/cnj.py`
 
 ## Pronto
 
@@ -17,26 +17,26 @@
   preserva quebras de linha; é o pipeline obrigatório das ferramentas.
 - Falha de leitura tenta um reparo tolerante por formato e, se necessário,
   levanta `WorkbookReadError` — sem `shell=True` e sem `xlsx2csv`.
-- Tratamento de Texto executa pela página, salva em `output/` e tem teste
-  funcional com 1.000 linhas fictícias geradas em memória.
-- `all_str.py` da raiz removido; restam `cnjs.py`, `cut.py` e `merge.py`.
+- Tratamento de Texto executa pela página e salva em `output/`.
+- Extração de CNJs padroniza, deduplica, ordena e salva `PROCESSOS` em
+  `output/<nome> lista cnj.xlsx`, com log de encontrados/duplicados.
+- `all_str.py` e `cnjs.py` removidos da raiz; restam `cut.py` e `merge.py`.
 
 ## Próximo passo
 
-S1b: criar `core/tools/cnj.py` com regex pura (20 dígitos ou formato CNJ),
-padronização, deduplicação e extração por todas as colunas, sempre sobre
-`prepare_workbook`; conectar a página e apagar `cnjs.py` da raiz.
+S1c: criar `core/tools/cut.py` com recorte puro por quantidade de linhas sobre
+`prepare_workbook`, controller salvando cada parte em `output/`, página com
+campo de linhas ativo e remoção de `cut.py` da raiz.
 
 ## Decisões abertas
 
-- Saída do CNJ: uma aba `PROCESSOS` em `output/<nome> lista cnj.xlsx` ou um
-  painel apenas em memória. Decidir na S1b.
+- Nenhuma bloqueante.
 
 ## Arquivos-chave
 
 - `src/xl_utils/core/tools/all_str.py` — pipeline seguro e erro tipado.
-- `src/xl_utils/controllers/all_str.py` — execução, saída e log.
-- `src/xl_utils/ui/pages/all_str.py` — página e opções fixas.
+- `src/xl_utils/core/tools/cnj.py` — regex, normalização e deduplicação.
+- `src/xl_utils/controllers/cnj.py` e `ui/pages/cnj.py` — execução e página.
 - `src/xl_utils/core/io.py` — leitura/escrita compartilhada.
 - `docs/reference/architecture.md` — camadas e fluxo.
 
@@ -47,7 +47,7 @@ padronização, deduplicação e extração por todas as colunas, sempre sobre
   original quando o detectado não é suportado.
 - Não normalizar quebras de linha: o texto da célula deve ser preservado.
 - `prepare_workbook` não converte tipos de `.html` para texto; revisar na S2a.
-- Scripts legados restantes (`cnjs`, `cut`, `merge`) não têm lint limpo.
+- Scripts legados restantes (`cut`, `merge`) não têm lint limpo.
 
 ## Como rodar
 
