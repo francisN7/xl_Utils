@@ -10,10 +10,10 @@ texto seguro antes de chegar à ferramenta.
 
 | Ferramenta | O que faz | Estado |
 |---|---|---|
-| Tratamento de Texto | Converte tudo para texto, remove emojis e repara metadados | em migração |
-| Extrair CNJs | Encontra e padroniza numerações CNJ em uma planilha | em migração |
-| Recortar Planilha | Divide uma planilha em arquivos por quantidade de linhas | em migração |
-| Mesclar Planilhas | Unifica arquivos com o mesmo cabeçalho ou abas de um arquivo | em migração |
+| Tratamento de Texto | Converte tudo para texto, remove emojis e repara metadados | pronta |
+| Extrair CNJs | Encontra e padroniza numerações CNJ em uma planilha | pronta |
+| Recortar Planilha | Divide uma planilha em arquivos por quantidade de linhas | pronta |
+| Mesclar Planilhas | Concatena as abas selecionadas com a origem de cada linha | pronta |
 
 ## Requisitos
 

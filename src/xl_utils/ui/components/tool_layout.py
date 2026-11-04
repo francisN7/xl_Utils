@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 from collections.abc import Callable
 from pathlib import Path
+from typing import Protocol
 
 import flet as ft
 
@@ -15,7 +16,17 @@ from xl_utils.ui.components.sheet_selector import SheetSelector
 from xl_utils.ui.state import ToolState
 
 RunHandler = Callable[[ToolState, ResultPanel], None]
-OptionsFactory = Callable[[ToolState], ft.Control]
+
+
+class OptionsPanel(Protocol):
+    """Options control that rebuilds itself when the input changes."""
+
+    control: ft.Control
+
+    def refresh(self) -> None: ...
+
+
+OptionsFactory = Callable[[ToolState], ft.Control | OptionsPanel]
 
 
 class ToolLayout:
@@ -109,6 +120,10 @@ class ToolLayout:
             spacing=10,
         )
 
+        options_control, self._options_refresh = _build_options(
+            options,
+            self.state,
+        )
         left = ft.Column(
             controls=[
                 _card(
@@ -117,7 +132,7 @@ class ToolLayout:
                 ),
                 _card(
                     "2. Opções",
-                    _build_options(options, self.state),
+                    options_control,
                 ),
             ],
             spacing=16,
@@ -181,6 +196,7 @@ class ToolLayout:
             self._summary.value = "Nenhum arquivo selecionado."
             self._run_button.disabled = True
         self.result.set_idle()
+        self._refresh_options()
         self._refresh()
         self._start_sheet_load()
 
@@ -242,7 +258,12 @@ class ToolLayout:
             return
         total = sum(len(names) for names in selection.values())
         self._summary.value = f"{len(self.state.files)} arquivo(s), {total} aba(s)."
+        self._refresh_options()
         self._refresh()
+
+    def _refresh_options(self) -> None:
+        if self._options_refresh is not None:
+            self._options_refresh()
 
     def _run(self, _event=None) -> None:
         if self._sheet_loading:
@@ -316,9 +337,13 @@ def _empty_options() -> ft.Control:
 def _build_options(
     options: OptionsFactory | ft.Control | None,
     state: ToolState,
-) -> ft.Control:
+) -> tuple[ft.Control, Callable[[], None] | None]:
     if options is None:
-        return _empty_options()
+        return _empty_options(), None
     if isinstance(options, ft.Control):
-        return options
-    return options(state)
+        return options, None
+
+    panel = options(state)
+    if isinstance(panel, ft.Control):
+        return panel, None
+    return panel.control, panel.refresh

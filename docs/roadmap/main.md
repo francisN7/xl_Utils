@@ -20,7 +20,7 @@ duplicação e com teste.
 - [x] **S1d — Seleção de abas.** Chips por aba com “Todas”/“Limpar”, nomes no
   core e filtro em `all_str`, `cnj` e `cut`, preservando as abas escolhidas na
   saída. Custo M.
-- [ ] **S1e — `merge`.** Um único modo: concatena as abas selecionadas de todos
+- [x] **S1e — `merge`.** Um único modo: concatena as abas selecionadas de todos
   os arquivos, com coluna `ORIGEM` e alinhamento opcional de colunas. Apagar
   `merge.py`. Custo G.
 

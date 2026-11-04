@@ -59,6 +59,40 @@ def list_sheets(path: Path) -> list[str]:
     raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
 
 
+def read_headers(path: Path) -> dict[str, list[str]]:
+    """Return the column labels of every sheet without loading the rows.
+
+    Excel reads only the headers; CSV tries the same encodings as the repair
+    path; HTML has no header-only mode, so its tables are parsed fully. Labels
+    are always returned as text, matching the UI column mapping.
+    """
+    suffix = resolve_suffix(path)
+
+    try:
+        match suffix:
+            case ".xlsx" | ".xlsm" | ".xls":
+                engine = "xlrd" if suffix == ".xls" else "openpyxl"
+                frames = pd.read_excel(path, sheet_name=None, nrows=0, engine=engine)
+                return {
+                    str(name): [str(column) for column in frame.columns]
+                    for name, frame in frames.items()
+                }
+            case ".csv":
+                return {"Planilha1": _csv_headers(path)}
+            case ".html" | ".htm":
+                frames = pd.read_html(path)
+                return {
+                    f"Página{index}": [str(column) for column in frame.columns]
+                    for index, frame in enumerate(frames, start=1)
+                }
+    except Exception as error:  # noqa: BLE001 - report one clear failure
+        raise ValueError(
+            f"Não foi possível ler as colunas de {path.name}: {error}"
+        ) from error
+
+    raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
+
+
 def save_workbook(sheets: Mapping[str, pd.DataFrame], destination: Path) -> Path:
     """Write a dataframe mapping to one xlsx file and return its path."""
     destination = unique_path(
@@ -96,6 +130,20 @@ def _list_html_sheets(path: Path) -> list[str]:
         raise ValueError(
             f"Não foi possível listar as abas de {path.name}: {error}"
         ) from error
+
+
+def _csv_headers(path: Path) -> list[str]:
+    last_error: Exception | None = None
+    for encoding in ("utf-8-sig", "cp1252", "latin-1"):
+        try:
+            frame = pd.read_csv(path, nrows=0, encoding=encoding)
+        except Exception as error:  # noqa: BLE001 - try the next encoding
+            last_error = error
+            continue
+        return [str(column) for column in frame.columns]
+
+    assert last_error is not None
+    raise last_error
 
 
 def _read_excel(

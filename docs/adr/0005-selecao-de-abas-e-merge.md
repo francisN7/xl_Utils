@@ -55,3 +55,17 @@ colunas de mesmo significado que chegam com nomes diferentes.
   cabeçalhos variam; o alinhamento manual cobre esse caso.
 - **Sem coluna de origem:** duplicidades de arquivos diferentes ficam
   indistinguíveis; rejeitado.
+
+## Adendo — S1e (2026-11-04)
+
+- O alinhamento é por **um dropdown por coluna distinta**, não por arrastar: o
+  Flet 1.0 não oferece drag de colunas.
+- Colunas com o mesmo nome já nascem alinhadas; para unir nomes diferentes, o
+  usuário escolhe a mesma coluna canônica nos dois dropdowns.
+- O mapa vive em `ToolState.options` e é recalculado quando os arquivos ou as
+  abas mudam; a lista de colunas vem de `core/io.read_headers`, que não carrega
+  as linhas para Excel e CSV.
+- `ORIGEM` é a primeira coluna, no formato `<arquivo> - <aba> - <linha>`. Uma
+  coluna de origem que já se chame `ORIGEM` é renomeada para `ORIGEM_original`.
+- Execução com uma única aba útil é recusada com mensagem clara, antes de
+  gravar qualquer arquivo.

@@ -37,13 +37,16 @@ decisões nos ADRs.
   ícones, logs e prévia.
 - Lote de arquivos em todas as ferramentas: texto, CNJ e recorte processam cada
   origem e salvam saídas separadas, com prévia e log identificando o arquivo.
+- Mesclagem de planilhas: concatena as abas selecionadas de um ou vários
+  arquivos em `output/Merge.xlsx`, com a coluna `ORIGEM`, alinhamento de colunas
+  por dropdown e recusa de uma única aba útil.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 
 ### Removed
 
-- `all_str.py`, `cnjs.py` e `cut.py` da raiz, substituídos por core +
-  controller + página.
+- `all_str.py`, `cnjs.py`, `cut.py` e `merge.py` da raiz, substituídos por
+  core + controller + página. Nenhum script legado permanece na raiz.
 - Branch `cli-app` e a tentativa de interface por linha de comando.
 - Ferramentas `convert`, `quick_replace` e `remove_emoji` (emojis passam para o
   pipeline do `all_str`).

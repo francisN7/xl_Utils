@@ -5,15 +5,19 @@ from dataclasses import dataclass
 
 import flet as ft
 
-from xl_utils.ui import theme
-from xl_utils.ui.components.tool_layout import RunHandler, ToolLayout
+from xl_utils.ui.components.tool_layout import (
+    OptionsFactory,
+    RunHandler,
+    ToolLayout,
+)
 from xl_utils.ui.pages.all_str import options as all_str_options
 from xl_utils.ui.pages.all_str import run as run_all_str
 from xl_utils.ui.pages.cnj import options as cnj_options
 from xl_utils.ui.pages.cnj import run as run_cnj
 from xl_utils.ui.pages.cut import options as cut_options
 from xl_utils.ui.pages.cut import run as run_cut
-from xl_utils.ui.state import ToolState
+from xl_utils.ui.pages.merge import options as merge_options
+from xl_utils.ui.pages.merge import run as run_merge
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,7 +36,7 @@ def _tool(
     label: str,
     icon: ft.IconData,
     description: str,
-    options: Callable[[ToolState], ft.Control],
+    options: OptionsFactory,
     *,
     multiple_files: bool = False,
     default_all_sheets: bool = False,
@@ -54,31 +58,6 @@ def _tool(
         icon=icon,
         description=description,
         build=build,
-    )
-
-
-def _merge_options(_state: ToolState) -> ft.Control:
-    return ft.Column(
-        controls=[
-            ft.Dropdown(
-                label="Modo de mesclagem",
-                value="files",
-                dense=True,
-                disabled=True,
-                text_size=theme.FONT_SM,
-                options=[
-                    ft.DropdownOption(
-                        key="files",
-                        text="Primeira aba de cada arquivo",
-                    ),
-                    ft.DropdownOption(
-                        key="sheets",
-                        text="Todas as abas de uma planilha",
-                    ),
-                ],
-            ),
-        ],
-        spacing=8,
     )
 
 
@@ -117,8 +96,9 @@ TOOLS: tuple[ToolPage, ...] = (
         "merge",
         "Mesclar Planilhas",
         ft.Icons.MERGE_TYPE,
-        "Unifica planilhas com o mesmo cabeçalho ou as abas de uma planilha.",
-        _merge_options,
+        "Concatena as abas selecionadas em uma planilha, com a origem de cada linha.",
+        merge_options,
         multiple_files=True,
+        run_handler=run_merge,
     ),
 )

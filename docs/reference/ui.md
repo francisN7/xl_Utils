@@ -72,6 +72,16 @@ erro do arquivo e a execução reporta a falha de leitura; sem nenhuma aba
 marcada, a ferramenta não executa e pede uma seleção. Enquanto as abas são
 lidas, aparece um spinner e o botão Executar fica desabilitado.
 
+### Mesclagem
+
+O merge usa a mesma seleção de abas, com a primeira aba de cada arquivo marcada
+por padrão quando há vários. Em “2. Opções” aparece um dropdown por coluna
+distinta: o nome à esquerda é a coluna de origem e o valor escolhido é a coluna
+canônica no resultado. Colunas com o mesmo nome já ficam alinhadas; nomes
+diferentes podem ser unidos escolhendo o mesmo destino. A lista é refeita quando
+os arquivos ou as abas mudam e o mapa vive em `ToolState.options`. A saída
+`Merge.xlsx` mostra `ORIGEM` como primeira coluna, com arquivo, aba e linha.
+
 ## Início
 
 O hub mostra quatro cartões em uma linha no desktop, dois no médio e um no

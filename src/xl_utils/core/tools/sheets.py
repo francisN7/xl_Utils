@@ -3,13 +3,11 @@
 from collections.abc import Collection, Mapping, Sequence
 from pathlib import Path
 
-import pandas as pd
 
-
-def filter_sheets(
-    sheets: Mapping[str, pd.DataFrame],
+def filter_sheets[Sheet](
+    sheets: Mapping[str, Sheet],
     selected: Collection[str] | None = None,
-) -> dict[str, pd.DataFrame]:
+) -> dict[str, Sheet]:
     """Keep only ``selected`` sheets, preserving the original order.
 
     ``None`` means "all sheets". An empty selection or a name that does not

@@ -100,7 +100,7 @@ alterado.
 | Tratamento de texto | `core/tools/all_str.py` | pronta |
 | Extrair CNJs | `core/tools/cnj.py` | pronta |
 | Recortar planilha | `core/tools/cut.py` | pronta |
-| Mesclar planilhas | `core/tools/merge.py` | a migrar |
+| Mesclar planilhas | `core/tools/merge.py` | pronta |
 
 ## Extração de CNJ
 
@@ -119,6 +119,22 @@ lê pelo `prepare_workbook`, filtra as abas escolhidas, salva cada bloco em
 `output/` e usa `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx`
 com várias abas processadas), saneando caracteres inválidos de nome de arquivo.
 O campo de linhas é editável na página e vive em `ToolState.options`.
+
+## Mesclagem
+
+`core/tools/merge.py` recebe uma sequência de `(arquivo, aba, DataFrame)` e
+concatena na mesma ordem, descartando apenas abas sem linhas. Antes de juntar,
+aplica `column_map` (`{coluna_de_origem: coluna_canônica}`) e insere `ORIGEM`
+como primeira coluna, no formato `<arquivo> - <aba> - <linha>`, com a linha
+contada a partir de 1 na origem. Colunas ausentes viram `NaN` e colunas novas
+entram no fim, na ordem em que aparecem.
+
+`controllers/merge.py` lê cada fonte pelo `prepare_workbook`, filtra as abas com
+`filter_sheets` e chama `merge_sheets`; exige ao menos duas abas com dados e
+grava `output/Merge.xlsx` na pasta da primeira origem. `inspect_columns` usa
+`core/io.read_headers` para listar os cabeçalhos sem carregar as linhas; a página
+monta um dropdown por coluna distinta e guarda o mapa em `ToolState.options`.
+O painel de opções é reconstruído quando arquivos ou abas mudam.
 
 ## Testes
 
