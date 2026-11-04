@@ -4,51 +4,50 @@
 
 ## Sessão
 
-- **Última concluída:** S5d — recorte por quantidade de arquivos
-- **Próxima:** S6a — histórico de execuções
-  (`docs/sessions/S6a-historico-de-execucoes.md`) — spec pronta
-- **Ciclo:** 0004 — Execução e robustez, Fase 2 concluída; resta o backlog
-- **Decisões:** ADR 0011 (execução/cancelamento); ADR 0012 (CNJ sujo, dígito
-  verificador não validado)
+- **Última concluída:** fechamento do ciclo 0004 (S5a–S5d)
+- **Próxima:** S6a — tema claro opcional
+  (`docs/sessions/S6a-tema-claro.md`) — spec pronta
+- **Ciclo:** 0005 — Polimento, Fase 1
+- **Decisões:** histórico de execuções descartado; tema claro aplicado só ao
+  reabrir o app; ADR 0011 e ADR 0012 seguem valendo
 
 ## Pronto
 
-- S5d: a página de recorte alterna entre “Linhas por arquivo” e “Arquivos por
-  aba”; a quantidade vale por aba, os blocos ficam equilibrados e o modo antigo
-  não mudou.
-- Quantidade acima do total de linhas é reduzida para não criar arquivo vazio;
-  aba vazia continua gerando um arquivo.
+- Ciclo 0004 fechado: execução fora da UI, log ao vivo/cancelamento, CNJ em
+  texto sujo e recorte por quantidade de arquivos.
+- S5d: recorte com “Linhas por arquivo” ou “Arquivos por aba”; a quantidade vale
+  por aba e os blocos ficam equilibrados.
 - S5c: CNJ em texto sujo com separadores flexíveis; CPF e 21 dígitos seguidos
   fora; dígito verificador inválido não descarta o valor.
 - S5b: log ao vivo na fila; “Executar” vira “Cancelar” e a parada cooperativa
   entre arquivos mantém a prévia parcial sem liberar salvar.
-- S5a: handler em `asyncio.to_thread`, barra e contador via fila, entrada
-  bloqueada; UI atualizada só no loop.
 - S4c/S4b: UI e `shared/` em PT-BR, leitura fiel de CSV/HTML, code tour.
 
 ## Próximo passo
 
-Executar a S6a: registrar as últimas execuções (ferramenta, arquivos, contagens,
-resultado e saída) em armazenamento local e exibi-las sem conteúdo de célula.
+Executar a S6a: tokenizar as cores, criar a paleta clara, salvar a preferência
+local e aplicar o tema na abertura; a troca na sidebar pede reabertura.
 
 ## Arquivos-chave
 
-- `core/tools/cut.py`, `controllers/cut.py` (dois modos de recorte)
-- `ui/pages/cut.py` (seletor de modo e campos)
-- `core/tools/cnj.py` (sanitização e regex flexível)
-- `shared/progress.py`, `ui/components/tool_layout.py` (execução e cancelamento)
+- `ui/theme.py`, `app.py`, `ui/components/sidebar.py`
+- `shared/progress.py`, `ui/components/tool_layout.py` (execução/cancelamento)
 - `ui/components/result_panel.py`, `ui/pages/batch.py`, `ui/pages/*.py`
+- `core/tools/cut.py`, `controllers/cut.py`, `ui/pages/cut.py`
+- `core/tools/cnj.py` (sanitização e regex flexível)
 - `tests/test_cut.py`, `tests/test_cnj.py`, `tests/test_integration.py`
-- `docs/adr/0011-execucao-fora-da-ui.md`, `docs/adr/0012-cnj-texto-sujo.md`
+- `docs/roadmap/0004-execucao-e-robustez.md` (histórico do ciclo fechado)
 
 ## Armadilhas
 
 - Flet não é thread-safe: UI só no loop da página, via dispatcher e fila.
+- A preferência de tema precisa ser lida antes de montar a UI; troca ao vivo
+  está fora de escopo nesta fase.
+- Componentes devem usar `theme.X`; import direto de constante ignora a paleta.
 - Cancelar não interrompe pandas: só vale entre arquivos, nunca na chamada.
-- Recorte por partes usa divisão equilibrada, não `ceil`; a diferença máxima é
-  uma linha e a quantidade é limitada ao total de linhas.
-- `rows_per_file` e `parts` não se misturam no controller; um dos dois é exigido.
-- Sanear o texto na busca não pode alterar a planilha nem o diagnóstico.
+- Recorte por partes usa divisão equilibrada, limitada ao total de linhas.
+- `rows_per_file` e `parts` não se misturam no controller.
+- Sanear o texto na busca não altera a planilha nem o diagnóstico.
 - `keep_default_na=False`: célula vazia vira `""`, não `NaN`; merge usa `pd.NA`.
 - `.xls` não tem leitor alternativo; falha do calamine é final.
 - Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir”.
