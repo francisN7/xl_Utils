@@ -1,4 +1,4 @@
-"""Merge the selected sheets of several files into one workbook."""
+"""Merge the selected sheets of several files into one in-memory workbook."""
 
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
@@ -6,8 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from xl_utils.core.io import read_headers, save_workbook
+from xl_utils.core.io import read_headers
 from xl_utils.core.paths import default_output_dir
+from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.merge import ColumnGroup, ColumnRef, merge_sheets
 from xl_utils.core.tools.sheets import filter_sheets
@@ -22,9 +23,13 @@ class MergeOutcome:
 
     sources: tuple[Path, ...]
     merged: pd.DataFrame
-    output: Path
+    item: SaveItem
     sheets: int
     log: RunLog
+
+    @property
+    def suggested_name(self) -> str:
+        return self.item.suggested_name
 
     @property
     def rows(self) -> int:
@@ -53,7 +58,7 @@ def run_merge(
     sources: Sequence[Source],
     groups: Sequence[ColumnGroup] | None = None,
 ) -> MergeOutcome:
-    """Concatenate the selected sheets of ``sources`` into ``output/``."""
+    """Concatenate the selected sheets of ``sources``, without writing."""
     if not sources:
         raise ValueError("Selecione ao menos um arquivo para mesclar.")
 
@@ -74,8 +79,12 @@ def run_merge(
         )
 
     merged = merge_sheets(entries, groups)
-    destination = default_output_dir(loaded[0][0]) / "Merge.xlsx"
-    output = save_workbook({"Mesclado": merged}, destination)
+    name = "Merge.xlsx"
+    item = SaveItem(
+        suggested_name=name,
+        sheets={"Mesclado": merged},
+        output_dir=default_output_dir(loaded[0][0]),
+    )
 
     log = RunLog()
     for source, sheets in loaded:
@@ -98,12 +107,12 @@ def run_merge(
     log.info(f"Abas mescladas: {usable}")
     log.info(f"Linhas mescladas: {len(merged)}")
     log.info(f"Colunas no resultado: {len(merged.columns)}")
-    log.success(f"Saída: {output}")
+    log.success(f"Pronto para salvar: {name}")
 
     return MergeOutcome(
         sources=tuple(source for source, _ in loaded),
         merged=merged,
-        output=output,
+        item=item,
         sheets=usable,
         log=log,
     )

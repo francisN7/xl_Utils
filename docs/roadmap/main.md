@@ -38,7 +38,7 @@ duplicação e com teste.
   avisa quando diverge da extensão e bloqueia antes de ler quando nada é
   identificável. Testes cobrem `.xlsx` como `.xls`, CSV e HTML como `.xlsx`,
   leitura pelo conteúdo e origem intacta. Nunca renomear o arquivo. Custo M.
-- [ ] **S2e — Saída escolhida.** Executar sem gravar automaticamente, mostrar a
+- [x] **S2e — Saída escolhida.** Executar sem gravar automaticamente, mostrar a
   prévia e salvar só ao clicar em “Salvar”, escolhendo arquivo (saída única) ou
   pasta (lote), com “Salvar em output/” como atalho. Custo G.
 

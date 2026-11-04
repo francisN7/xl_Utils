@@ -54,7 +54,9 @@ def run(state: ToolState, result: ResultPanel) -> None:
     ]
     append_outcomes(state, outcomes)
 
-    total_outputs = sum(outcome.files for outcome in outcomes)
+    items = [item for outcome in outcomes for item in outcome.items]
+    state.save_items = items
+    total_outputs = len(items)
     total_rows = sum(outcome.rows for outcome in outcomes)
     if not total_outputs:
         result.set_info(
@@ -70,8 +72,7 @@ def run(state: ToolState, result: ResultPanel) -> None:
         f"{total_rows} linha(s)"
     )
     title = "Planilhas recortadas" if len(outcomes) > 1 else "Planilha recortada"
-    result.set_success(
-        outcomes[0].outputs[0],
+    result.set_ready(
         frames,
         title,
         f"{state.message} · {rows_per_file} linha(s) por arquivo",

@@ -112,8 +112,19 @@ próxima linha também começa à esquerda.
 
 ## Resultado e prévia
 
-A prévia fica **sempre visível** no painel de resultado:
+A prévia fica **sempre visível** no painel de resultado. Depois de executar, o
+painel entra em **“Pronto para salvar”**: a prévia aparece, mas nenhum arquivo
+é criado.
 
+- **Salvar** abre o seletor nativo: `save_file` para uma saída, com o nome
+  sugerido editável, ou `get_directory_path` para várias saídas.
+- **Salvar em output/** grava no `output/` de cada origem, sem diálogo; o merge
+  usa a pasta da primeira origem.
+- Cancelar o seletor mantém a prévia e os botões; nada é gravado.
+- Nomes existentes ganham sufixo; o log registra o caminho real como
+  `Salvo: <caminho>`.
+- Após salvar, o caminho real aparece, “Abrir pasta” é liberado e os botões de
+  salvar somem. Falha de escrita mostra o erro e mantém a prévia.
 - primeiras 100 linhas e todas as colunas;
 - rolagem vertical com barra oculta e horizontal com barra só quando precisa;
 - vista fixa de 240 px, com o log limitado a 160 px para não espremer a prévia;

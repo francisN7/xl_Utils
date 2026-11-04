@@ -1,4 +1,4 @@
-"""Run CNJ extraction and save the unique list beside the source file."""
+"""Run CNJ extraction and keep the unique list in memory for saving."""
 
 from collections.abc import Collection
 from dataclasses import dataclass
@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from xl_utils.core.io import save_workbook
 from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
+from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cnj import collect_cnjs, count_cnjs
 from xl_utils.core.tools.sheets import filter_sheets
@@ -20,10 +20,18 @@ class CnjOutcome:
     """Result of one CNJ extraction run."""
 
     source: Path
-    output: Path
+    item: SaveItem
     cnjs: list[str]
     found: int
     log: RunLog
+
+    @property
+    def suggested_name(self) -> str:
+        return self.item.suggested_name
+
+    @property
+    def sheets(self) -> dict[str, pd.DataFrame]:
+        return self.item.sheets
 
     @property
     def duplicates(self) -> int:
@@ -34,15 +42,16 @@ def run_cnj(
     source: Path,
     selected: Collection[str] | None = None,
 ) -> CnjOutcome:
-    """Extract CNJs from the selected sheets and save them into ``output/``."""
+    """Extract CNJs from the selected sheets, without writing anything."""
     sheets = filter_sheets(prepare_workbook(source), selected)
     cnjs = collect_cnjs(sheets)
     found = count_cnjs(sheets)
 
-    destination = default_output_dir(source) / f"{source.stem} lista cnj.xlsx"
-    output = save_workbook(
-        {"PROCESSOS": pd.DataFrame({"PROCESSOS": cnjs})},
-        destination,
+    name = f"{source.stem} lista cnj.xlsx"
+    item = SaveItem(
+        suggested_name=name,
+        sheets={"PROCESSOS": pd.DataFrame({"PROCESSOS": cnjs})},
+        output_dir=default_output_dir(source),
     )
 
     log = (
@@ -53,11 +62,11 @@ def run_cnj(
         .info(f"CNJs encontrados: {found}")
         .info(f"Duplicados removidos: {found - len(cnjs)}")
         .info(f"CNJs únicos: {len(cnjs)}")
-        .success(f"Saída: {output}")
+        .success(f"Pronto para salvar: {name}")
     )
     return CnjOutcome(
         source=source,
-        output=output,
+        item=item,
         cnjs=cnjs,
         found=found,
         log=log,

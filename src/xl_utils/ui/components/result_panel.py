@@ -1,7 +1,7 @@
-"""Result card: status, output path, log and spreadsheet preview."""
+"""Result card: status, save actions, output path, log and spreadsheet preview."""
 
 import contextlib
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import flet as ft
@@ -19,7 +19,14 @@ _LOG_MAX_HEIGHT = 160
 class ResultPanel:
     """Visual state of one tool result."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        on_save: Callable[[], None] | None = None,
+        on_save_output: Callable[[], None] | None = None,
+    ) -> None:
+        self._on_save = on_save
+        self._on_save_output = on_save_output
         self._output: Path | None = None
         self._kind = "idle"
         self._diagnostics = ""
@@ -44,6 +51,32 @@ class ResultPanel:
             "Abrir pasta",
             icon=ft.Icons.FOLDER_OPEN,
             on_click=self._open_folder,
+            visible=False,
+        )
+        self._save_button = ft.FilledButton(
+            "Salvar",
+            icon=ft.Icons.SAVE,
+            on_click=self._save,
+        )
+        self._save_output_button = ft.OutlinedButton(
+            "Salvar em output/",
+            icon=ft.Icons.FOLDER,
+            on_click=self._save_output,
+        )
+        self._save_row = ft.Column(
+            controls=[
+                ft.Row(
+                    controls=[self._save_button, self._save_output_button],
+                    spacing=8,
+                    wrap=True,
+                ),
+                ft.Text(
+                    "Nada é gravado até você escolher o destino.",
+                    size=theme.FONT_XS,
+                    color=theme.MUTED,
+                ),
+            ],
+            spacing=4,
             visible=False,
         )
         self._copy_button = ft.IconButton(
@@ -122,6 +155,7 @@ class ResultPanel:
                     spacing=10,
                 ),
                 self._path,
+                self._save_row,
                 ft.Row(
                     controls=[self._open_button],
                     alignment=ft.MainAxisAlignment.START,
@@ -136,7 +170,7 @@ class ResultPanel:
 
     @property
     def kind(self) -> str:
-        """Return the current visual state: idle, info, running, success, error."""
+        """Return the state: idle, info, running, ready, success or error."""
         return self._kind
 
     @property
@@ -160,6 +194,7 @@ class ResultPanel:
         self._path.value = ""
         self._path.visible = False
         self._open_button.visible = False
+        self._save_row.visible = False
         self.set_log([])
         self.preview.set_frames(None)
         self._refresh()
@@ -170,6 +205,7 @@ class ResultPanel:
         self._icon.color = theme.CYAN
         self._status.value = message
         self._detail.value = detail
+        self._save_row.visible = False
         self._refresh()
 
     def set_running(self, message: str = "Executando...") -> None:
@@ -178,6 +214,36 @@ class ResultPanel:
         self._icon.color = theme.YELLOW
         self._status.value = message
         self._detail.value = ""
+        self._save_row.visible = False
+        self._refresh()
+
+    def set_ready(
+        self,
+        frames: dict[str, pd.DataFrame],
+        message: str,
+        detail: str = "",
+    ) -> None:
+        """Show the preview and the save actions, before any file exists."""
+        self._output = None
+        self._kind = "ready"
+        self._icon.name = ft.Icons.SAVE
+        self._icon.color = theme.PURPLE
+        self._status.value = message
+        self._detail.value = detail
+        self._path.value = ""
+        self._path.visible = False
+        self._open_button.visible = False
+        self._save_row.visible = True
+        self.preview.set_frames(frames)
+        self._refresh()
+
+    def set_saving(self, message: str = "Salvando...") -> None:
+        self._kind = "running"
+        self._icon.name = ft.Icons.HOURGLASS_EMPTY
+        self._icon.color = theme.YELLOW
+        self._status.value = message
+        self._detail.value = ""
+        self._save_row.visible = False
         self._refresh()
 
     def set_success(
@@ -196,10 +262,30 @@ class ResultPanel:
         self._path.value = str(self._output)
         self._path.visible = True
         self._open_button.visible = True
+        self._save_row.visible = False
         self.preview.set_frames(frames)
         self._refresh()
 
-    def set_error(self, message: str, detail: str = "") -> None:
+    def set_save_error(self, message: str, detail: str = "") -> None:
+        """Report a write failure while keeping the preview and save actions."""
+        self._kind = "ready"
+        self._icon.name = ft.Icons.ERROR_OUTLINE
+        self._icon.color = theme.RED
+        self._status.value = message
+        self._detail.value = detail
+        self._path.value = ""
+        self._path.visible = False
+        self._open_button.visible = False
+        self._save_row.visible = True
+        self._refresh()
+
+    def set_error(
+        self,
+        message: str,
+        detail: str = "",
+        *,
+        keep_preview: bool = False,
+    ) -> None:
         self._output = None
         self._kind = "error"
         self._icon.name = ft.Icons.ERROR_OUTLINE
@@ -208,7 +294,9 @@ class ResultPanel:
         self._detail.value = detail
         self._path.visible = False
         self._open_button.visible = False
-        self.preview.set_frames(None)
+        self._save_row.visible = False
+        if not keep_preview:
+            self.preview.set_frames(None)
         self._refresh()
 
     def set_log(self, log: RunLog | Sequence[str]) -> None:
@@ -236,6 +324,14 @@ class ResultPanel:
     def _resize_log(self, lines: int) -> None:
         """Cap the log height so the preview keeps a usable viewport."""
         self._log_box.height = min(28 + 18 * lines, _LOG_MAX_HEIGHT) if lines else 0
+
+    def _save(self, _event=None) -> None:
+        if self._on_save is not None:
+            self._on_save()
+
+    def _save_output(self, _event=None) -> None:
+        if self._on_save_output is not None:
+            self._on_save_output()
 
     def _open_folder(self, _event=None) -> None:
         if self._output is not None:

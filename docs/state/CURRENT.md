@@ -4,10 +4,10 @@
 
 ## Sessão
 
-- **Última concluída:** S2d — tipo real x extensão
-- **Próxima:** S2e — saída escolhida (`docs/sessions/S2e-saida-escolhida.md`)
+- **Última concluída:** S2e — saída escolhida
+- **Próxima:** S3a — promover a UI a `main` (`docs/sessions/S3a-publicacao.md`)
 - **Ciclo:** 0002 — Fase 2 — Consolidação
-- **Retorno:** `result_panel.py`, `tool_layout.py`, controllers e `test_save.py`
+- **Retorno:** `core/save.py`, `result_panel.py`, `tool_layout.py`, `test_save.py`
 - **Decisões abertas:** nenhuma
 
 ## Pronto
@@ -15,8 +15,12 @@
 - Ambiente uv/Python 3.15, Flet desktop e pandas 3.1; MVC híbrido e tema Dracula.
 - `prepare_workbook` lê como texto, remove emojis, repara e falha como
   `WorkbookReadError`.
-- Texto, CNJ, recorte e merge salvam em `output/`; os três primeiros aceitam
-  lote e processam cada origem separadamente.
+- Texto, CNJ, recorte e merge devolvem `SaveItem` em memória; nada é gravado
+  até a escolha do usuário.
+- `core/save.py` grava arquivo único, lote em pasta ou atalho `output/`; nomes
+  livres via `unique_path` e falha tipada `SaveError`.
+- Painel “Pronto para salvar” com prévia, **Salvar**, **Salvar em output/** e
+  cancelamento sem efeito; após gravar, caminho real e “Abrir pasta”.
 - Seleção de abas por chips e `default_selection` por ferramenta; merge com
   `ORIGEM` e quadro de colunas arrastáveis (chips).
 - Integração cobre os quatro formatos; `.xls` usa `tests/fixtures/minimo.xls`;
@@ -29,29 +33,25 @@
 
 ## Próximo passo
 
-S2e: executar sem gravar, mostrar a prévia e salvar só ao clicar, com arquivo
-único, pasta para o lote e atalho para `output/`.
+S3a: confirmar que `main` é ancestral de `feat/ui`, criar `legacy` no commit
+antigo e avançar `main` para a versão com UI.
 
 ## Arquivos-chave
 
-- `ui/components/tool_layout.py` (`_check_formats`, `_block_formats`) e
-  `ui/pages/registry.py`.
-- `core/mime.py` (`FormatCheck`), `shared/log.py` e `result_panel.py`.
-- `tests/test_format_check.py`, `test_layout.py`, `test_log.py` e
-  `test_integration.py`.
+- `core/save.py` (`SaveItem`, `save_chosen`, `save_to_output`, `SaveError`),
+  `ui/components/result_panel.py`, `ui/components/tool_layout.py` e
+  `tests/test_save.py`.
 
 ## Armadilhas
 
 - Flet 1.0 não suporta drop do SO; o merge usa `Draggable`/`DragTarget`.
+- `FilePicker` fica em `page.services`; salvar/cancelar é assíncrono e `None`.
 - Uma aba contribui com no máximo uma coluna por saída; cabeçalhos repetidos
   ganham sufixo `_2`.
-- `puremagic` pode devolver `.txt`; a extensão suportada vence e não conta como
-  divergência. O gate só bloqueia quando não há formato suportado nenhum.
+- `puremagic` pode dar `.txt`; a extensão suportada vence e o gate só bloqueia
+  quando não há formato suportado nenhum.
 - `.xls` é lido com o engine `calamine` (`python-calamine`); `xlrd` saiu.
-- HTML sem `<meta charset>` pode perder acentos; as fixtures declaram UTF-8.
 - `read_html` não aceita `dtype`; a segunda passada com converters é necessária.
-- Log e diagnóstico não carregam valores de célula; só passos, contagens,
-  caminhos e formato.
 - O card “2. Opções” depende de `options` declaradas, não do conteúdo do painel.
 
 ## Como rodar

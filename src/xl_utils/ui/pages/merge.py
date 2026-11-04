@@ -347,11 +347,11 @@ def run(state: ToolState, result: ResultPanel) -> None:
     append_outcomes(state, [outcome])
     frames = {"Mesclado": outcome.merged}
     state.result = frames
+    state.save_items = [outcome.item]
     state.message = (
         f"{outcome.sheets} aba(s), {outcome.rows} linha(s), {outcome.columns} coluna(s)"
     )
-    result.set_success(
-        outcome.output,
+    result.set_ready(
         frames,
         "Planilhas mescladas",
         f"{state.message} · {len(pending)} arquivo(s)",

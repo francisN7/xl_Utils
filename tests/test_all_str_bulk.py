@@ -5,6 +5,7 @@ import pytest
 
 from xl_utils.controllers.all_str import run_all_str
 from xl_utils.core.io import read_workbook
+from xl_utils.core.save import save_chosen
 
 ROWS = 1000
 CITIES = (
@@ -55,11 +56,13 @@ def test_pipeline_end_to_end_with_one_thousand_rows(
     outcome = run_all_str(source)
 
     assert source.read_bytes() == before
-    assert outcome.output.parent == tmp_path / "output"
-    assert outcome.output.suffix == ".xlsx"
+    assert not (tmp_path / "output").exists()
     assert outcome.rows == ROWS
 
-    frame = next(iter(read_workbook(outcome.output, dtype=str).values()))
+    saved = save_chosen([outcome.item], tmp_path / "saida.xlsx")
+    assert saved is not None
+    assert saved[0].suffix == ".xlsx"
+    frame = next(iter(read_workbook(saved[0], dtype=str).values()))
     assert len(frame) == ROWS
     assert frame["id"].tolist() == expected["id"].tolist()
     assert frame["cnj"].tolist() == expected["cnj"].tolist()

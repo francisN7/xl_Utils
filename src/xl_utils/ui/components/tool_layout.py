@@ -11,6 +11,7 @@ import flet as ft
 
 from xl_utils.core.io import list_sheets
 from xl_utils.core.mime import FormatCheck, check_format
+from xl_utils.core.save import SaveError, SaveItem, save_chosen, save_to_output
 from xl_utils.core.tools.all_str import WorkbookReadError
 from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.ui import theme
@@ -55,9 +56,14 @@ class ToolLayout:
             self._files_changed,
             multiple=multiple_files,
         )
-        self.result = ResultPanel()
+        self.result = ResultPanel(
+            on_save=self._save_clicked,
+            on_save_output=self._save_output_clicked,
+        )
         self._formats: dict[Path, FormatCheck] = {}
         self._sheet_loading = False
+        self._save_picker = ft.FilePicker()
+        self._save_picker_attached = False
         self.sheet_selector = SheetSelector(
             self.state,
             on_change=self._selection_changed,
@@ -306,6 +312,7 @@ class ToolLayout:
         self.state.message = ""
         self.state.error = None
         self.state.error_detail = None
+        self.state.save_items.clear()
         log = RunLog()
         for check in checks:
             if check.diverges:
@@ -333,6 +340,8 @@ class ToolLayout:
         else:
             if self.result.kind == "success":
                 log.success(f"Concluído: {self.result.status}")
+            elif self.result.kind == "ready":
+                log.success("Pronto para salvar")
             elif self.result.kind == "info":
                 log.warning(self.result.status)
         finally:
@@ -367,6 +376,114 @@ class ToolLayout:
         self.result.set_error(title, detail or type(error).__name__)
         if self.state.log is not None:
             self.state.log.error(f"{type(error).__name__}: {error}")
+
+    def _save_clicked(self, _event=None) -> None:
+        """Open the native selector: file for one output, folder for many."""
+        items = list(self.state.save_items)
+        if not items:
+            return
+        page = self._attach_save_picker()
+        if page is None:
+            self._save_failed(
+                SaveError("A janela ainda não está pronta para abrir o seletor.")
+            )
+            return
+        page.run_task(self._pick_and_save, items)
+
+    async def _pick_and_save(self, items: list[SaveItem]) -> None:
+        try:
+            if len(items) == 1:
+                destination = await self._save_picker.save_file(
+                    dialog_title="Salvar planilha",
+                    file_name=items[0].suggested_name,
+                    file_type=ft.FilePickerFileType.CUSTOM,
+                    allowed_extensions=["xlsx"],
+                )
+            else:
+                destination = await self._save_picker.get_directory_path(
+                    dialog_title="Selecione a pasta de destino",
+                )
+        except Exception as error:  # noqa: BLE001 - keep the preview usable
+            self._save_failed(SaveError(f"Não foi possível abrir o seletor: {error}"))
+            return
+        if not destination:
+            return
+        chosen = Path(destination)
+        await self._write(lambda: save_chosen(items, chosen))
+
+    def _save_output_clicked(self, _event=None) -> None:
+        """Save in the origin ``output/`` folder without opening a dialog."""
+        items = list(self.state.save_items)
+        if not items:
+            return
+        page = self._page()
+        if page is None:
+            self._save_failed(SaveError("A janela ainda não está pronta para gravar."))
+            return
+        page.run_task(self._write, lambda: save_to_output(items))
+
+    async def _write(self, work: Callable[[], list[Path] | None]) -> None:
+        self.result.set_saving()
+        try:
+            paths = await asyncio.to_thread(work)
+        except SaveError as error:
+            self._save_failed(error)
+            return
+        except Exception as error:  # noqa: BLE001 - any write failure is typed here
+            self._save_failed(SaveError(f"Falha ao salvar: {error}"))
+            return
+        if paths:
+            self._saved(paths)
+
+    def _saved(self, paths: list[Path]) -> None:
+        log = self.state.log or RunLog()
+        for path in paths:
+            log.success(f"Salvo: {path}")
+        self.state.log = log
+        detail = (
+            f"{len(paths)} arquivo(s) gravado(s) no destino escolhido."
+            if len(paths) > 1
+            else "Arquivo gravado no destino escolhido."
+        )
+        self.result.set_success(
+            paths[0],
+            self.state.result or {},
+            "Salvo com sucesso",
+            detail,
+        )
+        self.result.set_log(log)
+        self.result.set_diagnostics(self._diagnostics(None))
+        self._refresh()
+
+    def _save_failed(self, error: BaseException) -> None:
+        """Keep the preview and the save actions when writing fails."""
+        self.state.error = str(error)
+        trace = traceback.format_exc()
+        self.state.error_detail = (
+            trace if trace and not trace.startswith("NoneType") else None
+        )
+        log = self.state.log or RunLog()
+        log.error(f"{type(error).__name__}: {error}")
+        self.state.log = log
+        self.result.set_save_error("Não foi possível salvar", str(error))
+        self.result.set_log(log)
+        self.result.set_diagnostics(self._diagnostics(error))
+        self._refresh()
+
+    def _attach_save_picker(self) -> ft.Page | None:
+        page = self._page()
+        if page is None:
+            return None
+        if not self._save_picker_attached:
+            page.services.append(self._save_picker)
+            self._save_picker_attached = True
+        return page
+
+    def _page(self) -> ft.Page | None:
+        try:
+            return self.control.page
+        except RuntimeError:
+            return None
 
     def _diagnostics(self, error: BaseException | None) -> str:
         return build_diagnostics(

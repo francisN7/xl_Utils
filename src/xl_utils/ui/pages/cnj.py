@@ -28,6 +28,7 @@ def run(state: ToolState, result: ResultPanel) -> None:
         lambda outcome: {"PROCESSOS": pd.DataFrame({"PROCESSOS": outcome.cnjs})},
     )
     state.result = frames
+    state.save_items = [outcome.item for outcome in outcomes]
 
     unique = sum(len(outcome.cnjs) for outcome in outcomes)
     duplicates = sum(outcome.duplicates for outcome in outcomes)
@@ -36,16 +37,14 @@ def run(state: ToolState, result: ResultPanel) -> None:
         title = (
             "Listas de CNJs geradas" if len(outcomes) > 1 else "Lista de CNJs gerada"
         )
-        result.set_success(
-            outcomes[0].output,
+        result.set_ready(
             frames,
             title,
             f"{state.message} · {duplicates} duplicado(s)",
         )
     else:
         state.message = "Nenhum CNJ encontrado"
-        result.set_success(
-            outcomes[0].output,
+        result.set_ready(
             frames,
             state.message,
             "A planilha não contém numeração no padrão CNJ."

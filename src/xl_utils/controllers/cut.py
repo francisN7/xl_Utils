@@ -1,4 +1,4 @@
-"""Run the row cut and save every part into the output folder."""
+"""Run the row cut and keep every part in memory for saving."""
 
 from collections.abc import Collection
 from dataclasses import dataclass
@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from xl_utils.core.io import save_workbook
 from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
+from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cut import split_workbook
 from xl_utils.core.tools.sheets import filter_sheets
@@ -23,14 +23,18 @@ class CutOutcome:
     """Result of one row-cut run."""
 
     source: Path
-    outputs: list[Path]
+    items: list[SaveItem]
     parts: dict[str, list[pd.DataFrame]]
     preview: dict[str, pd.DataFrame]
     log: RunLog
 
     @property
     def files(self) -> int:
-        return len(self.outputs)
+        return len(self.items)
+
+    @property
+    def suggested_names(self) -> list[str]:
+        return [item.suggested_name for item in self.items]
 
     @property
     def rows(self) -> int:
@@ -42,12 +46,12 @@ def run_cut(
     rows_per_file: int,
     selected: Collection[str] | None = None,
 ) -> CutOutcome:
-    """Cut the selected sheets of ``source`` into ``output/``."""
+    """Cut the selected sheets of ``source``, without writing anything."""
     sheets = filter_sheets(prepare_workbook(source), selected)
     parts = split_workbook(sheets, rows_per_file)
     output_dir = default_output_dir(source)
     multiple_sheets = len(parts) > 1
-    outputs: list[Path] = []
+    items: list[SaveItem] = []
 
     for sheet_name, frames in parts.items():
         for number, frame in enumerate(frames, start=1):
@@ -57,10 +61,11 @@ def run_cut(
                 )
             else:
                 base = f"{source.stem}_Recorte_{number:03d}"
-            outputs.append(
-                save_workbook(
-                    {sheet_name: frame},
-                    output_dir / f"{base}.xlsx",
+            items.append(
+                SaveItem(
+                    suggested_name=f"{base}.xlsx",
+                    sheets={sheet_name: frame},
+                    output_dir=output_dir,
                 )
             )
 
@@ -74,13 +79,13 @@ def run_cut(
         .info(f"Abas: {len(parts)}")
         .info(f"Linhas: {total_rows}")
         .info(f"Linhas por arquivo: {rows_per_file}")
-        .success(f"Arquivos gerados: {len(outputs)}")
+        .success(f"Arquivos prontos: {len(items)}")
     )
-    log.extend(f"Saída: {output}" for output in outputs)
+    log.extend(f"Pronto para salvar: {item.suggested_name}" for item in items)
 
     return CutOutcome(
         source=source,
-        outputs=outputs,
+        items=items,
         parts=parts,
         preview=preview,
         log=log,

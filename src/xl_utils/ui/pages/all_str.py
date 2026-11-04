@@ -23,6 +23,7 @@ def run(state: ToolState, result: ResultPanel) -> None:
     append_outcomes(state, outcomes)
     frames = prefixed_frames(outcomes, lambda outcome: outcome.sheets)
     state.result = frames
+    state.save_items = [outcome.item for outcome in outcomes]
 
     total_sheets = sum(len(outcome.sheets) for outcome in outcomes)
     total_rows = sum(outcome.rows for outcome in outcomes)
@@ -34,8 +35,7 @@ def run(state: ToolState, result: ResultPanel) -> None:
         if len(outcomes) > 1
         else "Planilha convertida para texto"
     )
-    result.set_success(
-        outcomes[0].output,
+    result.set_ready(
         frames,
         title,
         f"{state.message} · emojis removidos",

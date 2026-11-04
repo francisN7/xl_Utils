@@ -29,6 +29,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | camadas e fluxo de dados | `reference/architecture.md` → **Camadas** | 30 |
 | pipeline de leitura segura | `reference/architecture.md` → **Leitura segura** | 20 |
 | detecção de formato e MIME | `reference/architecture.md` → **Detecção de formato** | 15 |
+| saída e gravação | `reference/architecture.md` → **Saída** | 12 |
 | layout, navegação e tema | `reference/ui.md` → **Layout** | 30 |
 | comandos do dia a dia | `guide/setup.md` → **Rodando** | 15 |
 | como escrever teste | `guide/testing.md` → **Testes** | 20 |
@@ -39,6 +40,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que seleção de abas e merge por origem | `adr/0005-selecao-de-abas-e-merge.md` | 35 |
 | por que lote de arquivos e seleção padrão | `adr/0006-lote-de-arquivos.md` | 35 |
 | por que log estruturado e diagnóstico | `adr/0007-log-e-diagnostico.md` | 35 |
+| por que salvar só depois da escolha | `adr/0008-saida-escolhida.md` | 35 |
 
 ## Regras do mapa
 

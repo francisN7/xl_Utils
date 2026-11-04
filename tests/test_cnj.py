@@ -5,6 +5,7 @@ import pytest
 
 from xl_utils.controllers.cnj import run_cnj
 from xl_utils.core.io import read_workbook
+from xl_utils.core.save import save_chosen, save_to_output
 from xl_utils.core.tools.cnj import (
     collect_cnjs,
     count_cnjs,
@@ -55,7 +56,7 @@ def test_collect_cnjs_reads_duplicate_column_names() -> None:
     assert collect_cnjs({"Uma": frame}) == [FIRST, SECOND]
 
 
-def test_run_cnj_writes_a_sorted_unique_list(tmp_path: Path) -> None:
+def test_run_cnj_prepares_a_sorted_unique_list(tmp_path: Path) -> None:
     source = tmp_path / "entrada.xlsx"
     with pd.ExcelWriter(source) as writer:
         pd.DataFrame({"texto": [f"{FIRST} e {FIRST_DIGITS}", SECOND]}).to_excel(
@@ -69,15 +70,18 @@ def test_run_cnj_writes_a_sorted_unique_list(tmp_path: Path) -> None:
 
     outcome = run_cnj(source)
 
-    assert outcome.output.parent == tmp_path / "output"
-    assert outcome.output.name == "entrada lista cnj.xlsx"
+    assert not (tmp_path / "output").exists()
+    assert outcome.item.output_dir == tmp_path / "output"
+    assert outcome.suggested_name == "entrada lista cnj.xlsx"
     assert outcome.cnjs == [FIRST, SECOND]
     assert outcome.found == 4
     assert outcome.duplicates == 2
     assert any("Duplicados removidos: 2" in line for line in outcome.log)
 
-    saved = read_workbook(outcome.output, dtype=str)["PROCESSOS"]
-    assert saved["PROCESSOS"].tolist() == [FIRST, SECOND]
+    saved = save_chosen([outcome.item], tmp_path / "lista.xlsx")
+    assert saved is not None
+    frame = read_workbook(saved[0], dtype=str)["PROCESSOS"]
+    assert frame["PROCESSOS"].tolist() == [FIRST, SECOND]
 
 
 def test_run_cnj_ignores_unselected_sheets(tmp_path: Path) -> None:
@@ -95,7 +99,7 @@ def test_run_cnj_ignores_unselected_sheets(tmp_path: Path) -> None:
     assert outcome.duplicates == 0
 
 
-def test_run_cnj_without_matches_saves_an_empty_list(tmp_path: Path) -> None:
+def test_run_cnj_without_matches_prepares_an_empty_list(tmp_path: Path) -> None:
     source = tmp_path / "vazia.xlsx"
     pd.DataFrame({"texto": ["nada aqui", None]}).to_excel(
         source,
@@ -107,8 +111,10 @@ def test_run_cnj_without_matches_saves_an_empty_list(tmp_path: Path) -> None:
     assert outcome.cnjs == []
     assert outcome.found == 0
     assert outcome.duplicates == 0
-    assert outcome.output.is_file()
+    assert not (tmp_path / "output").exists()
 
-    saved = read_workbook(outcome.output, dtype=str)["PROCESSOS"]
-    assert list(saved.columns) == ["PROCESSOS"]
-    assert saved.empty
+    saved = save_to_output([outcome.item])
+    assert saved[0].is_file()
+    frame = read_workbook(saved[0], dtype=str)["PROCESSOS"]
+    assert list(frame.columns) == ["PROCESSOS"]
+    assert frame.empty

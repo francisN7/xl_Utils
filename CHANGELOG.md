@@ -60,6 +60,10 @@ decisões nos ADRs.
   quando diverge do nome, bloqueia a execução quando nada é identificável e
   registra formato e divergência no log e no diagnóstico. Extensões trocadas são
   lidas pelo conteúdo sem renomear a origem.
+- Saída escolhida: executar só calcula e mostra a prévia; “Salvar” abre o
+  seletor nativo (arquivo único ou pasta para lote), “Salvar em output/”
+  continua como atalho e cancelar não grava nada. Nomes existentes ganham
+  sufixo e o log registra o caminho real.
 
 ### Removed
 

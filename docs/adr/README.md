@@ -12,6 +12,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0005](0005-selecao-de-abas-e-merge.md) | Seleção de abas e mesclagem com origem | Aceita |
 | [0006](0006-lote-de-arquivos.md) | Lote de arquivos nas ferramentas | Aceita |
 | [0007](0007-log-e-diagnostico.md) | Log estruturado e diagnóstico copiável | Aceita |
+| [0008](0008-saida-escolhida.md) | Saída escolhida depois da prévia | Aceita |
 
 ## Como ler
 

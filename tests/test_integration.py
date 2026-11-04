@@ -8,6 +8,7 @@ from xl_utils.controllers.cnj import run_cnj
 from xl_utils.controllers.cut import run_cut
 from xl_utils.controllers.merge import run_merge
 from xl_utils.core.io import list_sheets, read_workbook
+from xl_utils.core.save import save_to_output
 from xl_utils.core.tools.merge import ColumnGroup, ColumnRef
 
 _FORMATS = ["xlsx_file", "csv_file", "html_file", "xls_file"]
@@ -25,10 +26,11 @@ def test_all_str_runs_on_every_format(
     outcome = run_all_str(source)
 
     assert source.read_bytes() == before
-    assert outcome.output.parent == source.parent / "output"
-    assert outcome.output.is_file()
+    saved_path = save_to_output([outcome.item])[0]
+    assert saved_path.parent == source.parent / "output"
+    assert saved_path.is_file()
     assert outcome.rows == 3
-    saved = next(iter(read_workbook(outcome.output, dtype=str).values()))
+    saved = next(iter(read_workbook(saved_path, dtype=str).values()))
     assert saved["codigo"].tolist() == sample_rows["codigo"]
     assert saved["cnj"].tolist() == sample_rows["cnj"]
     assert saved["nome"].tolist() == sample_rows["nome"]
@@ -46,9 +48,10 @@ def test_cnj_runs_on_every_format(
     outcome = run_cnj(source)
 
     assert source.read_bytes() == before
-    assert outcome.output.parent == source.parent / "output"
     assert outcome.cnjs == sorted(sample_rows["cnj"])
-    saved = read_workbook(outcome.output, dtype=str)["PROCESSOS"]
+    saved_path = save_to_output([outcome.item])[0]
+    assert saved_path.parent == source.parent / "output"
+    saved = read_workbook(saved_path, dtype=str)["PROCESSOS"]
     assert saved["PROCESSOS"].tolist() == sorted(sample_rows["cnj"])
 
 
@@ -67,7 +70,7 @@ def test_cut_runs_on_every_format(
     assert outcome.files == 2
     assert outcome.rows == 3
     values: list[str] = []
-    for output in outcome.outputs:
+    for output in save_to_output(outcome.items):
         assert output.parent == source.parent / "output"
         frame = next(iter(read_workbook(output, dtype=str).values()))
         values.extend(frame["codigo"].tolist())
@@ -91,8 +94,9 @@ def test_merge_runs_with_mixed_formats(
 
     outcome = run_merge([(path, None) for path, _ in sources])
 
-    assert outcome.output.parent == xlsx_file.parent / "output"
-    assert outcome.output.is_file()
+    saved_path = save_to_output([outcome.item])[0]
+    assert saved_path.parent == xlsx_file.parent / "output"
+    assert saved_path.is_file()
     assert outcome.rows == 12
     assert outcome.merged["codigo"].tolist() == sample_rows["codigo"] * 4
     assert outcome.merged["ORIGEM"].tolist() == [
@@ -101,7 +105,7 @@ def test_merge_runs_with_mixed_formats(
         for row in range(1, 4)
     ]
     assert all(path.read_bytes() == data for path, data in before.items())
-    saved = read_workbook(outcome.output, dtype=str)["Mesclado"]
+    saved = read_workbook(saved_path, dtype=str)["Mesclado"]
     assert saved["codigo"].tolist() == sample_rows["codigo"] * 4
 
 

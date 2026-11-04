@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.sheets import default_selection
 from xl_utils.shared.log import RunLog
 
@@ -20,6 +21,7 @@ class ToolState:
 
     files: list[Path] = field(default_factory=list)
     result: dict[str, pd.DataFrame] | None = None
+    save_items: list[SaveItem] = field(default_factory=list)
     options: dict[str, object] = field(default_factory=dict)
     sheet_names: dict[Path, list[str]] = field(default_factory=dict)
     selected_sheets: dict[Path, set[str]] = field(default_factory=dict)
@@ -43,6 +45,7 @@ class ToolState:
         """Replace the selection and discard any previous result."""
         self.files = list(files)
         self.result = None
+        self.save_items.clear()
         self.sheet_names = {}
         self.selected_sheets = {}
         self.message = ""
@@ -76,6 +79,7 @@ class ToolState:
         """Clear everything for this tool."""
         self.files.clear()
         self.result = None
+        self.save_items.clear()
         self.options.clear()
         self.sheet_names.clear()
         self.selected_sheets.clear()

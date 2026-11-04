@@ -5,6 +5,7 @@ import pytest
 
 from xl_utils.controllers.merge import inspect_columns, run_merge
 from xl_utils.core.io import read_workbook
+from xl_utils.core.save import save_to_output
 from xl_utils.core.tools.merge import (
     ColumnGroup,
     ColumnRef,
@@ -255,7 +256,7 @@ def test_inspect_columns_reads_csv_headers(tmp_path: Path) -> None:
     ]
 
 
-def test_run_merge_writes_one_workbook_and_keeps_the_sources(
+def test_run_merge_prepares_one_workbook_and_keeps_the_sources(
     tmp_path: Path,
 ) -> None:
     first = tmp_path / "a.xlsx"
@@ -267,7 +268,9 @@ def test_run_merge_writes_one_workbook_and_keeps_the_sources(
     outcome = run_merge([(first, None), (second, None)])
 
     assert (first.read_bytes(), second.read_bytes()) == before
-    assert outcome.output == tmp_path / "output" / "Merge.xlsx"
+    assert not (tmp_path / "output").exists()
+    assert outcome.suggested_name == "Merge.xlsx"
+    assert outcome.item.output_dir == tmp_path / "output"
     assert outcome.rows == 3
     assert outcome.sheets == 2
     assert outcome.merged["ORIGEM"].tolist() == [
@@ -275,7 +278,10 @@ def test_run_merge_writes_one_workbook_and_keeps_the_sources(
         "a.xlsx - Uma - 2",
         "b.xlsx - Dados - 1",
     ]
-    saved = read_workbook(outcome.output, dtype=str)
+
+    saved_path = save_to_output([outcome.item])[0]
+    assert saved_path == tmp_path / "output" / "Merge.xlsx"
+    saved = read_workbook(saved_path, dtype=str)
     assert list(saved) == ["Mesclado"]
     assert saved["Mesclado"]["ORIGEM"].tolist() == outcome.merged["ORIGEM"].tolist()
     assert any("Arquivo: a.xlsx" in line for line in outcome.log)
@@ -341,8 +347,10 @@ def test_run_merge_does_not_overwrite_an_existing_output(
 
     one = run_merge([(first, None), (second, None)])
     two = run_merge([(first, None), (second, None)])
+    one_path = save_to_output([one.item])[0]
+    two_path = save_to_output([two.item])[0]
 
-    assert one.output.name == "Merge.xlsx"
-    assert two.output.name == "Merge_001.xlsx"
-    assert one.output.is_file()
-    assert two.output.is_file()
+    assert one_path.name == "Merge.xlsx"
+    assert two_path.name == "Merge_001.xlsx"
+    assert one_path.is_file()
+    assert two_path.is_file()

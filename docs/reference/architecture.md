@@ -23,8 +23,10 @@ arquivo escolhido
   → all_str.prepare_workbook (leitura segura + emojis)
   → sheets.filter_sheets (abas escolhidas)
   → regra da ferramenta em core/tools/
-  → save_workbook / resultado em memória
-  → result panel (status, caminho, log e prévia)
+  → SaveItem em memória (sem escrever)
+  → result panel (prévia e “Pronto para salvar”)
+  → escolha do usuário
+  → core/save.py grava e devolve o caminho real
 ```
 
 ## Leitura segura
@@ -41,8 +43,8 @@ Excel é lido com `openpyxl` para `.xlsx`/`.xlsm` e com `calamine` para `.xls`
 (pacote `python-calamine`). `core/tools/all_str.py` expõe
 `prepare_workbook(path)`, que devolve `{nome_da_aba: DataFrame}` já limpo. As
 demais ferramentas importam essa função antes de aplicar a própria regra.
-`controllers/all_str.py` orquestra a leitura, a gravação em `output/` e o log;
-`ui/pages/all_str.py` só conecta a página.
+`controllers/all_str.py` orquestra a leitura, monta o `SaveItem` em memória e o
+log; `ui/pages/all_str.py` só conecta a página.
 
 Quando a leitura normal falha, o pipeline tenta **um** leitor mais tolerante,
 de acordo com o formato real: `openpyxl` em modo somente leitura para
@@ -80,8 +82,9 @@ antes da regra da ferramenta.
 
 Texto, CNJ e recorte aceitam vários arquivos. A página monta a lista de
 `(origem, abas)` com `ui/pages/batch.py`, chama o controller uma vez por arquivo
-e junta logs e prévias; cada saída fica no `output/` da própria origem. O merge
-continua sendo o único que produz uma saída única. Ver ADR 0006.
+e junta logs e prévias. Cada `SaveItem` carrega o `output/` da própria origem
+para o atalho “Salvar em output/”; o destino escolhido no seletor vence. O merge
+continua sendo o único que produz uma saída única. Ver ADR 0006 e ADR 0008.
 
 ## Detecção de formato
 
@@ -100,10 +103,16 @@ registra o motivo no log e no diagnóstico. A leitura continua usando
 
 ## Saída
 
+Os controllers não gravam: cada execução devolve `SaveItem` com o nome sugerido,
+as abas em memória e a pasta `output/` da origem. `core/save.py` concentra a
+gravação depois da escolha: `save_chosen` grava um item no arquivo escolhido ou
+vários na pasta escolhida; `save_to_output` usa o atalho. `SaveError` embrulha
+qualquer falha de escrita sem apagar a prévia.
+
 `core/paths.py` cria a pasta e devolve um nome livre (`saida_001.xlsx`).
 `core/io.py` grava todas as abas em um `.xlsx` com nomes saneados (limite de 31
 caracteres e caracteres inválidos do Excel). O arquivo de origem nunca é
-alterado.
+alterado e nada é criado antes da escolha do usuário.
 
 ## Logging e erros
 
@@ -138,15 +147,15 @@ divergência, opções, resultado, tipo, mensagem, causa e traceback limitado a
 (`NNNNNNN-DD.AAAA.J.TR.OOOO`) e 20 dígitos consecutivos, sem aceitar trecho de
 número maior. `normalize_cnj` devolve sempre o formato pontuado; `collect_cnjs`
 percorre todas as abas e célula a célula, remove duplicatas e ordena a lista.
-`controllers/cnj.py` grava `output/<nome> lista cnj.xlsx` com a coluna
+`controllers/cnj.py` prepara `SaveItem` com `<nome> lista cnj.xlsx` na coluna
 `PROCESSOS` e registra encontrados, duplicados e únicos no log.
 
 ## Recorte
 
 `core/tools/cut.py` divide cada aba em blocos sequenciais de N linhas; o resto
 fica no último bloco e uma aba vazia ainda gera um arquivo. `controllers/cut.py`
-lê pelo `prepare_workbook`, filtra as abas escolhidas, salva cada bloco em
-`output/` e usa `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx`
+lê pelo `prepare_workbook`, filtra as abas escolhidas e prepara um `SaveItem`
+por bloco, com `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx`
 com várias abas processadas), saneando caracteres inválidos de nome de arquivo.
 O campo de linhas é editável na página e vive em `ToolState.options`.
 
@@ -163,8 +172,8 @@ repetidos com sufixo `_2`.
 
 `controllers/merge.py` lê cada fonte pelo `prepare_workbook`, filtra as abas com
 `filter_sheets` e chama `merge_sheets`; exige ao menos duas abas com dados e
-grava `output/Merge.xlsx` na pasta da primeira origem. `inspect_columns` usa
-`core/io.read_headers` para devolver os `ColumnRef`s sem carregar as linhas; a
+prepara `SaveItem` com `Merge.xlsx` na pasta da primeira origem. `inspect_columns`
+usa `core/io.read_headers` para devolver os `ColumnRef`s sem carregar as linhas; a
 página monta o quadro arrastável e guarda os grupos em `ToolState.options`.
 `move_column` concentra a regra de mover/juntar chips. O painel é reconstruído
 quando arquivos ou abas mudam.
@@ -181,11 +190,14 @@ linha.
 linhas fictícias e confere `read_workbook`, `list_sheets`, `read_headers` e
 `prepare_workbook`; `tests/test_integration.py` roda as quatro ferramentas sobre
 os quatro formatos, incluindo origens mistas no merge e a imutabilidade das
-origens. O `.xls` é uma fixture binária mínima em `tests/fixtures/minimo.xls`,
-gerada uma vez com `xlwt` e **sem** adicionar a dependência ao projeto.
+origens. `tests/test_save.py` cobre controllers sem escrita, arquivo único,
+pasta, nome livre, cancelamento e `SaveError`. O `.xls` é uma fixture binária
+mínima em `tests/fixtures/minimo.xls`, gerada uma vez com `xlwt` e **sem**
+adicionar a dependência ao projeto.
 
 ## Decisões
 
 - [ADR 0001](../adr/0001-stack-ui-e-ambiente.md) — stack, uv e Flet.
 - [ADR 0002](../adr/0002-arquitetura-core-ui.md) — camadas.
 - [ADR 0004](../adr/0004-leitura-segura-e-emojis.md) — leitura segura e emojis.
+- [ADR 0008](../adr/0008-saida-escolhida.md) — saída escolhida depois da prévia.

@@ -5,6 +5,7 @@ import pytest
 
 from xl_utils.controllers.cut import run_cut, safe_file_part
 from xl_utils.core.io import read_workbook
+from xl_utils.core.save import save_to_output
 from xl_utils.core.tools.cut import split_frame, split_workbook
 
 
@@ -67,7 +68,7 @@ def test_safe_file_part_replaces_invalid_characters() -> None:
     assert safe_file_part("   ") == "Aba"
 
 
-def test_run_cut_writes_parts_and_keeps_the_source(tmp_path: Path) -> None:
+def test_run_cut_prepares_parts_and_keeps_the_source(tmp_path: Path) -> None:
     source = tmp_path / "entrada.xlsx"
     _frame(2500).to_excel(source, index=False)
     before = source.read_bytes()
@@ -77,7 +78,7 @@ def test_run_cut_writes_parts_and_keeps_the_source(tmp_path: Path) -> None:
     assert source.read_bytes() == before
     assert outcome.files == 3
     assert outcome.rows == 2500
-    assert [path.name for path in outcome.outputs] == [
+    assert outcome.suggested_names == [
         "entrada_Recorte_001.xlsx",
         "entrada_Recorte_002.xlsx",
         "entrada_Recorte_003.xlsx",
@@ -86,17 +87,19 @@ def test_run_cut_writes_parts_and_keeps_the_source(tmp_path: Path) -> None:
         "0001",
         "0002",
     ]
+    assert not (tmp_path / "output").exists()
 
+    outputs = save_to_output(outcome.items)
     lengths = []
     values = []
-    for output in outcome.outputs:
+    for output in outputs:
         frame = next(iter(read_workbook(output, dtype=str).values()))
         lengths.append(len(frame))
         values.extend(frame["numero"].tolist())
 
     assert lengths == [1000, 1000, 500]
     assert values == _frame(2500)["numero"].tolist()
-    assert any("Arquivos gerados: 3" in line for line in outcome.log)
+    assert any("Arquivos prontos: 3" in line for line in outcome.log)
 
 
 def test_run_cut_names_parts_by_sheet_when_there_are_many(
@@ -109,7 +112,7 @@ def test_run_cut_names_parts_by_sheet_when_there_are_many(
 
     outcome = run_cut(source, 2)
 
-    assert [path.name for path in outcome.outputs] == [
+    assert outcome.suggested_names == [
         "entrada_Uma_Recorte_001.xlsx",
         "entrada_Uma_Recorte_002.xlsx",
         "entrada_Outra_Recorte_001.xlsx",
@@ -126,11 +129,12 @@ def test_run_cut_processes_only_the_selected_sheet(tmp_path: Path) -> None:
     outcome = run_cut(source, 2, selected={"Outra"})
 
     assert outcome.rows == 3
-    assert [path.name for path in outcome.outputs] == [
+    assert outcome.suggested_names == [
         "entrada_Recorte_001.xlsx",
         "entrada_Recorte_002.xlsx",
     ]
-    assert list(read_workbook(outcome.outputs[0], dtype=str)) == ["Outra"]
+    outputs = save_to_output(outcome.items)
+    assert list(read_workbook(outputs[0], dtype=str)) == ["Outra"]
 
 
 def test_run_cut_names_parts_by_sheet_for_many_selected(
@@ -143,7 +147,7 @@ def test_run_cut_names_parts_by_sheet_for_many_selected(
 
     outcome = run_cut(source, 1, selected={"Uma", "Outra"})
 
-    assert [path.name for path in outcome.outputs] == [
+    assert outcome.suggested_names == [
         "entrada_Uma_Recorte_001.xlsx",
         "entrada_Uma_Recorte_002.xlsx",
         "entrada_Outra_Recorte_001.xlsx",
@@ -166,7 +170,9 @@ def test_run_cut_with_rows_above_total_writes_one_file(tmp_path: Path) -> None:
     outcome = run_cut(source, 10)
 
     assert outcome.files == 1
-    saved = next(iter(read_workbook(outcome.outputs[0], dtype=str).values()))
+    saved = next(
+        iter(read_workbook(save_to_output(outcome.items)[0], dtype=str).values())
+    )
     assert saved["numero"].tolist() == _frame(5)["numero"].tolist()
 
 
@@ -179,7 +185,9 @@ def test_run_cut_with_empty_sheet_writes_one_empty_file(
     outcome = run_cut(source, 10)
 
     assert outcome.files == 1
-    saved = next(iter(read_workbook(outcome.outputs[0], dtype=str).values()))
+    saved = next(
+        iter(read_workbook(save_to_output(outcome.items)[0], dtype=str).values())
+    )
     assert saved.empty
     assert list(saved.columns) == ["numero"]
 
@@ -202,6 +210,8 @@ def test_run_cut_does_not_overwrite_existing_files(tmp_path: Path) -> None:
 
     first = run_cut(source, 2)
     second = run_cut(source, 2)
+    first_paths = save_to_output(first.items)
+    second_paths = save_to_output(second.items)
 
-    assert first.outputs[0] != second.outputs[0]
-    assert all(path.is_file() for path in first.outputs + second.outputs)
+    assert first_paths[0] != second_paths[0]
+    assert all(path.is_file() for path in first_paths + second_paths)

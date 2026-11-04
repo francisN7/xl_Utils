@@ -5,6 +5,7 @@ import pytest
 
 from xl_utils.controllers.all_str import run_all_str
 from xl_utils.core.io import read_workbook
+from xl_utils.core.save import save_chosen, save_to_output
 from xl_utils.core.tools.all_str import WorkbookReadError, prepare_workbook
 
 
@@ -66,7 +67,7 @@ def test_prepare_workbook_raises_typed_error_for_corrupt_file(
         prepare_workbook(source)
 
 
-def test_run_all_str_saves_only_the_selected_sheets(tmp_path: Path) -> None:
+def test_run_all_str_keeps_only_the_selected_sheets(tmp_path: Path) -> None:
     source = tmp_path / "entrada.xlsx"
     with pd.ExcelWriter(source) as writer:
         pd.DataFrame({"nome": ["Ana"]}).to_excel(writer, sheet_name="Uma", index=False)
@@ -77,7 +78,10 @@ def test_run_all_str_saves_only_the_selected_sheets(tmp_path: Path) -> None:
     outcome = run_all_str(source, selected={"Outra"})
 
     assert list(outcome.sheets) == ["Outra"]
-    assert list(read_workbook(outcome.output, dtype=str)) == ["Outra"]
+    assert not (tmp_path / "output").exists()
+    saved = save_chosen([outcome.item], tmp_path / "escolhido.xlsx")
+    assert saved is not None
+    assert list(read_workbook(saved[0], dtype=str)) == ["Outra"]
 
 
 def test_run_all_str_rejects_an_empty_selection(tmp_path: Path) -> None:
@@ -88,7 +92,7 @@ def test_run_all_str_rejects_an_empty_selection(tmp_path: Path) -> None:
         run_all_str(source, selected=set())
 
 
-def test_run_all_str_saves_in_output_folder(tmp_path: Path) -> None:
+def test_run_all_str_prepares_the_output_folder(tmp_path: Path) -> None:
     source = tmp_path / "entrada.xlsx"
     pd.DataFrame({"codigo": ["000123"], "nome": ["Ana 🙂"]}).to_excel(
         source,
@@ -96,11 +100,17 @@ def test_run_all_str_saves_in_output_folder(tmp_path: Path) -> None:
     )
 
     outcome = run_all_str(source)
-    saved = read_workbook(outcome.output, dtype=str)["Sheet1"]
 
-    assert outcome.output.parent == tmp_path / "output"
-    assert outcome.output.is_file()
+    assert not (tmp_path / "output").exists()
+    assert outcome.item.output_dir == tmp_path / "output"
+    assert outcome.suggested_name == "entrada.xlsx"
     assert outcome.rows == 1
-    assert saved["codigo"].tolist() == ["000123"]
-    assert saved["nome"].tolist() == ["Ana "]
-    assert any("Saída:" in line for line in outcome.log)
+    assert any("Pronto para salvar" in line for line in outcome.log)
+
+    saved = save_to_output([outcome.item])
+    assert saved[0].parent == tmp_path / "output"
+    assert saved[0].is_file()
+
+    frame = read_workbook(saved[0], dtype=str)["Sheet1"]
+    assert frame["codigo"].tolist() == ["000123"]
+    assert frame["nome"].tolist() == ["Ana "]
