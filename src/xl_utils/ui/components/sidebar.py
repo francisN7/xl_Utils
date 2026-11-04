@@ -1,4 +1,4 @@
-"""Custom Dracula sidebar, built to keep icons and labels aligned."""
+"""Barra lateral Dracula própria, montada para alinhar ícones e rótulos."""
 
 import contextlib
 from collections.abc import Callable, Sequence
@@ -10,7 +10,7 @@ from xl_utils.ui.pages.registry import ToolPage
 
 
 class Sidebar:
-    """Fixed-width sidebar with Início and one item per tool."""
+    """Barra lateral de largura fixa com Início e um item por ferramenta."""
 
     def __init__(
         self,
@@ -59,7 +59,7 @@ class Sidebar:
         self.select(selected)
 
     def select(self, index: int) -> None:
-        """Highlight one item, keeping the previous one neutral."""
+        """Destaca um item e devolve o anterior ao estado neutro."""
         for position, (container, icon, label) in enumerate(self._items):
             active = position == index
             container.bgcolor = theme.SURFACE if active else None

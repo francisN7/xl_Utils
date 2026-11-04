@@ -1,1 +1,1 @@
-"""Flet views and reusable components."""
+"""Telas Flet e componentes reutilizáveis."""

@@ -1,4 +1,4 @@
-"""Structured run log and copyable diagnostics."""
+"""Log estruturado de execução e diagnóstico copiável."""
 
 import platform
 import traceback as traceback_lib
@@ -24,52 +24,52 @@ _MAX_TRACEBACK = 4000
 
 @dataclass(frozen=True, slots=True)
 class LogEvent:
-    """One step of a run, with its level."""
+    """Um passo da execução, com o seu nível."""
 
     level: LogLevel
     text: str
 
     def to_line(self) -> str:
-        """Return the event as one displayable line."""
+        """Devolve o evento como uma linha exibível."""
         if not self.text:
             return ""
         return f"[{_LABELS[self.level]}] {self.text}"
 
 
 class RunLog:
-    """Ordered events produced while one tool runs."""
+    """Eventos ordenados produzidos durante a execução de uma ferramenta."""
 
     def __init__(self, events: Iterable[LogEvent] = ()) -> None:
         self._events: list[LogEvent] = list(events)
 
     @property
     def events(self) -> tuple[LogEvent, ...]:
-        """Return the recorded events, preserving their order."""
+        """Devolve os eventos registrados, preservando a ordem."""
         return tuple(self._events)
 
     def add(self, level: LogLevel, text: str) -> RunLog:
-        """Append an event and return the log for chaining."""
+        """Acrescenta um evento e devolve o log para encadeamento."""
         self._events.append(LogEvent(level, text))
         return self
 
     def info(self, text: str) -> RunLog:
-        """Record a regular step."""
+        """Registra um passo normal."""
         return self.add("info", text)
 
     def success(self, text: str) -> RunLog:
-        """Record a completed step."""
+        """Registra um passo concluído."""
         return self.add("success", text)
 
     def warning(self, text: str) -> RunLog:
-        """Record something the user should notice."""
+        """Registra algo que o usuário deve notar."""
         return self.add("warning", text)
 
     def error(self, text: str) -> RunLog:
-        """Record a failure."""
+        """Registra uma falha."""
         return self.add("error", text)
 
     def extend(self, events: RunLog | Iterable[str]) -> RunLog:
-        """Append another log, or plain lines treated as info events."""
+        """Acrescenta outro log, ou linhas simples tratadas como eventos info."""
         if isinstance(events, RunLog):
             self._events.extend(events.events)
         else:
@@ -77,11 +77,11 @@ class RunLog:
         return self
 
     def to_text(self) -> str:
-        """Return one line per event."""
+        """Devolve uma linha por evento."""
         return "\n".join(self)
 
     def __iter__(self) -> Iterator[str]:
-        """Iterate over the formatted lines, so logs stay list-compatible."""
+        """Percorre as linhas formatadas, mantendo o log compatível com lista."""
         return (event.to_line() for event in self._events)
 
     def __len__(self) -> int:
@@ -92,7 +92,7 @@ class RunLog:
 
 
 def app_versions() -> dict[str, str]:
-    """Return the versions shown in the diagnostics."""
+    """Devolve as versões exibidas no diagnóstico."""
     return {
         "App": _package_version("xl-utils"),
         "Python": platform.python_version(),
@@ -113,7 +113,12 @@ def build_diagnostics(
     traceback_text: str | None = None,
     versions: Mapping[str, str] | None = None,
 ) -> str:
-    """Build the copyable diagnostic text for one run."""
+    """Monta o texto copiável do diagnóstico de uma execução.
+
+    Inclui versões, arquivos (caminho, formato e abas escolhidas), opções,
+    resultado, erro e traceback truncado. Não inclui conteúdo de célula: as
+    abas entram só pelo nome, e as colunas, por nome de arquivo, aba e coluna.
+    """
     lines = ["Diagnóstico — xl_utils"]
 
     if tool:

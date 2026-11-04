@@ -1,4 +1,4 @@
-"""Operating-system helpers that are not part of the domain core."""
+"""Auxiliares de sistema operacional que não pertencem ao core do domínio."""
 
 import os
 import subprocess
@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 def open_folder(path: Path) -> None:
-    """Open the folder that contains ``path`` in the native file manager."""
+    """Abre no gerenciador nativo a pasta que contém ``path``."""
     target = path if path.is_dir() else path.parent
     if sys.platform == "win32":
         os.startfile(target)  # noqa: S606  # type: ignore[attr-defined]

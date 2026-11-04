@@ -1,4 +1,4 @@
-"""Page wiring for the spreadsheet merge tool."""
+"""Ligação da página com a ferramenta de mesclagem de planilhas."""
 
 import contextlib
 from pathlib import Path
@@ -23,7 +23,7 @@ _CHIP_WIDTH = 176
 
 
 class MergeOptions:
-    """Draggable board where each column holds the sources of one output."""
+    """Quadro arrastável em que cada coluna reúne as origens de uma saída."""
 
     def __init__(self, state: ToolState) -> None:
         self._state = state
@@ -54,7 +54,7 @@ class MergeOptions:
         self.refresh()
 
     def refresh(self) -> None:
-        """Rebuild the board from the files and sheets in the state."""
+        """Reconstrói o quadro a partir dos arquivos e abas do estado."""
         files = tuple(self._state.files)
         if files != self._files:
             self._files = files
@@ -85,7 +85,7 @@ class MergeOptions:
         ]
         try:
             refs = inspect_columns(sources)
-        except Exception as error:  # noqa: BLE001 - shown in the options card
+        except Exception as error:  # noqa: BLE001 - erro exibido no cartão de opções
             return [], f"Não foi possível ler as colunas: {error}"
 
         if not refs:
@@ -326,12 +326,12 @@ class MergeOptions:
 
 
 def options(state: ToolState) -> MergeOptions:
-    """Build the draggable column board for this page."""
+    """Monta o quadro arrastável de colunas desta página."""
     return MergeOptions(state)
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Merge every selected file and sheet into one workbook."""
+    """Mescla cada arquivo e aba selecionados em uma única pasta de trabalho."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",

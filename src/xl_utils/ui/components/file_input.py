@@ -1,4 +1,4 @@
-"""Clickable file picker used by every tool."""
+"""Seletor de arquivo clicável usado por todas as ferramentas."""
 
 import contextlib
 from collections.abc import Callable, Sequence
@@ -13,7 +13,7 @@ ALLOWED_EXTENSIONS = ["xlsx", "xlsm", "xls", "csv", "html", "htm"]
 
 
 class FileInput:
-    """Dropzone-style area that opens the native file picker on click."""
+    """Área no estilo dropzone que abre o seletor nativo ao clique."""
 
     def __init__(
         self,
@@ -102,7 +102,7 @@ class FileInput:
         self._on_change(list(self._files))
 
     def set_formats(self, checks: Sequence[FormatCheck]) -> None:
-        """Store the format check of each file and refresh the list."""
+        """Guarda a checagem de formato de cada arquivo e atualiza a lista."""
         self._formats = {check.path: check for check in checks}
         self._render()
 

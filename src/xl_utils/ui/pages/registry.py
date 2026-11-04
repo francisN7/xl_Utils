@@ -1,4 +1,4 @@
-"""Registry of the tool pages shown in the navigation rail."""
+"""Registro das páginas de ferramenta mostradas na navegação."""
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -20,7 +20,7 @@ from xl_utils.ui.pages.merge import run as run_merge
 
 @dataclass(frozen=True, slots=True)
 class ToolPage:
-    """Metadata and factory for one tool page."""
+    """Metadados e fábrica de uma página de ferramenta."""
 
     id: str
     label: str

@@ -1,4 +1,4 @@
-"""Page wiring for the CNJ extraction tool."""
+"""Ligação da página com a ferramenta de extração de CNJ."""
 
 import pandas as pd
 
@@ -9,7 +9,7 @@ from xl_utils.ui.state import ToolState
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Extract CNJs from every selected file and show the batch outcome."""
+    """Extrai CNJs de cada arquivo selecionado e mostra o lote."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",

@@ -1,4 +1,4 @@
-"""Common page anatomy: header, input/options, result and action bar."""
+"""Anatomia comum das páginas: cabeçalho, entrada/opções, resultado e barra."""
 
 import asyncio
 import contextlib
@@ -24,7 +24,7 @@ RunHandler = Callable[[ToolState, ResultPanel], None]
 
 
 class OptionsPanel(Protocol):
-    """Options control that rebuilds itself when the input changes."""
+    """Controle de opções que se reconstrói quando a entrada muda."""
 
     control: ft.Control
 
@@ -35,7 +35,7 @@ OptionsFactory = Callable[[ToolState], ft.Control | OptionsPanel]
 
 
 class ToolLayout:
-    """Shared layout for every tool page."""
+    """Layout compartilhado por todas as páginas de ferramenta."""
 
     def __init__(
         self,
@@ -219,7 +219,7 @@ class ToolLayout:
         self._start_sheet_load()
 
     def _check_formats(self) -> list[FormatCheck]:
-        """Detect the real format of every file and show it in the entry."""
+        """Detecta o formato real de cada arquivo e o mostra na entrada."""
         checks = [check_format(path) for path in self.state.files]
         self._formats = {check.path: check for check in checks}
         self.file_input.set_formats(checks)
@@ -259,7 +259,7 @@ class ToolLayout:
         for path in files:
             try:
                 names[path] = list_sheets(path)
-            except Exception as error:  # noqa: BLE001 - shown in the selector
+            except Exception as error:  # noqa: BLE001 - erro exibido no seletor
                 failures.append(f"{path.name}: {error}")
         return names, failures
 
@@ -334,7 +334,7 @@ class ToolLayout:
         except ValueError as error:
             failure = error
             self._fail(error, "Confira a seleção")
-        except Exception as error:  # noqa: BLE001 - show any failure in the UI
+        except Exception as error:  # noqa: BLE001 - mostra qualquer falha na UI
             failure = error
             self._fail(error, "Falha inesperada", include_type=True)
         else:
@@ -350,7 +350,7 @@ class ToolLayout:
             self.result.set_diagnostics(self._diagnostics(failure))
 
     def _block_formats(self, failures: list[FormatCheck]) -> None:
-        """Stop the run before reading when no format can be identified."""
+        """Para a execução antes da leitura se nenhum formato for identificado."""
         detail = "; ".join(f"{check.path.name}: {check.reason}" for check in failures)
         log = RunLog().error(f"Formato não identificado: {detail}")
         self.state.running = False
@@ -369,7 +369,7 @@ class ToolLayout:
         *,
         include_type: bool = False,
     ) -> None:
-        """Show the friendly title, keep the original message and the trace."""
+        """Mostra o título amigável e mantém a mensagem original e o trace."""
         self.state.error = str(error)
         self.state.error_detail = traceback.format_exc()
         detail = f"{type(error).__name__}: {error}" if include_type else str(error)
@@ -378,7 +378,7 @@ class ToolLayout:
             self.state.log.error(f"{type(error).__name__}: {error}")
 
     def _save_clicked(self, _event=None) -> None:
-        """Open the native selector: file for one output, folder for many."""
+        """Abre o seletor nativo: arquivo para uma saída, pasta para várias."""
         items = list(self.state.save_items)
         if not items:
             return
@@ -403,7 +403,7 @@ class ToolLayout:
                 destination = await self._save_picker.get_directory_path(
                     dialog_title="Selecione a pasta de destino",
                 )
-        except Exception as error:  # noqa: BLE001 - keep the preview usable
+        except Exception as error:  # noqa: BLE001 - mantém a prévia utilizável
             self._save_failed(SaveError(f"Não foi possível abrir o seletor: {error}"))
             return
         if not destination:
@@ -412,7 +412,7 @@ class ToolLayout:
         await self._write(lambda: save_chosen(items, chosen))
 
     def _save_output_clicked(self, _event=None) -> None:
-        """Save in the origin ``output/`` folder without opening a dialog."""
+        """Grava na pasta ``output/`` da origem sem abrir diálogo."""
         items = list(self.state.save_items)
         if not items:
             return
@@ -429,7 +429,7 @@ class ToolLayout:
         except SaveError as error:
             self._save_failed(error)
             return
-        except Exception as error:  # noqa: BLE001 - any write failure is typed here
+        except Exception as error:  # noqa: BLE001 - falha de escrita tipada aqui
             self._save_failed(SaveError(f"Falha ao salvar: {error}"))
             return
         if paths:
@@ -456,7 +456,7 @@ class ToolLayout:
         self._refresh()
 
     def _save_failed(self, error: BaseException) -> None:
-        """Keep the preview and the save actions when writing fails."""
+        """Mantém a prévia e as ações de salvar quando a escrita falha."""
         self.state.error = str(error)
         trace = traceback.format_exc()
         self.state.error_detail = (

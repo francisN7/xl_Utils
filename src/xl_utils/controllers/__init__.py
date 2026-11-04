@@ -1,1 +1,1 @@
-"""Bridges between the Flet pages and the pure core logic."""
+"""Ponte entre as páginas Flet e a lógica pura do core."""

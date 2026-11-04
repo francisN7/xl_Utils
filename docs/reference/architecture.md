@@ -12,7 +12,7 @@ guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 | Core | `src/xl_utils/core/` | Regra pura, sem Flet, sem diálogo, sem `print`. |
 | Controllers | `src/xl_utils/controllers/` | Orquestra core + threading + progresso. |
 | UI | `src/xl_utils/ui/` | Coleta entrada e exibe resultado; não contém regra. |
-| Shared | `src/xl_utils/shared/` | Logging, config e clipboard. |
+| Shared | `src/xl_utils/shared/` | Log de execução, diagnóstico e abertura de pasta. |
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 

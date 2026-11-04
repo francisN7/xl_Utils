@@ -13,7 +13,8 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 
 | Arquivo | Estado | O que é |
 |---|---|---|
-| [`main.md`](main.md) | **ativo** | fases e backlog em andamento |
+| [`main.md`](main.md) | **ativo** | backlog à espera de um novo ciclo |
+| [`0003-qualidade.md`](0003-qualidade.md) | fechado | histórico do ciclo de qualidade e clareza |
 | [`0002-migracao.md`](0002-migracao.md) | fechado | histórico do ciclo de migração e publicação |
 | [`0001-fundacao.md`](0001-fundacao.md) | fechado | histórico do ciclo da fundação |
 
@@ -23,6 +24,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 |---|---|---|
 | [`0001-fundacao.md`](0001-fundacao.md) | Fundação | 2026-11-04 |
 | [`0002-migracao.md`](0002-migracao.md) | Migração e publicação | 2026-11-04 |
+| [`0003-qualidade.md`](0003-qualidade.md) | Qualidade e clareza | 2026-11-04 |
 
 ## Convenção de nomes
 

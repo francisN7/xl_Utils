@@ -83,6 +83,8 @@ decisões nos ADRs.
   cabeçalho; `.xlsm` deixou de ser tratado como divergência.
 - `save_workbook` normaliza o sufixo para `.xlsx`; `save_chosen` recusa arquivo
   como destino de lote; `safe_file_part` e `summarize_cnjs` foram para o core.
+- Docstrings e comentários de `ui/`, `shared/`, shell e `__init__` passam para
+  PT-BR; o diagnóstico foi revisado sem incluir conteúdo de célula.
 
 ### Removed
 

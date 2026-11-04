@@ -1,4 +1,4 @@
-"""Per-tool state kept while the user navigates between pages."""
+"""Estado por ferramenta mantido enquanto o usuário navega entre as páginas."""
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
@@ -13,10 +13,10 @@ from xl_utils.shared.log import RunLog
 
 @dataclass
 class ToolState:
-    """State of one tool page.
+    """Estado de uma página de ferramenta.
 
-    Selecting a new file discards the previous result; the page, its options
-    and the selected tool stay in memory while the user navigates.
+    Selecionar um novo arquivo descarta o resultado anterior; a página, as
+    opções e a ferramenta selecionada permanecem em memória durante a navegação.
     """
 
     files: list[Path] = field(default_factory=list)
@@ -33,16 +33,16 @@ class ToolState:
 
     @property
     def sheet_count(self) -> int:
-        """Return how many sheets the current files expose."""
+        """Devolve quantas abas os arquivos atuais expõem."""
         return sum(len(names) for names in self.sheet_names.values())
 
     @property
     def selected_count(self) -> int:
-        """Return how many sheets are currently marked."""
+        """Devolve quantas abas estão marcadas agora."""
         return sum(len(names) for names in self.selected_sheets.values())
 
     def select_files(self, files: list[Path]) -> None:
-        """Replace the selection and discard any previous result."""
+        """Substitui a seleção e descarta qualquer resultado anterior."""
         self.files = list(files)
         self.result = None
         self.save_items.clear()
@@ -55,7 +55,7 @@ class ToolState:
         self.running = False
 
     def diagnostic_options(self) -> dict[str, object]:
-        """Return the current option values as plain, readable data."""
+        """Devolve os valores atuais das opções como dados simples e legíveis."""
         values: dict[str, object] = {}
         for name, raw in self.options.items():
             value = getattr(raw, "value", raw)
@@ -70,13 +70,13 @@ class ToolState:
         *,
         all_sheets: bool = False,
     ) -> None:
-        """Store the sheets of the current files and apply the default rule."""
+        """Guarda as abas dos arquivos atuais e aplica a regra padrão."""
         names = {path: list(values) for path, values in sheets.items()}
         self.sheet_names = names
         self.selected_sheets = default_selection(names, all_sheets=all_sheets)
 
     def reset(self) -> None:
-        """Clear everything for this tool."""
+        """Limpa tudo desta ferramenta."""
         self.files.clear()
         self.result = None
         self.save_items.clear()

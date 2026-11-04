@@ -1,4 +1,4 @@
-"""Read-only spreadsheet preview limited to the first rows."""
+"""Prévia de planilha somente leitura, limitada às primeiras linhas."""
 
 import contextlib
 
@@ -11,7 +11,7 @@ MAX_ROWS = 100
 
 
 class PreviewTable:
-    """Shows the first rows of one result sheet."""
+    """Mostra as primeiras linhas de uma aba de resultado."""
 
     def __init__(self) -> None:
         self._frames: dict[str, pd.DataFrame] = {}
@@ -81,8 +81,8 @@ class PreviewTable:
             self._refresh()
 
     def _show(self, name: str) -> None:
-        # Vertical scroll goes inside: the wheel over the table must scroll the
-        # rows, while the outer row handles the horizontal overflow.
+        # A rolagem vertical fica por dentro: a roda sobre a tabela deve rolar as
+        # linhas, enquanto a linha externa cuida do transbordo horizontal.
         self._body.content = ft.Row(
             controls=[
                 ft.Column(

@@ -1,4 +1,4 @@
-"""Result card: status, save actions, output path, log and spreadsheet preview."""
+"""Cartão de resultado: status, ações de salvar, caminho de saída, log e prévia."""
 
 import contextlib
 from collections.abc import Callable, Sequence
@@ -17,7 +17,7 @@ _LOG_MAX_HEIGHT = 160
 
 
 class ResultPanel:
-    """Visual state of one tool result."""
+    """Estado visual do resultado de uma ferramenta."""
 
     def __init__(
         self,
@@ -170,17 +170,17 @@ class ResultPanel:
 
     @property
     def kind(self) -> str:
-        """Return the state: idle, info, running, ready, success or error."""
+        """Devolve o estado: idle, info, running, ready, success ou error."""
         return self._kind
 
     @property
     def status(self) -> str:
-        """Return the status line currently shown."""
+        """Devolve a linha de status exibida agora."""
         return str(self._status.value or "")
 
     @property
     def diagnostics(self) -> str:
-        """Return the text stored for “Copiar diagnóstico”."""
+        """Devolve o texto guardado para “Copiar diagnóstico”."""
         return self._diagnostics
 
     def set_idle(self, message: str = "Selecione um arquivo para começar.") -> None:
@@ -223,7 +223,7 @@ class ResultPanel:
         message: str,
         detail: str = "",
     ) -> None:
-        """Show the preview and the save actions, before any file exists."""
+        """Mostra a prévia e as ações de salvar, antes de existir arquivo."""
         self._output = None
         self._kind = "ready"
         self._icon.name = ft.Icons.SAVE
@@ -267,7 +267,7 @@ class ResultPanel:
         self._refresh()
 
     def set_save_error(self, message: str, detail: str = "") -> None:
-        """Report a write failure while keeping the preview and save actions."""
+        """Relata falha de escrita mantendo a prévia e as ações de salvar."""
         self._kind = "ready"
         self._icon.name = ft.Icons.ERROR_OUTLINE
         self._icon.color = theme.RED
@@ -311,7 +311,7 @@ class ResultPanel:
         self._refresh()
 
     def set_diagnostics(self, text: str) -> None:
-        """Store the text used by “Copiar diagnóstico”."""
+        """Guarda o texto usado por “Copiar diagnóstico”."""
         self._diagnostics = text
 
     def append_log(self, line: str) -> None:
@@ -322,7 +322,7 @@ class ResultPanel:
         self._refresh()
 
     def _resize_log(self, lines: int) -> None:
-        """Cap the log height so the preview keeps a usable viewport."""
+        """Limita a altura do log para a prévia manter uma área útil."""
         self._log_box.height = min(28 + 18 * lines, _LOG_MAX_HEIGHT) if lines else 0
 
     def _save(self, _event=None) -> None:

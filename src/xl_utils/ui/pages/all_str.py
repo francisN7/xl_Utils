@@ -1,4 +1,4 @@
-"""Page wiring for the text treatment tool."""
+"""Ligação da página com a ferramenta de tratamento de texto."""
 
 from xl_utils.controllers.all_str import run_all_str
 from xl_utils.ui.components.result_panel import ResultPanel
@@ -7,7 +7,7 @@ from xl_utils.ui.state import ToolState
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Run the pipeline for every selected file and show the batch outcome."""
+    """Roda o pipeline para cada arquivo selecionado e mostra o lote."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",

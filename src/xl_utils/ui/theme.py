@@ -1,4 +1,4 @@
-"""Dracula dark palette and the Flet theme built from it."""
+"""Paleta escura Dracula e o tema Flet construído a partir dela."""
 
 import flet as ft
 
@@ -20,7 +20,7 @@ SUCCESS_BG = "#22342A"
 ERROR_BG = "#3A2428"
 INFO_BG = "#1F3438"
 
-# Smallest size used anywhere in the UI: hints, counters, logs and table cells.
+# Menor tamanho usado na UI: dicas, contadores, logs e células da tabela.
 FONT_XS = 12
 FONT_SM = 13
 FONT_MD = 15
@@ -29,7 +29,7 @@ FONT_HERO = 26
 
 
 def build_theme() -> ft.Theme:
-    """Return the Dracula theme used by the app."""
+    """Devolve o tema Dracula usado pelo aplicativo."""
     return ft.Theme(
         use_material3=True,
         color_scheme=ft.ColorScheme(

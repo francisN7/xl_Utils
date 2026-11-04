@@ -1,4 +1,4 @@
-"""Helpers for tools that process several files in one run."""
+"""Auxiliares para ferramentas que processam vários arquivos numa execução."""
 
 from collections.abc import Callable, Collection, Sequence
 from pathlib import Path
@@ -14,14 +14,14 @@ Pending = list[tuple[Path, Collection[str] | None]]
 
 
 class Outcome(Protocol):
-    """Structure shared by the per-tool outcome dataclasses."""
+    """Estrutura comum aos dataclasses de resultado de cada ferramenta."""
 
     source: Path
     log: RunLog
 
 
 def pending_files(state: ToolState, result: ResultPanel) -> Pending | None:
-    """Return the files to run, or warn when a file has no sheet selected."""
+    """Devolve os arquivos a rodar, ou avisa quando um arquivo não tem aba."""
     pending: Pending = []
     for source in state.files:
         selected = state.selected_sheets.get(source)
@@ -36,7 +36,7 @@ def pending_files(state: ToolState, result: ResultPanel) -> Pending | None:
 
 
 def join_logs(outcomes: Sequence[Outcome]) -> RunLog:
-    """Concatenate per-file logs, keeping one blank line between files."""
+    """Concatena os logs por arquivo, com uma linha em branco entre arquivos."""
     log = RunLog()
     for outcome in outcomes:
         if log:
@@ -46,7 +46,7 @@ def join_logs(outcomes: Sequence[Outcome]) -> RunLog:
 
 
 def append_outcomes(state: ToolState, outcomes: Sequence[Outcome]) -> None:
-    """Append the outcome logs to the run log stored in the state."""
+    """Acrescenta os logs dos resultados ao log de execução do estado."""
     log = state.log or RunLog()
     log.extend(join_logs(outcomes))
     state.log = log
@@ -56,7 +56,7 @@ def prefixed_frames(
     outcomes: Sequence[Outcome],
     frames_of: Callable[[Outcome], dict[str, pd.DataFrame]],
 ) -> dict[str, pd.DataFrame]:
-    """Key preview frames by file when several files run together."""
+    """Identifica a prévia pelo arquivo quando vários rodam juntos."""
     if len(outcomes) == 1:
         return frames_of(outcomes[0])
     return {

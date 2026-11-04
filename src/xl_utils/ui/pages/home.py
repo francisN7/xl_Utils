@@ -1,4 +1,4 @@
-"""Start screen with one card per tool."""
+"""Tela inicial com um cartão por ferramenta."""
 
 from collections.abc import Callable
 
@@ -9,7 +9,7 @@ from xl_utils.ui.pages.registry import TOOLS
 
 
 def build_home(on_open: Callable[[str], None]) -> ft.Control:
-    """Build the hub that links to every tool."""
+    """Monta o hub que leva a cada ferramenta."""
     cards = [
         ft.Container(
             content=ft.Column(

@@ -1,1 +1,1 @@
-"""Shared Flet widgets (file picker, progress, log panel)."""
+"""Widgets Flet compartilhados (seletor de arquivo, progresso, painel de log)."""

@@ -1,1 +1,1 @@
-"""Cross-cutting helpers such as logging and clipboard access."""
+"""Auxiliares transversais, como log e acesso à área de transferência."""

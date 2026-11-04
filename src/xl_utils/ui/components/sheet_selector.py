@@ -1,4 +1,4 @@
-"""Clickable chips for choosing which sheets enter each tool run."""
+"""Chips clicáveis para escolher quais abas entram em cada execução."""
 
 import contextlib
 from collections.abc import Callable
@@ -16,7 +16,7 @@ _CHIP_TEXT = "#B8BCD0"
 
 
 class SheetSelector:
-    """Chips per file, plus "Todas"/"Limpar" and a live counter."""
+    """Chips por arquivo, além de "Todas"/"Limpar" e um contador ao vivo."""
 
     def __init__(
         self,
@@ -90,16 +90,16 @@ class SheetSelector:
         self.refresh()
 
     def set_failures(self, failures: list[str]) -> None:
-        """Show files whose sheet names could not be listed."""
+        """Mostra os arquivos cujas abas não puderam ser listadas."""
         self._failures = list(failures)
 
     def set_loading(self, loading: bool) -> None:
-        """Show a progress row while the sheet names are being listed."""
+        """Mostra uma linha de progresso enquanto as abas são listadas."""
         self._loading = loading
         self.refresh()
 
     def refresh(self) -> None:
-        """Rebuild the chips from the state and update the counter."""
+        """Reconstrói os chips a partir do estado e atualiza o contador."""
         state = self._state
         self._loading_row.visible = self._loading
         self._groups.visible = not self._loading

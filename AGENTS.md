@@ -49,7 +49,7 @@ src/xl_utils/
   ui/pages/         Início + uma página por ferramenta
   ui/components/    entrada, resultado, prévia e layout
   ui/theme.py       tokens e tema Dracula
-  shared/           logging, config, clipboard
+  shared/           log de execução e abertura de pasta
 tests/              testes do core
 scripts/            automação de docs
 docs/               mapa, estado, roadmap, guias, ADRs
@@ -59,8 +59,7 @@ docs/               mapa, estado, roadmap, guias, ADRs
 ## Convenções
 
 - Identificadores e código em inglês; comentários, docstrings, UI e docs em
-  PT-BR. O core e os controllers estão traduzidos; `ui/` e `shared/` seguem no
-  backlog.
+  PT-BR. Core, controllers, `ui/`, `shared/` e o shell já estão traduzidos.
 - `core/` não importa Flet, não abre diálogos e não imprime no terminal.
 - Páginas Flet só coletam entrada, chamam controller e exibem resultado.
 - Regra de negócio fica em função pura testável, não na página.

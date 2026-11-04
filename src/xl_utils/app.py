@@ -1,4 +1,4 @@
-"""Application shell: sidebar, home hub and tool pages."""
+"""Shell do aplicativo: barra lateral, hub inicial e páginas de ferramenta."""
 
 import flet as ft
 
@@ -10,7 +10,7 @@ from xl_utils.ui.theme import build_theme
 
 
 def main(page: ft.Page) -> None:
-    """Build the main window."""
+    """Monta a janela principal."""
     page.title = "xl_Utils"
     page.padding = 0
     page.bgcolor = theme.BACKGROUND
@@ -57,5 +57,5 @@ def main(page: ft.Page) -> None:
 
 
 def run() -> None:
-    """Start the desktop application."""
+    """Inicia o aplicativo desktop."""
     ft.run(main)

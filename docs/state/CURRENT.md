@@ -4,38 +4,39 @@
 
 ## Sessão
 
-- **Última concluída:** S4b — revisão fiel do core, comentários e code tour
-- **Próxima:** S4c — tradução de `ui/` e `shared/` e revisão do diagnóstico
-  (`docs/sessions/S4c-traducao-ui.md`) — proposta; confirmar com o dono
-- **Ciclo:** 0003 — Qualidade e clareza — Fase 4
-- **Decisões abertas:** confirmar S4c; prioridade do backlog
+- **Última concluída:** S4c — tradução de `ui/`/`shared/` e revisão do
+  diagnóstico
+- **Próxima:** nenhuma definida; aguardando feedback do dono sobre o backlog em
+  `docs/roadmap/main.md`
+- **Ciclo:** 0003 fechado em `docs/roadmap/0003-qualidade.md`; nenhum ciclo ativo
+- **Decisões abertas:** qual item do backlog vira a próxima sessão, quando
+  houver um novo ciclo
 
 ## Pronto
 
-- CSV com `;`, tab e `|`: encoding e separador detectados; `NA`/`N/A`/`NULL`
-  preservados como texto; HTML com `colspan` mantém zeros e achata o cabeçalho.
-- `.xlsm` não é mais divergência; `.xls` falha com mensagem de “sem leitor
-  alternativo”; `read_headers` de CSV lê amostra.
-- `save_chosen` recusa arquivo no lote; `save_workbook` normaliza `.xlsx`;
-  `safe_file_part` e `summarize_cnjs` vivem no core.
-- Core e controllers com docstrings/comentários em PT-BR; `AGENTS.md`
-  atualizado.
-- `docs/guide/code-tour.md`, “Mapa do core” em `architecture.md`, ADR 0010 e o
-  comando global em `setup.md`/`README.md`.
-- Ciclo 0002 fechado em `docs/roadmap/0002-migracao.md`; `main.md` ativo é o
-  ciclo 0003.
+- `ui/`, `shared/`, shell (`app.py`) e `__init__` com docstrings e comentários
+  em PT-BR; identificadores seguem em inglês.
+- `build_diagnostics` revisado: versões, caminho do arquivo, abas por nome,
+  formato, opções, resultado, erro, causa e traceback limitado a 4.000
+  caracteres; nenhum conteúdo de célula entra no texto.
+- `AGENTS.md` sem o backlog de tradução; `reference/architecture.md` corrigido
+  para a composição real de `shared/`.
+- S4b anterior: CSV/HTML fiéis, `.xlsm` equivalente a `.xlsx`, `.xls` sem falso
+  reparo, core/controllers em PT-BR e code tour publicado.
+- Ciclo 0002 em `docs/roadmap/0002-migracao.md`; specs de fases fechadas fora do
+  working tree.
 
 ## Próximo passo
 
-S4c: traduzir docstrings/comentários de `ui/` e `shared/`, revisar a cópia do
-diagnóstico e atualizar o code tour se algum módulo mudar.
+Sem sessão agendada e sem ciclo ativo. Quando houver feedback, escolher o novo
+ciclo, um item do backlog e escrever a spec antes de codar.
 
 ## Arquivos-chave
 
-- `src/xl_utils/core/io.py`, `mime.py`, `tools/all_str.py`
-- `docs/guide/code-tour.md`, `docs/reference/architecture.md`,
-  `docs/adr/0010-leitura-fiel-csv-html.md`
-- `tests/test_formats.py`, `tests/test_format_check.py`
+- `src/xl_utils/ui/` e `src/xl_utils/shared/log.py`, `system.py`
+- `docs/reference/architecture.md`, `docs/guide/code-tour.md`
+- `docs/roadmap/0003-qualidade.md`, `docs/roadmap/main.md`
+- `tests/test_log.py`, `tests/test_layout.py`, `tests/test_ui_state.py`
 
 ## Armadilhas
 
@@ -46,6 +47,8 @@ diagnóstico e atualizar o code tour se algum módulo mudar.
 - `.xls` não tem leitor alternativo; a falha do calamine é final.
 - Datas do Excel viram texto ISO, não o formato exibido.
 - Flet 1.0 não suporta drop do SO; merge usa `Draggable`/`DragTarget`.
+- Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir” para sintaxe
+  antiga.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 
 ## Como rodar

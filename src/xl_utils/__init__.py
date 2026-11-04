@@ -1,3 +1,3 @@
-"""xl-utils: a collection of spreadsheet utilities with a desktop interface."""
+"""xl-utils: conjunto de utilitários de planilha com interface desktop."""
 
 __version__ = "0.1.0"

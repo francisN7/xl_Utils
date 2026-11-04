@@ -1,4 +1,4 @@
-"""Page wiring for the spreadsheet cut tool."""
+"""Ligação da página com a ferramenta de recorte de planilhas."""
 
 import flet as ft
 
@@ -12,7 +12,7 @@ DEFAULT_ROWS = "1000"
 
 
 def options(state: ToolState) -> ft.Control:
-    """Build the editable rows-per-file field and keep it in the state."""
+    """Monta o campo editável de linhas por arquivo e o guarda no estado."""
     field = ft.TextField(
         label="Linhas por arquivo",
         value=DEFAULT_ROWS,
@@ -35,7 +35,7 @@ def options(state: ToolState) -> ft.Control:
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
-    """Cut every selected file and show the generated files."""
+    """Recorta cada arquivo selecionado e mostra os arquivos gerados."""
     if not state.files:
         result.set_info(
             "Selecione um arquivo",

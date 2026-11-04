@@ -1,22 +1,10 @@
 # Roadmap atual
 
-Ciclo ativo: **0003 — Qualidade e clareza**. O ciclo anterior está em
-[`0002-migracao.md`](0002-migracao.md). A ordem segue **valor × custo × risco**:
-primeiro o que deixa as próximas sessões mais baratas, depois o que mais dói no
-uso. Um item só vira sessão quando a fase é escolhida.
+Nenhum ciclo ativo. O ciclo 0003 está fechado em
+[`0003-qualidade.md`](0003-qualidade.md).
 
-## Fase 4 — Qualidade e clareza
-
-Objetivo: deixar o código e a documentação fáceis de ler sem mudar o
-comportamento das ferramentas; toda correção de leitura precisa de teste.
-
-- [x] **S4b — Revisão fiel do core.** CSV com separador/encoding detectados
-  (`;`, tab, `|`), `NA`/`N/A` como texto, HTML com cabeçalho de dois níveis
-  achatado, `.xlsm`/`.xlsx` equivalentes, `.xls` sem falso reparo, docstrings do
-  core/controllers em PT-BR e code tour publicado. Custo G.
-- [ ] **S4c — Tradução de `ui/` e `shared/`.** Traduzir docstrings/comentários
-  restantes, revisar a cópia do diagnóstico e manter o code tour atualizado.
-  Custo M.
+O backlog abaixo aguarda mais feedback do dono; um item só vira sessão quando um
+novo ciclo e uma fase forem escolhidos.
 
 ## Backlog
 
@@ -32,7 +20,6 @@ comportamento das ferramentas; toda correção de leitura precisa de teste.
   testes verdes e app abrindo.
 - Revisar `docs:check` no CI a cada mudança de documentação.
 - Atualizar o code tour quando um módulo do core mudar de papel.
-- Traduzir comentários de `ui/` e `shared/` na S4c.
 
 ## Gatilhos (não são backlog)
 
@@ -59,4 +46,5 @@ comportamento das ferramentas; toda correção de leitura precisa de teste.
 
 - A S4a (fechamento do ciclo 0002) foi absorvida pela S4b; o resumo do ciclo
   está em [`0002-migracao.md`](0002-migracao.md).
-- O próximo item da Fase 4 é a S4c, salvo decisão diferente do dono.
+- O ciclo 0003 fechou com a S4c; o resumo está em
+  [`0003-qualidade.md`](0003-qualidade.md).
