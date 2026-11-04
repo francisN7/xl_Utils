@@ -126,19 +126,22 @@ O campo de linhas é editável na página e vive em `ToolState.options`.
 
 ## Mesclagem
 
-`core/tools/merge.py` recebe uma sequência de `(arquivo, aba, DataFrame)` e
-concatena na mesma ordem, descartando apenas abas sem linhas. Antes de juntar,
-aplica `column_map` (`{coluna_de_origem: coluna_canônica}`) e insere `ORIGEM`
-como primeira coluna, no formato `<arquivo> - <aba> - <linha>`, com a linha
-contada a partir de 1 na origem. Colunas ausentes viram `NaN` e colunas novas
-entram no fim, na ordem em que aparecem.
+`core/tools/merge.py` recebe uma sequência de `(arquivo, aba, DataFrame)` e uma
+lista de `ColumnGroup`, concatena na mesma ordem e descarta apenas abas sem
+linhas. Cada grupo vira uma coluna de saída: o primeiro `ColumnRef` define o
+cabeçalho e os demais alimentam a mesma coluna; `group_by_name` agrupa
+automaticamente colunas de mesmo nome. O núcleo valida que uma aba contribui com
+no máximo uma coluna por saída, preenche lacunas com `NaN`, insere `ORIGEM` como
+primeira coluna no formato `<arquivo> - <aba> - <linha>` e desempata cabeçalhos
+repetidos com sufixo `_2`.
 
 `controllers/merge.py` lê cada fonte pelo `prepare_workbook`, filtra as abas com
 `filter_sheets` e chama `merge_sheets`; exige ao menos duas abas com dados e
 grava `output/Merge.xlsx` na pasta da primeira origem. `inspect_columns` usa
-`core/io.read_headers` para listar os cabeçalhos sem carregar as linhas; a página
-monta um dropdown por coluna distinta e guarda o mapa em `ToolState.options`.
-O painel de opções é reconstruído quando arquivos ou abas mudam.
+`core/io.read_headers` para devolver os `ColumnRef`s sem carregar as linhas; a
+página monta o quadro arrastável e guarda os grupos em `ToolState.options`.
+`move_column` concentra a regra de mover/juntar chips. O painel é reconstruído
+quando arquivos ou abas mudam.
 
 ## Testes
 

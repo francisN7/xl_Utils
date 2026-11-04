@@ -75,12 +75,20 @@ lidas, aparece um spinner e o botão Executar fica desabilitado.
 ### Mesclagem
 
 O merge usa a mesma seleção de abas, com a primeira aba de cada arquivo marcada
-por padrão quando há vários. Em “2. Opções” aparece um dropdown por coluna
-distinta: o nome à esquerda é a coluna de origem e o valor escolhido é a coluna
-canônica no resultado. Colunas com o mesmo nome já ficam alinhadas; nomes
-diferentes podem ser unidos escolhendo o mesmo destino. A lista é refeita quando
-os arquivos ou as abas mudam e o mapa vive em `ToolState.options`. A saída
-`Merge.xlsx` mostra `ORIGEM` como primeira coluna, com arquivo, aba e linha.
+por padrão quando há vários. Em “2. Opções”, a seção **“Alinhamento de colunas”**
+mostra um quadro de colunas de saída. Cada chip representa uma coluna de uma
+aba e exibe `arquivo · aba`; arrastar um chip para outra coluna junta as duas
+no mesmo destino, e arrastar para antes de outro chip muda a ordem. O **primeiro
+chip de cada coluna define o cabeçalho** e recebe o ícone de alfinete.
+
+Os botões “+ esq.” e “+ dir.” criam uma coluna vazia ao lado; “Nova coluna”
+acrescenta uma no fim. Uma coluna vazia só aparece como área de destino e é
+ignorada na execução. Colunas com o mesmo nome já nascem juntas; para separar
+uma correspondência automática, crie uma coluna vazia e arraste um dos chips
+para ela. Cada aba pode contribuir com no máximo uma coluna por saída. O quadro
+é refeito quando os arquivos ou as abas mudam e o estado vive em
+`ToolState.options`. A saída `Merge.xlsx` mostra `ORIGEM` como primeira coluna,
+com arquivo, aba e linha.
 
 ## Início
 

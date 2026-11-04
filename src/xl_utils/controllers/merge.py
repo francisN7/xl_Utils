@@ -1,6 +1,6 @@
 """Merge the selected sheets of several files into one workbook."""
 
-from collections.abc import Collection, Mapping, Sequence
+from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -9,7 +9,7 @@ import pandas as pd
 from xl_utils.core.io import read_headers, save_workbook
 from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
-from xl_utils.core.tools.merge import merge_sheets
+from xl_utils.core.tools.merge import ColumnGroup, ColumnRef, merge_sheets
 from xl_utils.core.tools.sheets import filter_sheets
 
 Source = tuple[Path, Collection[str] | None]
@@ -34,24 +34,23 @@ class MergeOutcome:
         return len(self.merged.columns)
 
 
-def inspect_columns(sources: Sequence[Source]) -> list[str]:
-    """Return the distinct columns of the selected sheets, in reading order.
+def inspect_columns(sources: Sequence[Source]) -> list[ColumnRef]:
+    """Return the selected columns of every sheet, in reading order.
 
-    The UI uses this to offer one canonical choice per column. Files are read
+    The UI uses this to build the draggable column board. Files are read
     through their real format; the rows are not loaded for Excel and CSV.
     """
-    seen: dict[str, None] = {}
+    refs: list[ColumnRef] = []
     for source, selected in sources:
         headers = filter_sheets(read_headers(source), selected)
-        for names in headers.values():
-            for name in names:
-                seen.setdefault(name, None)
-    return list(seen)
+        for sheet, names in headers.items():
+            refs.extend(ColumnRef(source, sheet, name) for name in names)
+    return refs
 
 
 def run_merge(
     sources: Sequence[Source],
-    column_map: Mapping[str, str] | None = None,
+    groups: Sequence[ColumnGroup] | None = None,
 ) -> MergeOutcome:
     """Concatenate the selected sheets of ``sources`` into ``output/``."""
     if not sources:
@@ -73,7 +72,7 @@ def run_merge(
             "mesmo arquivo — para mesclar."
         )
 
-    merged = merge_sheets(entries, column_map)
+    merged = merge_sheets(entries, groups)
     destination = default_output_dir(loaded[0][0]) / "Merge.xlsx"
     output = save_workbook({"Mesclado": merged}, destination)
 

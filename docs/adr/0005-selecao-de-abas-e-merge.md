@@ -69,3 +69,19 @@ colunas de mesmo significado que chegam com nomes diferentes.
   coluna de origem que já se chame `ORIGEM` é renomeada para `ORIGEM_original`.
 - Execução com uma única aba útil é recusada com mensagem clara, antes de
   gravar qualquer arquivo.
+
+## Adendo — alinhamento por arraste (2026-11-04)
+
+- O Flet 1.0 **tem** `Draggable` e `DragTarget`; a afirmação anterior de que não
+  oferecia arraste de colunas estava errada.
+- O alinhamento passa a ser um quadro de colunas de saída. Cada chip representa
+  uma coluna de uma aba e mostra `arquivo · aba`; o primeiro chip do grupo
+  define o cabeçalho e os demais alimentam a mesma coluna.
+- Arrastar um chip para outro grupo junta as colunas; arrastar para antes de
+  outro chip muda a ordem/cabeçalho. Os botões “+ esq.” e “+ dir.” criam colunas
+  vazias para separar correspondências automáticas.
+- Uma aba pode contribuir com no máximo uma coluna por saída; `move_column` e
+  `merge_sheets` validam essa regra. Colunas de mesmo nome continuam agrupadas
+  por padrão (`group_by_name`), mas podem ser separadas manualmente.
+- O quadro vive em `ToolState.options["column_groups"]` e é refeito quando os
+  arquivos ou as abas mudam.

@@ -38,8 +38,10 @@ decisões nos ADRs.
 - Lote de arquivos em todas as ferramentas: texto, CNJ e recorte processam cada
   origem e salvam saídas separadas, com prévia e log identificando o arquivo.
 - Mesclagem de planilhas: concatena as abas selecionadas de um ou vários
-  arquivos em `output/Merge.xlsx`, com a coluna `ORIGEM`, alinhamento de colunas
-  por dropdown e recusa de uma única aba útil.
+  arquivos em `output/Merge.xlsx`, com a coluna `ORIGEM`, quadro de chips
+  arrastáveis para juntar, separar e ordenar colunas e recusa de uma única aba
+  útil. O primeiro chip define o cabeçalho; cada aba contribui com uma coluna
+  por saída.
 - Suíte de integração nos quatro formatos (`.xlsx`, `.xls`, `.csv` e `.html`):
   leitura, cabeçalhos, reparo de CSV cp1252, imutabilidade das origens e
   execução das quatro ferramentas, incluindo merge com origens mistas. O `.xls`

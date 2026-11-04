@@ -18,7 +18,7 @@
 - Texto, CNJ, recorte e merge prontos e salvando em `output/`; as três primeiras
   aceitam lote e processam cada origem separadamente.
 - Seleção de abas por chips e `default_selection` por ferramenta; merge com
-  `ORIGEM` e alinhamento por dropdown.
+  `ORIGEM` e quadro de colunas arrastáveis (chips).
 - Integração coberta nos quatro formatos: `.xlsx`, `.xls`, `.csv` e `.html`; o
   `.xls` usa a fixture binária `tests/fixtures/minimo.xls`.
 - HTML preserva zeros à esquerda: `read_workbook` reparseia com converters
@@ -33,13 +33,15 @@ diagnóstico com versões, arquivos, abas, opções e traceback.
 
 ## Arquivos-chave
 
-- `tests/conftest.py`, `test_formats.py` e `test_integration.py`.
-- `core/io.py` (`read_headers`, HTML com converters) e `core/tools/all_str.py`.
+- `core/tools/merge.py` (`ColumnGroup`, `move_column`) e `ui/pages/merge.py`.
+- `tests/conftest.py`, `test_formats.py`, `test_integration.py` e `test_merge.py`.
 
 ## Armadilhas
 
-- Flet 1.0 não suporta drop de arquivos do SO nem drag de colunas.
-- Flet 1.0 usa `Dropdown.on_select`, não `on_change`.
+- Flet 1.0 não suporta drop de arquivos do SO; o merge usa
+  `Draggable`/`DragTarget` para o quadro de colunas.
+- Uma aba contribui com no máximo uma coluna por saída; cabeçalhos repetidos
+  ganham sufixo `_2`.
 - `puremagic` lê HTML como `.txt`; `resolve_suffix` usa a extensão original.
 - `.xls` é lido com o engine `calamine` (`python-calamine`); `xlrd` saiu.
 - HTML sem `<meta charset>` pode perder acentos; as fixtures declaram UTF-8.

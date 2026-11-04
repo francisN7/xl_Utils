@@ -7,7 +7,8 @@ from xl_utils.controllers.all_str import run_all_str
 from xl_utils.controllers.cnj import run_cnj
 from xl_utils.controllers.cut import run_cut
 from xl_utils.controllers.merge import run_merge
-from xl_utils.core.io import read_workbook
+from xl_utils.core.io import list_sheets, read_workbook
+from xl_utils.core.tools.merge import ColumnGroup, ColumnRef
 
 _FORMATS = ["xlsx_file", "csv_file", "html_file", "xls_file"]
 
@@ -115,10 +116,26 @@ def test_merge_aligns_columns_across_formats(tmp_path: Path) -> None:
         csv,
         index=False,
     )
+    xlsx_sheet = list_sheets(xlsx)[0]
+    csv_sheet = list_sheets(csv)[0]
+    groups = [
+        ColumnGroup(
+            (
+                ColumnRef(xlsx, xlsx_sheet, "codigo"),
+                ColumnRef(csv, csv_sheet, "codigo"),
+            )
+        ),
+        ColumnGroup(
+            (
+                ColumnRef(csv, csv_sheet, "cnj"),
+                ColumnRef(xlsx, xlsx_sheet, "documento"),
+            )
+        ),
+    ]
 
     outcome = run_merge(
         [(xlsx, None), (csv, None)],
-        {"documento": "cnj"},
+        groups,
     )
 
     assert list(outcome.merged.columns) == ["ORIGEM", "codigo", "cnj"]

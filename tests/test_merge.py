@@ -5,7 +5,13 @@ import pytest
 
 from xl_utils.controllers.merge import inspect_columns, run_merge
 from xl_utils.core.io import read_workbook
-from xl_utils.core.tools.merge import merge_sheets
+from xl_utils.core.tools.merge import (
+    ColumnGroup,
+    ColumnRef,
+    group_by_name,
+    merge_sheets,
+    move_column,
+)
 
 
 def _frame(**columns: list[str]) -> pd.DataFrame:
@@ -52,19 +58,119 @@ def test_merge_sheets_fills_missing_columns_and_appends_extra() -> None:
     assert merged.loc[1, "extra"] == "X"
 
 
-def test_merge_sheets_uses_the_column_map_to_join_names() -> None:
+def test_merge_sheets_joins_names_with_an_explicit_group() -> None:
     entries = [
         (Path("a.xlsx"), "Uma", _frame(documento=["111"])),
         (Path("b.xlsx"), "Uma", _frame(CPF=["222"])),
     ]
+    groups = [
+        ColumnGroup(
+            (
+                ColumnRef(Path("a.xlsx"), "Uma", "documento"),
+                ColumnRef(Path("b.xlsx"), "Uma", "CPF"),
+            )
+        )
+    ]
 
-    merged = merge_sheets(
-        entries,
-        {"documento": "cpf", "CPF": "cpf"},
-    )
+    merged = merge_sheets(entries, groups)
 
-    assert list(merged.columns) == ["ORIGEM", "cpf"]
-    assert merged["cpf"].tolist() == ["111", "222"]
+    assert list(merged.columns) == ["ORIGEM", "documento"]
+    assert merged["documento"].tolist() == ["111", "222"]
+
+
+def test_group_by_name_joins_equal_columns() -> None:
+    refs = [
+        ColumnRef(Path("a.xlsx"), "Uma", "TAREFA"),
+        ColumnRef(Path("a.xlsx"), "Uma", "CLASSE"),
+        ColumnRef(Path("b.xlsx"), "Uma", "TAREFA"),
+    ]
+
+    groups = group_by_name(refs)
+
+    assert [group.header for group in groups] == ["TAREFA", "CLASSE"]
+    assert groups[0].columns == (refs[0], refs[2])
+
+
+def test_merge_sheets_can_split_equal_names_into_two_columns() -> None:
+    entries = [
+        (Path("a.xlsx"), "Uma", _frame(TAREFA=["A"])),
+        (Path("b.xlsx"), "Uma", _frame(TAREFA=["B"])),
+    ]
+    groups = [
+        ColumnGroup((ColumnRef(Path("a.xlsx"), "Uma", "TAREFA"),)),
+        ColumnGroup((ColumnRef(Path("b.xlsx"), "Uma", "TAREFA"),)),
+    ]
+
+    merged = merge_sheets(entries, groups)
+
+    assert list(merged.columns) == ["ORIGEM", "TAREFA", "TAREFA_2"]
+    assert merged["TAREFA"].iloc[0] == "A"
+    assert pd.isna(merged["TAREFA"].iloc[1])
+    assert pd.isna(merged["TAREFA_2"].iloc[0])
+    assert merged["TAREFA_2"].iloc[1] == "B"
+
+
+def test_move_column_reorders_and_changes_the_header() -> None:
+    a = ColumnRef(Path("a.xlsx"), "Uma", "a")
+    b = ColumnRef(Path("b.xlsx"), "Uma", "b")
+    c = ColumnRef(Path("c.xlsx"), "Uma", "c")
+    groups = [[a, b], [c]]
+
+    moved = move_column(groups, b, 0, 0)
+
+    assert moved == [[b, a], [c]]
+    assert move_column(moved, c, 0, 0) == [[c, b, a], []]
+
+
+def test_move_column_fills_an_empty_group() -> None:
+    a = ColumnRef(Path("a.xlsx"), "Uma", "a")
+
+    assert move_column([[], [a]], a, 0, 0) == [[a], []]
+
+
+def test_move_column_rejects_two_columns_of_one_sheet() -> None:
+    first = ColumnRef(Path("a.xlsx"), "Uma", "a")
+    second = ColumnRef(Path("a.xlsx"), "Uma", "b")
+
+    with pytest.raises(ValueError, match="uma coluna por saída"):
+        move_column([[first], [second]], second, 0, 0)
+
+
+def test_move_column_rejects_an_invalid_target() -> None:
+    a = ColumnRef(Path("a.xlsx"), "Uma", "a")
+
+    with pytest.raises(ValueError, match="destino inválida"):
+        move_column([[a]], a, 2, 0)
+
+
+def test_merge_sheets_rejects_two_columns_of_one_sheet_in_a_group() -> None:
+    entries = [
+        (Path("a.xlsx"), "Uma", _frame(um=["1"], outro=["2"])),
+        (Path("b.xlsx"), "Uma", _frame(um=["3"])),
+    ]
+    groups = [
+        ColumnGroup(
+            (
+                ColumnRef(Path("a.xlsx"), "Uma", "um"),
+                ColumnRef(Path("a.xlsx"), "Uma", "outro"),
+            )
+        )
+    ]
+
+    with pytest.raises(ValueError, match="duas colunas"):
+        merge_sheets(entries, groups)
+
+
+def test_merge_sheets_matches_numeric_headers_as_text() -> None:
+    entries = [
+        (Path("a.xlsx"), "Uma", pd.DataFrame({2024: ["A"]})),
+        (Path("b.xlsx"), "Uma", pd.DataFrame({2024: ["B"]})),
+    ]
+
+    merged = merge_sheets(entries)
+
+    assert list(merged.columns) == ["ORIGEM", "2024"]
+    assert merged["2024"].tolist() == ["A", "B"]
 
 
 def test_merge_sheets_skips_empty_sheets_but_keeps_rows() -> None:
@@ -132,14 +238,21 @@ def test_inspect_columns_keeps_order_and_only_selected_sheets(
         ]
     )
 
-    assert columns == ["id", "nome", "cpf"]
+    assert columns == [
+        ColumnRef(first, "Uma", "id"),
+        ColumnRef(first, "Uma", "nome"),
+        ColumnRef(second, "Dados", "id"),
+        ColumnRef(second, "Dados", "cpf"),
+    ]
 
 
 def test_inspect_columns_reads_csv_headers(tmp_path: Path) -> None:
     source = tmp_path / "entrada.csv"
     source.write_text("nome;documento\nA;1\n", encoding="utf-8-sig")
 
-    assert inspect_columns([(source, None)]) == ["nome;documento"]
+    assert inspect_columns([(source, None)]) == [
+        ColumnRef(source, "Planilha1", "nome;documento")
+    ]
 
 
 def test_run_merge_writes_one_workbook_and_keeps_the_sources(
