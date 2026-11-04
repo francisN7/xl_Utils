@@ -34,6 +34,12 @@ duplicação e com teste.
   Texto e CNJ: o que é obrigatório vira uma frase de comportamento fixo, não um
   controle. O card “2. Opções” só aparece quando há algo editável (linhas do
   recorte, colunas do merge). Custo S.
+- [ ] **S2d — Tipo real x extensão.** Conferir o tipo detectado por conteúdo
+  contra a extensão antes de executar; mostrar o tipo real na entrada quando
+  divergirem e bloquear quando a detecção falhar. A leitura já usa o tipo real
+  (`resolve_suffix`); faltam o indicador, o gate e os testes com extensões
+  trocadas (`.xlsx` como `.xls`, `.csv` como `.xlsx`, HTML como `.xlsx`).
+  Nunca renomear o arquivo do usuário. Custo M.
 
 ## Fase 3 — Distribuição
 
