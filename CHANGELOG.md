@@ -56,6 +56,10 @@ decisões nos ADRs.
   inesperada, sempre mantendo a mensagem original.
 - Texto e CNJ sem checkboxes desabilitados: o comportamento fixo vira uma frase
   na entrada, e o card “2. Opções” só aparece em recorte e merge.
+- Tipo real x extensão: `FormatCheck` mostra o formato detectado na entrada
+  quando diverge do nome, bloqueia a execução quando nada é identificável e
+  registra formato e divergência no log e no diagnóstico. Extensões trocadas são
+  lidas pelo conteúdo sem renomear a origem.
 
 ### Removed
 

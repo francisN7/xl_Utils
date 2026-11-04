@@ -34,12 +34,10 @@ duplicação e com teste.
   Texto e CNJ: o que é obrigatório vira uma frase de comportamento fixo, não um
   controle. O card “2. Opções” só aparece quando há algo editável (linhas do
   recorte, colunas do merge). Custo S.
-- [ ] **S2d — Tipo real x extensão.** Conferir o tipo detectado por conteúdo
-  contra a extensão antes de executar; mostrar o tipo real na entrada quando
-  divergirem e bloquear quando a detecção falhar. A leitura já usa o tipo real
-  (`resolve_suffix`); faltam o indicador, o gate e os testes com extensões
-  trocadas (`.xlsx` como `.xls`, `.csv` como `.xlsx`, HTML como `.xlsx`).
-  Nunca renomear o arquivo do usuário. Custo M.
+- [x] **S2d — Tipo real x extensão.** `FormatCheck` mostra o tipo detectado,
+  avisa quando diverge da extensão e bloqueia antes de ler quando nada é
+  identificável. Testes cobrem `.xlsx` como `.xls`, CSV e HTML como `.xlsx`,
+  leitura pelo conteúdo e origem intacta. Nunca renomear o arquivo. Custo M.
 - [ ] **S2e — Saída escolhida.** Executar sem gravar automaticamente, mostrar a
   prévia e salvar só ao clicar em “Salvar”, escolhendo arquivo (saída única) ou
   pasta (lote), com “Salvar em output/” como atalho. Custo G.

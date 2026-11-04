@@ -90,6 +90,14 @@ usuário. Quando o detectado é genérico (`.txt`) e a extensão original é
 suportada, a extensão original vence. Formatos: `.xlsx`, `.xlsm`, `.xls`,
 `.csv`, `.html` e `.htm`.
 
+`check_format` devolve um `FormatCheck` imutável com o tipo detectado, a
+extensão declarada, o tipo efetivo de leitura e os estados `identified` e
+`diverges`. A UI mostra `conteúdo: .xlsx · nome: .xls` somente quando dois
+formatos suportados divergem. `ToolLayout._run` bloqueia antes de ler quando
+`identified` é falso, mostra “Não foi possível identificar o formato” e
+registra o motivo no log e no diagnóstico. A leitura continua usando
+`resolve_suffix`, então o conteúdo vence o nome sem tocar no arquivo.
+
 ## Saída
 
 `core/paths.py` cria a pasta e devolve um nome livre (`saida_001.xlsx`).
@@ -110,8 +118,9 @@ anexa os logs ao `ToolState.log`, e o `ToolLayout` grava o evento final.
 planilha”), `ValueError` (“Confira a seleção”) e falhas inesperadas. A mensagem
 original fica no painel, o traceback em `ToolState.error_detail` e o log recebe
 o evento de erro. `build_diagnostics` monta o texto de “Copiar diagnóstico” com
-versões do app, Python, pandas e Flet, arquivos e abas, opções, resultado, tipo,
-mensagem, causa e traceback limitado a 4.000 caracteres. Versão ausente vira
+versões do app, Python, pandas e Flet, arquivos e abas, formato detectado e
+divergência, opções, resultado, tipo, mensagem, causa e traceback limitado a
+4.000 caracteres. Versão ausente vira
 “desconhecida”; nenhum conteúdo de célula entra no diagnóstico.
 
 ## Ferramentas

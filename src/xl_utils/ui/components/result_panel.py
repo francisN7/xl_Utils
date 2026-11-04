@@ -144,6 +144,11 @@ class ResultPanel:
         """Return the status line currently shown."""
         return str(self._status.value or "")
 
+    @property
+    def diagnostics(self) -> str:
+        """Return the text stored for “Copiar diagnóstico”."""
+        return self._diagnostics
+
     def set_idle(self, message: str = "Selecione um arquivo para começar.") -> None:
         self._output = None
         self._kind = "idle"

@@ -8,6 +8,8 @@ from importlib import metadata
 from pathlib import Path
 from typing import Literal
 
+from xl_utils.core.mime import FormatCheck
+
 LogLevel = Literal["info", "success", "warning", "error"]
 
 _LABELS: dict[LogLevel, str] = {
@@ -104,6 +106,7 @@ def build_diagnostics(
     tool: str = "",
     files: Sequence[Path] = (),
     sheets: Mapping[Path, Sequence[str]] | None = None,
+    formats: Mapping[Path, FormatCheck] | None = None,
     options: Mapping[str, object] | None = None,
     message: str = "",
     error: BaseException | None = None,
@@ -125,6 +128,11 @@ def build_diagnostics(
         lines += ["", "Arquivos:"]
         for path in files:
             lines.append(f"  {path}")
+            check = (formats or {}).get(path)
+            if check is not None:
+                lines.append(f"    Formato: {check.summary}")
+                if check.diverges:
+                    lines.append("    Divergência: conteúdo difere da extensão")
             selected = (sheets or {}).get(path)
             if selected:
                 names = ", ".join(sorted(str(name) for name in selected))

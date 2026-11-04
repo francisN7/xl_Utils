@@ -61,6 +61,13 @@ para selecionar" substitui a promessa de drop. Todas as ferramentas aceitam
 vários arquivos: depois do primeiro, o dropzone vira “Adicionar outro arquivo” e
 a lista permite remover cada um.
 
+Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
+extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:
+.xls`). Se nem o conteúdo nem a extensão apontarem para um formato suportado, a
+linha fica vermelha com “Não foi possível identificar o formato”; a execução é
+bloqueada antes da leitura e o motivo vai para o log e o diagnóstico. No caso
+comum, nada além do nome e do tamanho aparece.
+
 Texto e CNJ não têm opções editáveis: o card “2. Opções” não aparece e o
 comportamento fixo fica em uma frase no card “1. Entrada” (remoção de emojis e
 quebras preservadas; padronização e deduplicação de CNJ). Recorte e merge
@@ -149,6 +156,7 @@ abaixo de `FONT_XS`.
 | Vazio | Dropzone e botão desabilitado. |
 | Selecionado | Arquivos, opções (quando existirem) e botão habilitado. |
 | Lendo abas | Spinner “Lendo as abas...” e Executar desabilitado. |
+| Formato desconhecido | Linha vermelha na entrada; Executar mostra “Não foi possível identificar o formato”. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
 | Executando | Status amarelo e log inicial. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |

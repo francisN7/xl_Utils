@@ -10,6 +10,7 @@ from typing import Protocol
 import flet as ft
 
 from xl_utils.core.io import list_sheets
+from xl_utils.core.mime import FormatCheck, check_format
 from xl_utils.core.tools.all_str import WorkbookReadError
 from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.ui import theme
@@ -55,6 +56,7 @@ class ToolLayout:
             multiple=multiple_files,
         )
         self.result = ResultPanel()
+        self._formats: dict[Path, FormatCheck] = {}
         self._sheet_loading = False
         self.sheet_selector = SheetSelector(
             self.state,
@@ -196,6 +198,7 @@ class ToolLayout:
 
     def _files_changed(self, files: list[Path]) -> None:
         self.state.select_files(files)
+        self._check_formats()
         self.sheet_selector.set_failures([])
         self.sheet_selector.refresh()
         if files:
@@ -208,6 +211,13 @@ class ToolLayout:
         self._refresh_options()
         self._refresh()
         self._start_sheet_load()
+
+    def _check_formats(self) -> list[FormatCheck]:
+        """Detect the real format of every file and show it in the entry."""
+        checks = [check_format(path) for path in self.state.files]
+        self._formats = {check.path: check for check in checks}
+        self.file_input.set_formats(checks)
+        return checks
 
     def _start_sheet_load(self) -> None:
         if not self.state.files:
@@ -281,6 +291,11 @@ class ToolLayout:
                 "Aguarde a lista de abas terminar de carregar.",
             )
             return
+        checks = self._check_formats()
+        blocked = [check for check in checks if not check.identified]
+        if blocked:
+            self._block_formats(blocked)
+            return
         if self._run_handler is None:
             self.result.set_info(
                 "Ferramenta em migração",
@@ -291,7 +306,16 @@ class ToolLayout:
         self.state.message = ""
         self.state.error = None
         self.state.error_detail = None
-        log = RunLog().info(f"Lendo {len(self.state.files)} arquivo(s)...")
+        log = RunLog()
+        for check in checks:
+            if check.diverges:
+                log.warning(
+                    f"{check.path.name}: conteúdo {check.detected} · "
+                    f"nome {check.declared}; lido como {check.effective}"
+                )
+            else:
+                log.info(f"{check.path.name}: lido como {check.effective}")
+        log.info(f"Lendo {len(self.state.files)} arquivo(s)...")
         self.state.log = log
         self.result.set_running()
         failure: BaseException | None = None
@@ -316,6 +340,19 @@ class ToolLayout:
             self.result.set_log(log)
             self.result.set_diagnostics(self._diagnostics(failure))
 
+    def _block_formats(self, failures: list[FormatCheck]) -> None:
+        """Stop the run before reading when no format can be identified."""
+        detail = "; ".join(f"{check.path.name}: {check.reason}" for check in failures)
+        log = RunLog().error(f"Formato não identificado: {detail}")
+        self.state.running = False
+        self.state.message = ""
+        self.state.error = detail
+        self.state.error_detail = None
+        self.state.log = log
+        self.result.set_error("Não foi possível identificar o formato", detail)
+        self.result.set_log(log)
+        self.result.set_diagnostics(self._diagnostics(None))
+
     def _fail(
         self,
         error: BaseException,
@@ -336,6 +373,7 @@ class ToolLayout:
             tool=self._title,
             files=self.state.files,
             sheets=self.state.selected_sheets,
+            formats=self._formats,
             options=self.state.diagnostic_options(),
             message=self.state.message,
             error=error,

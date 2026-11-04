@@ -1,11 +1,12 @@
 """Clickable file picker used by every tool."""
 
 import contextlib
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 
 import flet as ft
 
+from xl_utils.core.mime import FormatCheck
 from xl_utils.ui import theme
 
 ALLOWED_EXTENSIONS = ["xlsx", "xlsm", "xls", "csv", "html", "htm"]
@@ -23,6 +24,7 @@ class FileInput:
         self._on_change = on_change
         self._multiple = multiple
         self._files: list[Path] = []
+        self._formats: dict[Path, FormatCheck] = {}
         self._picker = ft.FilePicker()
         self._picker_attached = False
 
@@ -99,6 +101,11 @@ class FileInput:
         self._render()
         self._on_change(list(self._files))
 
+    def set_formats(self, checks: Sequence[FormatCheck]) -> None:
+        """Store the format check of each file and refresh the list."""
+        self._formats = {check.path: check for check in checks}
+        self._render()
+
     def _remove(self, path: Path) -> None:
         self._files = [item for item in self._files if item != path]
         self._render()
@@ -142,14 +149,7 @@ class FileInput:
                         padding=6,
                     ),
                     ft.Column(
-                        controls=[
-                            ft.Text(path.name, size=theme.FONT_SM),
-                            ft.Text(
-                                _format_size(size),
-                                size=theme.FONT_XS,
-                                color=theme.MUTED,
-                            ),
-                        ],
+                        controls=self._file_details(path, size),
                         spacing=0,
                         expand=True,
                     ),
@@ -168,6 +168,34 @@ class FileInput:
             border_radius=8,
             padding=9,
         )
+
+    def _file_details(self, path: Path, size: int) -> list[ft.Control]:
+        details: list[ft.Control] = [
+            ft.Text(path.name, size=theme.FONT_SM),
+            ft.Text(
+                _format_size(size),
+                size=theme.FONT_XS,
+                color=theme.MUTED,
+            ),
+        ]
+        check = self._formats.get(path)
+        if check is not None and not check.identified:
+            details.append(
+                ft.Text(
+                    f"Não foi possível identificar o formato ({check.reason})",
+                    size=theme.FONT_XS,
+                    color=theme.RED,
+                )
+            )
+        elif check is not None and check.diverges:
+            details.append(
+                ft.Text(
+                    check.reason,
+                    size=theme.FONT_XS,
+                    color=theme.ORANGE,
+                )
+            )
+        return details
 
     def _refresh(self) -> None:
         with contextlib.suppress(RuntimeError):

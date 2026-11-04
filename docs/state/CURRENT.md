@@ -4,10 +4,10 @@
 
 ## Sessão
 
-- **Última concluída:** S2c — opções reais ou nada
-- **Próxima:** S2d — tipo real x extensão (`docs/sessions/S2d-tipo-real.md`)
+- **Última concluída:** S2d — tipo real x extensão
+- **Próxima:** S2e — saída escolhida (`docs/sessions/S2e-saida-escolhida.md`)
 - **Ciclo:** 0002 — Fase 2 — Consolidação
-- **Retorno:** `tool_layout.py`, `registry.py`, `pages/` e `test_layout.py`
+- **Retorno:** `result_panel.py`, `tool_layout.py`, controllers e `test_save.py`
 - **Decisões abertas:** nenhuma
 
 ## Pronto
@@ -21,36 +21,37 @@
   `ORIGEM` e quadro de colunas arrastáveis (chips).
 - Integração cobre os quatro formatos; `.xls` usa `tests/fixtures/minimo.xls`;
   HTML preserva zeros e o reparo cp1252 é testado.
-- `RunLog` grava `(nível, texto)`, itera como linhas e alimenta o `ToolState.log`.
-- `ToolLayout._run` separa leitura, seleção e falha inesperada; guarda traceback
-  em `error_detail` e mostra a mensagem original.
-- “Copiar diagnóstico” traz versões (fallback “desconhecida”), arquivos, abas,
-  opções, causa e traceback.
+- `RunLog` grava eventos e o diagnóstico traz arquivos, formato, abas, opções,
+  causa e traceback; `ToolLayout._run` separa leitura, seleção e falha.
+- `FormatCheck`/`check_format` mostram o tipo real, avisam a divergência e
+  bloqueiam a execução quando nada é identificável.
 - Texto e CNJ usam `note`; o card “2. Opções” só aparece para recorte e merge.
 
 ## Próximo passo
 
-S2d: conferir o tipo detectado por conteúdo contra a extensão, mostrar o tipo
-real na entrada e bloquear quando a detecção falhar.
+S2e: executar sem gravar, mostrar a prévia e salvar só ao clicar, com arquivo
+único, pasta para o lote e atalho para `output/`.
 
 ## Arquivos-chave
 
-- `ui/components/tool_layout.py` (`note`, card condicional) e `ui/pages/registry.py`.
-- `shared/log.py` (`RunLog`, `build_diagnostics`) e `ui/components/result_panel.py`.
-- `tests/test_layout.py`, `test_log.py` e `test_integration.py`.
+- `ui/components/tool_layout.py` (`_check_formats`, `_block_formats`) e
+  `ui/pages/registry.py`.
+- `core/mime.py` (`FormatCheck`), `shared/log.py` e `result_panel.py`.
+- `tests/test_format_check.py`, `test_layout.py`, `test_log.py` e
+  `test_integration.py`.
 
 ## Armadilhas
 
-- Flet 1.0 não suporta drop de arquivos do SO; o merge usa
-  `Draggable`/`DragTarget` para o quadro de colunas.
+- Flet 1.0 não suporta drop do SO; o merge usa `Draggable`/`DragTarget`.
 - Uma aba contribui com no máximo uma coluna por saída; cabeçalhos repetidos
   ganham sufixo `_2`.
-- `puremagic` lê HTML como `.txt`; `resolve_suffix` usa a extensão original.
+- `puremagic` pode devolver `.txt`; a extensão suportada vence e não conta como
+  divergência. O gate só bloqueia quando não há formato suportado nenhum.
 - `.xls` é lido com o engine `calamine` (`python-calamine`); `xlrd` saiu.
 - HTML sem `<meta charset>` pode perder acentos; as fixtures declaram UTF-8.
 - `read_html` não aceita `dtype`; a segunda passada com converters é necessária.
-- `merge` marca só a primeira aba por arquivo quando há vários.
-- Log não pode carregar valores de célula; só passos, contagens e caminhos.
+- Log e diagnóstico não carregam valores de célula; só passos, contagens,
+  caminhos e formato.
 - O card “2. Opções” depende de `options` declaradas, não do conteúdo do painel.
 
 ## Como rodar
