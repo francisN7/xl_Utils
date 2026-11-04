@@ -5,9 +5,9 @@
 ## Sessão
 
 - **Última concluída:** S1c — recorte de planilha
-- **Próxima:** S1d — mesclagem (`docs/sessions/S1d-merge.md`)
+- **Próxima:** S1d — seleção de abas (`docs/sessions/S1d-sheet-selection.md`)
 - **Ciclo:** 0002 — Fase 1 — Migração dos scripts
-- **Retorno:** `src/xl_utils/core/tools/cut.py` e `src/xl_utils/ui/pages/cut.py`
+- **Retorno:** `src/xl_utils/ui/components/tool_layout.py` e `core/io.py`
 
 ## Pronto
 
@@ -25,21 +25,20 @@
 
 ## Próximo passo
 
-S1d: criar `core/tools/merge.py` com concatenação pura por arquivos ou abas
-sobre `prepare_workbook`, controller salvando em `output/`, seletor de modo
-ativo na página e remoção de `merge.py` da raiz.
+S1d: seletor de abas com chips + “Todas”/“Limpar”, `list_sheets` e
+`filter_sheets` no core, e filtro em `all_str`, `cnj` e `cut` preservando os
+nomes das abas na saída.
 
 ## Decisões abertas
 
-- Nenhuma bloqueante.
+- S1e: merge em um único modo, coluna `ORIGEM` e alinhamento manual de colunas; ver ADR 0005.
 
 ## Arquivos-chave
 
-- `src/xl_utils/core/tools/all_str.py` — pipeline seguro e erro tipado.
-- `src/xl_utils/core/tools/cnj.py` — regex, normalização e deduplicação.
-- `src/xl_utils/core/tools/cut.py`, `controllers/cut.py` e `ui/pages/cut.py` — recorte e saída.
-- `src/xl_utils/core/io.py` — leitura/escrita compartilhada.
-- `docs/reference/architecture.md` — camadas e fluxo.
+- `src/xl_utils/core/io.py` — `list_sheets` e leitura/escrita.
+- `src/xl_utils/ui/components/tool_layout.py` — integra o seletor.
+- `src/xl_utils/ui/state.py` — abas por arquivo.
+- `src/xl_utils/controllers/` — filtro em all_str, cnj e cut.
 
 ## Armadilhas
 
@@ -48,6 +47,7 @@ ativo na página e remoção de `merge.py` da raiz.
   original quando o detectado não é suportado.
 - Não normalizar quebras de linha: o texto da célula deve ser preservado.
 - `prepare_workbook` não converte tipos de `.html` para texto; revisar na S2a.
+- Seleção vazia precisa de erro claro, não execução silenciosa.
 
 ## Como rodar
 

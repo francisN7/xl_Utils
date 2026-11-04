@@ -17,8 +17,12 @@ duplicação e com teste.
   pipeline do `all_str`. Apagar `cnjs.py`. Custo M.
 - [x] **S1c — `cut`.** Recorte por quantidade de linhas, com prévia.
   Apagar `cut.py`. Custo M.
-- [ ] **S1d — `merge`.** Unificar arquivos ou abas, com erros tipados.
-  Apagar `merge.py`. Custo M.
+- [ ] **S1d — Seleção de abas.** Chips por aba com “Todas”/“Limpar”, nomes no
+  core e filtro em `all_str`, `cnj` e `cut`, preservando as abas escolhidas na
+  saída. Custo M.
+- [ ] **S1e — `merge`.** Um único modo: concatena as abas selecionadas de todos
+  os arquivos, com coluna `ORIGEM` e alinhamento opcional de colunas. Apagar
+  `merge.py`. Custo G.
 
 ## Fase 2 — Consolidação
 

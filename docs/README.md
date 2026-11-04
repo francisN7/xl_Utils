@@ -36,6 +36,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que core/controllers/ui | `adr/0002-arquitetura-core-ui.md` | 35 |
 | por que sidebar + Início | `adr/0003-ui-sidebar-e-inicio.md` | 30 |
 | por que leitura sempre em texto | `adr/0004-leitura-segura-e-emojis.md` | 30 |
+| por que seleção de abas e merge por origem | `adr/0005-selecao-de-abas-e-merge.md` | 35 |
 
 ## Regras do mapa
 

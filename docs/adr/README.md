@@ -9,6 +9,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0002](0002-arquitetura-core-ui.md) | Arquitetura core/controllers/ui | Aceita |
 | [0003](0003-ui-sidebar-e-inicio.md) | Sidebar com Início e anatomia de ferramenta | Aceita |
 | [0004](0004-leitura-segura-e-emojis.md) | Leitura segura e limpeza compartilhada | Aceita |
+| [0005](0005-selecao-de-abas-e-merge.md) | Seleção de abas e mesclagem com origem | Aceita |
 
 ## Como ler
 
