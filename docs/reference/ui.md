@@ -48,7 +48,7 @@ O conteúdo abre em uma das duas formas:
 | `sidebar` | Logo, Início e as quatro ferramentas, com item ativo destacado. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
-| `options_panel` | Controles específicos; campos editáveis guardam o valor no `ToolState`. |
+| `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
 | `tool_layout` | Cabeçalho, cartões, barra de ação e estados. |
@@ -60,6 +60,12 @@ dropzone é uma área clicável que abre o `FilePicker` nativo; o texto "clique
 para selecionar" substitui a promessa de drop. Todas as ferramentas aceitam
 vários arquivos: depois do primeiro, o dropzone vira “Adicionar outro arquivo” e
 a lista permite remover cada um.
+
+Texto e CNJ não têm opções editáveis: o card “2. Opções” não aparece e o
+comportamento fixo fica em uma frase no card “1. Entrada” (remoção de emojis e
+quebras preservadas; padronização e deduplicação de CNJ). Recorte e merge
+mantêm o card, respectivamente com o campo de linhas e o quadro de colunas; sem
+opções, o resultado passa a ser o cartão “2. Resultado”.
 
 ### Seleção de abas
 
@@ -141,7 +147,7 @@ abaixo de `FONT_XS`.
 | Estado | O que mostra |
 |---|---|
 | Vazio | Dropzone e botão desabilitado. |
-| Selecionado | Arquivos, opções e botão habilitado. |
+| Selecionado | Arquivos, opções (quando existirem) e botão habilitado. |
 | Lendo abas | Spinner “Lendo as abas...” e Executar desabilitado. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
 | Executando | Status amarelo e log inicial. |

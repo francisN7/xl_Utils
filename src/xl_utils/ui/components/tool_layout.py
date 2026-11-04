@@ -41,6 +41,7 @@ class ToolLayout:
         description: str,
         *,
         options: OptionsFactory | ft.Control | None = None,
+        note: str = "",
         multiple_files: bool = False,
         default_all_sheets: bool = False,
         run_handler: RunHandler | None = None,
@@ -115,12 +116,21 @@ class ToolLayout:
             padding=ft.Padding.only(bottom=16),
         )
 
+        entrada_controls: list[ft.Control] = [
+            self.file_input.control,
+            ft.Divider(height=1, color=theme.BORDER),
+            self.sheet_selector.control,
+        ]
+        if note:
+            entrada_controls.append(
+                ft.Text(
+                    note,
+                    size=theme.FONT_XS,
+                    color=theme.MUTED,
+                )
+            )
         entrada = ft.Column(
-            controls=[
-                self.file_input.control,
-                ft.Divider(height=1, color=theme.BORDER),
-                self.sheet_selector.control,
-            ],
+            controls=entrada_controls,
             spacing=10,
         )
 
@@ -128,26 +138,21 @@ class ToolLayout:
             options,
             self.state,
         )
+        left_controls: list[ft.Control] = [_card("1. Entrada", entrada)]
+        if options_control is not None:
+            left_controls.append(_card("2. Opções", options_control))
         left = ft.Column(
-            controls=[
-                _card(
-                    "1. Entrada",
-                    entrada,
-                ),
-                _card(
-                    "2. Opções",
-                    options_control,
-                ),
-            ],
+            controls=left_controls,
             spacing=16,
             expand=1,
             scroll=ft.ScrollMode.HIDDEN,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
+        result_step = "3" if options_control is not None else "2"
         right = ft.Column(
             controls=[
                 _card(
-                    "3. Resultado",
+                    f"{result_step}. Resultado",
                     self.result.control,
                 )
             ],
@@ -371,20 +376,12 @@ def _card(
     )
 
 
-def _empty_options() -> ft.Control:
-    return ft.Text(
-        "As opções desta ferramenta entram na sessão de migração.",
-        size=theme.FONT_SM,
-        color=theme.MUTED,
-    )
-
-
 def _build_options(
     options: OptionsFactory | ft.Control | None,
     state: ToolState,
-) -> tuple[ft.Control, Callable[[], None] | None]:
+) -> tuple[ft.Control | None, Callable[[], None] | None]:
     if options is None:
-        return _empty_options(), None
+        return None, None
     if isinstance(options, ft.Control):
         return options, None
 

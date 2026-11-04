@@ -4,10 +4,10 @@
 
 ## Sessão
 
-- **Última concluída:** S2b — logging e erros
-- **Próxima:** S2c — opções reais ou nada (`docs/sessions/S2c-opcoes-reais.md`)
+- **Última concluída:** S2c — opções reais ou nada
+- **Próxima:** S2d — tipo real x extensão (`docs/sessions/S2d-tipo-real.md`)
 - **Ciclo:** 0002 — Fase 2 — Consolidação
-- **Retorno:** `shared/log.py`, `result_panel.py`, `tool_layout.py`, `state.py`
+- **Retorno:** `tool_layout.py`, `registry.py`, `pages/` e `test_layout.py`
 - **Decisões abertas:** nenhuma
 
 ## Pronto
@@ -19,26 +19,25 @@
   lote e processam cada origem separadamente.
 - Seleção de abas por chips e `default_selection` por ferramenta; merge com
   `ORIGEM` e quadro de colunas arrastáveis (chips).
-- Integração cobre `.xlsx`, `.xls`, `.csv` e `.html`; `.xls` usa
-  `tests/fixtures/minimo.xls`.
-- HTML preserva zeros à esquerda com a segunda passada de converters.
-- Reparo testado com CSV cp1252; arquivo inválido sobe `WorkbookReadError`.
+- Integração cobre os quatro formatos; `.xls` usa `tests/fixtures/minimo.xls`;
+  HTML preserva zeros e o reparo cp1252 é testado.
 - `RunLog` grava `(nível, texto)`, itera como linhas e alimenta o `ToolState.log`.
 - `ToolLayout._run` separa leitura, seleção e falha inesperada; guarda traceback
   em `error_detail` e mostra a mensagem original.
 - “Copiar diagnóstico” traz versões (fallback “desconhecida”), arquivos, abas,
   opções, causa e traceback.
+- Texto e CNJ usam `note`; o card “2. Opções” só aparece para recorte e merge.
 
 ## Próximo passo
 
-S2c: remover os checkboxes desabilitados de Texto e CNJ e só mostrar o card
-“2. Opções” quando houver algo editável (linhas do recorte, colunas do merge).
+S2d: conferir o tipo detectado por conteúdo contra a extensão, mostrar o tipo
+real na entrada e bloquear quando a detecção falhar.
 
 ## Arquivos-chave
 
-- `shared/log.py` (`RunLog`, `build_diagnostics`) e `ui/components/tool_layout.py`.
-- `core/tools/merge.py` (`ColumnGroup`, `move_column`) e `ui/pages/merge.py`.
-- `tests/test_log.py`, `test_integration.py` e `test_merge.py`.
+- `ui/components/tool_layout.py` (`note`, card condicional) e `ui/pages/registry.py`.
+- `shared/log.py` (`RunLog`, `build_diagnostics`) e `ui/components/result_panel.py`.
+- `tests/test_layout.py`, `test_log.py` e `test_integration.py`.
 
 ## Armadilhas
 
@@ -52,6 +51,7 @@ S2c: remover os checkboxes desabilitados de Texto e CNJ e só mostrar o card
 - `read_html` não aceita `dtype`; a segunda passada com converters é necessária.
 - `merge` marca só a primeira aba por arquivo quando há vários.
 - Log não pode carregar valores de célula; só passos, contagens e caminhos.
+- O card “2. Opções” depende de `options` declaradas, não do conteúdo do painel.
 
 ## Como rodar
 

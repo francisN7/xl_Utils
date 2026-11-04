@@ -10,9 +10,7 @@ from xl_utils.ui.components.tool_layout import (
     RunHandler,
     ToolLayout,
 )
-from xl_utils.ui.pages.all_str import options as all_str_options
 from xl_utils.ui.pages.all_str import run as run_all_str
-from xl_utils.ui.pages.cnj import options as cnj_options
 from xl_utils.ui.pages.cnj import run as run_cnj
 from xl_utils.ui.pages.cut import options as cut_options
 from xl_utils.ui.pages.cut import run as run_cut
@@ -36,8 +34,9 @@ def _tool(
     label: str,
     icon: ft.IconData,
     description: str,
-    options: OptionsFactory,
+    options: OptionsFactory | None = None,
     *,
+    note: str = "",
     multiple_files: bool = False,
     default_all_sheets: bool = False,
     run_handler: RunHandler | None = None,
@@ -47,6 +46,7 @@ def _tool(
             label,
             description,
             options=options,
+            note=note,
             multiple_files=multiple_files,
             default_all_sheets=default_all_sheets,
             run_handler=run_handler,
@@ -67,7 +67,8 @@ TOOLS: tuple[ToolPage, ...] = (
         "Tratamento de Texto",
         ft.Icons.TEXT_FIELDS,
         "Converte tudo para texto, remove emojis e repara metadados.",
-        all_str_options,
+        note="Remove emojis, preserva quebras de linha e repara metadados "
+        "automaticamente.",
         multiple_files=True,
         default_all_sheets=True,
         run_handler=run_all_str,
@@ -77,7 +78,7 @@ TOOLS: tuple[ToolPage, ...] = (
         "Extrair CNJs",
         ft.Icons.SEARCH,
         "Encontra e padroniza numerações CNJ em uma ou mais planilhas.",
-        cnj_options,
+        note="Padroniza para o formato CNJ e remove duplicados automaticamente.",
         multiple_files=True,
         default_all_sheets=True,
         run_handler=run_cnj,

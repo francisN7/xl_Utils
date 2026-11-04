@@ -30,7 +30,7 @@ duplicação e com teste.
   leitura de `.xls`, `.csv` e `.html`, reparo de arquivo corrompido.
 - [x] **S2b — Logging e erros.** Log estruturado por execução, erros tipados
   exibidos na UI e botão de copiar diagnóstico.
-- [ ] **S2c — Opções reais ou nada.** Remover os checkboxes desabilitados de
+- [x] **S2c — Opções reais ou nada.** Remover os checkboxes desabilitados de
   Texto e CNJ: o que é obrigatório vira uma frase de comportamento fixo, não um
   controle. O card “2. Opções” só aparece quando há algo editável (linhas do
   recorte, colunas do merge). Custo S.

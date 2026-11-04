@@ -1,28 +1,9 @@
 """Page wiring for the text treatment tool."""
 
-import flet as ft
-
 from xl_utils.controllers.all_str import run_all_str
-from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.pages.batch import append_outcomes, pending_files, prefixed_frames
 from xl_utils.ui.state import ToolState
-
-
-def options(_state: ToolState) -> ft.Control:
-    """Return the fixed options of the text pipeline."""
-    return ft.Column(
-        controls=[
-            _check("Remover emojis", True),
-            _check("Reparar metadados se a leitura falhar", True),
-            ft.Text(
-                "Sempre aplicado antes das demais ferramentas.",
-                size=theme.FONT_XS,
-                color=theme.MUTED,
-            ),
-        ],
-        spacing=4,
-    )
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
@@ -58,13 +39,4 @@ def run(state: ToolState, result: ResultPanel) -> None:
         frames,
         title,
         f"{state.message} · emojis removidos",
-    )
-
-
-def _check(label: str, value: bool = True) -> ft.Checkbox:
-    return ft.Checkbox(
-        label=label,
-        value=value,
-        disabled=True,
-        label_style=ft.TextStyle(size=theme.FONT_SM),
     )

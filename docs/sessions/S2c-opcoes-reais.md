@@ -29,10 +29,10 @@ Flet; mudar o pipeline de leitura.
 
 ## Aceite
 
-- [ ] Texto e CNJ sem checkboxes desabilitados
-- [ ] card “2. Opções” ausente nas duas ferramentas e presente em recorte/merge
-- [ ] frase de comportamento visível na entrada
-- [ ] `ruff`, `pytest` e `docs:check` verdes
+- [x] Texto e CNJ sem checkboxes desabilitados
+- [x] card “2. Opções” ausente nas duas ferramentas e presente em recorte/merge
+- [x] frase de comportamento visível na entrada
+- [x] `ruff`, `pytest` e `docs:check` verdes
 
 ## Orçamento de contexto (≤90 linhas)
 

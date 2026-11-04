@@ -1,24 +1,11 @@
 """Page wiring for the CNJ extraction tool."""
 
-import flet as ft
 import pandas as pd
 
 from xl_utils.controllers.cnj import run_cnj
-from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.pages.batch import append_outcomes, pending_files, prefixed_frames
 from xl_utils.ui.state import ToolState
-
-
-def options(_state: ToolState) -> ft.Control:
-    """Return the fixed options of the CNJ extraction."""
-    return ft.Column(
-        controls=[
-            _check("Padronizar para o formato CNJ", True),
-            _check("Remover duplicados", True),
-        ],
-        spacing=4,
-    )
 
 
 def run(state: ToolState, result: ResultPanel) -> None:
@@ -65,12 +52,3 @@ def run(state: ToolState, result: ResultPanel) -> None:
             if len(outcomes) == 1
             else "As planilhas não contêm numeração no padrão CNJ.",
         )
-
-
-def _check(label: str, value: bool = True) -> ft.Checkbox:
-    return ft.Checkbox(
-        label=label,
-        value=value,
-        disabled=True,
-        label_style=ft.TextStyle(size=theme.FONT_SM),
-    )

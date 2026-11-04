@@ -54,6 +54,8 @@ decisões nos ADRs.
   opções, resultado, tipo, mensagem, causa e traceback limitado.
 - Erros da UI separados em leitura da planilha, seleção inválida e falha
   inesperada, sempre mantendo a mensagem original.
+- Texto e CNJ sem checkboxes desabilitados: o comportamento fixo vira uma frase
+  na entrada, e o card “2. Opções” só aparece em recorte e merge.
 
 ### Removed
 
