@@ -81,6 +81,10 @@ decisões nos ADRs.
   painel durante a execução, “Executar” vira “Cancelar” e a parada acontece
   entre arquivos, mantendo a prévia parcial sem liberar a gravação. Ver adendo
   do ADR 0011.
+- Extração de CNJ tolerante a texto sujo: espaços, quebras, travessões, barras
+  e caracteres invisíveis não impedem o achado; CPF e números maiores continuam
+  fora. O dígito verificador não é validado e o valor inválido não é descartado.
+  Ver ADR 0012.
 
 ### Changed
 

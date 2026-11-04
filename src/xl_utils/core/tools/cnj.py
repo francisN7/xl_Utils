@@ -10,26 +10,51 @@ from collections.abc import Iterator, Mapping
 
 import pandas as pd
 
-# 20 dígitos seguidos ou o formato CNJ pontuado. Os lookarounds impedem que um
-# match comece ou termine dentro de um número maior (CPF, protocolo, etc.).
+# Separadores tolerados entre os blocos: espaço, quebra, ponto, barra e hífens.
+_SEPARATOR = r"[\s./\-\u2010-\u2015\u2212]*"
+
+# 20 dígitos: formato CNJ com separadores flexíveis ou sequência contínua. Os
+# lookarounds impedem que um match comece ou termine dentro de um número maior
+# (CPF, protocolo, etc.). O dígito verificador não é validado de propósito.
 _CNJ_PATTERN = re.compile(
-    r"(?<![0-9])"
-    r"(?:[0-9]{7}-[0-9]{2}\.[0-9]{4}\.[0-9]\.[0-9]{2}\.[0-9]{4}"
-    r"|[0-9]{20})"
-    r"(?![0-9])"
+    rf"(?<![0-9])"
+    rf"(?:[0-9]{{7}}{_SEPARATOR}[0-9]{{2}}{_SEPARATOR}[0-9]{{4}}"
+    rf"{_SEPARATOR}[0-9]{_SEPARATOR}[0-9]{{2}}{_SEPARATOR}[0-9]{{4}}"
+    rf"|[0-9]{{20}})"
+    rf"(?![0-9])"
 )
+
+_INVISIBLE = dict.fromkeys(map(ord, "\u200b\u200c\u200d\u2060\u00ad\ufeff"))
+_SPACES = str.maketrans({"\u00a0": " ", "\u2007": " ", "\u202f": " "})
+_DASHES = str.maketrans(
+    {
+        "\u2010": "-",
+        "\u2011": "-",
+        "\u2012": "-",
+        "\u2013": "-",
+        "\u2014": "-",
+        "\u2015": "-",
+        "\u2212": "-",
+    }
+)
+
+
+def _sanitize(text: str) -> str:
+    """Remove invisíveis e uniformiza espaços e travessões só para a busca."""
+    return text.translate(_INVISIBLE).translate(_SPACES).translate(_DASHES)
 
 
 def extract_cnjs(text: str) -> list[str]:
     """Devolve cada valor com cara de CNJ em ``text``, na ordem de origem."""
     if not isinstance(text, str) or not text:
         return []
-    return [match.group(0) for match in _CNJ_PATTERN.finditer(text)]
+    clean = _sanitize(text)
+    return [match.group(0) for match in _CNJ_PATTERN.finditer(clean)]
 
 
 def normalize_cnj(value: str) -> str:
     """Converte um CNJ pontuado ou de 20 dígitos para o formato pontuado."""
-    text = value.strip()
+    text = _sanitize(value).strip()
     if not _CNJ_PATTERN.fullmatch(text):
         raise ValueError(
             "CNJ inválido: esperado 20 dígitos ou o formato pontuado, "

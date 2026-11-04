@@ -4,45 +4,45 @@
 
 ## Sessão
 
-- **Última concluída:** S5b — log ao vivo e cancelamento cooperativo
-- **Próxima:** S5c — extração de CNJ em texto sujo
-  (`docs/sessions/S5c-cnj-texto-sujo.md`) — spec pronta
+- **Última concluída:** S5c — extração de CNJ em texto sujo
+- **Próxima:** S5d — recorte por quantidade de arquivos
+  (`docs/sessions/S5d-recorte-por-arquivos.md`) — spec pronta
 - **Ciclo:** 0004 — Execução e robustez, Fase 2
-- **Decisões:** ADR 0011 com adendo de S5b (log na fila, token cooperativo)
+- **Decisões:** ADR 0011 (execução/cancelamento); ADR 0012 (CNJ sujo, dígito
+  verificador não validado)
 
 ## Pronto
 
-- S5b: a fila transporta linhas de log; cada arquivo aparece no painel assim que
-  termina. “Executar” vira “Cancelar” durante a execução.
-- Cancelamento entre arquivos: a chamada em curso termina, a prévia parcial fica
-  em memória e “Execução cancelada” não libera salvar nem grava nada.
-- `CancelToken` em `shared/progress.py` entregue ao handler como 4º parâmetro;
-  merge só cancela antes de começar (etapa única).
+- S5c: a busca remove invisíveis, NBSP e travessões variantes de uma cópia do
+  texto; aceita espaço, quebra, ponto, barra e hífen entre os blocos.
+- CPF e sequência de 21 dígitos seguidos continuam fora; o dígito verificador
+  não é validado e o CNJ inválido não é descartado.
+- S5b: log ao vivo na fila; “Executar” vira “Cancelar” e a parada cooperativa
+  entre arquivos mantém a prévia parcial sem liberar salvar.
 - S5a: handler em `asyncio.to_thread`, barra e contador via fila, entrada
   bloqueada; UI atualizada só no loop.
 - S4c/S4b: UI e `shared/` em PT-BR, leitura fiel de CSV/HTML, code tour.
 
 ## Próximo passo
 
-Executar a S5c: extrair CNJ de texto sujo com normalização de espaços, quebras,
-travessões e invisíveis, aceitando separadores flexíveis e mantendo a rejeição a
-CPF e números maiores.
+Executar a S5d: alternar o recorte entre linhas por arquivo e quantidade de
+arquivos, aplicando a quantidade **por aba** e preservando o nome de saída.
 
 ## Arquivos-chave
 
-- `shared/progress.py` (`CancelToken`, evento `log`)
-- `ui/components/tool_layout.py` (fila, botão Cancelar, token)
-- `ui/components/result_panel.py` (`apply_progress`, `set_cancelled`)
-- `ui/pages/batch.py` (`report_cancelled`), `ui/pages/*.py`
-- `tests/test_progress.py`, `tests/test_layout.py`, `tests/test_integration.py`
-- `docs/adr/0011-execucao-fora-da-ui.md`
+- `core/tools/cnj.py` (sanitização e regex flexível)
+- `shared/progress.py`, `ui/components/tool_layout.py` (execução e cancelamento)
+- `ui/components/result_panel.py`, `ui/pages/batch.py`, `ui/pages/*.py`
+- `core/tools/cut.py`, `controllers/cut.py`, `ui/pages/cut.py`
+- `tests/test_cnj.py`, `tests/test_progress.py`, `tests/test_layout.py`
+- `docs/adr/0011-execucao-fora-da-ui.md`, `docs/adr/0012-cnj-texto-sujo.md`
 
 ## Armadilhas
 
 - Flet não é thread-safe: UI só no loop da página, via dispatcher e fila.
-- `page.run_task` pode não existir em teste headless; manter o caminho síncrono.
-- Cancelar não interrompe pandas: só vale entre arquivos, nunca no meio da chamada.
+- Cancelar não interrompe pandas: só vale entre arquivos, nunca na chamada.
 - Merge é uma única chamada de controller; não há ponto de parada por origem.
+- Sanear o texto na busca não pode alterar a planilha nem o diagnóstico.
 - `keep_default_na=False`: célula vazia vira `""`, não `NaN`; merge usa `pd.NA`.
 - `.xls` não tem leitor alternativo; falha do calamine é final.
 - Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir”.

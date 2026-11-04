@@ -16,6 +16,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0009](0009-publicacao-main-legacy.md) | UI na `main`, história antiga na `legacy` | Aceita |
 | [0010](0010-leitura-fiel-csv-html.md) | Leitura fiel de CSV/HTML e `NA` como texto | Aceita |
 | [0011](0011-execucao-fora-da-ui.md) | Execução fora da UI thread e progresso por arquivo | Aceita |
+| [0012](0012-cnj-texto-sujo.md) | CNJ em texto sujo sem validar o dígito verificador | Aceita |
 
 ## Como ler
 

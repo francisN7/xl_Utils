@@ -18,6 +18,16 @@ FIRST = "0001234-56.2024.8.26.0100"
 FIRST_DIGITS = "00012345620248260100"
 SECOND = "0009999-99.2024.8.26.0100"
 
+_DIRTY = [
+    "0001234 56 2024 8 26 0100",
+    "0001234-56.2024.\n8.26.0100",
+    "0001234–56.2024.8.26.0100",
+    "0001234\u201156.2024.8.26.0100",
+    "0001234\u200b-56.2024.8.26.0100",
+    "0001234\u00a056.2024.8.26.0100",
+    "0001234/56.2024.8.26.0100",
+]
+
 
 def test_extract_cnjs_finds_both_formats_in_a_sentence() -> None:
     text = f"Processo {FIRST}, protocolo {FIRST_DIGITS}."
@@ -28,6 +38,20 @@ def test_extract_cnjs_finds_both_formats_in_a_sentence() -> None:
 def test_extract_cnjs_ignores_longer_numbers_and_cpf() -> None:
     assert extract_cnjs("123456789012345678901") == []
     assert extract_cnjs("CPF 123.456.789-00") == []
+
+
+@pytest.mark.parametrize("text", _DIRTY)
+def test_extract_cnjs_accepts_dirty_separators(text: str) -> None:
+    assert [normalize_cnj(value) for value in extract_cnjs(text)] == [FIRST]
+
+
+@pytest.mark.parametrize("text", _DIRTY)
+def test_normalize_cnj_accepts_dirty_separators(text: str) -> None:
+    assert normalize_cnj(text) == FIRST
+
+
+def test_extract_cnjs_keeps_invalid_check_digit() -> None:
+    assert extract_cnjs(f"processo {SECOND}") == [SECOND]
 
 
 def test_normalize_cnj_accepts_both_formats() -> None:

@@ -18,10 +18,10 @@ Objetivo: manter a janela responsiva e mostrar o andamento em execuções longas
 Objetivo: reduzir falhas em texto sujo e ampliar o recorte sem mudar o
 comportamento atual.
 
-- [ ] **S5c — Extração de CNJ em texto sujo.** Normalizar espaços, quebras,
-  travessões e caracteres invisíveis; aceitar separadores flexíveis e manter a
-  rejeição a CPF e a números maiores. Decisão: extrair mesmo com dígito
-  verificador inválido, sem descartar. Custo M.
+- [x] **S5c — Extração de CNJ em texto sujo.** Normaliza espaços, quebras,
+  travessões e invisíveis, aceita separadores flexíveis e mantém a rejeição a
+  CPF e números maiores. Extrai mesmo com dígito verificador inválido. Ver
+  ADR 0012.
 - [ ] **S5d — Recorte por quantidade de arquivos.** Alternar entre linhas por
   arquivo e quantidade de arquivos; a quantidade vale **por aba**. Custo M.
 
@@ -66,6 +66,8 @@ comportamento atual.
   ao vivo e cancelamento entre arquivos.
 - A S5b manteve o cancelamento cooperativo: a chamada do controller em curso
   termina antes da parada, e o parcial não libera salvar.
+- A S5c saneia só a cópia usada na busca; o texto da planilha continua intacto.
+  Dígito verificador inválido não descarta o CNJ (ADR 0012).
 - A S4c fechou o ciclo 0003; o resumo está em
   [`0003-qualidade.md`](0003-qualidade.md).
 - O template de spec foi versionado e o `docs:check` voltou a passar no CI.

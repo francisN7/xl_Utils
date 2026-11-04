@@ -203,9 +203,12 @@ os chips de abas e “Executar” ficam desabilitados até `_finish`. Ver ADR 00
 
 ## Extração de CNJ
 
-`core/tools/cnj.py` reconhece o formato pontuado
-(`NNNNNNN-DD.AAAA.J.TR.OOOO`) e 20 dígitos consecutivos, sem aceitar trecho de
-número maior. `normalize_cnj` devolve sempre o formato pontuado;
+`core/tools/cnj.py` reconhece 20 dígitos com separadores flexíveis (ponto,
+barra, hífen, espaço, travessão e quebra de linha) ou a sequência contínua, sem
+aceitar trecho de número maior nem CPF. Antes da busca, remove invisíveis
+(zero-width, BOM), troca NBSP por espaço e uniformiza travessões, só na cópia
+usada pela regex. O dígito verificador **não** é validado: o valor é extraído e
+padronizado mesmo inválido. `normalize_cnj` devolve sempre o formato pontuado;
 `summarize_cnjs` percorre todas as abas e célula a célula **uma vez** e devolve
 `(achados, únicos ordenados)`. `collect_cnjs` e `count_cnjs` continuam como
 atalhos. `controllers/cnj.py` prepara `SaveItem` com `<nome> lista cnj.xlsx` na
