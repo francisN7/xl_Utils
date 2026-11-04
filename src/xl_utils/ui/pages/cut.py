@@ -16,6 +16,8 @@ def options(state: ToolState) -> ft.Control:
         label="Linhas por arquivo",
         value=DEFAULT_ROWS,
         dense=True,
+        text_size=theme.FONT_SM,
+        label_style=ft.TextStyle(size=theme.FONT_XS),
     )
     state.options["rows_per_file"] = field
     return ft.Column(
@@ -23,7 +25,7 @@ def options(state: ToolState) -> ft.Control:
             field,
             ft.Text(
                 "O resto final fica no último arquivo.",
-                size=10,
+                size=theme.FONT_XS,
                 color=theme.MUTED,
             ),
         ],

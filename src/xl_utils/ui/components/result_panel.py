@@ -22,13 +22,13 @@ class ResultPanel:
         self._icon = ft.Icon(ft.Icons.INFO_OUTLINE, color=theme.MUTED, size=18)
         self._status = ft.Text(
             "Aguardando arquivo.",
-            size=12,
+            size=theme.FONT_SM,
             weight=ft.FontWeight.BOLD,
         )
-        self._detail = ft.Text("", size=11, color=theme.MUTED)
+        self._detail = ft.Text("", size=theme.FONT_SM, color=theme.MUTED)
         self._path = ft.Text(
             "",
-            size=10,
+            size=theme.FONT_XS,
             font_family="Consolas",
             color=theme.CYAN,
             selectable=True,
@@ -48,7 +48,7 @@ class ResultPanel:
         )
         self._log = ft.Text(
             "",
-            size=10,
+            size=theme.FONT_XS,
             font_family="Consolas",
             color="#C9CBDC",
             selectable=True,
@@ -66,7 +66,7 @@ class ResultPanel:
                     controls=[
                         ft.Text(
                             "Log",
-                            size=11,
+                            size=theme.FONT_SM,
                             weight=ft.FontWeight.BOLD,
                             color=theme.MUTED,
                         ),

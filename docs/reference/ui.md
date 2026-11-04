@@ -6,7 +6,7 @@ responde:** regras de negócio (ver `architecture.md`) nem o porquê (ver
 
 ## Layout
 
-Sidebar fixa de 240 px + área de conteúdo. A sidebar é um `Column` próprio, não
+Sidebar fixa de 260 px + área de conteúdo. A sidebar é um `Column` próprio, não
 um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
 forma consistente. Ela tem o logo, o item **Início** e as quatro ferramentas.
 O conteúdo abre em uma das duas formas:
@@ -105,12 +105,18 @@ No Flet: `page.theme_mode = ft.ThemeMode.DARK` e
 `page.theme = ft.Theme(color_scheme=ft.ColorScheme(...))`. O tema claro fica
 fora do escopo inicial.
 
+A tipografia usa a escala de `ui/theme.py`: mínimo de **12 px** (`FONT_XS`) para
+dicas, contadores, log e células; 13 px (`FONT_SM`) para corpo e rótulos; 15 px
+(`FONT_MD`) para nomes de ferramenta; 24/26 px para títulos. Texto nunca fica
+abaixo de `FONT_XS`.
+
 ## Estados
 
 | Estado | O que mostra |
 |---|---|
 | Vazio | Dropzone e botão desabilitado. |
 | Selecionado | Arquivos, opções e botão habilitado. |
+| Lendo abas | Spinner “Lendo as abas...” e Executar desabilitado. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
 | Executando | Progresso, botão “Cancelar” e log ao vivo. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |

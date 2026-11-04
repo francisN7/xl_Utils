@@ -20,6 +20,13 @@ SUCCESS_BG = "#22342A"
 ERROR_BG = "#3A2428"
 INFO_BG = "#1F3438"
 
+# Smallest size used anywhere in the UI: hints, counters, logs and table cells.
+FONT_XS = 12
+FONT_SM = 13
+FONT_MD = 15
+FONT_TITLE = 24
+FONT_HERO = 26
+
 
 def build_theme() -> ft.Theme:
     """Return the Dracula theme used by the app."""

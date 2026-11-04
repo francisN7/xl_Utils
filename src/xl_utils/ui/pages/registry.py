@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import flet as ft
 
+from xl_utils.ui import theme
 from xl_utils.ui.components.tool_layout import RunHandler, ToolLayout
 from xl_utils.ui.pages.all_str import options as all_str_options
 from xl_utils.ui.pages.all_str import run as run_all_str
@@ -62,6 +63,7 @@ def _merge_options(_state: ToolState) -> ft.Control:
                 value="files",
                 dense=True,
                 disabled=True,
+                text_size=theme.FONT_SM,
                 options=[
                     ft.DropdownOption(
                         key="files",

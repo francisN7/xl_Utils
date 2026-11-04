@@ -30,9 +30,11 @@ decisões nos ADRs.
   padroniza, remove duplicatas e grava `PROCESSOS` em `output/`.
 - Recorte de planilhas funcional: divide cada aba em blocos de N linhas, com
   campo editável na página, nomes `_Recorte_NNN` e saída em `output/`.
-- Seleção de abas por planilha: chips com “Todas”/“Limpar” e contador;
-  `all_str`, `cnj` e `cut` processam apenas as abas marcadas, preservando os
-  nomes na saída.
+- Seleção de abas por planilha: chips com “Todas”/“Limpar”, contador e aviso de
+  leitura; `all_str`, `cnj` e `cut` processam apenas as abas marcadas,
+  preservando os nomes na saída.
+- Tipografia mínima de 12 px, sidebar de 260 px e fontes maiores em rótulos,
+  ícones, logs e prévia.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 

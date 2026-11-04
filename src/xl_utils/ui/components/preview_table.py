@@ -19,12 +19,12 @@ class PreviewTable:
             visible=False,
             dense=True,
             width=180,
-            text_size=11,
+            text_size=theme.FONT_XS,
             on_select=self._sheet_changed,
         )
         self._empty = ft.Text(
             "Nenhum resultado para pré-visualizar.",
-            size=11,
+            size=theme.FONT_SM,
             color=theme.MUTED,
         )
         self._body = ft.Container(expand=True)
@@ -34,7 +34,7 @@ class PreviewTable:
                     controls=[
                         ft.Text(
                             "Prévia",
-                            size=12,
+                            size=theme.FONT_SM,
                             weight=ft.FontWeight.BOLD,
                         ),
                         self._sheet,
@@ -93,7 +93,7 @@ class PreviewTable:
             ft.DataColumn(
                 label=ft.Text(
                     str(column),
-                    size=10,
+                    size=theme.FONT_XS,
                     weight=ft.FontWeight.BOLD,
                 )
             )
@@ -101,7 +101,10 @@ class PreviewTable:
         ]
         rows = [
             ft.DataRow(
-                cells=[ft.DataCell(ft.Text(_cell(value), size=10)) for value in row]
+                cells=[
+                    ft.DataCell(ft.Text(_cell(value), size=theme.FONT_XS))
+                    for value in row
+                ]
             )
             for row in frame.head(MAX_ROWS).itertuples(index=False, name=None)
         ]
@@ -112,10 +115,10 @@ class PreviewTable:
             heading_row_color=theme.BACKGROUND_DEEP,
             heading_text_style=ft.TextStyle(
                 color=theme.MUTED,
-                size=10,
+                size=theme.FONT_XS,
                 weight=ft.FontWeight.BOLD,
             ),
-            data_text_style=ft.TextStyle(color=theme.TEXT, size=10),
+            data_text_style=ft.TextStyle(color=theme.TEXT, size=theme.FONT_XS),
             border=ft.Border.all(1, theme.BORDER),
             border_radius=8,
             column_spacing=18,

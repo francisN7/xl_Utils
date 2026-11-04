@@ -3,6 +3,7 @@
 import flet as ft
 
 from xl_utils.controllers.all_str import run_all_str
+from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.state import ToolState
 
@@ -15,7 +16,8 @@ def options(_state: ToolState) -> ft.Control:
             _check("Reparar metadados se a leitura falhar", True),
             ft.Text(
                 "Sempre aplicado antes das demais ferramentas.",
-                size=10,
+                size=theme.FONT_XS,
+                color=theme.MUTED,
             ),
         ],
         spacing=4,
@@ -56,4 +58,9 @@ def run(state: ToolState, result: ResultPanel) -> None:
 
 
 def _check(label: str, value: bool = True) -> ft.Checkbox:
-    return ft.Checkbox(label=label, value=value, disabled=True)
+    return ft.Checkbox(
+        label=label,
+        value=value,
+        disabled=True,
+        label_style=ft.TextStyle(size=theme.FONT_SM),
+    )

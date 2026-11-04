@@ -28,13 +28,13 @@ class FileInput:
 
         self._dropzone_text = ft.Text(
             "Clique para selecionar a planilha",
-            size=12,
+            size=theme.FONT_SM,
             weight=ft.FontWeight.BOLD,
         )
         self._file_rows = ft.Column(spacing=6)
         self._hint = ft.Text(
             "Nenhum arquivo selecionado.",
-            size=10,
+            size=theme.FONT_XS,
             color=theme.MUTED,
         )
 
@@ -45,7 +45,7 @@ class FileInput:
                     self._dropzone_text,
                     ft.Text(
                         "seletor nativo · .xlsx, .xls, .csv, .html",
-                        size=10,
+                        size=theme.FONT_XS,
                         color=theme.MUTED,
                     ),
                 ],
@@ -126,7 +126,7 @@ class FileInput:
                     ft.Container(
                         content=ft.Text(
                             path.suffix.upper().lstrip(".") or "FILE",
-                            size=9,
+                            size=theme.FONT_XS,
                             weight=ft.FontWeight.BOLD,
                             color=theme.GREEN,
                         ),
@@ -136,10 +136,10 @@ class FileInput:
                     ),
                     ft.Column(
                         controls=[
-                            ft.Text(path.name, size=11),
+                            ft.Text(path.name, size=theme.FONT_SM),
                             ft.Text(
                                 _format_size(size),
-                                size=9,
+                                size=theme.FONT_XS,
                                 color=theme.MUTED,
                             ),
                         ],

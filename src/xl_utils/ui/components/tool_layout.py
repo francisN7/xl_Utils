@@ -37,6 +37,7 @@ class ToolLayout:
             multiple=multiple_files,
         )
         self.result = ResultPanel()
+        self._sheet_loading = False
         self.sheet_selector = SheetSelector(
             self.state,
             on_change=self._selection_changed,
@@ -44,7 +45,7 @@ class ToolLayout:
 
         self._summary = ft.Text(
             "Nenhum arquivo selecionado.",
-            size=11,
+            size=theme.FONT_SM,
             color=theme.MUTED,
         )
         self._run_button = ft.FilledButton(
@@ -61,12 +62,12 @@ class ToolLayout:
                         controls=[
                             ft.Text(
                                 title,
-                                size=24,
+                                size=theme.FONT_TITLE,
                                 weight=ft.FontWeight.BOLD,
                             ),
                             ft.Text(
                                 description,
-                                size=12,
+                                size=theme.FONT_SM,
                                 color=theme.MUTED,
                             ),
                         ],
@@ -76,7 +77,7 @@ class ToolLayout:
                     ft.Container(
                         content=ft.Text(
                             "Pronto",
-                            size=10,
+                            size=theme.FONT_XS,
                             weight=ft.FontWeight.BOLD,
                             color=theme.GREEN,
                         ),
@@ -168,6 +169,13 @@ class ToolLayout:
         self._start_sheet_load()
 
     def _start_sheet_load(self) -> None:
+        if not self.state.files:
+            self._sheet_loading = False
+            self.sheet_selector.set_loading(False)
+            return
+        self._sheet_loading = True
+        self.sheet_selector.set_loading(True)
+        self._run_button.disabled = True
         page = self.control.page
         if page is None:
             names, failures = self._read_sheet_names(list(self.state.files))
@@ -202,7 +210,9 @@ class ToolLayout:
     ) -> None:
         self.state.set_sheet_names(names)
         self.sheet_selector.set_failures(failures)
-        self.sheet_selector.refresh()
+        self._sheet_loading = False
+        self.sheet_selector.set_loading(False)
+        self._run_button.disabled = not self.state.files
         self._selection_changed(self.state.selected_sheets)
 
     def _selection_changed(self, selection: dict[Path, set[str]]) -> None:
@@ -213,6 +223,12 @@ class ToolLayout:
         self._refresh()
 
     def _run(self, _event=None) -> None:
+        if self._sheet_loading:
+            self.result.set_info(
+                "Lendo as abas...",
+                "Aguarde a lista de abas terminar de carregar.",
+            )
+            return
         if self._run_handler is None:
             self.result.set_info(
                 "Ferramenta em migração",
@@ -249,7 +265,7 @@ def _card(
             controls=[
                 ft.Text(
                     title,
-                    size=11,
+                    size=theme.FONT_SM,
                     weight=ft.FontWeight.BOLD,
                     color="#B8BCD0",
                 ),
@@ -269,7 +285,7 @@ def _card(
 def _empty_options() -> ft.Control:
     return ft.Text(
         "As opções desta ferramenta entram na sessão de migração.",
-        size=11,
+        size=theme.FONT_SM,
         color=theme.MUTED,
     )
 

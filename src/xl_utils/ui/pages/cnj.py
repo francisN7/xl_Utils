@@ -4,6 +4,7 @@ import flet as ft
 import pandas as pd
 
 from xl_utils.controllers.cnj import run_cnj
+from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.state import ToolState
 
@@ -64,4 +65,9 @@ def run(state: ToolState, result: ResultPanel) -> None:
 
 
 def _check(label: str, value: bool = True) -> ft.Checkbox:
-    return ft.Checkbox(label=label, value=value, disabled=True)
+    return ft.Checkbox(
+        label=label,
+        value=value,
+        disabled=True,
+        label_style=ft.TextStyle(size=theme.FONT_SM),
+    )

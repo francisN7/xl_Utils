@@ -44,7 +44,7 @@ class Sidebar:
                 spacing=0,
                 expand=True,
             ),
-            width=240,
+            width=260,
             bgcolor=theme.BACKGROUND_DEEP,
             border=ft.Border.only(
                 right=ft.BorderSide(1, theme.BORDER),
@@ -73,10 +73,10 @@ class Sidebar:
         icon: ft.IconData,
         label: str,
     ) -> ft.Container:
-        icon_control = ft.Icon(icon, size=17, color=theme.MUTED)
+        icon_control = ft.Icon(icon, size=20, color=theme.MUTED)
         label_control = ft.Text(
             label,
-            size=12,
+            size=14,
             color="#C9CBDC",
             expand=True,
         )
@@ -86,7 +86,7 @@ class Sidebar:
                 spacing=10,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            padding=ft.Padding.symmetric(vertical=9, horizontal=10),
+            padding=ft.Padding.symmetric(vertical=10, horizontal=10),
             border_radius=8,
             on_click=lambda _event, position=index: self._click(position),
             ink=True,
@@ -105,26 +105,26 @@ class Sidebar:
                     ft.Container(
                         content=ft.Text(
                             "x",
-                            size=15,
+                            size=19,
                             weight=ft.FontWeight.BOLD,
                             color=theme.BACKGROUND_DEEP,
                         ),
-                        width=30,
-                        height=30,
+                        width=36,
+                        height=36,
                         bgcolor=theme.PURPLE,
-                        border_radius=8,
+                        border_radius=9,
                         alignment=ft.Alignment.CENTER,
                     ),
                     ft.Column(
                         controls=[
                             ft.Text(
                                 "xl_Utils",
-                                size=14,
+                                size=17,
                                 weight=ft.FontWeight.BOLD,
                             ),
                             ft.Text(
                                 "planilhas",
-                                size=9,
+                                size=theme.FONT_XS,
                                 color=theme.MUTED,
                             ),
                         ],
@@ -133,7 +133,7 @@ class Sidebar:
                 ],
                 spacing=10,
             ),
-            padding=ft.Padding.only(left=8, top=6, bottom=18),
+            padding=ft.Padding.only(left=8, top=6, bottom=20),
         )
 
     def _footer(self) -> ft.Control:
@@ -148,7 +148,7 @@ class Sidebar:
                     ),
                     ft.Text(
                         "uv · Python 3.15",
-                        size=9,
+                        size=theme.FONT_XS,
                         color=theme.MUTED,
                     ),
                 ],

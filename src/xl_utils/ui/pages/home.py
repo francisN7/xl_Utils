@@ -19,7 +19,7 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                             ft.Container(
                                 content=ft.Icon(
                                     tool.icon,
-                                    size=18,
+                                    size=20,
                                     color=theme.PURPLE,
                                 ),
                                 bgcolor="#332B45",
@@ -28,13 +28,13 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                             ),
                             ft.Text(
                                 tool.label,
-                                size=14,
+                                size=theme.FONT_MD,
                                 weight=ft.FontWeight.BOLD,
                                 expand=True,
                             ),
                             ft.Icon(
                                 ft.Icons.ARROW_FORWARD,
-                                size=14,
+                                size=16,
                                 color=theme.MUTED,
                             ),
                         ],
@@ -43,13 +43,13 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                     ),
                     ft.Text(
                         tool.description,
-                        size=12,
+                        size=theme.FONT_SM,
                         color=theme.MUTED,
                     ),
                     ft.Container(expand=True),
                     ft.Text(
                         "Abrir ferramenta →",
-                        size=11,
+                        size=theme.FONT_SM,
                         weight=ft.FontWeight.BOLD,
                         color=theme.PURPLE,
                     ),
@@ -76,13 +76,13 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                     controls=[
                         ft.Text(
                             "O que você precisa fazer hoje?",
-                            size=26,
+                            size=theme.FONT_HERO,
                             weight=ft.FontWeight.BOLD,
                         ),
                         ft.Text(
                             "Escolha uma ferramenta. O estado de cada uma é "
                             "preservado enquanto você navega.",
-                            size=12,
+                            size=theme.FONT_SM,
                             color=theme.MUTED,
                         ),
                     ],
@@ -97,7 +97,7 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                 ft.Text(
                     "Toda leitura passa pelo pipeline de texto seguro: nada de "
                     "notação científica, zeros perdidos ou emojis.",
-                    size=10,
+                    size=theme.FONT_XS,
                     color=theme.MUTED,
                     italic=True,
                 ),

@@ -20,8 +20,8 @@
   `PROCESSOS` em `<nome> lista cnj.xlsx` e o recorte usa `_Recorte_NNN`.
 - `list_sheets` lista abas pelo tipo real; `filter_sheets` aplica a seleção e
   `default_selection` marca todas (1 arquivo) ou a primeira de cada (vários).
-- Seletor de chips no card “1. Entrada” com “Todas”/“Limpar” e contador; a
-  seleção vive em `ToolState` e recarrega quando a lista de arquivos muda.
+- Seletor de chips no card “1. Entrada” com “Todas”/“Limpar”, contador e
+  spinner de leitura; tipografia mínima de 12 px em toda a UI.
 - `all_str`, `cnj` e `cut` filtram as abas escolhidas; seleção vazia não executa.
 - `all_str.py`, `cnjs.py` e `cut.py` removidos da raiz; resta `merge.py`.
 

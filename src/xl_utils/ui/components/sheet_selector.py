@@ -1,4 +1,4 @@
-"""Chips for choosing which sheets enter each tool run."""
+"""Clickable chips for choosing which sheets enter each tool run."""
 
 import contextlib
 from collections.abc import Callable
@@ -10,6 +10,9 @@ from xl_utils.ui import theme
 from xl_utils.ui.state import ToolState
 
 Selection = dict[Path, set[str]]
+
+_SELECTED_BG = "#2D2A47"
+_CHIP_TEXT = "#B8BCD0"
 
 
 class SheetSelector:
@@ -24,10 +27,27 @@ class SheetSelector:
         self._state = state
         self._on_change = on_change
         self._failures: list[str] = []
+        self._loading = False
 
-        self._counter = ft.Text(size=10, color=theme.MUTED)
+        self._counter = ft.Text(size=theme.FONT_XS, color=theme.MUTED)
         self._groups = ft.Column(spacing=10)
-        self._empty = ft.Text(size=10, color=theme.MUTED)
+        self._empty = ft.Text(size=theme.FONT_XS, color=theme.MUTED)
+        self._spinner = ft.ProgressRing(
+            width=14,
+            height=14,
+            stroke_width=2,
+            color=theme.PURPLE,
+        )
+        self._loading_text = ft.Text(
+            "Lendo as abas...",
+            size=theme.FONT_XS,
+            color=theme.PURPLE,
+        )
+        self._loading_row = ft.Row(
+            controls=[self._spinner, self._loading_text],
+            spacing=8,
+            visible=False,
+        )
         self._all_button = ft.TextButton(
             "Todas",
             on_click=self._select_all,
@@ -46,9 +66,9 @@ class SheetSelector:
                         controls=[
                             ft.Text(
                                 "Abas",
-                                size=10,
+                                size=theme.FONT_XS,
                                 weight=ft.FontWeight.BOLD,
-                                color="#B8BCD0",
+                                color=_CHIP_TEXT,
                             ),
                             self._counter,
                             self._all_button,
@@ -58,6 +78,7 @@ class SheetSelector:
                         wrap=True,
                         run_spacing=2,
                     ),
+                    self._loading_row,
                     self._groups,
                     self._empty,
                 ],
@@ -72,13 +93,36 @@ class SheetSelector:
         """Show files whose sheet names could not be listed."""
         self._failures = list(failures)
 
+    def set_loading(self, loading: bool) -> None:
+        """Show a progress row while the sheet names are being listed."""
+        self._loading = loading
+        self.refresh()
+
     def refresh(self) -> None:
         """Rebuild the chips from the state and update the counter."""
         state = self._state
-        self._counter.value = f"{state.selected_count} de {state.sheet_count}"
-        self._all_button.disabled = state.sheet_count == 0
-        self._clear_button.disabled = state.sheet_count == 0
+        self._loading_row.visible = self._loading
+        self._groups.visible = not self._loading
+        self._counter.value = (
+            "lendo..."
+            if self._loading
+            else f"{state.selected_count} de {state.sheet_count}"
+        )
+        self._all_button.disabled = self._loading or state.sheet_count == 0
+        self._clear_button.disabled = self._loading or state.sheet_count == 0
 
+        if self._loading:
+            self._groups.controls = []
+            self._empty.visible = False
+        else:
+            self._render_groups()
+            self._empty.value, self._empty.color = self._empty_text()
+            self._empty.visible = self._empty.value != ""
+
+        self._refresh()
+
+    def _render_groups(self) -> None:
+        state = self._state
         multiple = len(state.files) > 1
         groups: list[ft.Control] = []
         for path in state.files:
@@ -91,7 +135,7 @@ class SheetSelector:
                 controls.append(
                     ft.Text(
                         f"{path.name} · {len(names)} aba(s)",
-                        size=9,
+                        size=theme.FONT_XS,
                         color=theme.MUTED,
                     )
                 )
@@ -108,9 +152,6 @@ class SheetSelector:
             groups.append(ft.Column(controls=controls, spacing=4))
 
         self._groups.controls = groups
-        self._empty.value, self._empty.color = self._empty_text()
-        self._empty.visible = self._empty.value != ""
-        self._refresh()
 
     def _empty_text(self) -> tuple[str, str]:
         if self._state.sheet_count > 0:
@@ -122,19 +163,35 @@ class SheetSelector:
             return "Nenhuma aba encontrada.", theme.MUTED
         return "Selecione um arquivo para escolher as abas.", theme.MUTED
 
-    def _chip(self, path: Path, name: str, selected: bool) -> ft.Chip:
-        return ft.Chip(
-            label=name,
-            selected=selected,
-            show_checkmark=True,
+    def _chip(self, path: Path, name: str, selected: bool) -> ft.Control:
+        return ft.Container(
+            content=ft.Row(
+                controls=[
+                    ft.Icon(
+                        ft.Icons.CHECK,
+                        size=12,
+                        color=theme.PURPLE,
+                        visible=selected,
+                    ),
+                    ft.Text(
+                        name,
+                        size=theme.FONT_XS,
+                        color=theme.TEXT if selected else _CHIP_TEXT,
+                        max_lines=1,
+                        overflow=ft.TextOverflow.ELLIPSIS,
+                    ),
+                ],
+                spacing=4,
+                tight=True,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            ),
+            bgcolor=_SELECTED_BG if selected else theme.BACKGROUND_DEEP,
+            border=ft.Border.all(1, theme.PURPLE if selected else theme.BORDER),
+            border_radius=999,
+            padding=ft.Padding.symmetric(vertical=6, horizontal=10),
+            ink=True,
             on_click=lambda _event, item=path, sheet=name: self._toggle(item, sheet),
-            bgcolor=theme.BACKGROUND_DEEP,
-            selected_color=theme.SUCCESS_BG,
-            check_color=theme.GREEN,
-            color=theme.TEXT,
-            label_text_style=ft.TextStyle(size=10, color=theme.TEXT),
-            visual_density=ft.VisualDensity.COMPACT,
-            padding=ft.Padding.symmetric(vertical=2, horizontal=6),
+            tooltip=f"{name} (clique para alternar)",
         )
 
     def _toggle(self, path: Path, name: str) -> None:
