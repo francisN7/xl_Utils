@@ -1,19 +1,9 @@
 # Roadmap atual
 
-Fases e backlog. A ordem segue **valor × custo × risco**: primeiro o que deixa as
-próximas sessões mais baratas, depois o que mais dói no uso. Um item só vira
-sessão quando a fase é escolhida.
-
-## Fase 0 — Fundação
-
-Objetivo: app desktop navegável, com tema Dracula e ambiente reproduzível.
-
-- [x] **S0a — Scaffold e contexto.** Branch `feat/ui`, uv no Python 3.15,
-  estrutura MVC híbrida, shell Flet com placeholders, helpers de core com
-  testes e documentação entre sessões. Custo M.
-- [x] **S0b — UI base.** Tema Dracula, sidebar própria com Início, quatro
-  cartões alinhados à esquerda, entrada de arquivo, resultado com prévia,
-  barra de ação e estado por ferramenta. Custo M/L.
+Ciclo ativo: **0002 — Migração**. O ciclo anterior está em
+[`0001-fundacao.md`](0001-fundacao.md). A ordem segue **valor × custo × risco**:
+primeiro o que deixa as próximas sessões mais baratas, depois o que mais dói no
+uso. Um item só vira sessão quando a fase é escolhida.
 
 ## Fase 1 — Migração dos scripts
 
@@ -22,7 +12,7 @@ duplicação e com teste.
 
 - [ ] **S1a — `all_str`.** Pipeline de leitura segura (texto + emojis, sem
   tocar em quebras de linha), reparo sem `xlsx2csv`/`shell=True` e página
-  própria. Apagar `all_str.py` e `remove_emoji.py`. Custo M.
+  própria. Apagar `all_str.py`. Custo M.
 - [ ] **S1b — `cnj`.** Regex pura, padronização e deduplicação, usando o
   pipeline do `all_str`. Apagar `cnjs.py`. Custo M.
 - [ ] **S1c — `cut`.** Recorte por quantidade de linhas, com prévia.
@@ -47,11 +37,9 @@ duplicação e com teste.
 
 | Item | Valor | Custo | Pré-requisito |
 |---|---|---|---|
-| Tema claro opcional | Baixo | S | S0b |
+| Tema claro opcional | Baixo | S | — |
 | Histórico de execuções | Médio | M | S2b |
-| Abrir pasta de saída no Explorer/Finder | Alto | S | S0b |
-| Cancelar execução em andamento | Médio | M | S0b |
-| Arrastar e soltar múltiplos arquivos | Alto | S | S0b |
+| Cancelar execução em andamento | Médio | M | S1a |
 
 ## Manutenção
 
@@ -64,6 +52,8 @@ duplicação e com teste.
 - Suporte a macOS/Linux — só entra quando houver máquina para testar.
 - Instalador nativo (MSI) — só entra se o PyInstaller não bastar.
 - Internacionalização — só entra se aparecer usuário fora do PT-BR.
+- Drag & drop real de arquivos — só entra se migrar para PySide6 ou houver hook
+  Windows-only.
 
 ## Descartados (não voltam sem decisão nova)
 

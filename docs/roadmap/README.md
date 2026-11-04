@@ -14,7 +14,13 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | Arquivo | Estado | O que é |
 |---|---|---|
 | [`main.md`](main.md) | **ativo** | fases e backlog em andamento |
-| `NNNN-*.md` | fechado | histórico de um ciclo entregue (criado ao fechar) |
+| [`0001-fundacao.md`](0001-fundacao.md) | fechado | histórico do ciclo da fundação |
+
+## Ciclos fechados
+
+| Arquivo | Ciclo | Fechado em |
+|---|---|---|
+| [`0001-fundacao.md`](0001-fundacao.md) | Fundação | 2026-11-04 |
 
 ## Convenção de nomes
 
@@ -42,4 +48,4 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 ## Numeração
 
 - Sessão dentro da mesma fase usa letra: `S0a`, `S0b`, `S1a`.
-- Fases/ciclos fechados ganham quatro dígitos no arquivo: `0001-mvp.md`.
+- Fases/ciclos fechados ganham quatro dígitos no arquivo: `0001-fundacao.md`.

@@ -12,7 +12,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 |---|---|
 | saber onde paramos | [`state/CURRENT.md`](state/CURRENT.md) |
 | saber o que vem agora | [`roadmap/main.md`](roadmap/main.md) |
-| ver o que já foi entregue | [`roadmap/`](roadmap/) |
+| ver o que já foi entregue | [`roadmap/README.md`](roadmap/README.md) |
 | entender as regras do agente | [`../AGENTS.md`](../AGENTS.md) |
 | rodar o projeto | [`guide/setup.md`](guide/setup.md) |
 | testar | [`guide/testing.md`](guide/testing.md) |

@@ -4,9 +4,9 @@
 
 ## Sessão
 
-- **Última concluída:** S0b — UI base (Dracula, sidebar, Início e componentes)
+- **Última concluída:** S0b — UI base (ciclo 0001 fechado)
 - **Próxima:** S1a — `all_str` (`docs/sessions/S1a-all-str.md`)
-- **Ciclo:** Fase 1 — Migração dos scripts
+- **Ciclo:** 0002 — Fase 1 — Migração dos scripts
 - **Retorno:** `src/xl_utils/core/io.py` e `src/xl_utils/ui/components/`
 
 ## Pronto
