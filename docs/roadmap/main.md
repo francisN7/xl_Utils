@@ -47,7 +47,7 @@ duplicação e com teste.
 Objetivo: promover a versão com UI a `main` e manter a `main` antiga como
 branch `legacy`, apenas para histórico.
 
-- [ ] **S3a — Promover a UI a `main`.** A `main` atual é ancestral de
+- [x] **S3a — Promover a UI a `main`.** A `main` atual é ancestral de
   `feat/ui`; avançar `main` até `feat/ui`, criar `legacy` no commit antigo,
   trocar o README da `legacy` por um aviso de descontinuação e publicar as duas.
   Remover `feat/ui` depois. Custo S.

@@ -60,6 +60,12 @@ O mapa completo está em [`docs/README.md`](docs/README.md). Para retomar o
 projeto, leia [`AGENTS.md`](AGENTS.md) e
 [`docs/state/CURRENT.md`](docs/state/CURRENT.md).
 
+## Branch `legacy`
+
+A versão anterior, sem interface gráfica, fica na branch
+[`legacy`](https://github.com/francisN7/xl_Utils/tree/legacy), mantida apenas
+como registro histórico. Ela não recebe manutenção.
+
 ## Licença
 
 Ainda não definida.

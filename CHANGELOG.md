@@ -64,6 +64,9 @@ decisões nos ADRs.
   seletor nativo (arquivo único ou pasta para lote), “Salvar em output/”
   continua como atalho e cancelar não grava nada. Nomes existentes ganham
   sufixo e o log registra o caminho real.
+- Publicação: a `main` passa a ser a versão com UI, a `main` antiga vira a
+  branch `legacy` com aviso de descontinuação e `feat/ui` é removida depois de
+  publicada; o README aponta para as duas.
 
 ### Removed
 

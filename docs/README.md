@@ -41,6 +41,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que lote de arquivos e seleção padrão | `adr/0006-lote-de-arquivos.md` | 35 |
 | por que log estruturado e diagnóstico | `adr/0007-log-e-diagnostico.md` | 35 |
 | por que salvar só depois da escolha | `adr/0008-saida-escolhida.md` | 35 |
+| por que `main` tem UI e `legacy` só história | `adr/0009-publicacao-main-legacy.md` | 35 |
 
 ## Regras do mapa
 
