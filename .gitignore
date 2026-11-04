@@ -1,5 +1,36 @@
-/venv
-/advbox_venv
+#=============#
+# ENVIRONMENT #
+#=============#
+.venv/
+venv/
+advbox_venv/
+.env
+
+#===========#
+# PYTHON    #
+#===========#
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+#===========#
+# TOOLING   #
+#===========#
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+#===========#
+# OUTPUTS   #
+#===========#
+output/
+
+#=================#
+# LOCAL / PERSONAL #
+#=================#
 process.json
 captureds.py
 *temp*
