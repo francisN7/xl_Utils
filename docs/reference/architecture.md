@@ -78,7 +78,10 @@ alterado.
 ## Testes
 
 O core é testado com `pytest` e `tmp_path`; a UI é validada por smoke manual
-enquanto não houver regressão que justifique teste de widget.
+enquanto não houver regressão que justifique teste de widget. O teste funcional
+do `all_str` gera 1.000 linhas fictícias em memória, roda em CSV e XLSX e
+confere zeros à esquerda, numeração CNJ-like, remoção de emojis e quebras de
+linha.
 
 ## Decisões
 

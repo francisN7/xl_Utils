@@ -24,6 +24,8 @@ decisões nos ADRs.
   abas, repara leitura com um fallback por formato e grava em `output/`.
 - Erro tipado `WorkbookReadError` quando a planilha não pode ser lida nem
   reparada, substituindo o antigo `xlsx2csv` via `shell=True`.
+- Teste funcional de 1.000 linhas fictícias geradas em memória, em CSV e XLSX,
+  sem versionar dados de teste; amostra local opcional em `samples/`.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 

@@ -17,8 +17,8 @@
   preserva quebras de linha; é o pipeline obrigatório das ferramentas.
 - Falha de leitura tenta um reparo tolerante por formato e, se necessário,
   levanta `WorkbookReadError` — sem `shell=True` e sem `xlsx2csv`.
-- Tratamento de Texto executa pela página, salva em `output/` ao lado da
-  planilha e mostra caminho, log e prévia.
+- Tratamento de Texto executa pela página, salva em `output/` e tem teste
+  funcional com 1.000 linhas fictícias geradas em memória.
 - `all_str.py` da raiz removido; restam `cnjs.py`, `cut.py` e `merge.py`.
 
 ## Próximo passo

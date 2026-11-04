@@ -27,6 +27,7 @@ htmlcov/
 # OUTPUTS   #
 #===========#
 output/
+samples/
 
 #=================#
 # LOCAL / PERSONAL #

@@ -41,6 +41,18 @@ def test_roundtrip(tmp_path: Path) -> None:
     assert read_workbook(saved, dtype=str)["Sheet1"]["nome"].tolist() == ["Ana"]
 ```
 
+## Base fictícia
+
+`tests/test_all_str_bulk.py` gera 1.000 linhas inventadas em memória, com zeros
+à esquerda, texto no formato CNJ (ano 0000, inválido de propósito), emojis e
+quebras de linha. Nenhum dado de teste é versionado. O teste roda o pipeline
+completo em CSV e XLSX e confere que nada disso se perde. Para criar uma amostra
+local em `samples/` (fora do Git):
+
+```bash
+uv run python scripts/make_fixture.py
+```
+
 ## Convenções
 
 - Um arquivo de teste por módulo de core: `tests/test_all_str.py`, etc.
