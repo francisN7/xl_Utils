@@ -1,52 +1,12 @@
-# Utils
-Uma série de mini scrpits python para resolução de pequenos problemas diários.
+# Utils (legacy)
 
-## Descrições
+Esta branch guarda a versão **antiga e sem interface gráfica** do projeto:
+apenas os scripts soltos da raiz, sem manutenção e mantida só como registro
+histórico.
 
-### all_str
+A versão ativa, com aplicativo desktop em Flet, está na branch
+[`main`](https://github.com/francisN7/xl_Utils/tree/main). Use o README de lá
+para instalar e rodar.
 
-Resolve o problema de números serem lidos como notação científica, convertendo todos os dados da planilha para texto simples ( ou str a nível de código).
-Em paralelo, está apto a corrigir arquivos com problemas de metadados (isso anteriormente impedia a leitura via pandas).
-
-### cnjs
-Percorre todo um arquivo.xlsx em busca de numerações no formato CNJ, após retorna um novo arquivo contendo todos os CNJs únicos encontrados.
-
-### convert
-
-Transforma o json da api em uma planilha.
-
-### cut
-
-Recorta planilhas com base na quantidade de linhas desejadas por arquivo.
-
-### merge
-
-Unifica planilhas que possuam o mesmo cabeçalho ou várias abas da mesma planilha.
-
-### quick_replace
-
-Substitui nomes com base em uma lista de pares.
-
-### remove_emoji
-
-Rapidamente substitui emojis por strings, nesse caso, por uma string em branco: (" ").
-
-# Futuro
-
-## Geral
-
-#### Idéias relacionados com todos os scripts:
-
-* Integrar com GUI.
-
-  * Iced;
-  * Flet;
-  * Tkinter;
-  * Textual;
-  * Slint;
-  * etc.
-
-* Distribuir com pyinstaller ou estudar possibilidade de instalação nativa.
-
-## Específicos
-Nenhuma pendência específica por hora.
+Nada aqui recebe correções ou melhorias. Se você chegou por um link antigo,
+siga para a `main`.
