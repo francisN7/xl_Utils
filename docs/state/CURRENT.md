@@ -6,7 +6,7 @@
 
 - **Última concluída:** S2e — saída escolhida
 - **Próxima:** S3a — promover a UI a `main` (`docs/sessions/S3a-publicacao.md`)
-- **Ciclo:** 0002 — Fase 2 — Consolidação
+- **Ciclo:** 0002 — Fase 3 — Publicação
 - **Retorno:** `core/save.py`, `result_panel.py`, `tool_layout.py`, `test_save.py`
 - **Decisões abertas:** nenhuma
 
