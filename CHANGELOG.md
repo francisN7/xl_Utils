@@ -49,6 +49,11 @@ decisões nos ADRs.
   pipeline do `all_str`).
 - Dependências `demoji`, `file-picker-py`, `xlsx2csv` e `click`.
 
+### Fixed
+
+- Coluna de entrada e prévia rolam sem barra visível; o conteúdo fica recortado
+  no cartão e não cobre mais a linha divisória nem a barra de ação.
+
 ## v0.1.0 — 2026-11-04
 
 ### Added

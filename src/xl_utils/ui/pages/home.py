@@ -103,7 +103,7 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                 ),
             ],
             spacing=20,
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.HIDDEN,
             expand=True,
         ),
         padding=24,

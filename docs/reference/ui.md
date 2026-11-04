@@ -13,7 +13,8 @@ O conteúdo abre em uma das duas formas:
 
 - **Início:** hub com cartões das ferramentas.
 - **Ferramenta:** cabeçalho + duas colunas (entrada/opções e resultado) + barra
-  de ação fixa.
+  de ação fixa. A coluna de entrada rola na vertical sem barra visível; os
+  cartões recortam o conteúdo e nunca invadem a barra de ação.
 
 ```text
 ┌──────────┬────────────────────────────────────────────┐
@@ -82,7 +83,7 @@ próxima linha também começa à esquerda.
 A prévia fica **sempre visível** no painel de resultado:
 
 - primeiras 100 linhas e todas as colunas;
-- rolagem horizontal e vertical;
+- rolagem horizontal e vertical com a barra oculta;
 - cabeçalho fixo;
 - valores vazios aparecem como célula vazia, não como `nan`;
 - a planilha original nunca é alterada.

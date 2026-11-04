@@ -49,6 +49,9 @@ class ToolLayout:
             "Nenhum arquivo selecionado.",
             size=theme.FONT_SM,
             color=theme.MUTED,
+            expand=True,
+            max_lines=1,
+            overflow=ft.TextOverflow.ELLIPSIS,
         )
         self._run_button = ft.FilledButton(
             "Executar",
@@ -119,6 +122,7 @@ class ToolLayout:
             ],
             spacing=16,
             expand=1,
+            scroll=ft.ScrollMode.HIDDEN,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
         right = _card(
@@ -131,7 +135,7 @@ class ToolLayout:
             controls=[left, right],
             spacing=16,
             expand=True,
-            vertical_alignment=ft.CrossAxisAlignment.START,
+            vertical_alignment=ft.CrossAxisAlignment.STRETCH,
         )
 
         action_bar = ft.Column(
@@ -286,6 +290,7 @@ def _card(
         bgcolor=theme.SURFACE,
         border=ft.Border.all(1, theme.BORDER),
         border_radius=12,
+        clip_behavior=ft.ClipBehavior.HARD_EDGE,
         expand=expand,
     )
 

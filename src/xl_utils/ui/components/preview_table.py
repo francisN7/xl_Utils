@@ -27,7 +27,10 @@ class PreviewTable:
             size=theme.FONT_SM,
             color=theme.MUTED,
         )
-        self._body = ft.Container(expand=True)
+        self._body = ft.Container(
+            expand=True,
+            clip_behavior=ft.ClipBehavior.HARD_EDGE,
+        )
         self.control = ft.Column(
             controls=[
                 ft.Row(
@@ -81,10 +84,10 @@ class PreviewTable:
             controls=[
                 ft.Row(
                     controls=[self._build_table(self._frames[name])],
-                    scroll=ft.ScrollMode.AUTO,
+                    scroll=ft.ScrollMode.HIDDEN,
                 )
             ],
-            scroll=ft.ScrollMode.AUTO,
+            scroll=ft.ScrollMode.HIDDEN,
             expand=True,
         )
 
