@@ -40,6 +40,9 @@ duplicação e com teste.
   (`resolve_suffix`); faltam o indicador, o gate e os testes com extensões
   trocadas (`.xlsx` como `.xls`, `.csv` como `.xlsx`, HTML como `.xlsx`).
   Nunca renomear o arquivo do usuário. Custo M.
+- [ ] **S2e — Saída escolhida.** Executar sem gravar automaticamente, mostrar a
+  prévia e salvar só ao clicar em “Salvar”, escolhendo arquivo (saída única) ou
+  pasta (lote), com “Salvar em output/” como atalho. Custo G.
 
 ## Fase 3 — Distribuição
 
