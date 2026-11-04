@@ -72,7 +72,7 @@ alterado.
 |---|---|---|
 | Tratamento de texto | `core/tools/all_str.py` | pronta |
 | Extrair CNJs | `core/tools/cnj.py` | pronta |
-| Recortar planilha | `core/tools/cut.py` | a migrar |
+| Recortar planilha | `core/tools/cut.py` | pronta |
 | Mesclar planilhas | `core/tools/merge.py` | a migrar |
 
 ## Extração de CNJ
@@ -83,6 +83,15 @@ número maior. `normalize_cnj` devolve sempre o formato pontuado; `collect_cnjs`
 percorre todas as abas e célula a célula, remove duplicatas e ordena a lista.
 `controllers/cnj.py` grava `output/<nome> lista cnj.xlsx` com a coluna
 `PROCESSOS` e registra encontrados, duplicados e únicos no log.
+
+## Recorte
+
+`core/tools/cut.py` divide cada aba em blocos sequenciais de N linhas; o resto
+fica no último bloco e uma aba vazia ainda gera um arquivo. `controllers/cut.py`
+lê pelo `prepare_workbook`, salva cada bloco em `output/` e usa
+`<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx` com várias abas),
+saneando caracteres inválidos de nome de arquivo. O campo de linhas é editável
+na página e vive em `ToolState.options`.
 
 ## Testes
 

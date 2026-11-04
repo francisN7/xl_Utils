@@ -36,7 +36,7 @@ O conteúdo abre em uma das duas formas:
 ## Navegação e estado
 
 - Trocar de ferramenta **mantém** o estado dela (arquivo, opções e resultado).
-- Trocar o arquivo **reseta** opções e resultado daquela ferramenta.
+- Trocar o arquivo **reseta o resultado**; o valor das opções permanece.
 - A página inicial é o hub; o item “Início” volta para ele.
 
 ## Componentes
@@ -45,7 +45,7 @@ O conteúdo abre em uma das duas formas:
 |---|---|
 | `sidebar` | Logo, Início e as quatro ferramentas, com item ativo destacado. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
-| `options_panel` | Controles específicos da ferramenta. |
+| `options_panel` | Controles específicos; campos editáveis guardam o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
 | `tool_layout` | Cabeçalho, cartões, barra de ação e estados. |

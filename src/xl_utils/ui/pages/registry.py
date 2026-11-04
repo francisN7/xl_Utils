@@ -10,6 +10,9 @@ from xl_utils.ui.pages.all_str import options as all_str_options
 from xl_utils.ui.pages.all_str import run as run_all_str
 from xl_utils.ui.pages.cnj import options as cnj_options
 from xl_utils.ui.pages.cnj import run as run_cnj
+from xl_utils.ui.pages.cut import options as cut_options
+from xl_utils.ui.pages.cut import run as run_cut
+from xl_utils.ui.state import ToolState
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,7 +31,7 @@ def _tool(
     label: str,
     icon: ft.IconData,
     description: str,
-    options: Callable[[], ft.Control],
+    options: Callable[[ToolState], ft.Control],
     *,
     multiple_files: bool = False,
     run_handler: RunHandler | None = None,
@@ -37,7 +40,7 @@ def _tool(
         return ToolLayout(
             label,
             description,
-            options=options(),
+            options=options,
             multiple_files=multiple_files,
             run_handler=run_handler,
         ).control
@@ -51,21 +54,7 @@ def _tool(
     )
 
 
-def _cut_options() -> ft.Control:
-    return ft.Column(
-        controls=[
-            ft.TextField(
-                label="Linhas por arquivo",
-                value="1000",
-                dense=True,
-                disabled=True,
-            ),
-        ],
-        spacing=8,
-    )
-
-
-def _merge_options() -> ft.Control:
+def _merge_options(_state: ToolState) -> ft.Control:
     return ft.Column(
         controls=[
             ft.Dropdown(
@@ -111,7 +100,8 @@ TOOLS: tuple[ToolPage, ...] = (
         "Recortar Planilha",
         ft.Icons.CONTENT_CUT,
         "Divide uma planilha em vários arquivos por quantidade de linhas.",
-        _cut_options,
+        cut_options,
+        run_handler=run_cut,
     ),
     _tool(
         "merge",

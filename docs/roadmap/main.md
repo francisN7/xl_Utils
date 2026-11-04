@@ -15,7 +15,7 @@ duplicação e com teste.
   própria. Apagar `all_str.py`. Custo M.
 - [x] **S1b — `cnj`.** Regex pura, padronização e deduplicação, usando o
   pipeline do `all_str`. Apagar `cnjs.py`. Custo M.
-- [ ] **S1c — `cut`.** Recorte por quantidade de linhas, com prévia.
+- [x] **S1c — `cut`.** Recorte por quantidade de linhas, com prévia.
   Apagar `cut.py`. Custo M.
 - [ ] **S1d — `merge`.** Unificar arquivos ou abas, com erros tipados.
   Apagar `merge.py`. Custo M.

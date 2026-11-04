@@ -10,12 +10,13 @@ import pandas as pd
 class ToolState:
     """State of one tool page.
 
-    Selecting a new file resets options and result; the page itself and the
-    selected tool stay in memory while the user navigates.
+    Selecting a new file discards the previous result; the page, its options
+    and the selected tool stay in memory while the user navigates.
     """
 
     files: list[Path] = field(default_factory=list)
     result: dict[str, pd.DataFrame] | None = None
+    options: dict[str, object] = field(default_factory=dict)
     message: str = ""
     error: str | None = None
     running: bool = False
@@ -32,6 +33,7 @@ class ToolState:
         """Clear everything for this tool."""
         self.files.clear()
         self.result = None
+        self.options.clear()
         self.message = ""
         self.error = None
         self.running = False

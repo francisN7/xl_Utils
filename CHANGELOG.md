@@ -28,12 +28,15 @@ decisões nos ADRs.
   sem versionar dados de teste; amostra local opcional em `samples/`.
 - Extração de CNJs funcional: aceita formato pontuado ou 20 dígitos,
   padroniza, remove duplicatas e grava `PROCESSOS` em `output/`.
+- Recorte de planilhas funcional: divide cada aba em blocos de N linhas, com
+  campo editável na página, nomes `_Recorte_NNN` e saída em `output/`.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 
 ### Removed
 
-- `all_str.py` e `cnjs.py` da raiz, substituídos por core + controller + página.
+- `all_str.py`, `cnjs.py` e `cut.py` da raiz, substituídos por core +
+  controller + página.
 - Branch `cli-app` e a tentativa de interface por linha de comando.
 - Ferramentas `convert`, `quick_replace` e `remove_emoji` (emojis passam para o
   pipeline do `all_str`).

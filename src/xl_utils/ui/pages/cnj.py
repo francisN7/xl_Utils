@@ -8,7 +8,7 @@ from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.state import ToolState
 
 
-def options() -> ft.Control:
+def options(_state: ToolState) -> ft.Control:
     """Return the fixed options of the CNJ extraction."""
     return ft.Column(
         controls=[

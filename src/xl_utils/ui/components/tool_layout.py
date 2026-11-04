@@ -12,6 +12,7 @@ from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.state import ToolState
 
 RunHandler = Callable[[ToolState, ResultPanel], None]
+OptionsFactory = Callable[[ToolState], ft.Control]
 
 
 class ToolLayout:
@@ -22,7 +23,7 @@ class ToolLayout:
         title: str,
         description: str,
         *,
-        options: ft.Control | None = None,
+        options: OptionsFactory | ft.Control | None = None,
         multiple_files: bool = False,
         run_handler: RunHandler | None = None,
     ) -> None:
@@ -94,7 +95,7 @@ class ToolLayout:
                 ),
                 _card(
                     "2. Opções",
-                    options or _empty_options(),
+                    _build_options(options, self.state),
                 ),
             ],
             spacing=16,
@@ -207,3 +208,14 @@ def _empty_options() -> ft.Control:
         size=11,
         color=theme.MUTED,
     )
+
+
+def _build_options(
+    options: OptionsFactory | ft.Control | None,
+    state: ToolState,
+) -> ft.Control:
+    if options is None:
+        return _empty_options()
+    if isinstance(options, ft.Control):
+        return options
+    return options(state)
