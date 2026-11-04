@@ -28,7 +28,7 @@ class PreviewTable:
             color=theme.MUTED,
         )
         self._body = ft.Container(
-            expand=True,
+            height=0,
             clip_behavior=ft.ClipBehavior.HARD_EDGE,
         )
         self.control = ft.Column(
@@ -48,7 +48,6 @@ class PreviewTable:
                 self._body,
             ],
             spacing=8,
-            expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
 
@@ -60,7 +59,9 @@ class PreviewTable:
             self._sheet.visible = False
             self._empty.visible = True
             self._body.content = None
+            self._body.height = 0
         else:
+            self._body.height = 240
             self._sheet.options = [
                 ft.DropdownOption(key=name, text=name) for name in names
             ]
@@ -80,14 +81,17 @@ class PreviewTable:
             self._refresh()
 
     def _show(self, name: str) -> None:
-        self._body.content = ft.Column(
+        # Vertical scroll goes inside: the wheel over the table must scroll the
+        # rows, while the outer row handles the horizontal overflow.
+        self._body.content = ft.Row(
             controls=[
-                ft.Row(
+                ft.Column(
                     controls=[self._build_table(self._frames[name])],
                     scroll=ft.ScrollMode.HIDDEN,
                 )
             ],
-            scroll=ft.ScrollMode.HIDDEN,
+            scroll=ft.ScrollMode.AUTO,
+            vertical_alignment=ft.CrossAxisAlignment.STRETCH,
             expand=True,
         )
 

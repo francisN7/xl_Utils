@@ -125,10 +125,17 @@ class ToolLayout:
             scroll=ft.ScrollMode.HIDDEN,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
-        right = _card(
-            "3. Resultado",
-            self.result.control,
+        right = ft.Column(
+            controls=[
+                _card(
+                    "3. Resultado",
+                    self.result.control,
+                )
+            ],
+            spacing=16,
             expand=1,
+            scroll=ft.ScrollMode.HIDDEN,
+            horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
 
         body = ft.Row(
@@ -138,16 +145,19 @@ class ToolLayout:
             vertical_alignment=ft.CrossAxisAlignment.STRETCH,
         )
 
-        action_bar = ft.Column(
-            controls=[
-                ft.Divider(height=1, color=theme.BORDER),
-                ft.Row(
-                    controls=[self._summary, self._run_button],
-                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
-                ),
-            ],
-            spacing=10,
+        action_bar = ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Divider(height=1, color=theme.BORDER),
+                    ft.Row(
+                        controls=[self._summary, self._run_button],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                ],
+                spacing=10,
+            ),
+            padding=ft.Padding.only(top=16),
         )
 
         self.control = ft.Container(

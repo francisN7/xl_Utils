@@ -11,6 +11,8 @@ from xl_utils.shared.system import open_folder
 from xl_utils.ui import theme
 from xl_utils.ui.components.preview_table import PreviewTable
 
+_LOG_MAX_HEIGHT = 160
+
 
 class ResultPanel:
     """Visual state of one tool result."""
@@ -54,7 +56,12 @@ class ResultPanel:
             selectable=True,
         )
         self._log_box = ft.Container(
-            content=self._log,
+            content=ft.Column(
+                controls=[self._log],
+                scroll=ft.ScrollMode.HIDDEN,
+                expand=True,
+            ),
+            height=0,
             bgcolor=theme.BACKGROUND_DEEP,
             border=ft.Border.all(1, theme.BORDER),
             border_radius=8,
@@ -103,7 +110,6 @@ class ResultPanel:
                 self.preview.control,
             ],
             spacing=10,
-            expand=True,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
 
@@ -166,13 +172,19 @@ class ResultPanel:
     def set_log(self, lines: list[str]) -> None:
         self._log.value = "\n".join(lines)
         self._log_section.visible = bool(lines)
+        self._resize_log(len(lines))
         self._refresh()
 
     def append_log(self, line: str) -> None:
         current = self._log.value or ""
         self._log.value = f"{current}\n{line}".strip()
         self._log_section.visible = True
+        self._resize_log(len(self._log.value.splitlines()))
         self._refresh()
+
+    def _resize_log(self, lines: int) -> None:
+        """Cap the log height so the preview keeps a usable viewport."""
+        self._log_box.height = min(28 + 18 * lines, _LOG_MAX_HEIGHT) if lines else 0
 
     def _open_folder(self, _event=None) -> None:
         if self._output is not None:

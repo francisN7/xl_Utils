@@ -51,7 +51,8 @@ decisões nos ADRs.
 
 ### Fixed
 
-- Coluna de entrada e prévia rolam sem barra visível; o conteúdo fica recortado
+- Colunas de entrada e de resultado rolam sem barra visível; log limitado a
+  160 px, prévia com 240 px e rolagem nos dois eixos. O conteúdo fica recortado
   no cartão e não cobre mais a linha divisória nem a barra de ação.
 
 ## v0.1.0 — 2026-11-04
