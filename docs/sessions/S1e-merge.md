@@ -3,13 +3,12 @@
 ## Objetivo
 
 Substituir `merge.py` por uma ferramenta única: concatenar as abas selecionadas
-de todos os arquivos na ordem, acrescentando a coluna `ORIGEM` e permitindo
-alinhar colunas de nomes diferentes antes de executar.
+de todos os arquivos na ordem, com coluna `ORIGEM` e alinhamento de colunas.
 
 ## Fora de escopo
 
-Alinhar colunas automaticamente por nome ou posição; converter tipos; arrastar
-colunas (o Flet 1.0 não oferece drag de lista); juntar linhas por chave (join).
+Alinhar colunas automaticamente; converter tipos; arrastar colunas (o Flet 1.0
+não oferece drag); juntar linhas por chave (join).
 
 ## Tarefas
 
@@ -27,10 +26,10 @@ colunas (o Flet 1.0 não oferece drag de lista); juntar linhas por chave (join).
    - lê com `prepare_workbook`, filtra com `filter_sheets` e chama
      `merge_sheets`;
    - exige ao menos uma aba no total e ao menos duas fontes ou duas abas;
-   - salva `output/Merge.xlsx` com uma aba `Mesclado` e log por arquivo
-     (abas, linhas e colunas).
+   - salva `output/Merge.xlsx` (`Mesclado`) e log por arquivo (abas, linhas, colunas).
 3. Criar `ui/pages/merge.py`:
-   - reaproveita o seletor de abas já integrado, com `multiple_files=True`;
+   - reaproveita o seletor, com `multiple_files=True` e o padrão de primeira aba
+     por arquivo (o lote das outras ferramentas segue o ADR 0006);
    - opções mostram, para cada coluna distinta, um dropdown para escolher a
      coluna canônica; colunas iguais já ficam alinhadas;
    - o mapeamento vive em `ToolState.options` e é recalculado quando os
@@ -62,9 +61,10 @@ colunas (o Flet 1.0 não oferece drag de lista); juntar linhas por chave (join).
 
 Ler `AGENTS.md`, `docs/state/CURRENT.md`, esta spec,
 `docs/reference/architecture.md`, `docs/adr/0005-selecao-de-abas-e-merge.md`,
-`core/tools/sheets.py`, `core/tools/all_str.py`, `ui/pages/registry.py`,
-`ui/components/sheet_selector.py` e `merge.py`. Consultar os controllers
-existentes só para repetir o padrão de log e saída.
+`docs/adr/0006-lote-de-arquivos.md`, `core/tools/sheets.py`,
+`core/tools/all_str.py`, `ui/pages/registry.py`,
+`ui/components/sheet_selector.py` e `merge.py`; controllers existentes só para
+repetir o padrão de log e saída.
 
 ## Arquivos prováveis
 

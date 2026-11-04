@@ -11,20 +11,17 @@
 
 ## Pronto
 
-- Ambiente uv no Python 3.15, Flet desktop, pandas 3.1; MVC híbrido, app
-  navegável e tema Dracula.
-- `prepare_workbook(path)` lê tudo com `dtype=str`, remove emojis e preserva
-  quebras de linha; falha de leitura tenta reparo e pode levantar
-  `WorkbookReadError`.
-- Texto, CNJ e recorte prontos e salvando em `output/`; aceitam vários arquivos
-  e processam cada origem separadamente. CNJ sai como `PROCESSOS` e recorte usa
-  `_Recorte_NNN`.
+- Ambiente uv/Python 3.15, Flet desktop e pandas 3.1; MVC híbrido e tema Dracula.
+- `prepare_workbook` lê tudo como texto, remove emojis, preserva quebras e tenta
+  reparo; falha vira `WorkbookReadError`.
+- Texto, CNJ e recorte prontos e salvando em `output/`; aceitam lote e processam
+  cada origem separadamente. CNJ sai como `PROCESSOS`; recorte usa `_Recorte_NNN`.
 - `list_sheets` lista abas pelo tipo real; `filter_sheets` aplica a seleção e
   `default_selection` marca todas no lote e a primeira de cada no merge.
-- Seletor de chips no card “1. Entrada” com “Todas”/“Limpar”, contador e
-  spinner de leitura; tipografia mínima de 12 px em toda a UI.
-- `all_str`, `cnj` e `cut` filtram as abas escolhidas; seleção vazia bloqueia o
-  lote inteiro.
+- Seletor de chips com “Todas”/“Limpar”, contador e spinner; tipografia mínima
+  de 12 px em toda a UI.
+- As duas colunas rolam sem barra visível; log de até 160 px e prévia de 240 px
+  com rolagem nos dois eixos. Seleção vazia bloqueia o lote.
 - `all_str.py`, `cnjs.py` e `cut.py` removidos da raiz; resta `merge.py`.
 
 ## Próximo passo
@@ -40,7 +37,7 @@ apagar `merge.py` e criar core + controller + página com testes.
 ## Arquivos-chave
 
 - `core/io.py` (`list_sheets`) e `core/tools/sheets.py` (`filter_sheets`).
-- `sheet_selector.py`, `state.py` e `tool_layout.py` — chips e seleção.
+- `sheet_selector.py`, `state.py` e `tool_layout.py` — chips e layout.
 
 ## Armadilhas
 
