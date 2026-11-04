@@ -4,41 +4,41 @@
 
 ## Sessão
 
-- **Última concluída:** S0b — UI base (ciclo 0001 fechado)
-- **Próxima:** S1a — `all_str` (`docs/sessions/S1a-all-str.md`)
+- **Última concluída:** S1a — pipeline do `all_str`
+- **Próxima:** S1b — extração de CNJ (`docs/sessions/S1b-cnj.md`)
 - **Ciclo:** 0002 — Fase 1 — Migração dos scripts
-- **Retorno:** `src/xl_utils/core/io.py` e `src/xl_utils/ui/components/`
+- **Retorno:** `src/xl_utils/core/tools/all_str.py` e `src/xl_utils/ui/pages/all_str.py`
 
 ## Pronto
 
 - Ambiente uv no Python 3.15, Flet desktop, pandas 3.1, puremagic e emoji.
-- Estrutura MVC híbrida e app desktop navegável.
-- Tema Dracula, sidebar de 240 px, Início com 4 cartões alinhados à esquerda.
-- Entrada clicável, resultado com caminho/log/prévia de 100 linhas e ação.
-- Estado por ferramenta preservado; trocar o arquivo reseta opções e resultado.
-- Escopo de 4 ferramentas: `all_str`, `cnj`, `cut`, `merge`.
-- `convert`, `quick_replace` e `remove_emoji` removidos da raiz.
-- Documentação, ADRs, screenshots, roadmap, `docs:check` e CI.
+- Estrutura MVC híbrida, app navegável e tema Dracula.
+- `prepare_workbook(path)` lê todas as abas com `dtype=str`, remove emojis e
+  preserva quebras de linha; é o pipeline obrigatório das ferramentas.
+- Falha de leitura tenta um reparo tolerante por formato e, se necessário,
+  levanta `WorkbookReadError` — sem `shell=True` e sem `xlsx2csv`.
+- Tratamento de Texto executa pela página, salva em `output/` ao lado da
+  planilha e mostra caminho, log e prévia.
+- `all_str.py` da raiz removido; restam `cnjs.py`, `cut.py` e `merge.py`.
 
 ## Próximo passo
 
-S1a: criar `core/tools/all_str.py` com o pipeline `prepare_workbook` (leitura
-`dtype=str` + remoção de emojis, preservando quebras de linha), reparo sem
-`xlsx2csv`/`shell=True`, página de Tratamento de Texto, testes e remoção de
-`all_str.py` da raiz.
+S1b: criar `core/tools/cnj.py` com regex pura (20 dígitos ou formato CNJ),
+padronização, deduplicação e extração por todas as colunas, sempre sobre
+`prepare_workbook`; conectar a página e apagar `cnjs.py` da raiz.
 
 ## Decisões abertas
 
-- Onde fica o pipeline: `core/tools/all_str.py` exporta `prepare_workbook` ou
-  `core/io.py` chama o módulo. Decidir na S1a.
-- Estratégia de reparo de xlsx corrompido: `openpyxl` read-only ou erro tipado.
+- Saída do CNJ: uma aba `PROCESSOS` em `output/<nome> lista cnj.xlsx` ou um
+  painel apenas em memória. Decidir na S1b.
 
 ## Arquivos-chave
 
-- `src/xl_utils/app.py` — shell e navegação.
-- `src/xl_utils/ui/components/` — sidebar, entrada, resultado, prévia e layout.
+- `src/xl_utils/core/tools/all_str.py` — pipeline seguro e erro tipado.
+- `src/xl_utils/controllers/all_str.py` — execução, saída e log.
+- `src/xl_utils/ui/pages/all_str.py` — página e opções fixas.
 - `src/xl_utils/core/io.py` — leitura/escrita compartilhada.
-- `docs/reference/ui.md` — layout, componentes e tema.
+- `docs/reference/architecture.md` — camadas e fluxo.
 
 ## Armadilhas
 
@@ -46,8 +46,8 @@ S1a: criar `core/tools/all_str.py` com o pipeline `prepare_workbook` (leitura
 - `puremagic` detecta HTML como `.txt`; `resolve_suffix` cai para a extensão
   original quando o detectado não é suportado.
 - Não normalizar quebras de linha: o texto da célula deve ser preservado.
-- Scripts legados restantes (`all_str`, `cnjs`, `cut`, `merge`) ainda não têm
-  lint limpo; saem nas sessões de migração.
+- `prepare_workbook` não converte tipos de `.html` para texto; revisar na S2a.
+- Scripts legados restantes (`cnjs`, `cut`, `merge`) não têm lint limpo.
 
 ## Como rodar
 

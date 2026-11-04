@@ -10,7 +10,7 @@ uso. Um item só vira sessão quando a fase é escolhida.
 Objetivo: substituir cada script da raiz por core + controller + página, sem
 duplicação e com teste.
 
-- [ ] **S1a — `all_str`.** Pipeline de leitura segura (texto + emojis, sem
+- [x] **S1a — `all_str`.** Pipeline de leitura segura (texto + emojis, sem
   tocar em quebras de linha), reparo sem `xlsx2csv`/`shell=True` e página
   própria. Apagar `all_str.py`. Custo M.
 - [ ] **S1b — `cnj`.** Regex pura, padronização e deduplicação, usando o

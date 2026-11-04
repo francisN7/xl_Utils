@@ -41,3 +41,12 @@ quando chamado sozinho. A remoção de emojis era uma ferramenta separada e o
 - **Manter `remove_emoji` separado:** duplica o pipeline e aumenta a superfície.
 - **Continuar com `demoji`:** incompatível com 3.15 e com API removida.
 - **Forçar tudo para numérico:** pior para CNJ/CPF e códigos com zero.
+
+## Adendo — reparo tipado (S1a)
+
+O reparo não converte mais para CSV via `xlsx2csv`. Quando a leitura normal
+falha, `prepare_workbook` tenta **um** leitor tolerante conforme o formato real
+(`openpyxl` somente leitura, codificações alternativas para CSV, outro parser
+para HTML). Se o fallback também falhar, levanta `WorkbookReadError` com a causa
+original; a página mostra a mensagem e o arquivo do usuário fica intacto.
+

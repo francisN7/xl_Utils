@@ -20,11 +20,16 @@ decisões nos ADRs.
   formato com `puremagic`, nomes de saída únicos e remoção de emojis.
 - Leitura segura por padrão: `dtype=str`, preservação de zeros/CNJ/CPF e
   quebras de linha intactas.
+- Tratamento de Texto funcional: `prepare_workbook` remove emojis de todas as
+  abas, repara leitura com um fallback por formato e grava em `output/`.
+- Erro tipado `WorkbookReadError` quando a planilha não pode ser lida nem
+  reparada, substituindo o antigo `xlsx2csv` via `shell=True`.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 
 ### Removed
 
+- `all_str.py` da raiz, substituído por core + controller + página.
 - Branch `cli-app` e a tentativa de interface por linha de comando.
 - Ferramentas `convert`, `quick_replace` e `remove_emoji` (emojis passam para o
   pipeline do `all_str`).

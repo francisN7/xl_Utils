@@ -1,0 +1,84 @@
+from pathlib import Path
+
+import pandas as pd
+import pytest
+
+from xl_utils.controllers.all_str import run_all_str
+from xl_utils.core.io import read_workbook
+from xl_utils.core.tools.all_str import WorkbookReadError, prepare_workbook
+
+
+def test_prepare_workbook_keeps_text_and_removes_emojis(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    pd.DataFrame(
+        {
+            "codigo": ["000123"],
+            "cnj": ["0001234-56.2024.8.26.0100"],
+            "nome": ["Ana 🙂\nSilva 🚀"],
+        }
+    ).to_excel(source, index=False)
+
+    frame = prepare_workbook(source)["Sheet1"]
+
+    assert frame["codigo"].tolist() == ["000123"]
+    assert frame["cnj"].tolist() == ["0001234-56.2024.8.26.0100"]
+    assert frame["nome"].tolist() == ["Ana \nSilva "]
+
+
+def test_prepare_workbook_cleans_every_sheet(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    with pd.ExcelWriter(source) as writer:
+        pd.DataFrame({"nome": ["Ana ✅"]}).to_excel(
+            writer,
+            sheet_name="Uma",
+            index=False,
+        )
+        pd.DataFrame({"nome": ["Bia ❌"]}).to_excel(
+            writer,
+            sheet_name="Outra",
+            index=False,
+        )
+
+    sheets = prepare_workbook(source)
+
+    assert list(sheets) == ["Uma", "Outra"]
+    assert sheets["Uma"]["nome"].tolist() == ["Ana "]
+    assert sheets["Outra"]["nome"].tolist() == ["Bia "]
+
+
+def test_prepare_workbook_repairs_csv_encoding(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.csv"
+    source.write_bytes("nome;cidade\nJoão;São Paulo\n".encode("latin-1"))
+
+    frame = prepare_workbook(source)["Planilha1"]
+
+    assert frame["nome"].tolist() == ["João"]
+    assert frame["cidade"].tolist() == ["São Paulo"]
+
+
+def test_prepare_workbook_raises_typed_error_for_corrupt_file(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "quebrada.xlsx"
+    source.write_bytes(b"isto nao e um xlsx")
+
+    with pytest.raises(WorkbookReadError, match="Não foi possível ler"):
+        prepare_workbook(source)
+
+
+def test_run_all_str_saves_in_output_folder(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    pd.DataFrame({"codigo": ["000123"], "nome": ["Ana 🙂"]}).to_excel(
+        source,
+        index=False,
+    )
+
+    outcome = run_all_str(source)
+    saved = read_workbook(outcome.output, dtype=str)["Sheet1"]
+
+    assert outcome.output.parent == tmp_path / "output"
+    assert outcome.output.is_file()
+    assert outcome.rows == 1
+    assert saved["codigo"].tolist() == ["000123"]
+    assert saved["nome"].tolist() == ["Ana "]
+    assert any("Saída:" in line for line in outcome.log)

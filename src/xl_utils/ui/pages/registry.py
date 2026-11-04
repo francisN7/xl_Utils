@@ -5,8 +5,9 @@ from dataclasses import dataclass
 
 import flet as ft
 
-from xl_utils.ui import theme
-from xl_utils.ui.components.tool_layout import ToolLayout
+from xl_utils.ui.components.tool_layout import RunHandler, ToolLayout
+from xl_utils.ui.pages.all_str import options as all_str_options
+from xl_utils.ui.pages.all_str import run as run_all_str
 
 
 @dataclass(frozen=True, slots=True)
@@ -28,6 +29,7 @@ def _tool(
     options: Callable[[], ft.Control],
     *,
     multiple_files: bool = False,
+    run_handler: RunHandler | None = None,
 ) -> ToolPage:
     def build() -> ft.Control:
         return ToolLayout(
@@ -35,6 +37,7 @@ def _tool(
             description,
             options=options(),
             multiple_files=multiple_files,
+            run_handler=run_handler,
         ).control
 
     return ToolPage(
@@ -48,21 +51,6 @@ def _tool(
 
 def _check(label: str, value: bool = True) -> ft.Checkbox:
     return ft.Checkbox(label=label, value=value, disabled=True)
-
-
-def _all_str_options() -> ft.Control:
-    return ft.Column(
-        controls=[
-            _check("Remover emojis", True),
-            _check("Reparar metadados se a leitura falhar", True),
-            ft.Text(
-                "Sempre aplicado antes das demais ferramentas.",
-                size=10,
-                color=theme.MUTED,
-            ),
-        ],
-        spacing=4,
-    )
 
 
 def _cnj_options() -> ft.Control:
@@ -119,7 +107,8 @@ TOOLS: tuple[ToolPage, ...] = (
         "Tratamento de Texto",
         ft.Icons.TEXT_FIELDS,
         "Converte tudo para texto, remove emojis e repara metadados.",
-        _all_str_options,
+        all_str_options,
+        run_handler=run_all_str,
     ),
     _tool(
         "cnj",

@@ -36,6 +36,18 @@ específica:
 3. preserva o texto da célula, inclusive quebras de linha;
 4. só tenta reparo quando a leitura falha, sem `shell=True`.
 
+`core/tools/all_str.py` expõe `prepare_workbook(path)`, que devolve
+`{nome_da_aba: DataFrame}` já limpo. As demais ferramentas importam essa função
+antes de aplicar a própria regra. `controllers/all_str.py` orquestra a leitura,
+a gravação em `output/` e o log; `ui/pages/all_str.py` só conecta a página.
+
+Quando a leitura normal falha, o pipeline tenta **um** leitor mais tolerante,
+de acordo com o formato real: `openpyxl` em modo somente leitura para
+`.xlsx`/`.xlsm`, codificações alternativas (`utf-8-sig`, `cp1252`, `latin-1`)
+para `.csv` e outros parsers para `.html`. Se ainda assim falhar, levanta
+`WorkbookReadError` com a causa original — nunca renomeia nem altera o arquivo
+do usuário.
+
 O objetivo é não perder zeros à esquerda, CNJ/CPF e valores que o Excel
 converteria em notação científica. A ferramenta “Tratamento de texto” também
 expõe esse pipeline sozinha, para conversão e reparo explícitos.
@@ -56,9 +68,9 @@ alterado.
 
 ## Ferramentas
 
-| Ferramenta | Módulo planejado | Estado |
+| Ferramenta | Módulo | Estado |
 |---|---|---|
-| Tratamento de texto | `core/tools/all_str.py` | a migrar |
+| Tratamento de texto | `core/tools/all_str.py` | pronta |
 | Extrair CNJs | `core/tools/cnj.py` | a migrar |
 | Recortar planilha | `core/tools/cut.py` | a migrar |
 | Mesclar planilhas | `core/tools/merge.py` | a migrar |
