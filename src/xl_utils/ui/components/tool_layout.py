@@ -2,6 +2,7 @@
 
 import asyncio
 import contextlib
+import traceback
 from collections.abc import Callable
 from pathlib import Path
 from typing import Protocol
@@ -9,6 +10,8 @@ from typing import Protocol
 import flet as ft
 
 from xl_utils.core.io import list_sheets
+from xl_utils.core.tools.all_str import WorkbookReadError
+from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.ui import theme
 from xl_utils.ui.components.file_input import FileInput
 from xl_utils.ui.components.result_panel import ResultPanel
@@ -43,6 +46,7 @@ class ToolLayout:
         run_handler: RunHandler | None = None,
     ) -> None:
         self.state = ToolState()
+        self._title = title
         self._run_handler = run_handler
         self._default_all_sheets = default_all_sheets
         self.file_input = FileInput(
@@ -279,18 +283,59 @@ class ToolLayout:
             )
             return
         self.state.running = True
+        self.state.message = ""
+        self.state.error = None
+        self.state.error_detail = None
+        log = RunLog().info(f"Lendo {len(self.state.files)} arquivo(s)...")
+        self.state.log = log
         self.result.set_running()
+        failure: BaseException | None = None
         try:
             self._run_handler(self.state, self.result)
+        except WorkbookReadError as error:
+            failure = error
+            self._fail(error, "Não foi possível ler a planilha")
+        except ValueError as error:
+            failure = error
+            self._fail(error, "Confira a seleção")
         except Exception as error:  # noqa: BLE001 - show any failure in the UI
-            self.state.running = False
-            self.state.error = str(error)
-            self.result.set_error(
-                "Falha ao executar",
-                str(error),
-            )
+            failure = error
+            self._fail(error, "Falha inesperada", include_type=True)
         else:
+            if self.result.kind == "success":
+                log.success(f"Concluído: {self.result.status}")
+            elif self.result.kind == "info":
+                log.warning(self.result.status)
+        finally:
             self.state.running = False
+            self.result.set_log(log)
+            self.result.set_diagnostics(self._diagnostics(failure))
+
+    def _fail(
+        self,
+        error: BaseException,
+        title: str,
+        *,
+        include_type: bool = False,
+    ) -> None:
+        """Show the friendly title, keep the original message and the trace."""
+        self.state.error = str(error)
+        self.state.error_detail = traceback.format_exc()
+        detail = f"{type(error).__name__}: {error}" if include_type else str(error)
+        self.result.set_error(title, detail or type(error).__name__)
+        if self.state.log is not None:
+            self.state.log.error(f"{type(error).__name__}: {error}")
+
+    def _diagnostics(self, error: BaseException | None) -> str:
+        return build_diagnostics(
+            tool=self._title,
+            files=self.state.files,
+            sheets=self.state.selected_sheets,
+            options=self.state.diagnostic_options(),
+            message=self.state.message,
+            error=error,
+            traceback_text=self.state.error_detail,
+        )
 
     def _refresh(self) -> None:
         with contextlib.suppress(RuntimeError):

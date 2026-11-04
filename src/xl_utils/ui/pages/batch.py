@@ -6,6 +6,7 @@ from typing import Protocol
 
 import pandas as pd
 
+from xl_utils.shared.log import RunLog
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.state import ToolState
 
@@ -16,7 +17,7 @@ class Outcome(Protocol):
     """Structure shared by the per-tool outcome dataclasses."""
 
     source: Path
-    log: list[str]
+    log: RunLog
 
 
 def pending_files(state: ToolState, result: ResultPanel) -> Pending | None:
@@ -34,14 +35,21 @@ def pending_files(state: ToolState, result: ResultPanel) -> Pending | None:
     return pending
 
 
-def join_logs(outcomes: Sequence[Outcome]) -> list[str]:
+def join_logs(outcomes: Sequence[Outcome]) -> RunLog:
     """Concatenate per-file logs, keeping one blank line between files."""
-    lines: list[str] = []
+    log = RunLog()
     for outcome in outcomes:
-        if lines:
-            lines.append("")
-        lines.extend(outcome.log)
-    return lines
+        if log:
+            log.info("")
+        log.extend(outcome.log)
+    return log
+
+
+def append_outcomes(state: ToolState, outcomes: Sequence[Outcome]) -> None:
+    """Append the outcome logs to the run log stored in the state."""
+    log = state.log or RunLog()
+    log.extend(join_logs(outcomes))
+    state.log = log
 
 
 def prefixed_frames(

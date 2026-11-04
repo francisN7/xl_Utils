@@ -11,6 +11,7 @@ from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.sheets import filter_sheets
+from xl_utils.shared.log import RunLog
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,7 +21,7 @@ class AllStrOutcome:
     source: Path
     output: Path
     sheets: dict[str, pd.DataFrame]
-    log: list[str]
+    log: RunLog
 
     @property
     def rows(self) -> int:
@@ -36,13 +37,14 @@ def run_all_str(
     destination = default_output_dir(source) / f"{source.stem}.xlsx"
     output = save_workbook(sheets, destination)
 
-    log = [
-        f"Arquivo: {source.name}",
-        f"Tipo detectado: {resolve_suffix(source)}",
-        f"Abas: {len(sheets)}",
-        f"Linhas: {sum(len(frame) for frame in sheets.values())}",
-        f"Saída: {output}",
-    ]
+    log = (
+        RunLog()
+        .info(f"Arquivo: {source.name}")
+        .info(f"Tipo detectado: {resolve_suffix(source)}")
+        .info(f"Abas: {len(sheets)}")
+        .info(f"Linhas: {sum(len(frame) for frame in sheets.values())}")
+        .success(f"Saída: {output}")
+    )
     return AllStrOutcome(
         source=source,
         output=output,

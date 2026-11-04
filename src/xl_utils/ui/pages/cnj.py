@@ -6,7 +6,7 @@ import pandas as pd
 from xl_utils.controllers.cnj import run_cnj
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
-from xl_utils.ui.pages.batch import join_logs, pending_files, prefixed_frames
+from xl_utils.ui.pages.batch import append_outcomes, pending_files, prefixed_frames
 from xl_utils.ui.state import ToolState
 
 
@@ -34,8 +34,8 @@ def run(state: ToolState, result: ResultPanel) -> None:
     if pending is None:
         return
 
-    result.set_log([f"Lendo {len(pending)} arquivo(s)..."])
     outcomes = [run_cnj(source, selected=selected) for source, selected in pending]
+    append_outcomes(state, outcomes)
     frames = prefixed_frames(
         outcomes,
         lambda outcome: {"PROCESSOS": pd.DataFrame({"PROCESSOS": outcome.cnjs})},
@@ -65,8 +65,6 @@ def run(state: ToolState, result: ResultPanel) -> None:
             if len(outcomes) == 1
             else "As planilhas não contêm numeração no padrão CNJ.",
         )
-
-    result.set_log(join_logs(outcomes))
 
 
 def _check(label: str, value: bool = True) -> ft.Checkbox:

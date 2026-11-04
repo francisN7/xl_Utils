@@ -48,6 +48,12 @@ decisões nos ADRs.
   usa uma fixture binária fictícia gerada com `xlwt`.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
+- Log estruturado por execução (`RunLog`) com níveis e evento final, exibido no
+  painel e copiável.
+- “Copiar diagnóstico” com versões do app/Python/pandas/Flet, arquivos, abas,
+  opções, resultado, tipo, mensagem, causa e traceback limitado.
+- Erros da UI separados em leitura da planilha, seleção inválida e falha
+  inesperada, sempre mantendo a mensagem original.
 
 ### Removed
 

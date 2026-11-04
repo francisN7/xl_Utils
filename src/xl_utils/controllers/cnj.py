@@ -12,6 +12,7 @@ from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cnj import collect_cnjs, count_cnjs
 from xl_utils.core.tools.sheets import filter_sheets
+from xl_utils.shared.log import RunLog
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,7 +23,7 @@ class CnjOutcome:
     output: Path
     cnjs: list[str]
     found: int
-    log: list[str]
+    log: RunLog
 
     @property
     def duplicates(self) -> int:
@@ -44,15 +45,16 @@ def run_cnj(
         destination,
     )
 
-    log = [
-        f"Arquivo: {source.name}",
-        f"Tipo detectado: {resolve_suffix(source)}",
-        f"Abas lidas: {len(sheets)} ({', '.join(sheets)})",
-        f"CNJs encontrados: {found}",
-        f"Duplicados removidos: {found - len(cnjs)}",
-        f"CNJs únicos: {len(cnjs)}",
-        f"Saída: {output}",
-    ]
+    log = (
+        RunLog()
+        .info(f"Arquivo: {source.name}")
+        .info(f"Tipo detectado: {resolve_suffix(source)}")
+        .info(f"Abas lidas: {len(sheets)} ({', '.join(sheets)})")
+        .info(f"CNJs encontrados: {found}")
+        .info(f"Duplicados removidos: {found - len(cnjs)}")
+        .info(f"CNJs únicos: {len(cnjs)}")
+        .success(f"Saída: {output}")
+    )
     return CnjOutcome(
         source=source,
         output=output,

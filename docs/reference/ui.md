@@ -104,6 +104,8 @@ A prévia fica **sempre visível** no painel de resultado:
 - primeiras 100 linhas e todas as colunas;
 - rolagem vertical com barra oculta e horizontal com barra só quando precisa;
 - vista fixa de 240 px, com o log limitado a 160 px para não espremer a prévia;
+- “Copiar log” copia os eventos; “Copiar diagnóstico” copia versões, arquivos,
+  abas, opções, resultado e, quando houver, tipo, mensagem, causa e traceback;
 - cabeçalho da tabela com fundo próprio, acompanhando a rolagem;
 - valores vazios aparecem como célula vazia, não como `nan`;
 - a planilha original nunca é alterada.
@@ -142,9 +144,9 @@ abaixo de `FONT_XS`.
 | Selecionado | Arquivos, opções e botão habilitado. |
 | Lendo abas | Spinner “Lendo as abas...” e Executar desabilitado. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
-| Executando | Progresso, botão “Cancelar” e log ao vivo. |
+| Executando | Status amarelo e log inicial. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |
-| Erro | Status vermelho, mensagem tipada e log copiável. |
+| Erro | Status vermelho, título tipado, mensagem original e diagnóstico copiável. |
 
 ## Acessibilidade
 

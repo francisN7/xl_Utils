@@ -14,7 +14,7 @@ from xl_utils.core.tools.merge import (
 )
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
-from xl_utils.ui.pages.batch import pending_files
+from xl_utils.ui.pages.batch import append_outcomes, pending_files
 from xl_utils.ui.state import ToolState
 
 _DRAG_GROUP = "merge-columns"
@@ -343,8 +343,8 @@ def run(state: ToolState, result: ResultPanel) -> None:
     if pending is None:
         return
 
-    result.set_log([f"Lendo {len(pending)} arquivo(s)..."])
     outcome = run_merge(pending, _groups(state) or None)
+    append_outcomes(state, [outcome])
     frames = {"Mesclado": outcome.merged}
     state.result = frames
     state.message = (
@@ -356,7 +356,6 @@ def run(state: ToolState, result: ResultPanel) -> None:
         "Planilhas mescladas",
         f"{state.message} · {len(pending)} arquivo(s)",
     )
-    result.set_log(outcome.log)
 
 
 def _groups(state: ToolState) -> list[ColumnGroup]:

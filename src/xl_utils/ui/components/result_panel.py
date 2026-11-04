@@ -1,12 +1,14 @@
 """Result card: status, output path, log and spreadsheet preview."""
 
 import contextlib
+from collections.abc import Sequence
 from pathlib import Path
 
 import flet as ft
 import pandas as pd
 import pyperclip
 
+from xl_utils.shared.log import RunLog
 from xl_utils.shared.system import open_folder
 from xl_utils.ui import theme
 from xl_utils.ui.components.preview_table import PreviewTable
@@ -19,6 +21,8 @@ class ResultPanel:
 
     def __init__(self) -> None:
         self._output: Path | None = None
+        self._kind = "idle"
+        self._diagnostics = ""
         self.preview = PreviewTable()
 
         self._icon = ft.Icon(ft.Icons.INFO_OUTLINE, color=theme.MUTED, size=18)
@@ -47,6 +51,16 @@ class ResultPanel:
             icon_size=16,
             tooltip="Copiar log",
             on_click=self._copy_log,
+        )
+        self._copy_diagnostics_button = ft.TextButton(
+            "Copiar diagnóstico",
+            icon=ft.Icons.BUG_REPORT,
+            tooltip="Copiar versões, arquivos, opções e traceback",
+            on_click=self._copy_diagnostics,
+            style=ft.ButtonStyle(
+                padding=ft.Padding.symmetric(horizontal=6, vertical=0),
+                text_style=ft.TextStyle(size=theme.FONT_XS),
+            ),
         )
         self._log = ft.Text(
             "",
@@ -77,7 +91,14 @@ class ResultPanel:
                             weight=ft.FontWeight.BOLD,
                             color=theme.MUTED,
                         ),
-                        self._copy_button,
+                        ft.Row(
+                            controls=[
+                                self._copy_diagnostics_button,
+                                self._copy_button,
+                            ],
+                            spacing=0,
+                            tight=True,
+                        ),
                     ],
                     alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                 ),
@@ -113,8 +134,20 @@ class ResultPanel:
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
 
+    @property
+    def kind(self) -> str:
+        """Return the current visual state: idle, info, running, success, error."""
+        return self._kind
+
+    @property
+    def status(self) -> str:
+        """Return the status line currently shown."""
+        return str(self._status.value or "")
+
     def set_idle(self, message: str = "Selecione um arquivo para começar.") -> None:
         self._output = None
+        self._kind = "idle"
+        self._diagnostics = ""
         self._icon.name = ft.Icons.INFO_OUTLINE
         self._icon.color = theme.MUTED
         self._status.value = message
@@ -127,6 +160,7 @@ class ResultPanel:
         self._refresh()
 
     def set_info(self, message: str, detail: str = "") -> None:
+        self._kind = "info"
         self._icon.name = ft.Icons.INFO_OUTLINE
         self._icon.color = theme.CYAN
         self._status.value = message
@@ -134,6 +168,7 @@ class ResultPanel:
         self._refresh()
 
     def set_running(self, message: str = "Executando...") -> None:
+        self._kind = "running"
         self._icon.name = ft.Icons.HOURGLASS_EMPTY
         self._icon.color = theme.YELLOW
         self._status.value = message
@@ -148,6 +183,7 @@ class ResultPanel:
         detail: str = "",
     ) -> None:
         self._output = Path(output_path)
+        self._kind = "success"
         self._icon.name = ft.Icons.CHECK_CIRCLE
         self._icon.color = theme.GREEN
         self._status.value = message
@@ -160,6 +196,7 @@ class ResultPanel:
 
     def set_error(self, message: str, detail: str = "") -> None:
         self._output = None
+        self._kind = "error"
         self._icon.name = ft.Icons.ERROR_OUTLINE
         self._icon.color = theme.RED
         self._status.value = message
@@ -169,11 +206,20 @@ class ResultPanel:
         self.preview.set_frames(None)
         self._refresh()
 
-    def set_log(self, lines: list[str]) -> None:
-        self._log.value = "\n".join(lines)
+    def set_log(self, log: RunLog | Sequence[str]) -> None:
+        if isinstance(log, RunLog):
+            text = log.to_text()
+        else:
+            text = "\n".join(str(line) for line in log)
+        self._log.value = text
+        lines = text.splitlines() if text else []
         self._log_section.visible = bool(lines)
         self._resize_log(len(lines))
         self._refresh()
+
+    def set_diagnostics(self, text: str) -> None:
+        """Store the text used by “Copiar diagnóstico”."""
+        self._diagnostics = text
 
     def append_log(self, line: str) -> None:
         current = self._log.value or ""
@@ -195,6 +241,12 @@ class ResultPanel:
             return
         with contextlib.suppress(Exception):
             pyperclip.copy(self._log.value)
+
+    def _copy_diagnostics(self, _event=None) -> None:
+        if not self._diagnostics:
+            return
+        with contextlib.suppress(Exception):
+            pyperclip.copy(self._diagnostics)
 
     def _refresh(self) -> None:
         with contextlib.suppress(RuntimeError):

@@ -38,6 +38,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que leitura sempre em texto | `adr/0004-leitura-segura-e-emojis.md` | 30 |
 | por que seleção de abas e merge por origem | `adr/0005-selecao-de-abas-e-merge.md` | 35 |
 | por que lote de arquivos e seleção padrão | `adr/0006-lote-de-arquivos.md` | 35 |
+| por que log estruturado e diagnóstico | `adr/0007-log-e-diagnostico.md` | 35 |
 
 ## Regras do mapa
 

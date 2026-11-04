@@ -97,6 +97,23 @@ suportada, a extensão original vence. Formatos: `.xlsx`, `.xlsm`, `.xls`,
 caracteres e caracteres inválidos do Excel). O arquivo de origem nunca é
 alterado.
 
+## Logging e erros
+
+`shared/log.py` define `RunLog`, uma lista ordenada de eventos `(nível, texto)`
+com helpers `info`, `success`, `warning` e `error`. `to_text()` devolve uma linha
+por evento (`[INFO]`, `[OK]`, `[AVISO]`, `[ERRO]`) e a iteração continua
+compatível com listas de strings, então `join_logs` e as prévias seguem iguais.
+Os controllers registram arquivo, tipo, abas, linhas, colunas e saída; a página
+anexa os logs ao `ToolState.log`, e o `ToolLayout` grava o evento final.
+
+`ToolLayout._run` distingue `WorkbookReadError` (“Não foi possível ler a
+planilha”), `ValueError` (“Confira a seleção”) e falhas inesperadas. A mensagem
+original fica no painel, o traceback em `ToolState.error_detail` e o log recebe
+o evento de erro. `build_diagnostics` monta o texto de “Copiar diagnóstico” com
+versões do app, Python, pandas e Flet, arquivos e abas, opções, resultado, tipo,
+mensagem, causa e traceback limitado a 4.000 caracteres. Versão ausente vira
+“desconhecida”; nenhum conteúdo de célula entra no diagnóstico.
+
 ## Ferramentas
 
 | Ferramenta | Módulo | Estado |

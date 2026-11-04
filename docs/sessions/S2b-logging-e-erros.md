@@ -36,11 +36,11 @@ telemetria ou envio automático de diagnóstico; testes de widget.
 
 ## Aceite
 
-- [ ] toda execução produz um log com passos e resultado final
-- [ ] erro mostra título amigável, mensagem original e causa
-- [ ] “Copiar diagnóstico” gera texto com versões, entrada, opções e traceback
-- [ ] log e diagnóstico continuam funcionando no lote e no merge
-- [ ] `ruff`, `pytest` e `docs:check` verdes
+- [x] toda execução produz um log com passos e resultado final
+- [x] erro mostra título amigável, mensagem original e causa
+- [x] “Copiar diagnóstico” gera texto com versões, entrada, opções e traceback
+- [x] log e diagnóstico continuam funcionando no lote e no merge
+- [x] `ruff`, `pytest` e `docs:check` verdes
 
 ## Orçamento de contexto (≤90 linhas)
 

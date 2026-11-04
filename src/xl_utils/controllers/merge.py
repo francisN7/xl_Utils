@@ -11,6 +11,7 @@ from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.merge import ColumnGroup, ColumnRef, merge_sheets
 from xl_utils.core.tools.sheets import filter_sheets
+from xl_utils.shared.log import RunLog
 
 Source = tuple[Path, Collection[str] | None]
 
@@ -23,7 +24,7 @@ class MergeOutcome:
     merged: pd.DataFrame
     output: Path
     sheets: int
-    log: list[str]
+    log: RunLog
 
     @property
     def rows(self) -> int:
@@ -76,10 +77,10 @@ def run_merge(
     destination = default_output_dir(loaded[0][0]) / "Merge.xlsx"
     output = save_workbook({"Mesclado": merged}, destination)
 
-    log: list[str] = []
+    log = RunLog()
     for source, sheets in loaded:
         if log:
-            log.append("")
+            log.info("")
         columns: dict[str, None] = {}
         for frame in sheets.values():
             for name in frame.columns:
@@ -93,15 +94,11 @@ def run_merge(
             ]
         )
 
-    log.extend(
-        [
-            "",
-            f"Abas mescladas: {usable}",
-            f"Linhas mescladas: {len(merged)}",
-            f"Colunas no resultado: {len(merged.columns)}",
-            f"Saída: {output}",
-        ]
-    )
+    log.info("")
+    log.info(f"Abas mescladas: {usable}")
+    log.info(f"Linhas mescladas: {len(merged)}")
+    log.info(f"Colunas no resultado: {len(merged.columns)}")
+    log.success(f"Saída: {output}")
 
     return MergeOutcome(
         sources=tuple(source for source, _ in loaded),

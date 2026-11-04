@@ -7,6 +7,7 @@ from pathlib import Path
 import pandas as pd
 
 from xl_utils.core.tools.sheets import default_selection
+from xl_utils.shared.log import RunLog
 
 
 @dataclass
@@ -24,6 +25,8 @@ class ToolState:
     selected_sheets: dict[Path, set[str]] = field(default_factory=dict)
     message: str = ""
     error: str | None = None
+    error_detail: str | None = None
+    log: RunLog | None = None
     running: bool = False
 
     @property
@@ -44,7 +47,19 @@ class ToolState:
         self.selected_sheets = {}
         self.message = ""
         self.error = None
+        self.error_detail = None
+        self.log = None
         self.running = False
+
+    def diagnostic_options(self) -> dict[str, object]:
+        """Return the current option values as plain, readable data."""
+        values: dict[str, object] = {}
+        for name, raw in self.options.items():
+            value = getattr(raw, "value", raw)
+            if value is None or value == "":
+                continue
+            values[name] = value
+        return values
 
     def set_sheet_names(
         self,
@@ -66,4 +81,6 @@ class ToolState:
         self.selected_sheets.clear()
         self.message = ""
         self.error = None
+        self.error_detail = None
+        self.log = None
         self.running = False

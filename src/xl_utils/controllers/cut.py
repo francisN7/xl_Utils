@@ -12,6 +12,7 @@ from xl_utils.core.paths import default_output_dir
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cut import split_workbook
 from xl_utils.core.tools.sheets import filter_sheets
+from xl_utils.shared.log import RunLog
 
 _INVALID_FILE_CHARS = frozenset('<>:"/\\|?*')
 _MAX_FILE_PART = 80
@@ -25,7 +26,7 @@ class CutOutcome:
     outputs: list[Path]
     parts: dict[str, list[pd.DataFrame]]
     preview: dict[str, pd.DataFrame]
-    log: list[str]
+    log: RunLog
 
     @property
     def files(self) -> int:
@@ -66,15 +67,16 @@ def run_cut(
     first_sheet = next(iter(parts), "")
     preview = {first_sheet: parts[first_sheet][0]} if first_sheet else {}
     total_rows = sum(len(frame) for frames in parts.values() for frame in frames)
-    log = [
-        f"Arquivo: {source.name}",
-        f"Tipo detectado: {resolve_suffix(source)}",
-        f"Abas: {len(parts)}",
-        f"Linhas: {total_rows}",
-        f"Linhas por arquivo: {rows_per_file}",
-        f"Arquivos gerados: {len(outputs)}",
-        *(f"Saída: {output}" for output in outputs),
-    ]
+    log = (
+        RunLog()
+        .info(f"Arquivo: {source.name}")
+        .info(f"Tipo detectado: {resolve_suffix(source)}")
+        .info(f"Abas: {len(parts)}")
+        .info(f"Linhas: {total_rows}")
+        .info(f"Linhas por arquivo: {rows_per_file}")
+        .success(f"Arquivos gerados: {len(outputs)}")
+    )
+    log.extend(f"Saída: {output}" for output in outputs)
 
     return CutOutcome(
         source=source,
