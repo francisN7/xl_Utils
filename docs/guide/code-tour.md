@@ -23,7 +23,7 @@ app.py                          monta a janela e a navegação
 └─ ui/pages/registry.py         lista as quatro ferramentas
    └─ ui/pages/<ferramenta>.py  conecta a página ao controller
       └─ ui/components/tool_layout.py
-         │                      ciclo: entrada → formato → execução → prévia
+         │                      ciclo: entrada → formato → execução em segundo plano → prévia
          └─ controllers/<ferramenta>.py
             │                   orquestra leitura, seleção e SaveItem
             └─ core/tools/all_str.py
@@ -47,13 +47,17 @@ entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 
 ### 2. Ciclo de uma ferramenta — `ui/components/tool_layout.py`
 
-`_run` é o coração: lê o `ToolState`, chama `_check_formats`, bloqueia formato
-não identificado, dispara o controller e entrega o resultado ao painel. A
-gravação fica em `_save_clicked`/`_pick_and_save`, que só gravam depois da
+`_run` é o coração: valida o `ToolState`, chama `_check_formats`, bloqueia
+formato não identificado e entrega o handler a `_execute_async`. Com página, o
+trabalho vai para `asyncio.to_thread`; sem página, roda no próprio loop. Os
+marcos de `shared/progress.py` voltam por uma fila e atualizam a barra no loop.
+A gravação fica em `_save_clicked`/`_pick_and_save`, que só gravam depois da
 escolha.
 
 **Observe:** `_check_formats` é o gate de formato; ele não renomeia o arquivo.
-`_fail` separa `WorkbookReadError`, `ValueError` e falha inesperada.
+`_fail` separa `WorkbookReadError`, `ValueError` e falha inesperada. Nenhum
+`update` de UI parte da thread de trabalho: `ResultPanel` e `PreviewTable` usam
+o dispatcher do loop.
 
 ### 3. Uma página — `ui/pages/all_str.py`
 
@@ -121,6 +125,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_merge.py` | ordem, `ORIGEM`, lacunas e colunas repetidas |
 | `test_save.py` | nada é gravado antes da escolha e o lote usa pasta |
 | `test_format_check.py` | conteúdo vence o nome e `.xlsm` não é divergência |
+| `test_progress.py` | a contagem por arquivo para no total e isola callback |
 | `test_integration.py` | as quatro ferramentas rodam nos quatro formatos |
 
 ## Onde mexer para…
@@ -134,6 +139,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |
 | mudar a regra do merge | `core/tools/merge.py` |
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
+| mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |
 
 ## Invariantes
 
@@ -143,6 +149,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 - O arquivo do usuário nunca é renomeado nem alterado.
 - Nada é gravado antes da escolha; `SaveItem` vive em memória.
 - Erros de leitura e escrita são tipados (`WorkbookReadError`, `SaveError`).
+- A UI só é atualizada no loop da página; a thread de trabalho usa fila.
 
 ## Limites conhecidos
 

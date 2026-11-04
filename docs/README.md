@@ -47,6 +47,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que salvar só depois da escolha | `adr/0008-saida-escolhida.md` | 35 |
 | por que `main` tem UI e `legacy` só história | `adr/0009-publicacao-main-legacy.md` | 35 |
 | por que CSV/HTML são lidos com separador e `NA` | `adr/0010-leitura-fiel-csv-html.md` | 30 |
+| por que a execução sai da UI thread | `adr/0011-execucao-fora-da-ui.md` | 35 |
 
 ## Regras do mapa
 

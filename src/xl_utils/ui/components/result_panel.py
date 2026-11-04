@@ -9,11 +9,14 @@ import pandas as pd
 import pyperclip
 
 from xl_utils.shared.log import RunLog
+from xl_utils.shared.progress import ProgressEvent
 from xl_utils.shared.system import open_folder
 from xl_utils.ui import theme
 from xl_utils.ui.components.preview_table import PreviewTable
 
 _LOG_MAX_HEIGHT = 160
+
+Dispatcher = Callable[[Callable[[], None]], None]
 
 
 class ResultPanel:
@@ -30,6 +33,7 @@ class ResultPanel:
         self._output: Path | None = None
         self._kind = "idle"
         self._diagnostics = ""
+        self._dispatch: Dispatcher | None = None
         self.preview = PreviewTable()
 
         self._icon = ft.Icon(ft.Icons.INFO_OUTLINE, color=theme.MUTED, size=18)
@@ -39,6 +43,19 @@ class ResultPanel:
             weight=ft.FontWeight.BOLD,
         )
         self._detail = ft.Text("", size=theme.FONT_SM, color=theme.MUTED)
+        self._progress_text = ft.Text(
+            "",
+            size=theme.FONT_XS,
+            color=theme.MUTED,
+            visible=False,
+        )
+        self._progress_bar = ft.ProgressBar(
+            value=0,
+            bar_height=4,
+            color=theme.PURPLE,
+            bgcolor=theme.BORDER,
+            visible=False,
+        )
         self._path = ft.Text(
             "",
             size=theme.FONT_XS,
@@ -154,6 +171,10 @@ class ResultPanel:
                     ],
                     spacing=10,
                 ),
+                ft.Column(
+                    controls=[self._progress_text, self._progress_bar],
+                    spacing=4,
+                ),
                 self._path,
                 self._save_row,
                 ft.Row(
@@ -183,6 +204,32 @@ class ResultPanel:
         """Devolve o texto guardado para “Copiar diagnóstico”."""
         return self._diagnostics
 
+    def set_dispatcher(self, dispatch: Dispatcher | None) -> None:
+        """Agenda as atualizações no loop da página, fora da thread de trabalho."""
+        self._dispatch = dispatch
+        self.preview.set_dispatcher(dispatch)
+
+    def start_progress(self, total: int) -> None:
+        """Mostra a barra zerada antes do primeiro arquivo."""
+        self._progress_bar.value = 0
+        self._progress_bar.visible = True
+        self._progress_text.value = f"Arquivo 0 de {total}"
+        self._progress_text.visible = True
+        self._refresh()
+
+    def apply_progress(self, event: ProgressEvent) -> None:
+        """Atualiza a barra e o contador; o resultado final esconde os dois."""
+        visible = self._kind == "running"
+        self._progress_bar.value = event.value
+        self._progress_bar.visible = visible
+        self._progress_text.value = event.text
+        self._progress_text.visible = visible
+        self._refresh()
+
+    def _hide_progress(self) -> None:
+        self._progress_bar.visible = False
+        self._progress_text.visible = False
+
     def set_idle(self, message: str = "Selecione um arquivo para começar.") -> None:
         self._output = None
         self._kind = "idle"
@@ -195,6 +242,7 @@ class ResultPanel:
         self._path.visible = False
         self._open_button.visible = False
         self._save_row.visible = False
+        self._hide_progress()
         self.set_log([])
         self.preview.set_frames(None)
         self._refresh()
@@ -206,6 +254,7 @@ class ResultPanel:
         self._status.value = message
         self._detail.value = detail
         self._save_row.visible = False
+        self._hide_progress()
         self._refresh()
 
     def set_running(self, message: str = "Executando...") -> None:
@@ -234,6 +283,7 @@ class ResultPanel:
         self._path.visible = False
         self._open_button.visible = False
         self._save_row.visible = True
+        self._hide_progress()
         self.preview.set_frames(frames)
         self._refresh()
 
@@ -244,6 +294,7 @@ class ResultPanel:
         self._status.value = message
         self._detail.value = ""
         self._save_row.visible = False
+        self._hide_progress()
         self._refresh()
 
     def set_success(
@@ -263,6 +314,7 @@ class ResultPanel:
         self._path.visible = True
         self._open_button.visible = True
         self._save_row.visible = False
+        self._hide_progress()
         self.preview.set_frames(frames)
         self._refresh()
 
@@ -277,6 +329,7 @@ class ResultPanel:
         self._path.visible = False
         self._open_button.visible = False
         self._save_row.visible = True
+        self._hide_progress()
         self._refresh()
 
     def set_error(
@@ -295,6 +348,7 @@ class ResultPanel:
         self._path.visible = False
         self._open_button.visible = False
         self._save_row.visible = False
+        self._hide_progress()
         if not keep_preview:
             self.preview.set_frames(None)
         self._refresh()
@@ -350,5 +404,11 @@ class ResultPanel:
             pyperclip.copy(self._diagnostics)
 
     def _refresh(self) -> None:
+        if self._dispatch is not None:
+            self._dispatch(self._update_now)
+            return
+        self._update_now()
+
+    def _update_now(self) -> None:
         with contextlib.suppress(RuntimeError):
             self.control.update()

@@ -7,9 +7,8 @@ Ciclo ativo: **0004 — Execução e robustez**. O ciclo anterior está em
 
 Objetivo: manter a janela responsiva e mostrar o andamento em execuções longas.
 
-- [ ] **S5a — Execução fora da UI thread e barra de progresso.** Rodar o
-  controller em segundo plano, exibir barra e contador por arquivo e bloquear
-  novas execuções enquanto roda. Custo M.
+- [x] **S5a — Execução fora da UI thread e barra de progresso.** Handler em
+  segundo plano, barra e contador por arquivo, entrada bloqueada. Ver ADR 0011.
 - [ ] **S5b — Log ao vivo e cancelamento.** Exibir os eventos conforme são
   produzidos e permitir cancelar entre arquivos/abas/células, sem gravar nada.
   Depende de S5a. Custo M.
@@ -63,6 +62,8 @@ comportamento atual.
 
 ## Notas do ciclo
 
+- A S5a deixou a fila de progresso pronta; a S5b reusa o mesmo caminho para log
+  ao vivo e cancelamento entre arquivos.
 - A S4c fechou o ciclo 0003; o resumo está em
   [`0003-qualidade.md`](0003-qualidade.md).
 - O template de spec foi versionado e o `docs:check` voltou a passar no CI.

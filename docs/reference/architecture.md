@@ -10,9 +10,9 @@ guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 | Camada | Pasta | Regra |
 |---|---|---|
 | Core | `src/xl_utils/core/` | Regra pura, sem Flet, sem diálogo, sem `print`. |
-| Controllers | `src/xl_utils/controllers/` | Orquestra core + threading + progresso. |
-| UI | `src/xl_utils/ui/` | Coleta entrada e exibe resultado; não contém regra. |
-| Shared | `src/xl_utils/shared/` | Log de execução, diagnóstico e abertura de pasta. |
+| Controllers | `src/xl_utils/controllers/` | Orquestra o core e devolve dados em memória. |
+| UI | `src/xl_utils/ui/` | Coleta entrada, executa em segundo plano e exibe resultado; não contém regra. |
+| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso e abertura de pasta. |
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 
@@ -167,6 +167,22 @@ divergência, opções, resultado, tipo, mensagem, causa e traceback limitado a
 4.000 caracteres. Versão ausente vira “desconhecida”; nenhum conteúdo de célula
 entra no diagnóstico.
 
+## Execução e progresso
+
+`ToolLayout._run` valida o formato no loop da página e, quando existe página com
+`run_task`, agenda `_execute_async`. O handler roda em `asyncio.to_thread`; os
+marcos de `shared/progress.py` (`start`, `file_started`, `file_done`, `finish`)
+viram `ProgressEvent` e chegam ao loop por uma `asyncio.Queue` alimentada com
+`call_soon_threadsafe`. A barra e o texto “Arquivo X de Y” ficam no painel de
+resultado. `ResultPanel` e `PreviewTable` recebem um dispatcher para que o
+`update` também seja agendado no loop; a thread de trabalho nunca chama a UI.
+
+Sem página (testes headless), o handler roda no próprio loop com um reporter
+síncrono. O estado da ferramenta é preenchido durante a execução, mas a entrada,
+os chips de abas e “Executar” ficam desabilitados até `_finish`. Merge reporta
+uma etapa única porque o controller mescla todas as fontes de uma vez. Ver
+ADR 0011.
+
 ## Ferramentas
 
 | Ferramenta | Módulo | Estado |
@@ -254,3 +270,5 @@ e **sem** adicionar a dependência ao projeto.
 - [ADR 0008](../adr/0008-saida-escolhida.md) — saída escolhida depois da prévia.
 - [ADR 0010](../adr/0010-leitura-fiel-csv-html.md) — CSV/HTML fiéis e `NA` como
   texto.
+- [ADR 0011](../adr/0011-execucao-fora-da-ui.md) — execução fora da UI thread e
+  progresso por arquivo.

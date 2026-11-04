@@ -3,6 +3,7 @@
 import flet as ft
 
 from xl_utils.controllers.cut import run_cut
+from xl_utils.shared.progress import NullReporter, ProgressReporter
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.pages.batch import append_outcomes, pending_files, prefixed_frames
@@ -34,7 +35,11 @@ def options(state: ToolState) -> ft.Control:
     )
 
 
-def run(state: ToolState, result: ResultPanel) -> None:
+def run(
+    state: ToolState,
+    result: ResultPanel,
+    progress: ProgressReporter | NullReporter,
+) -> None:
     """Recorta cada arquivo selecionado e mostra os arquivos gerados."""
     if not state.files:
         result.set_info(
@@ -48,10 +53,11 @@ def run(state: ToolState, result: ResultPanel) -> None:
         return
 
     rows_per_file = _rows_per_file(state)
-    outcomes = [
-        run_cut(source, rows_per_file, selected=selected)
-        for source, selected in pending
-    ]
+    outcomes = []
+    for source, selected in pending:
+        progress.file_started(source.name)
+        outcomes.append(run_cut(source, rows_per_file, selected=selected))
+        progress.file_done(source.name)
     append_outcomes(state, outcomes)
 
     items = [item for outcome in outcomes for item in outcome.items]

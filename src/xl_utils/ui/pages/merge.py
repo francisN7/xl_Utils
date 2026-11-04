@@ -12,6 +12,7 @@ from xl_utils.core.tools.merge import (
     group_by_name,
     move_column,
 )
+from xl_utils.shared.progress import NullReporter, ProgressReporter
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.pages.batch import append_outcomes, pending_files
@@ -330,7 +331,11 @@ def options(state: ToolState) -> MergeOptions:
     return MergeOptions(state)
 
 
-def run(state: ToolState, result: ResultPanel) -> None:
+def run(
+    state: ToolState,
+    result: ResultPanel,
+    progress: ProgressReporter | NullReporter,
+) -> None:
     """Mescla cada arquivo e aba selecionados em uma única pasta de trabalho."""
     if not state.files:
         result.set_info(
@@ -343,7 +348,10 @@ def run(state: ToolState, result: ResultPanel) -> None:
     if pending is None:
         return
 
+    progress.start(1)
+    progress.file_started(f"mesclagem de {len(pending)} arquivo(s)")
     outcome = run_merge(pending, _groups(state) or None)
+    progress.file_done()
     append_outcomes(state, [outcome])
     frames = {"Mesclado": outcome.merged}
     state.result = frames

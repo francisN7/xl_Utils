@@ -8,6 +8,7 @@ import pytest
 from xl_utils.controllers.all_str import run_all_str
 from xl_utils.core.io import read_workbook
 from xl_utils.core.save import SaveError, SaveItem, save_chosen, save_to_output
+from xl_utils.shared.progress import NullReporter
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.pages.all_str import run as run_all_str_page
 from xl_utils.ui.state import ToolState
@@ -126,7 +127,7 @@ def test_page_run_leaves_the_result_ready_to_save(tmp_path: Path) -> None:
     )
     panel = ResultPanel()
 
-    run_all_str_page(state, panel)
+    run_all_str_page(state, panel, NullReporter())
 
     assert panel.kind == "ready"
     assert [item.suggested_name for item in state.save_items] == ["entrada.xlsx"]

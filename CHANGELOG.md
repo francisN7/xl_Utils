@@ -74,6 +74,9 @@ decisões nos ADRs.
   em PT-BR.
 - Comando global documentado (`uv tool install --editable .`) e ADR 0010 sobre
   leitura fiel de CSV/HTML.
+- Execução em segundo plano nas quatro ferramentas: o handler roda fora do loop
+  da página, com barra de progresso e “Arquivo X de Y”, entrada e chips
+  bloqueados e atualizações de UI sempre no loop. Ver ADR 0011.
 
 ### Changed
 

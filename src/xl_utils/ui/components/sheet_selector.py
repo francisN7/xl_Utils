@@ -28,6 +28,7 @@ class SheetSelector:
         self._on_change = on_change
         self._failures: list[str] = []
         self._loading = False
+        self._busy = False
 
         self._counter = ft.Text(size=theme.FONT_XS, color=theme.MUTED)
         self._groups = ft.Column(spacing=10)
@@ -98,6 +99,11 @@ class SheetSelector:
         self._loading = loading
         self.refresh()
 
+    def set_busy(self, busy: bool) -> None:
+        """Bloqueia a troca de abas durante uma execução."""
+        self._busy = busy
+        self.refresh()
+
     def refresh(self) -> None:
         """Reconstrói os chips a partir do estado e atualiza o contador."""
         state = self._state
@@ -108,8 +114,9 @@ class SheetSelector:
             if self._loading
             else f"{state.selected_count} de {state.sheet_count}"
         )
-        self._all_button.disabled = self._loading or state.sheet_count == 0
-        self._clear_button.disabled = self._loading or state.sheet_count == 0
+        blocked = self._loading or self._busy
+        self._all_button.disabled = blocked or state.sheet_count == 0
+        self._clear_button.disabled = blocked or state.sheet_count == 0
 
         if self._loading:
             self._groups.controls = []
@@ -190,6 +197,7 @@ class SheetSelector:
             border_radius=999,
             padding=ft.Padding.symmetric(vertical=6, horizontal=10),
             ink=True,
+            disabled=self._busy,
             on_click=lambda _event, item=path, sheet=name: self._toggle(item, sheet),
             tooltip=f"{name} (clique para alternar)",
         )

@@ -25,6 +25,7 @@ class FileInput:
         self._multiple = multiple
         self._files: list[Path] = []
         self._formats: dict[Path, FormatCheck] = {}
+        self._busy = False
         self._picker = ft.FilePicker()
         self._picker_attached = False
 
@@ -106,6 +107,11 @@ class FileInput:
         self._formats = {check.path: check for check in checks}
         self._render()
 
+    def set_busy(self, busy: bool) -> None:
+        """Bloqueia a troca de arquivos enquanto uma execução está em andamento."""
+        self._busy = busy
+        self._render()
+
     def _remove(self, path: Path) -> None:
         self._files = [item for item in self._files if item != path]
         self._render()
@@ -126,6 +132,7 @@ class FileInput:
                 else "Clique para selecionar a planilha"
             )
         self._dropzone.visible = self._multiple or not self._files
+        self._dropzone.disabled = self._busy
         self._refresh()
 
     def _file_row(self, path: Path) -> ft.Control:
@@ -157,6 +164,7 @@ class FileInput:
                         icon=ft.Icons.CLOSE,
                         icon_size=16,
                         tooltip="Remover",
+                        disabled=self._busy,
                         on_click=lambda _event, item=path: self._remove(item),
                     ),
                 ],

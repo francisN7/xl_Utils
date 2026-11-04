@@ -1,6 +1,7 @@
 """Prévia de planilha somente leitura, limitada às primeiras linhas."""
 
 import contextlib
+from collections.abc import Callable
 
 import flet as ft
 import pandas as pd
@@ -9,12 +10,15 @@ from xl_utils.ui import theme
 
 MAX_ROWS = 100
 
+Dispatcher = Callable[[Callable[[], None]], None]
+
 
 class PreviewTable:
     """Mostra as primeiras linhas de uma aba de resultado."""
 
     def __init__(self) -> None:
         self._frames: dict[str, pd.DataFrame] = {}
+        self._dispatch: Dispatcher | None = None
         self._sheet = ft.Dropdown(
             visible=False,
             dense=True,
@@ -50,6 +54,10 @@ class PreviewTable:
             spacing=8,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
+
+    def set_dispatcher(self, dispatch: Dispatcher | None) -> None:
+        """Agenda as atualizações no loop da página."""
+        self._dispatch = dispatch
 
     def set_frames(self, frames: dict[str, pd.DataFrame] | None) -> None:
         self._frames = dict(frames or {})
@@ -135,6 +143,12 @@ class PreviewTable:
         )
 
     def _refresh(self) -> None:
+        if self._dispatch is not None:
+            self._dispatch(self._update_now)
+            return
+        self._update_now()
+
+    def _update_now(self) -> None:
         with contextlib.suppress(RuntimeError):
             self.control.update()
 

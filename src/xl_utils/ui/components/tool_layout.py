@@ -14,13 +14,21 @@ from xl_utils.core.mime import FormatCheck, check_format
 from xl_utils.core.save import SaveError, SaveItem, save_chosen, save_to_output
 from xl_utils.core.tools.all_str import WorkbookReadError
 from xl_utils.shared.log import RunLog, build_diagnostics
+from xl_utils.shared.progress import (
+    NullReporter,
+    ProgressEvent,
+    ProgressReporter,
+)
 from xl_utils.ui import theme
 from xl_utils.ui.components.file_input import FileInput
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.components.sheet_selector import SheetSelector
 from xl_utils.ui.state import ToolState
 
-RunHandler = Callable[[ToolState, ResultPanel], None]
+RunHandler = Callable[
+    [ToolState, ResultPanel, ProgressReporter | NullReporter],
+    None,
+]
 
 
 class OptionsPanel(Protocol):
@@ -62,6 +70,7 @@ class ToolLayout:
         )
         self._formats: dict[Path, FormatCheck] = {}
         self._sheet_loading = False
+        self._running = False
         self._save_picker = ft.FilePicker()
         self._save_picker_attached = False
         self.sheet_selector = SheetSelector(
@@ -291,6 +300,8 @@ class ToolLayout:
             self._options_refresh()
 
     def _run(self, _event=None) -> None:
+        if self._running:
+            return
         if self._sheet_loading:
             self.result.set_info(
                 "Lendo as abas...",
@@ -308,6 +319,16 @@ class ToolLayout:
                 "A lógica será conectada na sessão desta ferramenta.",
             )
             return
+        self._begin(checks)
+        page = self._page()
+        if page is None or not hasattr(page, "run_task"):
+            self._execute_sync()
+        else:
+            page.run_task(self._execute_async)
+
+    def _begin(self, checks: list[FormatCheck]) -> None:
+        """Prepara o estado e o painel antes de entregar o trabalho à thread."""
+        self._running = True
         self.state.running = True
         self.state.message = ""
         self.state.error = None
@@ -324,10 +345,66 @@ class ToolLayout:
                 log.info(f"{check.path.name}: lido como {check.effective}")
         log.info(f"Lendo {len(self.state.files)} arquivo(s)...")
         self.state.log = log
-        self.result.set_running()
+        self.result.set_running(f"Executando {len(self.state.files)} arquivo(s)...")
+        self.result.start_progress(len(self.state.files))
+        self._set_busy(True)
+
+    def _execute_sync(self) -> None:
+        """Executa no próprio loop quando não há página (testes headless)."""
+        reporter = ProgressReporter(self.result.apply_progress)
+        try:
+            self._execute(reporter)
+        finally:
+            self._finish()
+
+    async def _execute_async(self) -> None:
+        """Roda o handler em uma thread e consome os eventos no loop da página."""
+        loop = asyncio.get_running_loop()
+        events: asyncio.Queue[ProgressEvent] = asyncio.Queue()
+
+        def emit(event: ProgressEvent) -> None:
+            with contextlib.suppress(RuntimeError):
+                loop.call_soon_threadsafe(events.put_nowait, event)
+
+        def warn(message: str) -> None:
+            if self.state.log is not None:
+                self.state.log.warning(message)
+
+        reporter = ProgressReporter(emit, on_error=warn)
+        self.result.set_dispatcher(loop.call_soon_threadsafe)
+
+        async def execute_and_finish() -> None:
+            try:
+                await asyncio.to_thread(self._execute, reporter)
+            finally:
+                reporter.finish()
+                events.put_nowait(
+                    ProgressEvent(
+                        kind="finish",
+                        total=reporter.total,
+                        completed=reporter.completed,
+                    )
+                )
+
+        worker = asyncio.create_task(execute_and_finish())
+        try:
+            while True:
+                event = await events.get()
+                self.result.apply_progress(event)
+                if event.kind == "finish":
+                    break
+            await worker
+        finally:
+            self.result.set_dispatcher(None)
+            self._finish()
+
+    def _execute(self, progress: ProgressReporter | NullReporter) -> None:
+        """Chama o handler e registra o resultado da execução."""
+        progress.start(len(self.state.files))
+        log = self.state.log or RunLog()
         failure: BaseException | None = None
         try:
-            self._run_handler(self.state, self.result)
+            self._run_handler(self.state, self.result, progress)
         except WorkbookReadError as error:
             failure = error
             self._fail(error, "Não foi possível ler a planilha")
@@ -345,9 +422,20 @@ class ToolLayout:
             elif self.result.kind == "info":
                 log.warning(self.result.status)
         finally:
-            self.state.running = False
             self.result.set_log(log)
             self.result.set_diagnostics(self._diagnostics(failure))
+
+    def _finish(self) -> None:
+        """Devolve o controle à janela depois da execução."""
+        self._running = False
+        self.state.running = False
+        self._set_busy(False)
+
+    def _set_busy(self, busy: bool) -> None:
+        self._run_button.disabled = busy or self._sheet_loading or not self.state.files
+        self.file_input.set_busy(busy)
+        self.sheet_selector.set_busy(busy)
+        self._refresh()
 
     def _block_formats(self, failures: list[FormatCheck]) -> None:
         """Para a execução antes da leitura se nenhum formato for identificado."""
