@@ -35,4 +35,5 @@ samples/
 process.json
 captureds.py
 *temp*
+!docs/sessions/_TEMPLATE.md
 PJE.py
