@@ -54,7 +54,8 @@ decisões nos ADRs.
 - Branch `cli-app` e a tentativa de interface por linha de comando.
 - Ferramentas `convert`, `quick_replace` e `remove_emoji` (emojis passam para o
   pipeline do `all_str`).
-- Dependências `demoji`, `file-picker-py`, `xlsx2csv` e `click`.
+- Dependências `demoji`, `file-picker-py`, `xlsx2csv`, `click` e `xlrd`; o
+  `.xls` passou a ler pelo engine `calamine` (`python-calamine`).
 
 ### Fixed
 

@@ -41,8 +41,7 @@ diagnóstico com versões, arquivos, abas, opções e traceback.
 - Flet 1.0 não suporta drop de arquivos do SO nem drag de colunas.
 - Flet 1.0 usa `Dropdown.on_select`, não `on_change`.
 - `puremagic` lê HTML como `.txt`; `resolve_suffix` usa a extensão original.
-- Pandas 3.1 avisa que o engine `xlrd` será removido; migrar para `calamine`
-  antes do pandas 4.
+- `.xls` é lido com o engine `calamine` (`python-calamine`); `xlrd` saiu.
 - HTML sem `<meta charset>` pode perder acentos; as fixtures declaram UTF-8.
 - `read_html` não aceita `dtype`; a segunda passada com converters é necessária.
 - `merge` marca só a primeira aba por arquivo quando há vários.

@@ -28,7 +28,7 @@ def read_workbook(
         case ".xlsx" | ".xlsm":
             return _read_excel(path, dtype=dtype, engine="openpyxl")
         case ".xls":
-            return _read_excel(path, dtype=dtype, engine="xlrd")
+            return _read_excel(path, dtype=dtype, engine="calamine")
         case ".csv":
             return {"Planilha1": pd.read_csv(path, dtype=dtype)}
         case ".html" | ".htm":
@@ -50,7 +50,7 @@ def list_sheets(path: Path) -> list[str]:
     if suffix in {".html", ".htm"}:
         return _list_html_sheets(path)
     if suffix in {".xlsx", ".xlsm", ".xls"}:
-        engine = "xlrd" if suffix == ".xls" else "openpyxl"
+        engine = "calamine" if suffix == ".xls" else "openpyxl"
         return _excel_sheet_names(path, engine=engine)
 
     raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
@@ -69,7 +69,7 @@ def read_headers(path: Path) -> dict[str, list[str]]:
     try:
         match suffix:
             case ".xlsx" | ".xlsm" | ".xls":
-                engine = "xlrd" if suffix == ".xls" else "openpyxl"
+                engine = "calamine" if suffix == ".xls" else "openpyxl"
                 frames = pd.read_excel(path, sheet_name=None, nrows=0, engine=engine)
                 return {
                     str(name): [str(column) for column in frame.columns]

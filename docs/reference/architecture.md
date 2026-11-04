@@ -37,10 +37,12 @@ específica:
 3. preserva o texto da célula, inclusive quebras de linha;
 4. só tenta reparo quando a leitura falha, sem `shell=True`.
 
-`core/tools/all_str.py` expõe `prepare_workbook(path)`, que devolve
-`{nome_da_aba: DataFrame}` já limpo. As demais ferramentas importam essa função
-antes de aplicar a própria regra. `controllers/all_str.py` orquestra a leitura,
-a gravação em `output/` e o log; `ui/pages/all_str.py` só conecta a página.
+Excel é lido com `openpyxl` para `.xlsx`/`.xlsm` e com `calamine` para `.xls`
+(pacote `python-calamine`). `core/tools/all_str.py` expõe
+`prepare_workbook(path)`, que devolve `{nome_da_aba: DataFrame}` já limpo. As
+demais ferramentas importam essa função antes de aplicar a própria regra.
+`controllers/all_str.py` orquestra a leitura, a gravação em `output/` e o log;
+`ui/pages/all_str.py` só conecta a página.
 
 Quando a leitura normal falha, o pipeline tenta **um** leitor mais tolerante,
 de acordo com o formato real: `openpyxl` em modo somente leitura para
