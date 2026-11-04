@@ -6,49 +6,41 @@
 
 - **Última concluída:** S4c — tradução de `ui/`/`shared/` e revisão do
   diagnóstico
-- **Próxima:** nenhuma definida; aguardando feedback do dono sobre o backlog em
-  `docs/roadmap/main.md`
-- **Ciclo:** 0003 fechado em `docs/roadmap/0003-qualidade.md`; nenhum ciclo ativo
-- **Decisões abertas:** qual item do backlog vira a próxima sessão, quando
-  houver um novo ciclo
+- **Próxima:** S5a — execução fora da UI thread e barra de progresso
+  (`docs/sessions/S5a-execucao-fora-da-ui.md`) — spec pronta
+- **Ciclo:** 0004 — Execução e robustez, Fase 1
+- **Decisões:** quatro sessões aprovadas; recorte por aba; CNJ sem validar
+  dígito verificador
 
 ## Pronto
 
-- `ui/`, `shared/`, shell (`app.py`) e `__init__` com docstrings e comentários
-  em PT-BR; identificadores seguem em inglês.
-- `build_diagnostics` revisado: versões, caminho do arquivo, abas por nome,
-  formato, opções, resultado, erro, causa e traceback limitado a 4.000
-  caracteres; nenhum conteúdo de célula entra no texto.
-- `AGENTS.md` sem o backlog de tradução; `reference/architecture.md` corrigido
-  para a composição real de `shared/`.
-- S4b anterior: CSV/HTML fiéis, `.xlsm` equivalente a `.xlsx`, `.xls` sem falso
-  reparo, core/controllers em PT-BR e code tour publicado.
-- Ciclo 0002 em `docs/roadmap/0002-migracao.md`; specs de fases fechadas fora do
-  working tree.
+- Planejamento do ciclo 0004 e spec da S5a.
+- CI corrigido: template de spec versionado; `docs:check` verde.
+- S4c: `ui/`, `shared/`, shell e `__init__` em PT-BR; diagnóstico revisado.
+- S4b: CSV/HTML fiéis, `.xlsm` equivalente a `.xlsx`, `.xls` sem falso reparo
+  e code tour publicado.
+- Ciclos 0002 e 0003 fechados; specs antigas fora do working tree.
 
 ## Próximo passo
 
-Sem sessão agendada e sem ciclo ativo. Quando houver feedback, escolher o novo
-ciclo, um item do backlog e escrever a spec antes de codar.
+Executar a S5a após confirmação: mover `_run` para segundo plano, reporter de
+progresso por arquivo e barra no painel de resultado.
 
 ## Arquivos-chave
 
-- `src/xl_utils/ui/` e `src/xl_utils/shared/log.py`, `system.py`
-- `docs/reference/architecture.md`, `docs/guide/code-tour.md`
-- `docs/roadmap/0003-qualidade.md`, `docs/roadmap/main.md`
-- `tests/test_log.py`, `tests/test_layout.py`, `tests/test_ui_state.py`
+- `ui/components/tool_layout.py`, `ui/pages/*.py`
+- `shared/progress.py` (novo), `shared/log.py`
+- `docs/sessions/S5a-execucao-fora-da-ui.md`, `docs/roadmap/main.md`
+- `tests/test_layout.py`, `tests/test_integration.py`
 
 ## Armadilhas
 
-- `keep_default_na=False`: célula vazia vira `""`, não `NaN`; o merge ainda
-  preenche lacunas com `pd.NA`.
-- `csv.Sniffer` pode errar em arquivo atípico; o fallback usa `sep=None` com
-  engine Python.
-- `.xls` não tem leitor alternativo; a falha do calamine é final.
+- Flet não é thread-safe: UI só no loop da página, via fila e `run_task`.
+- `page.run_task` pode não existir em teste headless; manter caminho síncrono.
+- `keep_default_na=False`: célula vazia vira `""`, não `NaN`; merge usa `pd.NA`.
+- `.xls` não tem leitor alternativo; falha do calamine é final.
 - Datas do Excel viram texto ISO, não o formato exibido.
-- Flet 1.0 não suporta drop do SO; merge usa `Draggable`/`DragTarget`.
-- Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir” para sintaxe
-  antiga.
+- Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir”.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 
 ## Como rodar

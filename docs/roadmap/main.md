@@ -1,18 +1,37 @@
 # Roadmap atual
 
-Nenhum ciclo ativo. O ciclo 0003 está fechado em
+Ciclo ativo: **0004 — Execução e robustez**. O ciclo anterior está em
 [`0003-qualidade.md`](0003-qualidade.md).
 
-O backlog abaixo aguarda mais feedback do dono; um item só vira sessão quando um
-novo ciclo e uma fase forem escolhidos.
+## Fase 1 — Feedback de execução
+
+Objetivo: manter a janela responsiva e mostrar o andamento em execuções longas.
+
+- [ ] **S5a — Execução fora da UI thread e barra de progresso.** Rodar o
+  controller em segundo plano, exibir barra e contador por arquivo e bloquear
+  novas execuções enquanto roda. Custo M.
+- [ ] **S5b — Log ao vivo e cancelamento.** Exibir os eventos conforme são
+  produzidos e permitir cancelar entre arquivos/abas/células, sem gravar nada.
+  Depende de S5a. Custo M.
+
+## Fase 2 — Robustez das ferramentas
+
+Objetivo: reduzir falhas em texto sujo e ampliar o recorte sem mudar o
+comportamento atual.
+
+- [ ] **S5c — Extração de CNJ em texto sujo.** Normalizar espaços, quebras,
+  travessões e caracteres invisíveis; aceitar separadores flexíveis e manter a
+  rejeição a CPF e a números maiores. Decisão: extrair mesmo com dígito
+  verificador inválido, sem descartar. Custo M.
+- [ ] **S5d — Recorte por quantidade de arquivos.** Alternar entre linhas por
+  arquivo e quantidade de arquivos; a quantidade vale **por aba**. Custo M.
 
 ## Backlog
 
 | Item | Valor | Custo | Pré-requisito |
 |---|---|---|---|
-| Tema claro opcional | Baixo | S | — |
-| Histórico de execuções | Médio | M | S2b |
-| Cancelar execução em andamento | Médio | M | S1a |
+| Tema claro opcional | Baixo | M | tokenizar as cores |
+| Histórico de execuções | Médio | M | S5a e S5b |
 
 ## Manutenção
 
@@ -44,7 +63,10 @@ novo ciclo e uma fase forem escolhidos.
 
 ## Notas do ciclo
 
-- A S4a (fechamento do ciclo 0002) foi absorvida pela S4b; o resumo do ciclo
-  está em [`0002-migracao.md`](0002-migracao.md).
-- O ciclo 0003 fechou com a S4c; o resumo está em
+- A S4c fechou o ciclo 0003; o resumo está em
   [`0003-qualidade.md`](0003-qualidade.md).
+- O template de spec foi versionado e o `docs:check` voltou a passar no CI.
+- Tema claro teve o custo reavaliado para M: as cores são constantes importadas
+  por todos os componentes.
+- Histórico de execuções fica para depois da infraestrutura de execução (S5a e
+  S5b).
