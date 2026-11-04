@@ -39,10 +39,9 @@ def run(
             cancelled = True
             break
         progress.file_started(source.name)
-        outcome = run_cnj(source, selected=selected)
+        outcome = run_cnj(source, selected=selected, progress=progress)
         outcomes.append(outcome)
         progress.file_done(source.name)
-        progress.log(outcome.log)
     append_outcomes(state, outcomes)
     frames = prefixed_frames(
         outcomes,

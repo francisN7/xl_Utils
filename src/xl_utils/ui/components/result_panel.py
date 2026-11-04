@@ -8,7 +8,7 @@ import flet as ft
 import pandas as pd
 import pyperclip
 
-from xl_utils.shared.log import RunLog
+from xl_utils.shared.log import LogEvent, RunLog
 from xl_utils.shared.progress import ProgressEvent
 from xl_utils.shared.system import open_folder
 from xl_utils.ui import theme
@@ -210,24 +210,34 @@ class ResultPanel:
         self.preview.set_dispatcher(dispatch)
 
     def start_progress(self, total: int) -> None:
-        """Mostra a barra zerada antes do primeiro arquivo."""
-        self._progress_bar.value = 0
+        """Mostra a barra indeterminada antes do primeiro arquivo."""
+        self._progress_bar.value = None
         self._progress_bar.visible = True
         self._progress_text.value = f"Arquivo 0 de {total}"
         self._progress_text.visible = True
         self._refresh()
 
     def apply_progress(self, event: ProgressEvent) -> None:
-        """Atualiza a barra e o contador; o resultado final esconde os dois."""
+        """Atualiza barra, texto e log sempre no loop da página."""
         if event.kind == "log":
-            self.append_log(event.text)
+            self._append_log_line(event.text)
+            self._update_now()
+            return
+        if event.kind == "stage":
+            self._progress_text.value = event.text
+            self._progress_text.visible = self._kind == "running"
+            self._append_log_line(LogEvent("info", event.text).to_line())
+            self._update_now()
             return
         visible = self._kind == "running"
-        self._progress_bar.value = event.value
+        if event.kind in ("start", "file_started"):
+            self._progress_bar.value = None
+        else:
+            self._progress_bar.value = event.value
         self._progress_bar.visible = visible
         self._progress_text.value = event.text
         self._progress_text.visible = visible
-        self._refresh()
+        self._update_now()
 
     def _hide_progress(self) -> None:
         self._progress_bar.visible = False
@@ -398,11 +408,14 @@ class ResultPanel:
         self._diagnostics = text
 
     def append_log(self, line: str) -> None:
+        self._append_log_line(line)
+        self._refresh()
+
+    def _append_log_line(self, line: str) -> None:
         current = self._log.value or ""
         self._log.value = f"{current}\n{line}".strip()
         self._log_section.visible = True
         self._resize_log(len(self._log.value.splitlines()))
-        self._refresh()
 
     def _resize_log(self, lines: int) -> None:
         """Limita a altura do log para a prévia manter uma área útil."""

@@ -98,12 +98,21 @@ def run(
             break
         progress.file_started(source.name)
         if mode == MODE_PARTS:
-            outcome = run_cut(source, parts=value, selected=selected)
+            outcome = run_cut(
+                source,
+                parts=value,
+                selected=selected,
+                progress=progress,
+            )
         else:
-            outcome = run_cut(source, value, selected=selected)
+            outcome = run_cut(
+                source,
+                value,
+                selected=selected,
+                progress=progress,
+            )
         outcomes.append(outcome)
         progress.file_done(source.name)
-        progress.log(outcome.log)
     append_outcomes(state, outcomes)
 
     items = [item for outcome in outcomes for item in outcome.items]

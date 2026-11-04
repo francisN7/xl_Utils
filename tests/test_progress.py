@@ -1,3 +1,4 @@
+from xl_utils.shared.log import RunLog
 from xl_utils.shared.progress import (
     CancelToken,
     NullReporter,
@@ -104,6 +105,26 @@ def test_null_reporter_ignores_log_lines() -> None:
     reporter.log(["[INFO] ignorado"])
 
 
+def test_reporter_emits_stage_and_records_it_in_the_log() -> None:
+    events: list[ProgressEvent] = []
+    log = RunLog()
+    reporter = ProgressReporter(events.append)
+
+    reporter.note(log, "Lendo planilha")
+
+    assert [event.kind for event in events] == ["stage"]
+    assert events[0].text == "Lendo planilha"
+    assert log.to_text() == "[INFO] Lendo planilha"
+
+
+def test_null_reporter_note_still_feeds_the_log() -> None:
+    log = RunLog()
+
+    NullReporter().note(log, "Etapa sem painel")
+
+    assert log.to_text() == "[INFO] Etapa sem painel"
+
+
 def test_page_cancels_between_files_and_keeps_partial_log(
     xlsx_file,
     csv_file,
@@ -128,7 +149,8 @@ def test_page_cancels_between_files_and_keeps_partial_log(
     assert [event.name for event in events if event.kind == "file_started"] == [
         xlsx_file.name
     ]
-    assert any(event.kind == "log" for event in events)
+    assert any(event.kind == "stage" for event in events)
+    assert any("lendo e limpando planilha" in event.text for event in events)
     assert state.log is not None
     assert "Cancelado: 1 de 2" in state.log.to_text()
     assert not (xlsx_file.parent / "output").exists()

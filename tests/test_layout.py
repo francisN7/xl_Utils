@@ -4,6 +4,7 @@ from pathlib import Path
 
 import flet as ft
 
+from xl_utils.shared.progress import ProgressEvent
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.components.tool_layout import ToolLayout
 from xl_utils.ui.state import ToolState
@@ -120,3 +121,34 @@ def test_execute_button_becomes_cancel_while_running(xlsx_file: Path) -> None:
     assert layout._run_button.visible
     assert not layout._cancel_button.visible
     assert not layout._run_button.disabled
+
+
+def test_progress_stage_updates_text_and_log_immediately() -> None:
+    panel = ResultPanel()
+    panel.set_running("Executando")
+    panel.start_progress(1)
+
+    panel.apply_progress(
+        ProgressEvent(kind="stage", total=1, completed=0, line="Lendo planilha")
+    )
+
+    texts = _texts(panel.control)
+    assert "Lendo planilha" in texts
+    assert "[INFO] Lendo planilha" in texts
+    assert panel._progress_bar.value is None
+
+
+def test_progress_bar_is_indeterminate_while_a_file_runs() -> None:
+    panel = ResultPanel()
+    panel.set_running("Executando")
+    panel.start_progress(2)
+
+    panel.apply_progress(
+        ProgressEvent(kind="file_started", total=2, completed=0, index=1, name="a")
+    )
+    assert panel._progress_bar.value is None
+
+    panel.apply_progress(
+        ProgressEvent(kind="file_done", total=2, completed=1, name="a")
+    )
+    assert panel._progress_bar.value == 0.5

@@ -413,6 +413,10 @@ class ToolLayout:
                 self.result.apply_progress(event)
                 if event.kind == "finish":
                     break
+                # Deixa o loop processar a atualização enviada pelo painel antes
+                # de consumir o próximo evento; sem isso, lotes rápidos acumulam
+                # todos os eventos e a tela só muda no fim.
+                await asyncio.sleep(0)
             await worker
         finally:
             self.result.set_dispatcher(None)

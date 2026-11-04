@@ -177,16 +177,24 @@ viram `ProgressEvent` e chegam ao loop por uma `asyncio.Queue` alimentada com
 resultado. `ResultPanel` e `PreviewTable` recebem um dispatcher para que o
 `update` também seja agendado no loop; a thread de trabalho nunca chama a UI.
 
-A fila também leva `ProgressEvent(kind="log")`: cada página emite o `RunLog` do
-resultado assim que o arquivo termina, e o painel anexa as linhas na ordem em que
-chegam. O log inicial de formatos aparece já no começo, e o `ToolState` mantém a
-versão canônica usada no fim e no diagnóstico.
+A fila também leva `ProgressEvent(kind="stage")`: cada controller recebe o
+reporter e chama `note(log, texto)`, que acrescenta a etapa ao `RunLog` e a
+emite ao vivo. O painel atualiza o texto de andamento e anexa a linha formatada
+ao log; assim o usuário vê “lendo”, “planilha carregada”, “procurando CNJs” etc.
+antes de o arquivo terminar. O `ToolState` mantém a versão canônica usada no fim
+e no diagnóstico.
+
+A barra fica **indeterminada** enquanto um arquivo está em andamento e assume a
+fração concluída ao terminar cada arquivo. Depois de aplicar um evento, o loop
+cede com `asyncio.sleep(0)` para a atualização ser renderizada antes do próximo;
+sem isso, lotes rápidos acumulam eventos e a tela só muda no fim.
 
 `CancelToken` (mesmo módulo) expõe `cancel()` e `cancelled`. O layout cria um
 token por execução, entrega ao handler e troca “Executar” por “Cancelar”. As
 páginas checam o token entre arquivos: a chamada em curso termina, a prévia
 parcial permanece e `ResultPanel.set_cancelled` marca “Execução cancelada” sem
-liberar salvar nem gravar. Merge é etapa única e não tem ponto de parada.
+liberar salvar nem gravar. Merge emite etapas por fonte, mas continua uma única
+chamada de controller; o cancelamento só vale antes de começar.
 
 Sem página (testes headless), o handler roda no próprio loop com um reporter
 síncrono. O estado da ferramenta é preenchido durante a execução, mas a entrada,

@@ -72,3 +72,19 @@ pesado deve sair dele.
 - Merge continua como etapa única: não há ponto de parada dentro do controller,
   então o pedido só teria efeito antes de começar.
 
+## Adendo (S6b) — etapas visíveis e barra em andamento
+
+- `ProgressReporter` ganhou `stage(texto)` e `note(log, texto)`. O `note` grava a
+  etapa no `RunLog` canônico e a emite na fila, para o log crescer durante a
+  leitura e o cálculo, não só no fim do arquivo.
+- Os controllers recebem o reporter e marcam etapas específicas: leitura/limpeza,
+  planilha carregada, varredura/recorte/mesclagem e resultado pronto. Merge
+  também marca cada fonte lida.
+- Enquanto um arquivo está em andamento, a barra fica indeterminada
+  (`value=None`); ao concluir, assume a fração de arquivos concluídos. Assim ela
+  mostra atividade mesmo em uma única planilha.
+- Depois de cada evento, o consumidor da fila cede com `asyncio.sleep(0)`; sem
+  isso, lotes rápidos drenavam a fila inteira e a tela só mudava no fim.
+- O progresso continua sem conteúdo de célula e sempre atualizado no loop.
+
+

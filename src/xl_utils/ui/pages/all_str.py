@@ -37,10 +37,9 @@ def run(
             cancelled = True
             break
         progress.file_started(source.name)
-        outcome = run_all_str(source, selected=selected)
+        outcome = run_all_str(source, selected=selected, progress=progress)
         outcomes.append(outcome)
         progress.file_done(source.name)
-        progress.log(outcome.log)
     append_outcomes(state, outcomes)
     frames = prefixed_frames(outcomes, lambda outcome: outcome.sheets)
     if cancelled:

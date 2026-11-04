@@ -91,6 +91,10 @@ decisões nos ADRs.
 - Mesclagem: `ORIGEM` agora é `<arquivo> - <aba>` (sem extensão) e a nova
   `LINHA_ORIGEM` numera as linhas de dados do resultado inteiro com zeros à
   esquerda, preservando a ordenação. Ver adendo do ADR 0005.
+- Execução visível por etapa: as quatro ferramentas registram leitura, planilha
+  carregada e cálculo no log ao vivo; a barra fica indeterminada durante cada
+  arquivo e avança ao concluí-lo. O loop passa a renderizar entre eventos. Ver
+  adendo do ADR 0011.
 
 ### Changed
 

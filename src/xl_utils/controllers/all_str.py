@@ -12,6 +12,7 @@ from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.sheets import filter_sheets
 from xl_utils.shared.log import RunLog
+from xl_utils.shared.progress import NullReporter, ProgressReporter
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,9 +39,14 @@ class AllStrOutcome:
 def run_all_str(
     source: Path,
     selected: Collection[str] | None = None,
+    progress: ProgressReporter | NullReporter | None = None,
 ) -> AllStrOutcome:
     """Lê e limpa as abas escolhidas, sem gravar nada."""
+    reporter = progress or NullReporter()
+    log = RunLog().info(f"Arquivo: {source.name}")
+    reporter.note(log, f"{source.name}: lendo e limpando planilha")
     sheets = filter_sheets(prepare_workbook(source), selected)
+    reporter.note(log, f"{source.name}: planilha carregada · {len(sheets)} aba(s)")
     name = f"{source.stem}.xlsx"
     item = SaveItem(
         suggested_name=name,
@@ -48,12 +54,8 @@ def run_all_str(
         output_dir=default_output_dir(source),
     )
 
-    log = (
-        RunLog()
-        .info(f"Arquivo: {source.name}")
-        .info(f"Tipo detectado: {resolve_suffix(source)}")
-        .info(f"Abas: {len(sheets)}")
-        .info(f"Linhas: {sum(len(frame) for frame in sheets.values())}")
-        .success(f"Pronto para salvar: {name}")
-    )
+    log.info(f"Tipo detectado: {resolve_suffix(source)}")
+    log.info(f"Abas: {len(sheets)}")
+    log.info(f"Linhas: {sum(len(frame) for frame in sheets.values())}")
+    log.success(f"Pronto para salvar: {name}")
     return AllStrOutcome(source=source, item=item, log=log)

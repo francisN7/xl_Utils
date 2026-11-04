@@ -1,4 +1,4 @@
-# S6a — Tema claro opcional
+# S6c — Tema claro opcional
 
 ## Objetivo
 

@@ -13,6 +13,7 @@ from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.merge import ColumnGroup, ColumnRef, merge_sheets
 from xl_utils.core.tools.sheets import filter_sheets
 from xl_utils.shared.log import RunLog
+from xl_utils.shared.progress import NullReporter, ProgressReporter
 
 Source = tuple[Path, Collection[str] | None]
 
@@ -57,17 +58,36 @@ def inspect_columns(sources: Sequence[Source]) -> list[ColumnRef]:
 def run_merge(
     sources: Sequence[Source],
     groups: Sequence[ColumnGroup] | None = None,
+    progress: ProgressReporter | NullReporter | None = None,
 ) -> MergeOutcome:
     """Concatena as abas escolhidas de ``sources``, sem gravar."""
     if not sources:
         raise ValueError("Selecione ao menos um arquivo para mesclar.")
 
+    reporter = progress or NullReporter()
+    log = RunLog()
     loaded: list[tuple[Path, dict[str, pd.DataFrame]]] = []
     entries: list[tuple[Path, str, pd.DataFrame]] = []
-    for source, selected in sources:
+    for index, (source, selected) in enumerate(sources, start=1):
+        reporter.note(
+            log,
+            f"Lendo fonte {index}/{len(sources)}: {source.name}",
+        )
         sheets = filter_sheets(prepare_workbook(source), selected)
+        reporter.note(
+            log,
+            f"{source.name}: planilha carregada · {len(sheets)} aba(s)",
+        )
         loaded.append((source, sheets))
         entries.extend((source, name, frame) for name, frame in sheets.items())
+
+        columns: dict[str, None] = {}
+        for frame in sheets.values():
+            for name in frame.columns:
+                columns.setdefault(str(name), None)
+        log.info(f"  Abas: {len(sheets)} ({', '.join(sheets)})")
+        log.info(f"  Linhas: {sum(len(frame) for frame in sheets.values())}")
+        log.info(f"  Colunas: {len(columns)}")
 
     usable = sum(1 for _, _, frame in entries if not frame.empty)
     if usable == 0:
@@ -78,7 +98,12 @@ def run_merge(
             "mesmo arquivo — para mesclar."
         )
 
+    reporter.note(log, f"Mesclando {usable} aba(s)")
     merged = merge_sheets(entries, groups)
+    reporter.note(
+        log,
+        f"Resultado: {len(merged)} linha(s), {len(merged.columns)} coluna(s)",
+    )
     name = "Merge.xlsx"
     item = SaveItem(
         suggested_name=name,
@@ -86,27 +111,6 @@ def run_merge(
         output_dir=default_output_dir(loaded[0][0]),
     )
 
-    log = RunLog()
-    for source, sheets in loaded:
-        if log:
-            log.info("")
-        columns: dict[str, None] = {}
-        for frame in sheets.values():
-            for name in frame.columns:
-                columns.setdefault(str(name), None)
-        log.extend(
-            [
-                f"Arquivo: {source.name}",
-                f"Abas: {len(sheets)} ({', '.join(sheets)})",
-                f"Linhas: {sum(len(frame) for frame in sheets.values())}",
-                f"Colunas: {len(columns)}",
-            ]
-        )
-
-    log.info("")
-    log.info(f"Abas mescladas: {usable}")
-    log.info(f"Linhas mescladas: {len(merged)}")
-    log.info(f"Colunas no resultado: {len(merged.columns)}")
     log.success(f"Pronto para salvar: {name}")
 
     return MergeOutcome(

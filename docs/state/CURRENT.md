@@ -4,50 +4,51 @@
 
 ## Sessão
 
-- **Última concluída:** fechamento do ciclo 0004 (S5a–S5d)
-- **Próxima:** S6a — tema claro opcional
-  (`docs/sessions/S6a-tema-claro.md`) — spec pronta
-- **Ciclo:** 0005 — Polimento, Fase 1
-- **Decisões:** histórico de execuções descartado; tema claro aplicado só ao
-  reabrir o app; ADR 0011 e ADR 0012 seguem valendo
+- **Última concluída:** S6b — progresso e log por estágio
+- **Próxima:** S6c — tema claro opcional
+  (`docs/sessions/S6c-tema-claro.md`) — spec pronta
+- **Ciclo:** 0005 — Polimento, Fase 2
+- **Decisões:** tema claro aplicado ao reabrir; histórico descartado; ADR 0005
+  (ORIGEM/LINHA_ORIGEM) e ADR 0011 (etapas/barra) atualizados
 
 ## Pronto
 
-- Ciclo 0004 fechado: execução fora da UI, log ao vivo/cancelamento, CNJ em
-  texto sujo e recorte por quantidade de arquivos.
-- S5d: recorte com “Linhas por arquivo” ou “Arquivos por aba”; a quantidade vale
-  por aba e os blocos ficam equilibrados.
-- S5c: CNJ em texto sujo com separadores flexíveis; CPF e 21 dígitos seguidos
-  fora; dígito verificador inválido não descarta o valor.
-- S5b: log ao vivo na fila; “Executar” vira “Cancelar” e a parada cooperativa
-  entre arquivos mantém a prévia parcial sem liberar salvar.
-- S4c/S4b: UI e `shared/` em PT-BR, leitura fiel de CSV/HTML, code tour.
+- S6b: as quatro ferramentas emitem etapas no log ao vivo (leitura, planilha
+  carregada, cálculo); a barra fica indeterminada durante cada arquivo e avança
+  ao concluí-lo. O loop cede entre eventos para a tela renderizar.
+- S6a: `ORIGEM` = `<stem> - <aba>` e `LINHA_ORIGEM` numera o resultado inteiro
+  com zeros à esquerda; colunas de mesmo nome viram `_original`.
+- S5d: recorte com “Linhas por arquivo” ou “Arquivos por aba”, quantidade por
+  aba e blocos equilibrados.
+- S5c: CNJ em texto sujo; dígito verificador inválido não descarta o valor.
 
 ## Próximo passo
 
-Executar a S6a: tokenizar as cores, criar a paleta clara, salvar a preferência
+Executar a S6c: tokenizar as cores, criar a paleta clara, salvar a preferência
 local e aplicar o tema na abertura; a troca na sidebar pede reabertura.
 
 ## Arquivos-chave
 
 - `ui/theme.py`, `app.py`, `ui/components/sidebar.py`
-- `shared/progress.py`, `ui/components/tool_layout.py` (execução/cancelamento)
-- `ui/components/result_panel.py`, `ui/pages/batch.py`, `ui/pages/*.py`
+- `shared/progress.py`, `controllers/*.py` (etapas)
+- `ui/components/result_panel.py`, `ui/components/tool_layout.py`
+- `core/tools/merge.py` (`ORIGEM`/`LINHA_ORIGEM`)
 - `core/tools/cut.py`, `controllers/cut.py`, `ui/pages/cut.py`
-- `core/tools/cnj.py` (sanitização e regex flexível)
-- `tests/test_cut.py`, `tests/test_cnj.py`, `tests/test_integration.py`
-- `docs/roadmap/0004-execucao-e-robustez.md` (histórico do ciclo fechado)
+- `tests/test_merge.py`, `tests/test_progress.py`, `tests/test_layout.py`
+- `docs/adr/0005-selecao-de-abas-e-merge.md`,
+  `docs/adr/0011-execucao-fora-da-ui.md`
 
 ## Armadilhas
 
-- Flet não é thread-safe: UI só no loop da página, via dispatcher e fila.
+- Flet não é thread-safe: UI só no loop da página; o `apply_progress` atualiza
+  direto porque já roda no loop.
+- Sem `await asyncio.sleep(0)` entre eventos, lotes rápidos acumulam tudo no fim.
 - A preferência de tema precisa ser lida antes de montar a UI; troca ao vivo
   está fora de escopo nesta fase.
-- Componentes devem usar `theme.X`; import direto de constante ignora a paleta.
-- Cancelar não interrompe pandas: só vale entre arquivos, nunca na chamada.
+- Cancelar não interrompe pandas: só vale entre arquivos.
+- `LINHA_ORIGEM` usa a largura do total do resultado, não de cada aba/arquivo.
+- `ORIGEM`/`LINHA_ORIGEM` são reservados: coluna de origem vira `_original`.
 - Recorte por partes usa divisão equilibrada, limitada ao total de linhas.
-- `rows_per_file` e `parts` não se misturam no controller.
-- Sanear o texto na busca não altera a planilha nem o diagnóstico.
 - `keep_default_na=False`: célula vazia vira `""`, não `NaN`; merge usa `pd.NA`.
 - `.xls` não tem leitor alternativo; falha do calamine é final.
 - Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir”.

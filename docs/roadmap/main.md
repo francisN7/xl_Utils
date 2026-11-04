@@ -3,19 +3,31 @@
 Ciclo ativo: **0005 — Polimento**. O ciclo anterior está em
 [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md).
 
-## Fase 1 — Aparência
+## Fase 1 — Execução visível
+
+Objetivo: mostrar o que cada ferramenta está fazendo durante a execução e
+separar a origem da linha na mesclagem.
+
+- [x] **S6a — Mesclagem com `ORIGEM` e `LINHA_ORIGEM`.** `ORIGEM` passa a ser
+  `<stem> - <aba>` e `LINHA_ORIGEM` numera as linhas do resultado inteiro com
+  zeros à esquerda. Ver adendo do ADR 0005.
+- [x] **S6b — Progresso e log por estágio.** As quatro ferramentas registram
+  leitura, planilha carregada e cálculo no log ao vivo; a barra fica
+  indeterminada durante cada arquivo e avança ao concluí-lo. Ver adendo do
+  ADR 0011.
+
+## Fase 2 — Aparência
 
 Objetivo: permitir leitura confortável em ambiente claro sem mudar o layout nem
 o fluxo das ferramentas.
 
-- [ ] **S6a — Tema claro opcional.** Tokenizar as cores hoje constantes,
-  alternar entre Dracula e claro e manter a preferência do usuário. Preservar
-  contraste, estados de erro/sucesso e a legibilidade do log e da prévia.
-  Custo M. Ver spec.
+- [ ] **S6c — Tema claro opcional.** Tokenizar as cores hoje constantes,
+  alternar entre Dracula e claro e manter a preferência do usuário. A troca é
+  aplicada ao reabrir o app. Custo M. Ver spec.
 
 ## Backlog
 
-Sem itens no momento; o tema claro está na Fase 1 deste ciclo.
+Sem itens no momento.
 
 ## Manutenção
 
@@ -48,7 +60,9 @@ Sem itens no momento; o tema claro está na Fase 1 deste ciclo.
 
 ## Notas do ciclo
 
-- O ciclo 0004 fechou com execução fora da UI, log ao vivo/cancelamento, CNJ em
-  texto sujo e recorte por quantidade.
-- O tema claro é o único item que veio do backlog do ciclo anterior; as cores
-  são constantes importadas por todos os componentes, daí o custo M.
+- As duas adições do dono ao backlog viraram S6a (merge) e S6b (etapas); o tema
+  claro segue como S6c.
+- `LINHA_ORIGEM` usa a largura do total do resultado (12 linhas → `01`..`12`) e
+  não reinicia por arquivo/aba.
+- A barra indeterminada mostra atividade dentro de um arquivo; a fração só
+  aparece quando o arquivo termina.

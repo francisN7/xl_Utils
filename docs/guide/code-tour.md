@@ -50,8 +50,9 @@ entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 `_run` é o coração: valida o `ToolState`, chama `_check_formats`, bloqueia
 formato não identificado e entrega o handler a `_execute_async`. Com página, o
 trabalho vai para `asyncio.to_thread`; sem página, roda no próprio loop. Os
-marcos de `shared/progress.py` e as linhas de log voltam por uma fila e
-atualizam barra, contador e log no loop. O botão vira “Cancelar” durante a
+marcos de `shared/progress.py` e as etapas dos controllers voltam por uma fila
+e atualizam barra, texto e log no loop. Enquanto um arquivo roda, a barra fica
+indeterminada; entre arquivos, ela avança. O botão vira “Cancelar” durante a
 execução e aciona o `CancelToken` entregue ao handler. A gravação fica em
 `_save_clicked`/`_pick_and_save`, que só gravam depois da escolha.
 
@@ -64,17 +65,19 @@ o dispatcher do loop.
 
 A página só coleta a entrada, chama o controller e mostra o resultado. Em
 ferramentas de lote, `ui/pages/batch.py` junta logs e prévias de vários arquivos;
-cada página checa o `CancelToken` entre arquivos e emite o log do resultado
-assim que ele termina.
+cada página checa o `CancelToken` entre arquivos e passa o reporter ao
+controller. Assim as etapas viram log ao vivo sem a página conhecer os detalhes
+de leitura e cálculo.
 
 **Observe:** nenhuma regra de planilha mora aqui.
 
 ### 4. Controller — `controllers/all_str.py`
 
-`run_all_str` recebe o caminho e as abas escolhidas, chama `prepare_workbook`,
-filtra com `filter_sheets` e devolve `AllStrOutcome` com `SaveItem` e `RunLog`.
-Os demais controllers seguem o mesmo desenho: `CnjOutcome`, `CutOutcome` e
-`MergeOutcome`.
+`run_all_str` recebe o caminho, as abas escolhidas e o reporter, chama
+`prepare_workbook`, filtra com `filter_sheets` e devolve `AllStrOutcome` com
+`SaveItem` e `RunLog`. As etapas são registradas com `reporter.note(...)`: vão
+para o log final e aparecem durante a execução. Os demais controllers seguem o
+mesmo desenho: `CnjOutcome`, `CutOutcome` e `MergeOutcome`.
 
 **Observe:** nada é gravado; o controller devolve dados em memória.
 

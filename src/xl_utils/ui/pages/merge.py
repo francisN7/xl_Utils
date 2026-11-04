@@ -355,9 +355,8 @@ def run(
 
     progress.start(1)
     progress.file_started(f"mesclagem de {len(pending)} arquivo(s)")
-    outcome = run_merge(pending, _groups(state) or None)
+    outcome = run_merge(pending, _groups(state) or None, progress=progress)
     progress.file_done()
-    progress.log(outcome.log)
     append_outcomes(state, [outcome])
     frames = {"Mesclado": outcome.merged}
     state.result = frames

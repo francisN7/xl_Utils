@@ -5,7 +5,9 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from typing import Literal
 
-ProgressKind = Literal["start", "file_started", "file_done", "finish", "log"]
+from xl_utils.shared.log import RunLog
+
+ProgressKind = Literal["start", "file_started", "file_done", "stage", "finish", "log"]
 
 ProgressHandler = Callable[["ProgressEvent"], None]
 ErrorHandler = Callable[[str], None]
@@ -25,7 +27,7 @@ class ProgressEvent:
     @property
     def text(self) -> str:
         """Devolve o texto exibido no painel, sem dados de célula."""
-        if self.kind == "log":
+        if self.kind in ("log", "stage"):
             return self.line
         if self.kind == "start":
             return f"Arquivo 0 de {self.total}"
@@ -75,6 +77,13 @@ class NullReporter:
 
     def log(self, lines: Iterable[str] | str) -> None:
         """Ignora linhas de log no caminho síncrono."""
+
+    def stage(self, text: str) -> None:
+        """Ignora a etapa atual no caminho síncrono."""
+
+    def note(self, log: RunLog, text: str) -> None:
+        """Acrescenta a etapa ao log mesmo sem um painel conectado."""
+        log.info(text)
 
     def finish(self) -> None:
         """Marca o fim da execução."""
@@ -127,6 +136,15 @@ class ProgressReporter(NullReporter):
             lines = [lines]
         for line in lines:
             self._send("log", line=str(line))
+
+    def stage(self, text: str) -> None:
+        """Emite a etapa atual; a barra continua no arquivo em andamento."""
+        self._send("stage", line=text)
+
+    def note(self, log: RunLog, text: str) -> None:
+        """Registra a etapa no log canônico e a mostra ao vivo."""
+        log.info(text)
+        self.stage(text)
 
     def finish(self) -> None:
         """Emite o encerramento com a contagem real."""

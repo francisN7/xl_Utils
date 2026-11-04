@@ -13,6 +13,7 @@ from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cut import split_workbook, split_workbook_by_parts
 from xl_utils.core.tools.sheets import filter_sheets
 from xl_utils.shared.log import RunLog
+from xl_utils.shared.progress import NullReporter, ProgressReporter
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,6 +45,7 @@ def run_cut(
     selected: Collection[str] | None = None,
     *,
     parts: int | None = None,
+    progress: ProgressReporter | NullReporter | None = None,
 ) -> CutOutcome:
     """Recorta as abas escolhidas de ``source``, sem gravar nada.
 
@@ -55,13 +57,20 @@ def run_cut(
     if parts is None and rows_per_file is None:
         raise ValueError("Informe linhas por arquivo ou quantidade de arquivos.")
 
+    reporter = progress or NullReporter()
+    log = RunLog().info(f"Arquivo: {source.name}")
+    reporter.note(log, f"{source.name}: lendo e limpando planilha")
     sheets = filter_sheets(prepare_workbook(source), selected)
+    reporter.note(log, f"{source.name}: planilha carregada · {len(sheets)} aba(s)")
+    log.info(f"Tipo detectado: {resolve_suffix(source)}")
+
     if parts is not None:
         blocks = split_workbook_by_parts(sheets, parts)
         rule = f"Arquivos por aba: {parts}"
     else:
         blocks = split_workbook(sheets, rows_per_file)
         rule = f"Linhas por arquivo: {rows_per_file}"
+    reporter.note(log, f"{source.name}: recortando · {rule}")
 
     output_dir = default_output_dir(source)
     multiple_sheets = len(blocks) > 1
@@ -86,15 +95,12 @@ def run_cut(
     first_sheet = next(iter(blocks), "")
     preview = {first_sheet: blocks[first_sheet][0]} if first_sheet else {}
     total_rows = sum(len(frame) for frames in blocks.values() for frame in frames)
-    log = (
-        RunLog()
-        .info(f"Arquivo: {source.name}")
-        .info(f"Tipo detectado: {resolve_suffix(source)}")
-        .info(f"Abas: {len(blocks)}")
-        .info(f"Linhas: {total_rows}")
-        .info(rule)
-        .success(f"Arquivos prontos: {len(items)}")
-    )
+    reporter.note(log, f"{source.name}: {len(items)} arquivo(s) pronto(s)")
+
+    log.info(f"Abas: {len(blocks)}")
+    log.info(f"Linhas: {total_rows}")
+    log.info(rule)
+    log.success(f"Arquivos prontos: {len(items)}")
     log.extend(f"Pronto para salvar: {item.suggested_name}" for item in items)
 
     return CutOutcome(

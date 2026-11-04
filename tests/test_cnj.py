@@ -13,6 +13,7 @@ from xl_utils.core.tools.cnj import (
     normalize_cnj,
     summarize_cnjs,
 )
+from xl_utils.shared.progress import ProgressReporter
 
 FIRST = "0001234-56.2024.8.26.0100"
 FIRST_DIGITS = "00012345620248260100"
@@ -119,6 +120,20 @@ def test_run_cnj_prepares_a_sorted_unique_list(tmp_path: Path) -> None:
     assert saved is not None
     frame = read_workbook(saved[0], dtype=str)["PROCESSOS"]
     assert frame["PROCESSOS"].tolist() == [FIRST, SECOND]
+
+
+def test_run_cnj_emits_stages_and_keeps_them_in_the_log(tmp_path: Path) -> None:
+    source = tmp_path / "entrada.xlsx"
+    pd.DataFrame({"texto": [FIRST]}).to_excel(source, index=False)
+    events = []
+
+    outcome = run_cnj(source, progress=ProgressReporter(events.append))
+
+    stages = [event.text for event in events if event.kind == "stage"]
+    assert any("lendo e limpando planilha" in stage for stage in stages)
+    assert any("procurando CNJs" in stage for stage in stages)
+    assert any("CNJ(s) encontrado(s)" in stage for stage in stages)
+    assert "procurando CNJs" in outcome.log.to_text()
 
 
 def test_run_cnj_ignores_unselected_sheets(tmp_path: Path) -> None:

@@ -170,7 +170,7 @@ abaixo de `FONT_XS`.
 | Lendo abas | Spinner “Lendo as abas...” e Executar desabilitado. |
 | Formato desconhecido | Linha vermelha na entrada; Executar mostra “Não foi possível identificar o formato”. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
-| Executando | Status amarelo e log inicial. |
+| Executando | Status amarelo, barra indeterminada e log de etapas crescendo. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |
 | Erro | Status vermelho, título tipado, mensagem original e diagnóstico copiável. |
 
