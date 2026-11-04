@@ -23,6 +23,18 @@ mesclagem.
    - commitar com `SXX: resumo curto`.
 5. Se o contexto encher no meio, salve o estado em `CURRENT.md` e recomece.
 
+## Entrega final
+
+Toda resposta que conclui trabalho termina com uma linha de estado:
+
+- **Sessão fechada** — protocolo do item 4 aplicado; nada pendente. Não peça
+  encerramento.
+- **Sessão aberta** — a entrega não rodou o protocolo; peça “encerrar sessão”.
+- **Sem sessão** — ajuste de processo/docs que não mexe em `CURRENT.md` nem no
+  roadmap.
+
+Nunca esconder validação vermelha atrás do selo.
+
 Estado: `docs/state/CURRENT.md` · futuro: `docs/roadmap/main.md` · decisões:
 `docs/adr/`. Skills: `session-start` e `project-context-init`.
 
