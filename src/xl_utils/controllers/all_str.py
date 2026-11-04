@@ -1,4 +1,4 @@
-"""Run the text pipeline and keep the result in memory for saving."""
+"""Executa o pipeline de texto e mantém o resultado em memória para salvar."""
 
 from collections.abc import Collection
 from dataclasses import dataclass
@@ -16,7 +16,7 @@ from xl_utils.shared.log import RunLog
 
 @dataclass(frozen=True, slots=True)
 class AllStrOutcome:
-    """Result of one text-treatment run."""
+    """Resultado de uma execução de tratamento de texto."""
 
     source: Path
     item: SaveItem
@@ -39,7 +39,7 @@ def run_all_str(
     source: Path,
     selected: Collection[str] | None = None,
 ) -> AllStrOutcome:
-    """Read and clean the selected sheets, without writing anything."""
+    """Lê e limpa as abas escolhidas, sem gravar nada."""
     sheets = filter_sheets(prepare_workbook(source), selected)
     name = f"{source.stem}.xlsx"
     item = SaveItem(

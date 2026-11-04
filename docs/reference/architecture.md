@@ -2,7 +2,8 @@
 
 **O que responde:** camadas, fluxo de dados, leitura segura, detecção de
 formato e convenções do core. **O que não responde:** a interface (ver
-`ui.md`) nem o porquê das decisões (ver `../adr/`).
+`ui.md`) nem o porquê das decisões (ver `../adr/`). Para uma ordem de leitura
+guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 
 ## Camadas
 
@@ -14,6 +15,24 @@ formato e convenções do core. **O que não responde:** a interface (ver
 | Shared | `src/xl_utils/shared/` | Logging, config e clipboard. |
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
+
+## Mapa do core
+
+| Módulo | Papel | Superfície principal |
+|---|---|---|
+| `core/io.py` | lê e grava cada formato | `read_workbook`, `read_html_tables`, `list_sheets`, `read_headers`, `save_workbook` |
+| `core/mime.py` | decide o formato pelo conteúdo | `detect_suffix`, `resolve_suffix`, `check_format`, `FormatCheck` |
+| `core/paths.py` | caminhos e nomes seguros | `unique_path`, `default_output_dir`, `safe_file_part` |
+| `core/save.py` | grava só depois da escolha | `SaveItem`, `save_chosen`, `save_to_output`, `save_item` |
+| `core/text.py` | limpeza de texto | `remove_emojis` |
+| `core/tools/all_str.py` | pipeline de leitura | `prepare_workbook` |
+| `core/tools/sheets.py` | seleção de abas | `filter_sheets`, `default_selection` |
+| `core/tools/cnj.py` | regra do CNJ | `extract_cnjs`, `normalize_cnj`, `summarize_cnjs` |
+| `core/tools/cut.py` | regra do recorte | `split_frame`, `split_workbook` |
+| `core/tools/merge.py` | regra do merge | `ColumnRef`, `ColumnGroup`, `merge_sheets`, `move_column` |
+
+Erros tipados: `WorkbookReadError` (leitura), `SaveError` (gravação) e
+`ValueError` para seleção ou regra inválida.
 
 ## Fluxo de dados
 
@@ -37,7 +56,8 @@ específica:
 1. lê todas as abas com `dtype=str`;
 2. remove emojis com `emoji.replace_emoji`;
 3. preserva o texto da célula, inclusive quebras de linha;
-4. só tenta reparo quando a leitura falha, sem `shell=True`.
+4. mantém `NA`, `N/A`, `NULL` e `None` como texto (`keep_default_na=False`);
+5. só tenta reparo quando a leitura falha, sem `shell=True`.
 
 Excel é lido com `openpyxl` para `.xlsx`/`.xlsm` e com `calamine` para `.xls`
 (pacote `python-calamine`). `core/tools/all_str.py` expõe
@@ -46,18 +66,28 @@ demais ferramentas importam essa função antes de aplicar a própria regra.
 `controllers/all_str.py` orquestra a leitura, monta o `SaveItem` em memória e o
 log; `ui/pages/all_str.py` só conecta a página.
 
+CSV não confia na vírgula padrão: o Excel em pt-BR exporta com `;`, e ler com
+vírgula transformaria a linha inteira em uma coluna **sem levantar erro**.
+`core/io.py` decodifica uma amostra (`utf-8-sig`, depois `cp1252`, depois
+`latin-1`) e usa `csv.Sniffer` para escolher entre `,`, `;`, tab e `|`. Se a
+leitura rápida falhar, o motor Python infere o separador linha a linha.
+`read_headers` usa a mesma rotina com uma amostra curta.
+
 Quando a leitura normal falha, o pipeline tenta **um** leitor mais tolerante,
 de acordo com o formato real: `openpyxl` em modo somente leitura para
-`.xlsx`/`.xlsm`, codificações alternativas (`utf-8-sig`, `cp1252`, `latin-1`)
-para `.csv` e outros parsers para `.html`. Se ainda assim falhar, levanta
-`WorkbookReadError` com a causa original — nunca renomeia nem altera o arquivo
-do usuário.
+`.xlsx`/`.xlsm`, codificações/separadores alternativos para `.csv` e outros
+parsers para `.html`. O `.xls` não tem leitor alternativo — o calamine é o único
+engine do projeto — e a falha sobe com a causa original. Se o reparo também
+falhar, levanta `WorkbookReadError`; nunca renomeia nem altera o arquivo do
+usuário.
 
 O objetivo é não perder zeros à esquerda, CNJ/CPF e valores que o Excel
 converteria em notação científica. A ferramenta “Tratamento de texto” também
-expõe esse pipeline sozinha, para conversão e reparo explícitos. O
-`read_html` do pandas não aceita `dtype`; para HTML, a leitura faz uma segunda
-passada com converters e mantém os zeros à esquerda.
+expõe esse pipeline sozinha, para conversão e reparo explícitos. O `read_html`
+do pandas não aceita `dtype`; para HTML, a leitura faz uma segunda passada com
+converters nas **chaves reais** das colunas — inclusive tuplas de cabeçalho em
+dois níveis — e só depois achata o cabeçalho (`Grupo - cod`) com desempate
+`_2`. Assim `000123` continua texto.
 
 ## Seleção de abas
 
@@ -96,23 +126,28 @@ suportada, a extensão original vence. Formatos: `.xlsx`, `.xlsm`, `.xls`,
 `check_format` devolve um `FormatCheck` imutável com o tipo detectado, a
 extensão declarada, o tipo efetivo de leitura e os estados `identified` e
 `diverges`. A UI mostra `conteúdo: .xlsx · nome: .xls` somente quando dois
-formatos suportados divergem. `ToolLayout._run` bloqueia antes de ler quando
-`identified` é falso, mostra “Não foi possível identificar o formato” e
-registra o motivo no log e no diagnóstico. A leitura continua usando
-`resolve_suffix`, então o conteúdo vence o nome sem tocar no arquivo.
+formatos suportados divergem. Formatos equivalentes (`.xlsx`/`.xlsm` e
+`.htm`/`.html`) não contam como divergência, porque usam o mesmo leitor.
+`ToolLayout._run` bloqueia antes de ler quando `identified` é falso, mostra
+“Não foi possível identificar o formato” e registra o motivo no log e no
+diagnóstico. A leitura continua usando `resolve_suffix`, então o conteúdo vence
+o nome sem tocar no arquivo.
 
 ## Saída
 
 Os controllers não gravam: cada execução devolve `SaveItem` com o nome sugerido,
 as abas em memória e a pasta `output/` da origem. `core/save.py` concentra a
 gravação depois da escolha: `save_chosen` grava um item no arquivo escolhido ou
-vários na pasta escolhida; `save_to_output` usa o atalho. `SaveError` embrulha
-qualquer falha de escrita sem apagar a prévia.
+vários na pasta escolhida; `save_to_output` usa o atalho. Com vários itens, um
+destino que existe e não é pasta é recusado com `SaveError`, em vez de virar uma
+pasta com nome de arquivo. `SaveError` embrulha qualquer falha de escrita sem
+apagar a prévia.
 
 `core/paths.py` cria a pasta e devolve um nome livre (`saida_001.xlsx`).
-`core/io.py` grava todas as abas em um `.xlsx` com nomes saneados (limite de 31
-caracteres e caracteres inválidos do Excel). O arquivo de origem nunca é
-alterado e nada é criado antes da escolha do usuário.
+`core/io.py` grava todas as abas em um `.xlsx` — o sufixo do destino é sempre
+normalizado para `.xlsx` — com nomes saneados (limite de 31 caracteres e
+caracteres inválidos do Excel). O arquivo de origem nunca é alterado e nada é
+criado antes da escolha do usuário.
 
 ## Logging e erros
 
@@ -129,8 +164,8 @@ original fica no painel, o traceback em `ToolState.error_detail` e o log recebe
 o evento de erro. `build_diagnostics` monta o texto de “Copiar diagnóstico” com
 versões do app, Python, pandas e Flet, arquivos e abas, formato detectado e
 divergência, opções, resultado, tipo, mensagem, causa e traceback limitado a
-4.000 caracteres. Versão ausente vira
-“desconhecida”; nenhum conteúdo de célula entra no diagnóstico.
+4.000 caracteres. Versão ausente vira “desconhecida”; nenhum conteúdo de célula
+entra no diagnóstico.
 
 ## Ferramentas
 
@@ -145,10 +180,11 @@ divergência, opções, resultado, tipo, mensagem, causa e traceback limitado a
 
 `core/tools/cnj.py` reconhece o formato pontuado
 (`NNNNNNN-DD.AAAA.J.TR.OOOO`) e 20 dígitos consecutivos, sem aceitar trecho de
-número maior. `normalize_cnj` devolve sempre o formato pontuado; `collect_cnjs`
-percorre todas as abas e célula a célula, remove duplicatas e ordena a lista.
-`controllers/cnj.py` prepara `SaveItem` com `<nome> lista cnj.xlsx` na coluna
-`PROCESSOS` e registra encontrados, duplicados e únicos no log.
+número maior. `normalize_cnj` devolve sempre o formato pontuado;
+`summarize_cnjs` percorre todas as abas e célula a célula **uma vez** e devolve
+`(achados, únicos ordenados)`. `collect_cnjs` e `count_cnjs` continuam como
+atalhos. `controllers/cnj.py` prepara `SaveItem` com `<nome> lista cnj.xlsx` na
+coluna `PROCESSOS` e registra encontrados, duplicados e únicos no log.
 
 ## Recorte
 
@@ -156,8 +192,9 @@ percorre todas as abas e célula a célula, remove duplicatas e ordena a lista.
 fica no último bloco e uma aba vazia ainda gera um arquivo. `controllers/cut.py`
 lê pelo `prepare_workbook`, filtra as abas escolhidas e prepara um `SaveItem`
 por bloco, com `<stem>_Recorte_NNN.xlsx` (ou `<stem>_<aba>_Recorte_NNN.xlsx`
-com várias abas processadas), saneando caracteres inválidos de nome de arquivo.
-O campo de linhas é editável na página e vive em `ToolState.options`.
+com várias abas processadas). O nome da aba passa por
+`core/paths.safe_file_part`, que troca caracteres inválidos de arquivo. O campo
+de linhas é editável na página e vive em `ToolState.options`.
 
 ## Mesclagem
 
@@ -166,9 +203,11 @@ lista de `ColumnGroup`, concatena na mesma ordem e descarta apenas abas sem
 linhas. Cada grupo vira uma coluna de saída: o primeiro `ColumnRef` define o
 cabeçalho e os demais alimentam a mesma coluna; `group_by_name` agrupa
 automaticamente colunas de mesmo nome. O núcleo valida que uma aba contribui com
-no máximo uma coluna por saída, preenche lacunas com `NaN`, insere `ORIGEM` como
-primeira coluna no formato `<arquivo> - <aba> - <linha>` e desempata cabeçalhos
-repetidos com sufixo `_2`.
+no máximo uma coluna por saída, preenche lacunas com `pd.NA`, insere `ORIGEM`
+como primeira coluna e desempata cabeçalhos repetidos com sufixo `_2`. O valor
+de `ORIGEM` é `<arquivo> - <aba> - <linha>`, onde `linha` conta só as linhas de
+dados: `1` é a primeira linha depois do cabeçalho, não a linha física da
+planilha.
 
 `controllers/merge.py` lê cada fonte pelo `prepare_workbook`, filtra as abas com
 `filter_sheets` e chama `merge_sheets`; exige ao menos duas abas com dados e
@@ -188,12 +227,24 @@ linha.
 
 `tests/test_formats.py` percorre `.xlsx`, `.xls`, `.csv` e `.html` com as mesmas
 linhas fictícias e confere `read_workbook`, `list_sheets`, `read_headers` e
-`prepare_workbook`; `tests/test_integration.py` roda as quatro ferramentas sobre
-os quatro formatos, incluindo origens mistas no merge e a imutabilidade das
-origens. `tests/test_save.py` cobre controllers sem escrita, arquivo único,
-pasta, nome livre, cancelamento e `SaveError`. O `.xls` é uma fixture binária
-mínima em `tests/fixtures/minimo.xls`, gerada uma vez com `xlwt` e **sem**
-adicionar a dependência ao projeto.
+`prepare_workbook`; também cobre CSV com `;`, tab e `|`, preservação de
+`NA`/`N/A`, cabeçalho HTML de dois níveis e a falha explícita de `.xls`.
+`tests/test_integration.py` roda as quatro ferramentas sobre os quatro formatos,
+incluindo origens mistas no merge e a imutabilidade das origens.
+`tests/test_save.py` cobre controllers sem escrita, arquivo único, pasta, nome
+livre, cancelamento, `SaveError` e recusa de arquivo no lote. O `.xls` é uma
+fixture binária mínima em `tests/fixtures/minimo.xls`, gerada uma vez com `xlwt`
+e **sem** adicionar a dependência ao projeto.
+
+## Limites conhecidos
+
+- Datas do Excel chegam como texto ISO (`2024-01-02 00:00:00`), não no formato
+  exibido na planilha.
+- O `.xls` não tem leitor alternativo: se o calamine falhar, o erro é final.
+- A detecção de separador de CSV pode errar em arquivo atípico com aspas
+  inconsistentes; nesse caso o motor Python tenta inferir linha a linha.
+- HTML sem tabela e planilha sem aba útil falham com mensagem, nunca em
+  silêncio.
 
 ## Decisões
 
@@ -201,3 +252,5 @@ adicionar a dependência ao projeto.
 - [ADR 0002](../adr/0002-arquitetura-core-ui.md) — camadas.
 - [ADR 0004](../adr/0004-leitura-segura-e-emojis.md) — leitura segura e emojis.
 - [ADR 0008](../adr/0008-saida-escolhida.md) — saída escolhida depois da prévia.
+- [ADR 0010](../adr/0010-leitura-fiel-csv-html.md) — CSV/HTML fiéis e `NA` como
+  texto.

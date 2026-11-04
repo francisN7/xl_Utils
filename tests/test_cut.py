@@ -3,8 +3,9 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from xl_utils.controllers.cut import run_cut, safe_file_part
+from xl_utils.controllers.cut import run_cut
 from xl_utils.core.io import read_workbook
+from xl_utils.core.paths import safe_file_part
 from xl_utils.core.save import save_to_output
 from xl_utils.core.tools.cut import split_frame, split_workbook
 

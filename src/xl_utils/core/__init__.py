@@ -1,4 +1,4 @@
-"""Pure domain logic: no UI, no file dialogs, no terminal output."""
+"""Regra pura do domínio: sem UI, sem diálogo e sem saída no terminal."""
 
 from xl_utils.core.io import list_sheets, read_workbook, save_workbook
 from xl_utils.core.mime import resolve_suffix

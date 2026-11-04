@@ -36,7 +36,8 @@ Toda resposta que conclui trabalho termina com uma linha de estado:
 Nunca esconder validação vermelha atrás do selo.
 
 Estado: `docs/state/CURRENT.md` · futuro: `docs/roadmap/main.md` · decisões:
-`docs/adr/`. Skills: `session-start` e `project-context-init`.
+`docs/adr/` · leitura do código: `docs/guide/code-tour.md`. Skills:
+`session-start` e `project-context-init`.
 
 ## Estrutura
 
@@ -57,7 +58,9 @@ docs/               mapa, estado, roadmap, guias, ADRs
 
 ## Convenções
 
-- Código e identificadores em inglês; UI e documentação em PT-BR.
+- Identificadores e código em inglês; comentários, docstrings, UI e docs em
+  PT-BR. O core e os controllers estão traduzidos; `ui/` e `shared/` seguem no
+  backlog.
 - `core/` não importa Flet, não abre diálogos e não imprime no terminal.
 - Páginas Flet só coletam entrada, chamam controller e exibem resultado.
 - Regra de negócio fica em função pura testável, não na página.

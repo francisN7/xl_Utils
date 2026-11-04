@@ -1,4 +1,4 @@
-"""Run the row cut and keep every part in memory for saving."""
+"""Executa o recorte e mantém cada parte em memória para salvar."""
 
 from collections.abc import Collection
 from dataclasses import dataclass
@@ -7,20 +7,17 @@ from pathlib import Path
 import pandas as pd
 
 from xl_utils.core.mime import resolve_suffix
-from xl_utils.core.paths import default_output_dir
+from xl_utils.core.paths import default_output_dir, safe_file_part
 from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.all_str import prepare_workbook
 from xl_utils.core.tools.cut import split_workbook
 from xl_utils.core.tools.sheets import filter_sheets
 from xl_utils.shared.log import RunLog
 
-_INVALID_FILE_CHARS = frozenset('<>:"/\\|?*')
-_MAX_FILE_PART = 80
-
 
 @dataclass(frozen=True, slots=True)
 class CutOutcome:
-    """Result of one row-cut run."""
+    """Resultado de uma execução de recorte."""
 
     source: Path
     items: list[SaveItem]
@@ -46,7 +43,7 @@ def run_cut(
     rows_per_file: int,
     selected: Collection[str] | None = None,
 ) -> CutOutcome:
-    """Cut the selected sheets of ``source``, without writing anything."""
+    """Recorta as abas escolhidas de ``source``, sem gravar nada."""
     sheets = filter_sheets(prepare_workbook(source), selected)
     parts = split_workbook(sheets, rows_per_file)
     output_dir = default_output_dir(source)
@@ -90,11 +87,3 @@ def run_cut(
         preview=preview,
         log=log,
     )
-
-
-def safe_file_part(value: str) -> str:
-    """Make a sheet name safe for use inside a Windows file name."""
-    cleaned = "".join(
-        "_" if char in _INVALID_FILE_CHARS or ord(char) < 32 else char for char in value
-    ).strip(" .")
-    return (cleaned or "Aba")[:_MAX_FILE_PART]

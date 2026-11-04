@@ -24,6 +24,22 @@ Sem o entry point:
 uv run python -m xl_utils
 ```
 
+## Comando global (opcional)
+
+Para chamar `xl-utils` de qualquer pasta, instale o entry point como ferramenta
+do uv:
+
+```bash
+uv tool install --editable .
+xl-utils
+```
+
+`--editable` faz o comando apontar para este checkout: mudanças no código valem
+sem reinstalar. O diretório de ferramentas do uv (`~/.local/bin` no Windows)
+precisa estar no PATH; `uv tool update-shell` atualiza o perfil do shell. Para
+remover: `uv tool uninstall xl-utils`. Em Windows, o entry point é um
+`gui-script`: abre a janela sem console.
+
 ## Dependências
 
 O `pyproject.toml` é gerenciado pelo uv. Não edite `[project.dependencies]` nem

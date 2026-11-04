@@ -80,6 +80,39 @@ def test_generic_text_detection_keeps_a_supported_extension(
     assert not check.diverges
 
 
+def test_xlsm_content_is_not_a_divergence(
+    tmp_path: Path,
+    xlsx_file: Path,
+) -> None:
+    source = tmp_path / "macro.xlsm"
+    source.write_bytes(xlsx_file.read_bytes())
+
+    check = check_format(source)
+
+    assert check.detected == ".xlsx"
+    assert check.declared == ".xlsm"
+    assert check.effective == ".xlsx"
+    assert not check.diverges
+
+
+def test_htm_and_html_are_equivalent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source = tmp_path / "entrada.html"
+    source.write_text(
+        "<table><tr><th>a</th></tr><tr><td>1</td></tr></table>",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("xl_utils.core.mime.detect_suffix", lambda path: ".htm")
+
+    check = check_format(source)
+
+    assert check.detected == ".htm"
+    assert check.declared == ".html"
+    assert not check.diverges
+
+
 def test_unknown_content_and_extension_is_not_identified(tmp_path: Path) -> None:
     check = check_format(_unknown_file(tmp_path))
 

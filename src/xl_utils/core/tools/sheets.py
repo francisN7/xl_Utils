@@ -1,4 +1,9 @@
-"""Pure sheet selection: keep only the sheets the user marked."""
+"""Seleção pura de abas: mantém só o que o usuário marcou.
+
+Entrada: mapa de abas e a coleção escolhida na UI.
+Saída: novo mapa na ordem original.
+Erros: ``ValueError`` para seleção vazia ou nome inexistente.
+"""
 
 from collections.abc import Collection, Mapping, Sequence
 from pathlib import Path
@@ -8,10 +13,10 @@ def filter_sheets[Sheet](
     sheets: Mapping[str, Sheet],
     selected: Collection[str] | None = None,
 ) -> dict[str, Sheet]:
-    """Keep only ``selected`` sheets, preserving the original order.
+    """Mantém apenas as abas de ``selected``, preservando a ordem original.
 
-    ``None`` means "all sheets". An empty selection or a name that does not
-    exist raises ``ValueError`` instead of silently producing nothing.
+    ``None`` significa "todas as abas". Seleção vazia ou nome inexistente
+    levanta ``ValueError`` em vez de produzir um resultado vazio em silêncio.
     """
     if selected is None:
         return dict(sheets)
@@ -33,10 +38,11 @@ def default_selection(
     *,
     all_sheets: bool = False,
 ) -> dict[Path, set[str]]:
-    """Pick every sheet for one file and the first sheet for several files.
+    """Escolhe todas as abas de um arquivo e a primeira quando há vários.
 
-    ``all_sheets=True`` marks every sheet of every file instead; the batch
-    tools use it so adding files never hides sheets without telling the user.
+    ``all_sheets=True`` marca todas as abas de todos os arquivos. As
+    ferramentas em lote usam esse modo para que adicionar arquivo nunca esconda
+    abas sem avisar; o merge mantém só a primeira de cada origem.
     """
     if all_sheets or len(sheets) <= 1:
         return {path: set(names) for path, names in sheets.items()}

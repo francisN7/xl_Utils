@@ -17,6 +17,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | rodar o projeto | [`guide/setup.md`](guide/setup.md) |
 | testar | [`guide/testing.md`](guide/testing.md) |
 | entender como o código é organizado | [`reference/architecture.md`](reference/architecture.md) |
+| ler o código em ordem guiada | [`guide/code-tour.md`](guide/code-tour.md) |
 | entender a UI e o tema | [`reference/ui.md`](reference/ui.md) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
@@ -27,6 +28,9 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | Preciso de… | Vá direto a | ~linhas |
 |---|---|---|
 | camadas e fluxo de dados | `reference/architecture.md` → **Camadas** | 30 |
+| mapa dos módulos do core | `reference/architecture.md` → **Mapa do core** | 20 |
+| ordem de leitura do código | `guide/code-tour.md` → **As paradas** | 90 |
+| limites conhecidos da leitura | `reference/architecture.md` → **Limites conhecidos** | 10 |
 | pipeline de leitura segura | `reference/architecture.md` → **Leitura segura** | 20 |
 | detecção de formato e MIME | `reference/architecture.md` → **Detecção de formato** | 15 |
 | saída e gravação | `reference/architecture.md` → **Saída** | 12 |
@@ -42,6 +46,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que log estruturado e diagnóstico | `adr/0007-log-e-diagnostico.md` | 35 |
 | por que salvar só depois da escolha | `adr/0008-saida-escolhida.md` | 35 |
 | por que `main` tem UI e `legacy` só história | `adr/0009-publicacao-main-legacy.md` | 35 |
+| por que CSV/HTML são lidos com separador e `NA` | `adr/0010-leitura-fiel-csv-html.md` | 30 |
 
 ## Regras do mapa
 

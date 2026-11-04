@@ -14,6 +14,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | Arquivo | Estado | O que é |
 |---|---|---|
 | [`main.md`](main.md) | **ativo** | fases e backlog em andamento |
+| [`0002-migracao.md`](0002-migracao.md) | fechado | histórico do ciclo de migração e publicação |
 | [`0001-fundacao.md`](0001-fundacao.md) | fechado | histórico do ciclo da fundação |
 
 ## Ciclos fechados
@@ -21,6 +22,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | Arquivo | Ciclo | Fechado em |
 |---|---|---|
 | [`0001-fundacao.md`](0001-fundacao.md) | Fundação | 2026-11-04 |
+| [`0002-migracao.md`](0002-migracao.md) | Migração e publicação | 2026-11-04 |
 
 ## Convenção de nomes
 

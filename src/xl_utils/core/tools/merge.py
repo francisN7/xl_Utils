@@ -1,4 +1,11 @@
-"""Pure spreadsheet merge: concatenate sheets and label each row's origin."""
+"""Mesclagem pura: concatena abas e rotula a origem de cada linha.
+
+Entrada: sequência ``(arquivo, aba, DataFrame)`` e, opcionalmente, os grupos de
+colunas montados na UI.
+Saída: um único DataFrame com ``ORIGEM`` como primeira coluna.
+Erros: ``ValueError`` para coluna repetida, aba contribuindo duas vezes para a
+mesma saída ou ausência de dados.
+"""
 
 from collections.abc import Iterable
 from dataclasses import dataclass
@@ -11,7 +18,7 @@ SheetEntry = tuple[Path, str, pd.DataFrame]
 
 @dataclass(frozen=True, slots=True)
 class ColumnRef:
-    """A column of one source sheet."""
+    """Uma coluna de uma aba de origem."""
 
     source: Path
     sheet: str
@@ -20,18 +27,18 @@ class ColumnRef:
 
 @dataclass(frozen=True, slots=True)
 class ColumnGroup:
-    """One output column, fed by its source columns in order."""
+    """Uma coluna de saída, alimentada pelas colunas de origem em ordem."""
 
     columns: tuple[ColumnRef, ...]
 
     @property
     def header(self) -> str:
-        """Return the name chosen by the first chip."""
+        """Devolve o nome escolhido pelo primeiro chip."""
         return self.columns[0].column
 
 
 def group_by_name(refs: Iterable[ColumnRef]) -> list[ColumnGroup]:
-    """Group columns that share a name, preserving first-seen order."""
+    """Agrupa colunas de mesmo nome, preservando a ordem da primeira aparição."""
     groups: dict[str, list[ColumnRef]] = {}
     for ref in refs:
         groups.setdefault(ref.column, []).append(ref)
@@ -44,11 +51,11 @@ def move_column(
     target_group: int,
     target_index: int,
 ) -> list[list[ColumnRef]]:
-    """Return a copy of ``groups`` with ``ref`` moved to the target position.
+    """Devolve uma cópia de ``groups`` com ``ref`` na posição de destino.
 
-    The first source column of a group defines its header. A group may hold at
-    most one column from each source sheet; otherwise merging could not tell
-    which value to use for that sheet.
+    A primeira coluna de origem de um grupo define o cabeçalho. Um grupo pode
+    ter no máximo uma coluna de cada aba de origem; senão a mesclagem não saberia
+    qual valor usar para aquela aba.
     """
     result = [list(group) for group in groups]
     if not 0 <= target_group < len(result):
@@ -70,6 +77,8 @@ def move_column(
 
     source_index = result[source_group].index(ref)
     result[source_group].remove(ref)
+    # Ao mover dentro do mesmo grupo, remover antes desloca o destino uma
+    # posição para a esquerda quando a origem vinha antes dele.
     if source_group == target_group and source_index < target_index:
         target_index -= 1
     target.insert(min(max(target_index, 0), len(target)), ref)
@@ -80,15 +89,18 @@ def merge_sheets(
     entries: Iterable[SheetEntry],
     groups: Iterable[ColumnGroup] | None = None,
 ) -> pd.DataFrame:
-    """Concatenate ``entries`` in order, adding an ``ORIGEM`` column first.
+    """Concatena ``entries`` na ordem, com ``ORIGEM`` como primeira coluna.
 
-    Each entry is ``(source, sheet_name, frame)``. Empty frames are skipped;
-    rows are never dropped. ``groups`` decides the output columns: each group
-    is one output column, its first source column names the header, and its
-    remaining source columns feed the same output column. Without ``groups``,
-    columns with the same name are grouped automatically.
+    Cada entrada é ``(arquivo, aba, frame)``. Abas vazias (sem linhas) são
+    descartadas; linhas nunca são removidas. ``groups`` decide as colunas de
+    saída: cada grupo vira uma coluna, a primeira coluna de origem dá o nome e
+    as demais alimentam a mesma coluna. Sem ``groups``, colunas de mesmo nome
+    são agrupadas automaticamente.
 
-    Missing values become ``NaN`` and the output follows the group order.
+    Valores ausentes viram ``pd.NA``; a saída segue a ordem dos grupos. O
+    ``ORIGEM`` usa ``<arquivo> - <aba> - <linha>``, onde ``linha`` conta só as
+    linhas de dados (1 é a primeira linha depois do cabeçalho), não a linha
+    física da planilha.
     """
     active = [
         (source, sheet_name, frame)
@@ -104,6 +116,7 @@ def merge_sheets(
         for source, sheet_name, frame in active
         for column in frame.columns
     }
+    # Grupos que só apontam para abas vazias/ausentes saem do resultado.
     selected = [
         group
         for group in selected
@@ -159,6 +172,7 @@ def _column_for(
 
 
 def _validate(groups: Iterable[ColumnGroup]) -> None:
+    """Recusa coluna repetida e aba que contribui duas vezes para a saída."""
     seen: set[tuple[Path, str, str]] = set()
     for group in groups:
         sheets: set[tuple[Path, str]] = set()
@@ -179,6 +193,11 @@ def _validate(groups: Iterable[ColumnGroup]) -> None:
 
 
 def _unique_headers(names: Iterable[str]) -> list[str]:
+    """Desempata cabeçalhos repetidos com ``_2`` e protege o ``ORIGEM``.
+
+    Se o usuário já tem uma coluna ``ORIGEM``, ela vira ``ORIGEM_original``
+    para não disputar o rótulo com a coluna gerada pela mesclagem.
+    """
     used = {"ORIGEM"}
     headers: list[str] = []
     for name in names:

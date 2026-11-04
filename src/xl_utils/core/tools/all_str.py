@@ -1,27 +1,33 @@
-"""Shared workbook pipeline: read everything as text and remove emojis."""
+"""Pipeline compartilhado: ler tudo como texto e remover emojis.
+
+Entrada: caminho de uma planilha.
+Saída: ``{nome_da_aba: DataFrame}`` já limpo.
+Erros: ``WorkbookReadError`` quando a leitura normal e o reparo falham.
+"""
 
 from pathlib import Path
 
 import pandas as pd
 
-from xl_utils.core.io import read_workbook
+from xl_utils.core.io import read_html_tables, read_workbook
 from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.text import remove_emojis
 
 
 class WorkbookReadError(Exception):
-    """Raised when a workbook cannot be read, even after a repair attempt."""
+    """Indica que o livro não pôde ser lido nem após a tentativa de reparo."""
 
 
 def prepare_workbook(path: Path) -> dict[str, pd.DataFrame]:
-    """Read every sheet as text and remove emojis, keeping line breaks.
+    """Lê todas as abas como texto e remove emojis, mantendo quebras de linha.
 
-    The original file is never modified. When the normal read fails, a looser
-    reader is tried once; if that also fails, ``WorkbookReadError`` is raised.
+    O arquivo original nunca é modificado. Quando a leitura normal falha, um
+    leitor mais tolerante é tentado uma vez; se também falhar,
+    ``WorkbookReadError`` é levantado com a causa original.
     """
     try:
         sheets = read_workbook(path, dtype=str)
-    except Exception as error:  # noqa: BLE001 - any read failure gets one retry
+    except Exception as error:  # noqa: BLE001 - qualquer falha ganha um retry
         sheets = _read_with_repair(path, error)
 
     return {name: frame.map(remove_emojis) for name, frame in sheets.items()}
@@ -31,16 +37,25 @@ def _read_with_repair(
     path: Path,
     original: Exception,
 ) -> dict[str, pd.DataFrame]:
+    """Tenta o leitor alternativo ou falha com uma mensagem tipada."""
+    if resolve_suffix(path) == ".xls":
+        # O calamine é o único leitor de .xls do projeto; repetir a mesma
+        # chamada só esconderia a causa original.
+        raise WorkbookReadError(
+            f"Não foi possível ler {path.name}: {original} "
+            "(o formato .xls não tem leitor alternativo)."
+        ) from original
+
     try:
         return _repair_read(path)
-    except Exception as error:  # noqa: BLE001 - report one typed failure
+    except Exception as error:  # noqa: BLE001 - devolve uma falha única e clara
         raise WorkbookReadError(
             f"Não foi possível ler {path.name}: {original}"
         ) from error
 
 
 def _repair_read(path: Path) -> dict[str, pd.DataFrame]:
-    """Try a looser reader for the detected format, without shelling out."""
+    """Tenta um leitor mais tolerante para o formato real, sem shell."""
     suffix = resolve_suffix(path)
 
     match suffix:
@@ -50,24 +65,25 @@ def _repair_read(path: Path) -> dict[str, pd.DataFrame]:
             return _read_csv_encodings(path)
         case ".html" | ".htm":
             return _read_html_flavors(path)
-        case ".xls":
-            return read_workbook(path, dtype=str)
 
-    raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
+    raise ValueError(f"Sem leitor alternativo para {suffix or path.name!r}")
 
 
 def _read_excel_openpyxl(path: Path) -> dict[str, pd.DataFrame]:
+    """Lê Excel em modo somente leitura e com valores calculados."""
     sheets = pd.read_excel(
         path,
         sheet_name=None,
         dtype=str,
         engine="openpyxl",
         engine_kwargs={"read_only": True, "data_only": True},
+        keep_default_na=False,
     )
     return dict(sheets)
 
 
 def _read_csv_encodings(path: Path) -> dict[str, pd.DataFrame]:
+    """Percorre encodings e deixa o pandas inferir o separador."""
     last_error: Exception | None = None
     for encoding in ("utf-8-sig", "cp1252", "latin-1"):
         try:
@@ -77,8 +93,9 @@ def _read_csv_encodings(path: Path) -> dict[str, pd.DataFrame]:
                 encoding=encoding,
                 sep=None,
                 engine="python",
+                keep_default_na=False,
             )
-        except Exception as error:  # noqa: BLE001 - try the next encoding
+        except Exception as error:  # noqa: BLE001 - tenta o próximo encoding
             last_error = error
             continue
         return {"Planilha1": frame}
@@ -88,17 +105,16 @@ def _read_csv_encodings(path: Path) -> dict[str, pd.DataFrame]:
 
 
 def _read_html_flavors(path: Path) -> dict[str, pd.DataFrame]:
+    """Tenta os parsers de HTML disponíveis e mantém índices de página."""
     last_error: Exception | None = None
     for flavor in ("lxml", None):
         try:
-            frames = pd.read_html(path, flavor=flavor)
-        except Exception as error:  # noqa: BLE001 - try the next parser
+            frames = read_html_tables(path, dtype=str, flavor=flavor)
+        except Exception as error:  # noqa: BLE001 - tenta o próximo parser
             last_error = error
             continue
         if frames:
-            return {
-                f"Página{index}": frame for index, frame in enumerate(frames, start=1)
-            }
+            return frames
 
     if last_error is not None:
         raise last_error

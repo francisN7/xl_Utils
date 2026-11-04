@@ -51,3 +51,13 @@ def test_read_workbook_rejects_unknown_format(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="Formato não suportado"):
         read_workbook(unknown)
+
+
+def test_save_workbook_forces_the_xlsx_suffix(tmp_path: Path) -> None:
+    destination = save_workbook(
+        {"Dados": pd.DataFrame({"nome": ["Ana"]})},
+        tmp_path / "saida.csv",
+    )
+
+    assert destination == tmp_path / "saida.xlsx"
+    assert destination.is_file()

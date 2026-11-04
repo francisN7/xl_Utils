@@ -252,7 +252,8 @@ def test_inspect_columns_reads_csv_headers(tmp_path: Path) -> None:
     source.write_text("nome;documento\nA;1\n", encoding="utf-8-sig")
 
     assert inspect_columns([(source, None)]) == [
-        ColumnRef(source, "Planilha1", "nome;documento")
+        ColumnRef(source, "Planilha1", "nome"),
+        ColumnRef(source, "Planilha1", "documento"),
     ]
 
 

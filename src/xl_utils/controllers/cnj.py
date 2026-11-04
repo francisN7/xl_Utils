@@ -1,4 +1,4 @@
-"""Run CNJ extraction and keep the unique list in memory for saving."""
+"""Executa a extração de CNJ e mantém a lista única em memória para salvar."""
 
 from collections.abc import Collection
 from dataclasses import dataclass
@@ -10,14 +10,14 @@ from xl_utils.core.mime import resolve_suffix
 from xl_utils.core.paths import default_output_dir
 from xl_utils.core.save import SaveItem
 from xl_utils.core.tools.all_str import prepare_workbook
-from xl_utils.core.tools.cnj import collect_cnjs, count_cnjs
+from xl_utils.core.tools.cnj import summarize_cnjs
 from xl_utils.core.tools.sheets import filter_sheets
 from xl_utils.shared.log import RunLog
 
 
 @dataclass(frozen=True, slots=True)
 class CnjOutcome:
-    """Result of one CNJ extraction run."""
+    """Resultado de uma execução de extração de CNJ."""
 
     source: Path
     item: SaveItem
@@ -42,10 +42,9 @@ def run_cnj(
     source: Path,
     selected: Collection[str] | None = None,
 ) -> CnjOutcome:
-    """Extract CNJs from the selected sheets, without writing anything."""
+    """Extrai CNJs das abas escolhidas, sem gravar nada."""
     sheets = filter_sheets(prepare_workbook(source), selected)
-    cnjs = collect_cnjs(sheets)
-    found = count_cnjs(sheets)
+    found, cnjs = summarize_cnjs(sheets)
 
     name = f"{source.stem} lista cnj.xlsx"
     item = SaveItem(

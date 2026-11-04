@@ -69,6 +69,20 @@ decisões nos ADRs.
   publicada; o README aponta para as duas.
 - Branch `legacy` travada no GitHub: tag `legacy-v1` e rulesets que bloqueiam
   push, force-push e exclusão da branch e da tag.
+- Code tour em `docs/guide/code-tour.md` e “Mapa do core” em
+  `reference/architecture.md`, com docstrings e comentários do core/controllers
+  em PT-BR.
+- Comando global documentado (`uv tool install --editable .`) e ADR 0010 sobre
+  leitura fiel de CSV/HTML.
+
+### Changed
+
+- CSV passa a detectar encoding e separador (`;`, tab e `|`); `NA`, `N/A` e
+  `NULL` são preservados como texto.
+- HTML com cabeçalho de dois níveis mantém zeros à esquerda e achata o
+  cabeçalho; `.xlsm` deixou de ser tratado como divergência.
+- `save_workbook` normaliza o sufixo para `.xlsx`; `save_chosen` recusa arquivo
+  como destino de lote; `safe_file_part` e `summarize_cnjs` foram para o core.
 
 ### Removed
 
@@ -88,6 +102,10 @@ decisões nos ADRs.
 - HTML agora preserva zeros à esquerda: como `read_html` não aceita `dtype`, a
   leitura refaz a tabela com converters. As fixtures declaram UTF-8 para manter
   acentos.
+- CSV exportado pelo Excel em pt-BR (`;`) não vira mais uma coluna, e os
+  decimais com vírgula não quebram a linha.
+- O reparo de `.xls` deixou de repetir a mesma leitura: o formato falha com
+  mensagem de “sem leitor alternativo” quando o calamine não consegue abrir.
 
 ## v0.1.0 — 2026-11-04
 

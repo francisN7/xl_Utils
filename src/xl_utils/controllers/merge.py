@@ -1,4 +1,4 @@
-"""Merge the selected sheets of several files into one in-memory workbook."""
+"""Mescla as abas escolhidas de vários arquivos em um único livro em memória."""
 
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
@@ -19,7 +19,7 @@ Source = tuple[Path, Collection[str] | None]
 
 @dataclass(frozen=True, slots=True)
 class MergeOutcome:
-    """Result of one merge run."""
+    """Resultado de uma execução de mesclagem."""
 
     sources: tuple[Path, ...]
     merged: pd.DataFrame
@@ -41,10 +41,10 @@ class MergeOutcome:
 
 
 def inspect_columns(sources: Sequence[Source]) -> list[ColumnRef]:
-    """Return the selected columns of every sheet, in reading order.
+    """Devolve as colunas escolhidas de cada aba, na ordem de leitura.
 
-    The UI uses this to build the draggable column board. Files are read
-    through their real format; the rows are not loaded for Excel and CSV.
+    A UI usa isso para montar o quadro arrastável. Os arquivos são lidos pelo
+    formato real; para Excel e CSV as linhas de dados não são carregadas.
     """
     refs: list[ColumnRef] = []
     for source, selected in sources:
@@ -58,7 +58,7 @@ def run_merge(
     sources: Sequence[Source],
     groups: Sequence[ColumnGroup] | None = None,
 ) -> MergeOutcome:
-    """Concatenate the selected sheets of ``sources``, without writing."""
+    """Concatena as abas escolhidas de ``sources``, sem gravar."""
     if not sources:
         raise ValueError("Selecione ao menos um arquivo para mesclar.")
 

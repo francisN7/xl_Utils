@@ -47,7 +47,7 @@ def test_prepare_workbook_cleans_every_sheet(tmp_path: Path) -> None:
     assert sheets["Outra"]["nome"].tolist() == ["Bia "]
 
 
-def test_prepare_workbook_repairs_csv_encoding(tmp_path: Path) -> None:
+def test_prepare_workbook_reads_csv_encoding(tmp_path: Path) -> None:
     source = tmp_path / "entrada.csv"
     source.write_bytes("nome;cidade\nJoão;São Paulo\n".encode("latin-1"))
 

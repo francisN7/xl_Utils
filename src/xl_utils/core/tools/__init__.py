@@ -1,1 +1,1 @@
-"""One module per tool, holding the pure rules of that tool."""
+"""Um módulo por ferramenta, com as regras puras daquela ferramenta."""

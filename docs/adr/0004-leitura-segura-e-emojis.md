@@ -50,3 +50,9 @@ falha, `prepare_workbook` tenta **um** leitor tolerante conforme o formato real
 para HTML). Se o fallback também falhar, levanta `WorkbookReadError` com a causa
 original; a página mostra a mensagem e o arquivo do usuário fica intacto.
 
+## Adendo — `.xls` sem reparo (S4b)
+
+O calamine é o único leitor de `.xls` do projeto. Repetir a mesma chamada não
+configura reparo e escondia a causa original; o formato agora falha direto com
+`WorkbookReadError` e uma mensagem que diz que não há leitor alternativo.
+

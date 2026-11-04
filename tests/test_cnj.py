@@ -11,6 +11,7 @@ from xl_utils.core.tools.cnj import (
     count_cnjs,
     extract_cnjs,
     normalize_cnj,
+    summarize_cnjs,
 )
 
 FIRST = "0001234-56.2024.8.26.0100"
@@ -54,6 +55,18 @@ def test_collect_cnjs_reads_duplicate_column_names() -> None:
     frame = pd.DataFrame([[FIRST, SECOND]], columns=["processo", "processo"])
 
     assert collect_cnjs({"Uma": frame}) == [FIRST, SECOND]
+
+
+def test_summarize_cnjs_matches_collect_and_count() -> None:
+    sheets = {
+        "Uma": pd.DataFrame({"texto": [f"{FIRST} e {FIRST_DIGITS}", SECOND, None]}),
+        "Outra": pd.DataFrame({"processo": [FIRST, "sem cnj"]}),
+    }
+
+    found, unique = summarize_cnjs(sheets)
+
+    assert found == count_cnjs(sheets) == 4
+    assert unique == collect_cnjs(sheets) == [FIRST, SECOND]
 
 
 def test_run_cnj_prepares_a_sorted_unique_list(tmp_path: Path) -> None:

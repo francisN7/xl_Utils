@@ -67,6 +67,14 @@ def test_save_chosen_writes_many_items_into_a_folder(tmp_path: Path) -> None:
     assert all(path.is_file() for path in paths or [])
 
 
+def test_save_chosen_rejects_a_file_for_many_items(tmp_path: Path) -> None:
+    blocker = tmp_path / "bloqueio.xlsx"
+    blocker.write_bytes(b"nao e pasta")
+
+    with pytest.raises(SaveError, match="pasta"):
+        save_chosen([_item("um.xlsx"), _item("dois.xlsx")], blocker)
+
+
 def test_save_chosen_cancel_writes_nothing(tmp_path: Path) -> None:
     paths = save_chosen([_item()], None)
 

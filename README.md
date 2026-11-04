@@ -33,6 +33,14 @@ Alternativa sem o entry point:
 uv run python -m xl_utils
 ```
 
+Para chamar `xl-utils` de qualquer pasta (uma vez, apontando para este
+checkout):
+
+```bash
+uv tool install --editable .
+xl-utils
+```
+
 ## Desenvolvimento
 
 ```bash
@@ -56,9 +64,10 @@ docs/          documentação e memória entre sessões
 
 ## Documentação
 
-O mapa completo está em [`docs/README.md`](docs/README.md). Para retomar o
-projeto, leia [`AGENTS.md`](AGENTS.md) e
-[`docs/state/CURRENT.md`](docs/state/CURRENT.md).
+O mapa completo está em [`docs/README.md`](docs/README.md). Para entender o
+código em ordem guiada, comece pelo
+[code tour](docs/guide/code-tour.md). Para retomar o projeto, leia
+[`AGENTS.md`](AGENTS.md) e [`docs/state/CURRENT.md`](docs/state/CURRENT.md).
 
 ## Branch `legacy`
 
