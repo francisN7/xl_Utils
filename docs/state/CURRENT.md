@@ -4,11 +4,11 @@
 
 ## Sessão
 
-- **Última concluída:** S1e — mesclagem de planilhas
-- **Próxima:** S2a — integração do fluxo (`docs/sessions/S2a-integracao.md`)
-- **Ciclo:** 0002 — Fase 1 concluída; início da Fase 2 — Consolidação
-- **Retorno:** `core/tools/merge.py`, `controllers/merge.py`, `ui/pages/merge.py`
-- **Decisões abertas:** nenhuma; alinhamento do merge por dropdown (ADR 0005)
+- **Última concluída:** S2a — integração do fluxo
+- **Próxima:** S2b — logging e erros (`docs/sessions/S2b-logging-e-erros.md`)
+- **Ciclo:** 0002 — Fase 2 — Consolidação
+- **Retorno:** `tests/test_formats.py`, `tests/test_integration.py`, `core/io.py`
+- **Decisões abertas:** nenhuma
 
 ## Pronto
 
@@ -17,37 +17,35 @@
   reparo; falha vira `WorkbookReadError`.
 - Texto, CNJ, recorte e merge prontos e salvando em `output/`; as três primeiras
   aceitam lote e processam cada origem separadamente.
-- `list_sheets` lista abas pelo tipo real; `read_headers` lê só os cabeçalhos;
-  `filter_sheets` aplica a seleção e `default_selection` marca todas no lote e a
-  primeira de cada no merge.
-- Merge concatena as abas selecionadas na ordem, com `ORIGEM`
-  (`arquivo - aba - linha`) e alinhamento por dropdown; exige duas abas úteis.
-- Seletor de chips com “Todas”/“Limpar”, contador e spinner; tipografia mínima
-  de 12 px; colunas rolam sem barra, log de 160 px e prévia de 240 px.
+- Seleção de abas por chips e `default_selection` por ferramenta; merge com
+  `ORIGEM` e alinhamento por dropdown.
+- Integração coberta nos quatro formatos: `.xlsx`, `.xls`, `.csv` e `.html`; o
+  `.xls` usa a fixture binária `tests/fixtures/minimo.xls`.
+- HTML preserva zeros à esquerda: `read_workbook` reparseia com converters
+  porque `read_html` não aceita `dtype`.
+- Reparo testado com CSV cp1252; arquivo inválido sobe `WorkbookReadError`.
+- Controllers testados com origens intactas (bytes) e saídas em `output/`.
 
 ## Próximo passo
 
-S2a: fixtures fictícias para `.xlsx`, `.xls`, `.csv` e `.html`, testes de
-`prepare_workbook`/`read_headers` e de reparo (CSV cp1252 e arquivo inválido),
-mais um teste integrado por ferramenta.
+S2b: log estruturado por execução, erros tipados na UI e botão de copiar
+diagnóstico com versões, arquivos, abas, opções e traceback.
 
 ## Arquivos-chave
 
-- `core/tools/merge.py`, `controllers/merge.py`, `ui/pages/merge.py`.
-- `core/io.py` (`read_headers`), `core/tools/sheets.py` e `tool_layout.py`
-  (painéis de opções com `refresh()`).
+- `tests/conftest.py`, `test_formats.py` e `test_integration.py`.
+- `core/io.py` (`read_headers`, HTML com converters) e `core/tools/all_str.py`.
 
 ## Armadilhas
 
-- Flet 1.0 não suporta drop de arquivos do SO nem drag de colunas; o dropzone é
-  clicável e o alinhamento é por dropdown.
+- Flet 1.0 não suporta drop de arquivos do SO nem drag de colunas.
 - Flet 1.0 usa `Dropdown.on_select`, não `on_change`.
 - `puremagic` lê HTML como `.txt`; `resolve_suffix` usa a extensão original.
-- `merge` marca só a primeira aba de cada arquivo quando há vários; com um único
-  arquivo, marca todas (ADR 0005/0006).
-- Uma coluna de origem chamada `ORIGEM` vira `ORIGEM_original` na saída.
-- `read_headers` roda ao trocar a seleção; é só cabeçalho, mas HTML é inteiro.
-- `cut` usa o nome da aba no arquivo só com mais de uma aba processada.
+- Pandas 3.1 avisa que o engine `xlrd` será removido; migrar para `calamine`
+  antes do pandas 4.
+- HTML sem `<meta charset>` pode perder acentos; as fixtures declaram UTF-8.
+- `read_html` não aceita `dtype`; a segunda passada com converters é necessária.
+- `merge` marca só a primeira aba por arquivo quando há vários.
 
 ## Como rodar
 

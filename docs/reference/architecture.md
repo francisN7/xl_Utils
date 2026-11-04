@@ -51,7 +51,9 @@ do usuário.
 
 O objetivo é não perder zeros à esquerda, CNJ/CPF e valores que o Excel
 converteria em notação científica. A ferramenta “Tratamento de texto” também
-expõe esse pipeline sozinha, para conversão e reparo explícitos.
+expõe esse pipeline sozinha, para conversão e reparo explícitos. O
+`read_html` do pandas não aceita `dtype`; para HTML, a leitura faz uma segunda
+passada com converters e mantém os zeros à esquerda.
 
 ## Seleção de abas
 
@@ -143,6 +145,13 @@ enquanto não houver regressão que justifique teste de widget. O teste funciona
 do `all_str` gera 1.000 linhas fictícias em memória, roda em CSV e XLSX e
 confere zeros à esquerda, numeração CNJ-like, remoção de emojis e quebras de
 linha.
+
+`tests/test_formats.py` percorre `.xlsx`, `.xls`, `.csv` e `.html` com as mesmas
+linhas fictícias e confere `read_workbook`, `list_sheets`, `read_headers` e
+`prepare_workbook`; `tests/test_integration.py` roda as quatro ferramentas sobre
+os quatro formatos, incluindo origens mistas no merge e a imutabilidade das
+origens. O `.xls` é uma fixture binária mínima em `tests/fixtures/minimo.xls`,
+gerada uma vez com `xlwt` e **sem** adicionar a dependência ao projeto.
 
 ## Decisões
 

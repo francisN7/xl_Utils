@@ -32,10 +32,7 @@ def read_workbook(
         case ".csv":
             return {"Planilha1": pd.read_csv(path, dtype=dtype)}
         case ".html" | ".htm":
-            return {
-                f"Página{index}": frame
-                for index, frame in enumerate(pd.read_html(path), start=1)
-            }
+            return _read_html_tables(path, dtype=dtype)
 
     raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
 
@@ -62,9 +59,10 @@ def list_sheets(path: Path) -> list[str]:
 def read_headers(path: Path) -> dict[str, list[str]]:
     """Return the column labels of every sheet without loading the rows.
 
-    Excel reads only the headers; CSV tries the same encodings as the repair
-    path; HTML has no header-only mode, so its tables are parsed fully. Labels
-    are always returned as text, matching the UI column mapping.
+    Excel reads only the headers. CSV reads the file with the same encoding
+    and separator fallback as the repair path, so the labels match a real run.
+    HTML has no header-only mode, so its tables are parsed fully. Labels are
+    always returned as text, matching the UI column mapping.
     """
     suffix = resolve_suffix(path)
 
@@ -80,10 +78,9 @@ def read_headers(path: Path) -> dict[str, list[str]]:
             case ".csv":
                 return {"Planilha1": _csv_headers(path)}
             case ".html" | ".htm":
-                frames = pd.read_html(path)
                 return {
-                    f"Página{index}": [str(column) for column in frame.columns]
-                    for index, frame in enumerate(frames, start=1)
+                    name: [str(column) for column in frame.columns]
+                    for name, frame in read_workbook(path, dtype=str).items()
                 }
     except Exception as error:  # noqa: BLE001 - report one clear failure
         raise ValueError(
@@ -132,18 +129,44 @@ def _list_html_sheets(path: Path) -> list[str]:
         ) from error
 
 
-def _csv_headers(path: Path) -> list[str]:
-    last_error: Exception | None = None
-    for encoding in ("utf-8-sig", "cp1252", "latin-1"):
-        try:
-            frame = pd.read_csv(path, nrows=0, encoding=encoding)
-        except Exception as error:  # noqa: BLE001 - try the next encoding
-            last_error = error
-            continue
-        return [str(column) for column in frame.columns]
+def _read_html_tables(
+    path: Path,
+    *,
+    dtype: str | None,
+) -> dict[str, pd.DataFrame]:
+    """Read every HTML table, applying ``dtype=str`` cell by cell.
 
-    assert last_error is not None
-    raise last_error
+    ``read_html`` has no ``dtype`` parameter, so a second pass uses converters
+    to stop numbers such as ``000123`` from losing their leading zeros.
+    """
+    frames = pd.read_html(path)
+    if dtype is str:
+        columns = {str(column) for frame in frames for column in frame.columns}
+        frames = pd.read_html(path, converters=dict.fromkeys(columns, str))
+    return {f"Página{index}": frame for index, frame in enumerate(frames, start=1)}
+
+
+def _csv_headers(path: Path) -> list[str]:
+    try:
+        frame = pd.read_csv(path, dtype=str)
+    except Exception as first_error:  # noqa: BLE001 - retry like the repair path
+        last_error: Exception = first_error
+        for encoding in ("utf-8-sig", "cp1252", "latin-1"):
+            try:
+                frame = pd.read_csv(
+                    path,
+                    dtype=str,
+                    encoding=encoding,
+                    sep=None,
+                    engine="python",
+                )
+            except Exception as error:  # noqa: BLE001 - try the next encoding
+                last_error = error
+                continue
+            return [str(column) for column in frame.columns]
+        raise last_error from first_error
+
+    return [str(column) for column in frame.columns]
 
 
 def _read_excel(

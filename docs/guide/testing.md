@@ -46,8 +46,14 @@ def test_roundtrip(tmp_path: Path) -> None:
 `tests/test_all_str_bulk.py` gera 1.000 linhas inventadas em memória, com zeros
 à esquerda, texto no formato CNJ (ano 0000, inválido de propósito), emojis e
 quebras de linha. Nenhum dado de teste é versionado. O teste roda o pipeline
-completo em CSV e XLSX e confere que nada disso se perde. Para criar uma amostra
-local em `samples/` (fora do Git):
+completo em CSV e XLSX e confere que nada disso se perde.
+
+`tests/conftest.py` monta as mesmas linhas fictícias em `.xlsx`, `.csv` e
+`.html` dentro de `tmp_path` e copia `tests/fixtures/minimo.xls`. O `.xls` é o
+único binário versionado; foi gerado uma vez com `uv run --with xlwt` e contém
+três linhas inventadas. `tests/test_formats.py` cobre leitura, abas, cabeçalhos
+e reparo; `tests/test_integration.py` roda as quatro ferramentas nos quatro
+formatos. Para criar uma amostra local em `samples/` (fora do Git):
 
 ```bash
 uv run python scripts/make_fixture.py

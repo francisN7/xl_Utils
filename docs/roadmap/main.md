@@ -26,7 +26,7 @@ duplicação e com teste.
 
 ## Fase 2 — Consolidação
 
-- [ ] **S2a — Integração do fluxo.** Testes com planilhas reais fictícias,
+- [x] **S2a — Integração do fluxo.** Testes com planilhas reais fictícias,
   leitura de `.xls`, `.csv` e `.html`, reparo de arquivo corrompido.
 - [ ] **S2b — Logging e erros.** Log estruturado por execução, erros tipados
   exibidos na UI e botão de copiar diagnóstico.

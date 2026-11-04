@@ -40,6 +40,10 @@ decisões nos ADRs.
 - Mesclagem de planilhas: concatena as abas selecionadas de um ou vários
   arquivos em `output/Merge.xlsx`, com a coluna `ORIGEM`, alinhamento de colunas
   por dropdown e recusa de uma única aba útil.
+- Suíte de integração nos quatro formatos (`.xlsx`, `.xls`, `.csv` e `.html`):
+  leitura, cabeçalhos, reparo de CSV cp1252, imutabilidade das origens e
+  execução das quatro ferramentas, incluindo merge com origens mistas. O `.xls`
+  usa uma fixture binária fictícia gerada com `xlwt`.
 - Estrutura de contexto entre sessões (`AGENTS.md`, `CURRENT.md`, mapa em
   `docs/README.md`, roadmap `main` + histórico, specs, ADRs e check de docs).
 
@@ -57,6 +61,9 @@ decisões nos ADRs.
 - Colunas de entrada e de resultado rolam sem barra visível; log limitado a
   160 px, prévia com 240 px e rolagem nos dois eixos. O conteúdo fica recortado
   no cartão e não cobre mais a linha divisória nem a barra de ação.
+- HTML agora preserva zeros à esquerda: como `read_html` não aceita `dtype`, a
+  leitura refaz a tabela com converters. As fixtures declaram UTF-8 para manter
+  acentos.
 
 ## v0.1.0 — 2026-11-04
 
