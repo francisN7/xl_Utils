@@ -18,4 +18,5 @@ planilhas mais fiel e código inteiro legível em PT-BR.
 
 `uv run ruff check src tests`, `uv run ruff format --check src tests`,
 `uv run pytest` (155 testes) e `node scripts/check-docs.mjs` verdes antes do
-fechamento. O ciclo seguinte começa em [`main.md`](main.md).
+fechamento. O ciclo seguinte começa em
+[`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md).

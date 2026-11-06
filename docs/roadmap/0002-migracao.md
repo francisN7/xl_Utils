@@ -35,4 +35,4 @@ log/diagnóstico, saída escolhida e `main` publicada com a `legacy` preservada.
 
 `uv run ruff check src tests`, `uv run pytest` e `node scripts/check-docs.mjs`
 verdes antes do fechamento. O ciclo seguinte começa em
-[`main.md`](main.md).
+[`0003-qualidade.md`](0003-qualidade.md).

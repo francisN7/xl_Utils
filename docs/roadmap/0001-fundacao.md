@@ -16,3 +16,9 @@ e documentação entre sessões prontas para a migração.
 - [ADR 0002](../adr/0002-arquitetura-core-ui.md) — arquitetura core/controllers/ui.
 - [ADR 0003](../adr/0003-ui-sidebar-e-inicio.md) — sidebar + Início e anatomia de ferramenta.
 - [ADR 0004](../adr/0004-leitura-segura-e-emojis.md) — leitura segura e emojis.
+
+## Validação de fechamento
+
+`uv run ruff check src tests`, `uv run pytest` e `node scripts/check-docs.mjs`
+verdes antes do fechamento. O ciclo seguinte começa em
+[`0002-migracao.md`](0002-migracao.md).
