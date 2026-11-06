@@ -106,6 +106,9 @@ decisões nos ADRs.
   como destino de lote; `safe_file_part` e `summarize_cnjs` foram para o core.
 - Docstrings e comentários de `ui/`, `shared/`, shell e `__init__` passam para
   PT-BR; o diagnóstico foi revisado sem incluir conteúdo de célula.
+- Documentação: o backlog passa a registrar o envio direto do Google Drive e a
+  vinculação entre AGENDA, CLIENTES, FINANCEIRO e PROCESSOS, com decisões em
+  aberto e protocolo detalhado; nenhuma das duas foi implementada.
 
 ### Removed
 

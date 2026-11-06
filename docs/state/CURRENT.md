@@ -4,12 +4,12 @@
 
 ## Sessão
 
-- **Última concluída:** S6b — progresso e log por estágio
+- **Última concluída:** S6b — progresso e log por estágio; depois, curadoria do
+  backlog (Drive e vinculação)
 - **Próxima:** S6c — tema claro opcional
   (`docs/sessions/S6c-tema-claro.md`) — spec pronta
 - **Ciclo:** 0005 — Polimento, Fase 2
-- **Decisões:** tema claro aplicado ao reabrir; histórico descartado; ADR 0005
-  (ORIGEM/LINHA_ORIGEM) e ADR 0011 (etapas/barra) atualizados
+- **Decisões:** tema claro ao reabrir; histórico descartado; ADRs 0005 e 0011 atualizados
 
 ## Pronto
 
