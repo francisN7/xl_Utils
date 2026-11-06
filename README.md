@@ -14,7 +14,7 @@ texto seguro antes de chegar à ferramenta.
 | Extrair CNJs | Encontra e padroniza numerações CNJ em uma planilha | pronta |
 | Recortar Planilha | Divide uma planilha em arquivos por quantidade de linhas | pronta |
 | Mesclar Planilhas | Concatena as abas selecionadas com a origem de cada linha | pronta |
-| Vincular Planilhas | Cruza AGENDA e PROCESSOS e marca o vínculo de cada linha | pronta (AGENDA × PROCESSOS) |
+| Verificar Vínculos | Confere os vínculos entre AGENDA e PROCESSOS e marca cada linha | pronta (AGENDA × PROCESSOS) |
 
 ## Requisitos
 

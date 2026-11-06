@@ -21,8 +21,8 @@ NOTE = (
 def build() -> ft.Control:
     """Monta a página com duas entradas rotuladas e o aviso de reexecução."""
     return ToolLayout(
-        "Vincular Planilhas",
-        "Cruza a AGENDA com PROCESSOS e marca o vínculo de cada linha.",
+        "Verificar Vínculos",
+        "Confere os vínculos entre AGENDA e PROCESSOS e marca cada linha.",
         note=NOTE,
         inputs=LABELS,
         pre_run=_pre_run,

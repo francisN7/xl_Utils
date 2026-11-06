@@ -4,15 +4,18 @@
 
 ## Sessão
 
-- **Última concluída:** S7a — vinculação AGENDA × PROCESSOS
-- **Próxima:** S7b — FINANCEIRO + CLIENTES
+- **Última concluída:** S7b — renomear a ferramenta para “Verificar Vínculos”
+- **Próxima:** S7c — FINANCEIRO + CLIENTES
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO`
   sempre; config empacotada em `src/xl_utils/configs/headers.json`; ADR 0014
-  (regra) e ADR 0015 (config × estado)
+  (regra) e ADR 0015 (config × estado). O nome visível mudou, mas o `id`,
+  os módulos `link` e a palavra “vinculação” continuam.
 
 ## Pronto
 
+- S7b: “Vincular Planilhas” virou “Verificar Vínculos” na sidebar, no
+  cabeçalho, no README e na referência; a descrição acompanha o nome.
 - S7a: motor puro em `core/tools/link.py`; página com duas entradas rotuladas
   (AGENDA e PROCESSOS); `VINCULA?` na prioridade CNJ → PASTA → PROTOCOLO;
   protocolo preservado na descrição e campo vira `MIGRAÇÃO`; pop-up de
@@ -22,7 +25,7 @@
 
 ## Próximo passo
 
-Ler `docs/sessions/S7b-vinculacao-financeiro.md` e implementar FINANCEIRO +
+Ler `docs/sessions/S7c-vinculacao-financeiro.md` e implementar FINANCEIRO +
 CLIENTES, `VINCULA (POR NOME)?` e a opção de nome na descrição.
 
 ## Arquivos-chave
@@ -36,6 +39,8 @@ CLIENTES, `VINCULA (POR NOME)?` e a opção de nome na descrição.
 
 ## Armadilhas
 
+- As planilhas reais para validar a vinculação ainda não foram corrigidas pelo
+  dono; a S7c pode ficar bloqueada até isso acontecer.
 - Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula; é esperado.
 - CNJ numérico no Excel perde precisão antes da leitura; a coluna deve ser texto.
 - `PROCESSO ORIGINÁRIO` contém “PROCESSO”; o match é exato, nunca substring.

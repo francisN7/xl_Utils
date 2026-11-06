@@ -24,7 +24,7 @@ O conteúdo abre em uma das duas formas:
 │ CNJ      │ 1. Entrada        │ 3. Resultado           │
 │ Recortar │    dropzone       │    status + caminho    │
 │ Mesclar  │ 2. Opções         │    log + prévia        │
-│ Vincular │                   │                        │
+│ Vínculos │                   │                        │
 │          ├───────────────────┴────────────────────────┤
 │          │ [resumo]                    [Executar]     │
 └──────────┴────────────────────────────────────────────┘
@@ -109,7 +109,7 @@ como primeiras colunas.
 
 ### Vinculação
 
-A ferramenta **Vincular Planilhas** usa duas entradas rotuladas — AGENDA e
+A ferramenta **Verificar Vínculos** usa duas entradas rotuladas — AGENDA e
 PROCESSOS — e não mostra o seletor de abas: cada arquivo pode ter várias abas e
 a ferramenta escolhe a primeira que contém o bloco padrão. “Executar” só libera
 quando as duas planilhas estão escolhidas. A prévia mostra a AGENDA já com

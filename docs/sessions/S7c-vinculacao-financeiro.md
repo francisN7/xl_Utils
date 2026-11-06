@@ -1,4 +1,4 @@
-# S7b — Vinculação II: FINANCEIRO e CLIENTES
+# S7c — Vinculação II: FINANCEIRO e CLIENTES
 
 ## Objetivo
 
@@ -7,7 +7,7 @@ Acrescentar FINANCEIRO e CLIENTES à vinculação, gerando `VINCULA?` e
 
 ## Fora de escopo
 
-- Opção “manter apenas um campo vinculante” — fica para a S7c.
+- Opção “manter apenas um campo vinculante” — fica para a S7d.
 - Normalizar nome, CNJ, PASTA ou PROTOCOLO; continua tudo bruto.
 - Popular CLIENTES ou PROCESSOS; eles são só fontes de consulta.
 - Google Drive e tela cheia.
@@ -78,5 +78,5 @@ das outras ferramentas.
 
 ## Próximo depois desta
 
-S7c — opção de manter um único campo vinculante, log por etapa e acabamento da
+S7d — opção de manter um único campo vinculante, log por etapa e acabamento da
 ferramenta.

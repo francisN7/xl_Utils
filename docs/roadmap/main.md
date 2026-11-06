@@ -8,8 +8,9 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | Sessão | Entrega | Estado |
 |---|---|---|
 | S7a | Vinculação I — motor + AGENDA × PROCESSOS | [x] |
-| S7b | Vinculação II — FINANCEIRO + CLIENTES | [ ] |
-| S7c | Vinculação III — campo único, log e acabamento | [ ] |
+| S7b | Trocar nome de "Vincular Planilhas" para "Verificar Vínculos". | [x] |
+| S7c | Vinculação II — FINANCEIRO + CLIENTES | [ ] |
+| S7d | Vinculação III — campo único, log e acabamento | [ ] |
 | S8 | Alinhamento de colunas em tela cheia no merge | [ ] |
 | S9a | Drive I — ADR, OAuth, contas e shell | [ ] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
@@ -27,16 +28,22 @@ PROCESSOS), `VINCULA?` e preservação do protocolo na descrição com
 e o override por máquina em `%LOCALAPPDATA%/xl_utils/headers.json`. Detalhes na
 [spec](../sessions/S7a-vinculacao-agenda.md) e nos ADRs 0014 e 0015.
 
-## S7b — FINANCEIRO e CLIENTES
+## S7b — nome da ferramenta
+
+“Vincular Planilhas” passa a se chamar **Verificar Vínculos** na sidebar, no
+cabeçalho da página, no README e na referência. A descrição acompanha o novo
+vocabulário. O `id` interno, os módulos e a regra de vinculação não mudam.
+
+## S7c — FINANCEIRO e CLIENTES
 
 Acrescenta as outras duas entradas rotuladas. No FINANCEIRO, `VINCULA?` usa a
 mesma prioridade CNJ → PASTA → PROTOCOLO; `VINCULA (POR NOME)?` recebe
 SIM/NÃO comparando o nome com a lista única de PROCESSOS (split por `;`) e
 CLIENTES. A descrição usa `" | "` e o prefixo `NOME DO CLIENTE: X`. Opção
 “nome sem vínculo na descrição”. Ver
-[spec](../sessions/S7b-vinculacao-financeiro.md).
+[spec](../sessions/S7c-vinculacao-financeiro.md).
 
-## S7c — acabamento da vinculação
+## S7d — acabamento da vinculação
 
 Opção “manter apenas um campo vinculante” (AGENDA, FINANCEIRO ou ambos),
 etapas no log, cartão no Início e revisão dos textos. Fecha a regra de

@@ -105,9 +105,9 @@ TOOLS: tuple[ToolPage, ...] = (
     ),
     ToolPage(
         id="link",
-        label="Vincular Planilhas",
+        label="Verificar Vínculos",
         icon=ft.Icons.LINK,
-        description="Cruza AGENDA e PROCESSOS e marca o vínculo de cada linha.",
+        description="Confere os vínculos entre AGENDA e PROCESSOS e marca cada linha.",
         build=build_link,
     ),
 )

@@ -7,8 +7,8 @@ preservar o protocolo sem vínculo na descrição, sem alterar o original.
 
 ## Fora de escopo
 
-- FINANCEIRO, CLIENTES e `VINCULA (POR NOME)?` — ficam para a S7b.
-- Opção “manter apenas um campo vinculante” — fica para a S7c.
+- FINANCEIRO, CLIENTES e `VINCULA (POR NOME)?` — ficam para a S7c.
+- Opção “manter apenas um campo vinculante” — fica para a S7d.
 - Normalizar CNJ, PASTA, PROTOCOLO ou nome; a comparação é bruta.
 - Google Drive e o alinhamento em tela cheia.
 
@@ -70,5 +70,5 @@ Ler `AGENTS.md`, `CURRENT.md` e esta spec. Consultar pontualmente
 
 ## Próximo depois desta
 
-S7b — acrescentar FINANCEIRO e CLIENTES, `VINCULA (POR NOME)?` e a opção de
-nome na descrição.
+S7b — renomear a ferramenta para “Verificar Vínculos”; S7c — acrescentar
+FINANCEIRO e CLIENTES, `VINCULA (POR NOME)?` e a opção de nome na descrição.
