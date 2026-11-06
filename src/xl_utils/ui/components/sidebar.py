@@ -141,12 +141,6 @@ class Sidebar:
         )
 
     def _footer(self) -> ft.Control:
-        self._theme_hint = ft.Text(
-            "Reabra o aplicativo para aplicar",
-            size=theme.FONT_XS,
-            color=theme.YELLOW,
-            visible=False,
-        )
         self._theme_button = ft.TextButton(
             self._theme_action_label(),
             icon=self._theme_action_icon(),
@@ -178,7 +172,6 @@ class Sidebar:
                         spacing=7,
                     ),
                     self._theme_button,
-                    self._theme_hint,
                 ],
                 spacing=2,
             ),
@@ -195,7 +188,6 @@ class Sidebar:
         self._theme_mode = "light" if self._theme_mode == "dark" else "dark"
         self._theme_button.content = self._theme_action_label()
         self._theme_button.icon = self._theme_action_icon()
-        self._theme_hint.visible = True
         if self._on_theme_change is not None:
             self._on_theme_change(self._theme_mode)
         self._refresh()

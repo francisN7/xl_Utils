@@ -8,7 +8,7 @@ o próximo começa em [`main.md`](main.md).
 |---|---|---|
 | S6a | `ORIGEM` = `<stem> - <aba>` e `LINHA_ORIGEM` numerando o resultado inteiro com zeros à esquerda | origem e posição legíveis após a mesclagem |
 | S6b | leitura, planilha carregada e cálculo no log ao vivo; barra indeterminada por arquivo | quatro ferramentas mostram a etapa e avançam ao concluir cada arquivo |
-| S6c | paletas escura/clara, preferência em `settings.json` e botão na sidebar com aviso de reabertura | tema salvo sobrevive ao fechamento; settings inválido cai no escuro |
+| S6c | paletas escura/clara (Alucard), preferência em `settings.json` e troca ao vivo na sidebar sem perder estado | tema salvo sobrevive ao fechamento; settings inválido cai no escuro |
 
 **Resultado do ciclo:** execução visível nas quatro ferramentas e leitura
 confortável em ambiente claro, sem mudar layout, fluxo ou regra de negócio.
@@ -34,5 +34,5 @@ Nenhum tinha sessão marcada ao fechar o ciclo; a prioridade fica com o dono.
 `uv run ruff check src tests`, `uv run ruff format --check src tests`,
 `uv run pytest` e `node scripts/check-docs.mjs` verdes antes do fechamento.
 Smoke visual feito no app web: Início e Tratamento de Texto nos dois temas; o
-botão da sidebar gravou `light` em `settings.json` e mostrou o aviso de
-reabertura.
+botão da sidebar trocou as cores na hora, manteve a página aberta, os cartões e
+painéis ainda arredondados, e gravou a preferência em `settings.json`.

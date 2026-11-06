@@ -49,8 +49,21 @@ def main(page: ft.Page) -> None:
         show(index)
 
     def change_theme(next_mode: str) -> None:
+        nonlocal mode
+        if next_mode == mode:
+            return
         with contextlib.suppress(OSError):
             settings.save_theme(next_mode)
+        mapping = theme.color_mapping(mode, next_mode)
+        theme.apply(next_mode)
+        mode = next_mode
+        page.bgcolor = theme.BACKGROUND
+        page.theme_mode = ft.ThemeMode.LIGHT if mode == "light" else ft.ThemeMode.DARK
+        theme.restyle(sidebar.control, mapping)
+        theme.restyle(home, mapping)
+        for view in pages.values():
+            theme.restyle(view, mapping)
+        page.update()
 
     sidebar = Sidebar(
         TOOLS,
@@ -60,13 +73,12 @@ def main(page: ft.Page) -> None:
     )
     home = build_home(open_tool)
 
-    page.add(
-        ft.Row(
-            controls=[sidebar.control, content],
-            expand=True,
-            vertical_alignment=ft.CrossAxisAlignment.STRETCH,
-        )
+    shell = ft.Row(
+        controls=[sidebar.control, content],
+        expand=True,
+        vertical_alignment=ft.CrossAxisAlignment.STRETCH,
     )
+    page.add(shell)
     show(0)
 
 

@@ -98,7 +98,8 @@ decisões nos ADRs.
 - Tema claro opcional, variante Alucard do Dracula (creme quente, sem branco
   puro): a paleta esclarece os tokens de `ui/theme.py`, a escolha fica em
   `shared/settings.py` (`%LOCALAPPDATA%/xl_utils/settings.json`) e o botão da
-  sidebar pede reabertura. Ver ADR 0013.
+  sidebar troca na hora, recolorindo a árvore sem perder o estado nem os cantos
+  arredondados. Ver ADR 0013.
 
 ### Changed
 

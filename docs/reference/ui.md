@@ -140,7 +140,7 @@ painel entra em **“Pronto para salvar”**: a prévia aparece, mas nenhum arqu
 O app abre no tema salvo em `%LOCALAPPDATA%/xl_utils/settings.json` (fallback
 `~/.xl_utils/settings.json`), chave `theme` com `dark` ou `light`. Arquivo
 ausente, inválido ou com valor desconhecido abre no escuro. A preferência é
-gravada na sidebar; a troca só vale na próxima abertura.
+gravada na sidebar e aplicada na hora, sem perder o estado da ferramenta.
 
 O tema claro é a variante Alucard do Dracula: fundo creme quente, sem branco
 puro, com os mesmos matizes de roxo, rosa, verde, amarelo, ciano e laranja
@@ -172,8 +172,12 @@ escurecidos para manter o contraste AA.
 
 No Flet: `page.theme_mode` recebe `DARK` ou `LIGHT`; `page.theme` usa a paleta
 clara e `page.dark_theme` a escura. Os componentes leem `theme.X` no momento em
-que montam o controle, nunca a constante importada direto, porque
-`theme.apply(mode)` troca o conjunto ativo antes da UI ser montada.
+que montam o controle, nunca a constante importada direto. Ao alternar,
+`theme.apply(mode)` troca os tokens e `theme.restyle` recolore a árvore já
+montada, sem reconstruir páginas nem perder `ToolState`. Controles são mutados
+no lugar; bordas e estilos (`Border`, `BorderSide`, `TextStyle`, `ButtonStyle`,
+`Gradient`) são recriados inteiros. Mutar um `BorderSide` ao vivo fazia o Flet
+mandar um patch parcial e o `border_radius` do `Container` sumia.
 
 A tipografia usa a escala de `ui/theme.py`: mínimo de **12 px** (`FONT_XS`) para
 dicas, contadores, log e células; 13 px (`FONT_SM`) para corpo e rótulos; 15 px

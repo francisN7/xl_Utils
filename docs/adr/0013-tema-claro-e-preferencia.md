@@ -8,8 +8,8 @@
 A paleta Dracula era um conjunto de constantes em `ui/theme.py`, lidas pelos
 componentes no momento em que montavam cada controle. O dono pediu leitura
 confortável em ambiente claro, sem mudar layout nem fluxo das ferramentas.
-Trocar a paleta ao vivo exigiria reconstruir a árvore de controles e repetir
-todo o estado da página, o que aumenta o risco sem entregar valor imediato.
+Reconstruir a árvore a cada troca descartaria arquivos, abas e resultado; o
+desafio é recolorir o que já está montado.
 
 ## Decisão
 
@@ -25,14 +25,23 @@ todo o estado da página, o que aumenta o risco sem entregar valor imediato.
 - `app.main` lê a preferência e chama `theme.apply` **antes** de montar a
   sidebar e o hub. `page.theme` recebe a paleta clara, `page.dark_theme` a
   escura, e `page.theme_mode` escolhe uma delas.
-- A sidebar grava a escolha na hora e mostra “Reabra o aplicativo para
-  aplicar”. Não há reconstrução da UI nem mudança ao vivo.
+- `theme.color_mapping` monta o mapa token a token entre as paletas e
+  `theme.restyle` percorre controles e estilos já montados, trocando apenas os
+  campos de cor conhecidos. Textos, dados, layout e o `ToolState` ficam
+  intactos — um log que contenha `#282A36` continua igual.
+- Controles são mutados no lugar, mas os tipos de valor (`Border`,
+  `BorderSide`, `TextStyle`, `ButtonStyle` e `Gradient`) são reconstruídos e
+  trocados inteiros. Mutar `BorderSide` no lugar fazia o Flet enviar um patch
+  parcial e o `Container` perdia o `border_radius` na troca ao vivo.
+- A sidebar grava a escolha e aplica na hora: troca `page.theme_mode`, recolore
+  a sidebar, o hub e todas as páginas em cache, e atualiza a tela.
 
 ## Consequências
 
 - A preferência sobrevive ao fechamento; settings ausente, corrompido ou com
   valor desconhecido cai no escuro sem erro visível.
-- O tema só muda depois de reabrir o app. É a limitação aceita nesta fase.
+- A troca é imediata e não perde arquivos, abas, opções nem resultado. Nenhuma
+  página é reconstruída.
 - A paleta clara é a variante Alucard do Dracula: creme quente, sem branco
   puro, com os mesmos matizes escurecidos. Foi medida com contraste AA nos
   pares de texto, chips e status; o texto principal do tema escuro também passa.
@@ -44,8 +53,8 @@ todo o estado da página, o que aumenta o risco sem entregar valor imediato.
 
 ## Alternativas
 
-- **Troca ao vivo com reconstrução:** exigiria reidratar páginas e estado;
-  fica fora de escopo até existir demanda.
+- **Reconstruir a UI a cada troca:** exigiria reidratar páginas e estado;
+  perderia seleção e resultado no meio do trabalho.
 - **Seguir o tema do Windows:** o resultado mudaria sem o usuário pedir;
   preferência explícita é mais previsível.
 - **QSettings ou registry:** adiciona dependência/plataforma; JSON no

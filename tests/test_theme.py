@@ -105,7 +105,7 @@ def test_dark_primary_text_meets_aa(background: str) -> None:
     assert _contrast(theme.DARK["TEXT"], theme.DARK[background]) >= 4.5
 
 
-def test_sidebar_button_saves_and_asks_for_a_restart() -> None:
+def test_sidebar_button_toggles_without_a_restart_prompt() -> None:
     changes: list[str] = []
     sidebar = Sidebar(
         [],
@@ -116,13 +116,75 @@ def test_sidebar_button_saves_and_asks_for_a_restart() -> None:
 
     assert sidebar._theme_button.content == "Tema claro"
     assert sidebar._theme_button.icon == ft.Icons.LIGHT_MODE
+    assert not hasattr(sidebar, "_theme_hint")
 
     sidebar._toggle_theme()
 
     assert changes == ["light"]
     assert sidebar._theme_button.content == "Tema escuro"
     assert sidebar._theme_button.icon == ft.Icons.DARK_MODE
-    assert sidebar._theme_hint.visible is True
+
+
+def test_restyle_swaps_explicit_colors_and_keeps_the_text() -> None:
+    label = ft.Text("conteúdo", color=theme.MUTED)
+    log = ft.Text("#282A36", color=theme.SUBTLE_TEXT)
+    button = ft.TextButton(
+        "Salvar",
+        style=ft.ButtonStyle(
+            color=theme.SUBTLE_TEXT,
+            icon_color=theme.MUTED,
+        ),
+    )
+    card = ft.Container(
+        content=ft.Column(controls=[label, log, button]),
+        bgcolor=theme.SURFACE,
+        border=ft.Border.all(1, theme.BORDER),
+    )
+
+    theme.restyle(card, theme.color_mapping("dark", "light"))
+
+    assert label.color == theme.LIGHT["MUTED"]
+    assert log.color == theme.LIGHT["SUBTLE_TEXT"]
+    assert log.value == "#282A36"
+    assert card.bgcolor == theme.LIGHT["SURFACE"]
+    assert card.border.top.color == theme.LIGHT["BORDER"]
+    assert button.style.color == theme.LIGHT["SUBTLE_TEXT"]
+    assert button.style.icon_color == theme.LIGHT["MUTED"]
+
+
+def test_restyle_rebuilds_borders_instead_of_mutating_them() -> None:
+    card = ft.Container(
+        bgcolor=theme.SURFACE,
+        border=ft.Border.all(1, theme.BORDER),
+        border_radius=12,
+    )
+    original_border = card.border
+    original_side = original_border.top
+
+    theme.restyle(card, theme.color_mapping("dark", "light"))
+
+    assert card.border_radius == 12
+    assert card.border is not original_border
+    assert card.border.top.color == theme.LIGHT["BORDER"]
+    # O Border.all compartilha o mesmo lado; a reconstrução mantém isso.
+    assert card.border.top is card.border.left
+    # Nada foi mutado no objeto original: o Flet recebe o campo inteiro.
+    assert original_side.color == theme.DARK["BORDER"]
+
+
+def _find(control: object, kind: type) -> object | None:
+    if isinstance(control, kind):
+        return control
+    content = getattr(control, "content", None)
+    if content is not None:
+        found = _find(content, kind)
+        if found is not None:
+            return found
+    for child in getattr(control, "controls", None) or []:
+        found = _find(child, kind)
+        if found is not None:
+            return found
+    return None
 
 
 class _FakeWindow(SimpleNamespace):
@@ -145,48 +207,35 @@ class _FakePage:
         self.updates += 1
 
 
-class _FakeSidebar:
-    instances: list[_FakeSidebar] = []
-
-    def __init__(
-        self,
-        _tools: object,
-        _on_select: object,
-        *,
-        selected: int = 0,
-        theme_mode: str = "dark",
-        on_theme_change: object = None,
-    ) -> None:
-        self.control = ft.Container()
-        self.theme_mode = theme_mode
-        self.on_theme_change = on_theme_change
-        self.background_at_build = theme.BACKGROUND
-        self.selected = selected
-        self.__class__.instances.append(self)
-
-    def select(self, index: int) -> None:
-        self.selected = index
-
-
-def test_main_applies_the_saved_theme_before_building_the_sidebar(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    _FakeSidebar.instances = []
+def test_main_toggles_the_theme_live(monkeypatch: pytest.MonkeyPatch) -> None:
     saved: list[str] = []
 
-    monkeypatch.setattr(settings, "load_theme", lambda: "light")
+    monkeypatch.setattr(settings, "load_theme", lambda: "dark")
     monkeypatch.setattr(settings, "save_theme", saved.append)
-    monkeypatch.setattr(app, "Sidebar", _FakeSidebar)
-    monkeypatch.setattr(app, "build_home", lambda _on_open: ft.Container())
     monkeypatch.setattr(ft.Container, "update", lambda _self: None)
 
     page = _FakePage()
     app.main(page)
 
-    sidebar = _FakeSidebar.instances[0]
-    assert page.theme_mode == ft.ThemeMode.LIGHT
-    assert sidebar.background_at_build == theme.LIGHT["BACKGROUND"]
-    assert sidebar.theme_mode == "light"
+    row = page.added[0]
+    sidebar_control = row.controls[0]
+    button = _find(sidebar_control, ft.TextButton)
+    assert isinstance(button, ft.TextButton)
 
-    sidebar.on_theme_change("light")
+    assert page.theme_mode == ft.ThemeMode.DARK
+    assert sidebar_control.bgcolor == theme.DARK["BACKGROUND_DEEP"]
+
+    button.on_click(None)
+
     assert saved == ["light"]
+    assert page.theme_mode == ft.ThemeMode.LIGHT
+    assert page.bgcolor == theme.LIGHT["BACKGROUND"]
+    assert sidebar_control.bgcolor == theme.LIGHT["BACKGROUND_DEEP"]
+    assert button.content == "Tema escuro"
+
+    button.on_click(None)
+
+    assert saved == ["light", "dark"]
+    assert page.theme_mode == ft.ThemeMode.DARK
+    assert sidebar_control.bgcolor == theme.DARK["BACKGROUND_DEEP"]
+    assert button.content == "Tema claro"

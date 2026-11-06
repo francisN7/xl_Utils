@@ -8,14 +8,14 @@
 - **Próxima:** escolher um item do backlog (vinculação, alinhamento em tela
   cheia ou Drive) e escrever a spec antes de codar
 - **Ciclo:** 0006 — Backlog
-- **Decisões:** tema aplicado ao reabrir; settings em
+- **Decisões:** tema trocado ao vivo via `theme.restyle`; settings em
   `%LOCALAPPDATA%/xl_utils/settings.json`; ADR 0013
 
 ## Pronto
 
 - S6c: `DARK`/`LIGHT` em `ui/theme.py`, `theme.apply(mode)` antes de montar a
-  UI, botão na sidebar grava a preferência e pede reabertura; settings
-  ausente/corrompido cai no escuro. Contraste AA da paleta clara coberto.
+  UI e botão na sidebar grava e aplica na hora via `theme.restyle`, sem perder
+  o estado; settings ausente/corrompido cai no escuro. Contraste AA coberto.
 - S6b: log por etapa e barra indeterminada por arquivo nas quatro ferramentas.
 - S6a: `ORIGEM` = `<stem> - <aba>` e `LINHA_ORIGEM` no resultado inteiro.
 
@@ -36,7 +36,10 @@ do `_TEMPLATE.md`; nenhuma spec existe ainda.
 
 - Tokens mudam com `theme.apply`; componente novo deve ler `theme.X` na
   montagem, nunca `from ...theme import TEXT`.
-- A preferência é lida antes de sidebar/hub; troca ao vivo pede reabertura.
+- `theme.restyle` só toca campos de cor; não percorrer `value`/`data`, senão
+  um log com hex seria alterado. Controles são mutados no lugar, mas `Border`,
+  `BorderSide`, `TextStyle`, `ButtonStyle` e `Gradient` são recriados inteiros:
+  mutar `BorderSide` ao vivo faz o `Container` perder o `border_radius`.
 - `settings.json` guarda só preferência, nunca caminho de planilha.
 - Flet não é thread-safe: UI só no loop da página.
 - Sem `await asyncio.sleep(0)` entre eventos, lotes rápidos acumulam no fim.

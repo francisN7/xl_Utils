@@ -1,5 +1,8 @@
 """Paletas Dracula (escura) e clara, e o tema Flet construído a partir delas."""
 
+import contextlib
+import dataclasses
+
 import flet as ft
 
 DARK = {
@@ -70,6 +73,128 @@ def apply(mode: str) -> str:
     active = mode if mode in PALETTES else DEFAULT_MODE
     globals().update(PALETTES[active])
     return active
+
+
+# Campos que carregam cor numa cor ou num estilo do Flet.
+_COLOR_FIELDS = frozenset(
+    {
+        "active_color",
+        "active_track_color",
+        "bgcolor",
+        "border_color",
+        "check_color",
+        "color",
+        "colors",
+        "cursor_color",
+        "divider_color",
+        "fill_color",
+        "focus_color",
+        "focused_border_color",
+        "heading_row_color",
+        "hover_color",
+        "icon_color",
+        "inactive_color",
+        "inactive_track_color",
+        "indicator_color",
+        "overlay_color",
+        "selection_color",
+        "shadow_color",
+        "surface_tint_color",
+        "thumb_color",
+        "track_color",
+    }
+)
+
+# Nunca percorrer dados de aplicação: um log pode conter um hex como texto.
+_SKIP_FIELDS = frozenset({"data", "key"})
+
+# Só descemos por controles e estilos; medidas, alinhamentos e enums ficam de fora.
+_NODE_TYPES = (
+    ft.Control,
+    ft.Gradient,
+    ft.TextStyle,
+    ft.ButtonStyle,
+    ft.Border,
+    ft.BorderSide,
+)
+
+
+def color_mapping(old_mode: str, new_mode: str) -> dict[str, str]:
+    """Mapeia as cores da paleta antiga para os tokens da nova."""
+    old = PALETTES.get(old_mode, DARK)
+    new = PALETTES.get(new_mode, DARK)
+    return {old[token].upper(): new[token] for token in old}
+
+
+def restyle(control: object, mapping: dict[str, str]) -> None:
+    """Recolore a árvore já montada, preservando estado, textos e estrutura."""
+    _restyle_value(control, mapping, {})
+
+
+def _restyle_value(
+    value: object,
+    mapping: dict[str, str],
+    memo: dict[int, object],
+    *,
+    is_color: bool = False,
+) -> object:
+    if isinstance(value, str):
+        return mapping.get(value.upper(), value) if is_color else value
+    if isinstance(value, (bool, int, float, bytes)) or value is None:
+        return value
+    if isinstance(value, (list, tuple)):
+        items = [
+            _restyle_value(item, mapping, memo, is_color=is_color) for item in value
+        ]
+        return tuple(items) if isinstance(value, tuple) else items
+    if isinstance(value, dict):
+        for key, item in value.items():
+            value[key] = _restyle_value(item, mapping, memo)
+        return value
+    if not isinstance(value, _NODE_TYPES):
+        return value
+
+    identity = id(value)
+    if identity in memo:
+        return memo[identity]
+    # Guarda contra ciclos enquanto a subárvore ainda está sendo percorrida.
+    memo[identity] = value
+
+    fields = getattr(type(value), "__dataclass_fields__", None)
+    if not fields:
+        return value
+
+    updates: dict[str, object] = {}
+    for name in fields:
+        if name.startswith("_") or name in _SKIP_FIELDS:
+            continue
+        current = getattr(value, name, None)
+        updated = _restyle_value(
+            current,
+            mapping,
+            memo,
+            is_color=name in _COLOR_FIELDS,
+        )
+        if updated is not current:
+            updates[name] = updated
+
+    if not updates:
+        return value
+
+    if isinstance(value, ft.Control):
+        for name, updated in updates.items():
+            with contextlib.suppress(AttributeError, TypeError):
+                setattr(value, name, updated)
+        return value
+
+    # Tipos de valor (Border, BorderSide, TextStyle, ButtonStyle, Gradient) são
+    # trocados inteiros. Mutar BorderSide no lugar faz o Flet mandar um patch
+    # parcial e o Container perde o border_radius ao vivo.
+    with contextlib.suppress(TypeError):
+        rebuilt = dataclasses.replace(value, **updates)
+        memo[identity] = rebuilt
+        return rebuilt
+    return value
 
 
 def build_theme(mode: str = DEFAULT_MODE) -> ft.Theme:
