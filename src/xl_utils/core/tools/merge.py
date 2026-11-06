@@ -28,7 +28,11 @@ class ColumnRef:
 
 @dataclass(frozen=True, slots=True)
 class ColumnGroup:
-    """Uma coluna de saída, alimentada pelas colunas de origem em ordem."""
+    """Uma coluna de saída, alimentada pelas colunas de origem.
+
+    A ordem dos chips é só visual: o primeiro vira o cabeçalho e cada aba
+    contribui com a sua própria coluna, independentemente da posição no grupo.
+    """
 
     columns: tuple[ColumnRef, ...]
 
@@ -95,7 +99,9 @@ def merge_sheets(
     Cada entrada é ``(arquivo, aba, frame)``. Abas vazias (sem linhas) são
     descartadas; linhas nunca são removidas. ``groups`` decide as colunas de
     saída: cada grupo vira uma coluna, a primeira coluna de origem dá o nome e
-    as demais alimentam a mesma coluna. Sem ``groups``, colunas de mesmo nome
+    as demais alimentam a mesma coluna. Reordenar os chips dentro de um grupo
+    troca apenas o cabeçalho; os valores de cada aba vêm sempre da coluna
+    daquela aba, na ordem das linhas. Sem ``groups``, colunas de mesmo nome
     são agrupadas automaticamente.
 
     Valores ausentes viram ``pd.NA``; a saída segue a ordem dos grupos.

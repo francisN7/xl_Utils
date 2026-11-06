@@ -93,6 +93,42 @@ def test_merge_sheets_joins_names_with_an_explicit_group() -> None:
     assert merged["documento"].tolist() == ["111", "222"]
 
 
+def test_reordering_a_group_only_changes_the_header() -> None:
+    entries = [
+        (Path("a.xlsx"), "Uma", _frame(documento=["111"])),
+        (Path("b.xlsx"), "Uma", _frame(CPF=["222"])),
+    ]
+    documento = ColumnRef(Path("a.xlsx"), "Uma", "documento")
+    cpf = ColumnRef(Path("b.xlsx"), "Uma", "CPF")
+
+    before = merge_sheets(entries, [ColumnGroup((documento, cpf))])
+    after = merge_sheets(entries, [ColumnGroup((cpf, documento))])
+
+    assert list(before.columns) == ["ORIGEM", "LINHA_ORIGEM", "documento"]
+    assert list(after.columns) == ["ORIGEM", "LINHA_ORIGEM", "CPF"]
+    # A ordem vertical dos chips só escolhe o cabeçalho: as linhas continuam
+    # vindo da mesma coluna de cada aba.
+    assert after["CPF"].tolist() == before["documento"].tolist() == ["111", "222"]
+    assert after["ORIGEM"].tolist() == before["ORIGEM"].tolist()
+    assert after["LINHA_ORIGEM"].tolist() == before["LINHA_ORIGEM"].tolist()
+
+
+def test_move_column_within_a_group_keeps_the_rows() -> None:
+    documento = ColumnRef(Path("a.xlsx"), "Uma", "documento")
+    cpf = ColumnRef(Path("b.xlsx"), "Uma", "CPF")
+    entries = [
+        (Path("a.xlsx"), "Uma", _frame(documento=["111"])),
+        (Path("b.xlsx"), "Uma", _frame(CPF=["222"])),
+    ]
+
+    groups = move_column([[documento, cpf]], cpf, 0, 0)
+
+    merged = merge_sheets(entries, [ColumnGroup(tuple(column)) for column in groups])
+    assert groups == [[cpf, documento]]
+    assert list(merged.columns) == ["ORIGEM", "LINHA_ORIGEM", "CPF"]
+    assert merged["CPF"].tolist() == ["111", "222"]
+
+
 def test_group_by_name_joins_equal_columns() -> None:
     refs = [
         ColumnRef(Path("a.xlsx"), "Uma", "TAREFA"),
