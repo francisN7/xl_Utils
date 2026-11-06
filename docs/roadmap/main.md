@@ -27,7 +27,9 @@ o fluxo das ferramentas.
 
 ## Backlog
 
-Sem itens no momento.
+| Item | Valor | Custo | Pré-requisito |
+|---|---|---|---|
+| Alinhamento de colunas em tela cheia (mesclar) | Alto | M | Botão maximizar ao lado de “Alinhamento de colunas”; a seleção ocupa a tela inteira; restaurar no mesmo botão ou em “CONFIRMAR”, exibido no canto inferior direito só quando maximizado. Mantém a largura de cada card e usa toda a largura da tela para distribuí-los lado a lado, sem esticá-los. Não muda o modelo de grupos |
 
 ## Manutenção
 
