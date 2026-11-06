@@ -22,6 +22,8 @@ mesclagem.
    - escrever a spec da próxima sessão;
    - commitar com `SXX: resumo curto`.
 5. Se o contexto encher no meio, salve o estado em `CURRENT.md` e recomece.
+6. Revisão profunda de todos os `.md` é a skill `docs-review`: só sob pedido
+   explícito, nunca no fim da sessão.
 
 ## Entrega final
 
@@ -37,7 +39,8 @@ Nunca esconder validação vermelha atrás do selo.
 
 Estado: `docs/state/CURRENT.md` · futuro: `docs/roadmap/main.md` · decisões:
 `docs/adr/` · leitura do código: `docs/guide/code-tour.md`. Skills:
-`session-start` e `project-context-init`.
+`session-start`, `project-context-init` e `docs-review` (só sob pedido
+explícito).
 
 ## Estrutura
 
