@@ -4,54 +4,45 @@
 
 ## Sessão
 
-- **Última concluída:** S6b — progresso e log por estágio; depois, curadoria do
-  backlog (Drive e vinculação)
-- **Próxima:** S6c — tema claro opcional
-  (`docs/sessions/S6c-tema-claro.md`) — spec pronta
-- **Ciclo:** 0005 — Polimento, Fase 2
-- **Decisões:** tema claro ao reabrir; histórico descartado; ADRs 0005 e 0011 atualizados
+- **Última concluída:** S6c — tema claro opcional; ciclo 0005 fechado
+- **Próxima:** escolher um item do backlog (vinculação, alinhamento em tela
+  cheia ou Drive) e escrever a spec antes de codar
+- **Ciclo:** 0006 — Backlog
+- **Decisões:** tema aplicado ao reabrir; settings em
+  `%LOCALAPPDATA%/xl_utils/settings.json`; ADR 0013
 
 ## Pronto
 
-- S6b: as quatro ferramentas emitem etapas no log ao vivo (leitura, planilha
-  carregada, cálculo); a barra fica indeterminada durante cada arquivo e avança
-  ao concluí-lo. O loop cede entre eventos para a tela renderizar.
-- S6a: `ORIGEM` = `<stem> - <aba>` e `LINHA_ORIGEM` numera o resultado inteiro
-  com zeros à esquerda; colunas de mesmo nome viram `_original`.
-- S5d: recorte com “Linhas por arquivo” ou “Arquivos por aba”, quantidade por
-  aba e blocos equilibrados.
-- S5c: CNJ em texto sujo; dígito verificador inválido não descarta o valor.
+- S6c: `DARK`/`LIGHT` em `ui/theme.py`, `theme.apply(mode)` antes de montar a
+  UI, botão na sidebar grava a preferência e pede reabertura; settings
+  ausente/corrompido cai no escuro. Contraste AA da paleta clara coberto.
+- S6b: log por etapa e barra indeterminada por arquivo nas quatro ferramentas.
+- S6a: `ORIGEM` = `<stem> - <aba>` e `LINHA_ORIGEM` no resultado inteiro.
 
 ## Próximo passo
 
-Executar a S6c: tokenizar as cores, criar a paleta clara, salvar a preferência
-local e aplicar o tema na abertura; a troca na sidebar pede reabertura.
+Escolher o item do backlog com o dono e criar `docs/sessions/S7a-*.md` a partir
+do `_TEMPLATE.md`; nenhuma spec existe ainda.
 
 ## Arquivos-chave
 
-- `ui/theme.py`, `app.py`, `ui/components/sidebar.py`
+- `ui/theme.py`, `shared/settings.py`, `app.py`, `ui/components/sidebar.py`
+- `tests/test_theme.py`, `tests/test_settings.py`
+- `docs/reference/ui.md`, `docs/adr/0013-tema-claro-e-preferencia.md`
 - `shared/progress.py`, `controllers/*.py` (etapas)
-- `ui/components/result_panel.py`, `ui/components/tool_layout.py`
 - `core/tools/merge.py` (`ORIGEM`/`LINHA_ORIGEM`)
-- `core/tools/cut.py`, `controllers/cut.py`, `ui/pages/cut.py`
-- `tests/test_merge.py`, `tests/test_progress.py`, `tests/test_layout.py`
-- `docs/adr/0005-selecao-de-abas-e-merge.md`,
-  `docs/adr/0011-execucao-fora-da-ui.md`
 
 ## Armadilhas
 
-- Flet não é thread-safe: UI só no loop da página; o `apply_progress` atualiza
-  direto porque já roda no loop.
-- Sem `await asyncio.sleep(0)` entre eventos, lotes rápidos acumulam tudo no fim.
-- A preferência de tema precisa ser lida antes de montar a UI; troca ao vivo
-  está fora de escopo nesta fase.
+- Tokens mudam com `theme.apply`; componente novo deve ler `theme.X` na
+  montagem, nunca `from ...theme import TEXT`.
+- A preferência é lida antes de sidebar/hub; troca ao vivo pede reabertura.
+- `settings.json` guarda só preferência, nunca caminho de planilha.
+- Flet não é thread-safe: UI só no loop da página.
+- Sem `await asyncio.sleep(0)` entre eventos, lotes rápidos acumulam no fim.
 - Cancelar não interrompe pandas: só vale entre arquivos.
-- `LINHA_ORIGEM` usa a largura do total do resultado, não de cada aba/arquivo.
-- `ORIGEM`/`LINHA_ORIGEM` são reservados: coluna de origem vira `_original`.
-- Recorte por partes usa divisão equilibrada, limitada ao total de linhas.
-- `keep_default_na=False`: célula vazia vira `""`, não `NaN`; merge usa `pd.NA`.
+- `LINHA_ORIGEM` usa a largura do total do resultado.
 - `.xls` não tem leitor alternativo; falha do calamine é final.
-- Python 3.15 aceita `except A, B:` sem parênteses; não “corrigir”.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 
 ## Como rodar

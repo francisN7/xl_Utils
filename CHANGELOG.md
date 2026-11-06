@@ -95,6 +95,10 @@ decisões nos ADRs.
   carregada e cálculo no log ao vivo; a barra fica indeterminada durante cada
   arquivo e avança ao concluí-lo. O loop passa a renderizar entre eventos. Ver
   adendo do ADR 0011.
+- Tema claro opcional, variante Alucard do Dracula (creme quente, sem branco
+  puro): a paleta esclarece os tokens de `ui/theme.py`, a escolha fica em
+  `shared/settings.py` (`%LOCALAPPDATA%/xl_utils/settings.json`) e o botão da
+  sidebar pede reabertura. Ver ADR 0013.
 
 ### Changed
 

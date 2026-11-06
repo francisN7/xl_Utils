@@ -18,8 +18,12 @@ class Sidebar:
         on_select: Callable[[int], None],
         *,
         selected: int = 0,
+        theme_mode: str = "dark",
+        on_theme_change: Callable[[str], None] | None = None,
     ) -> None:
         self._on_select = on_select
+        self._theme_mode = theme_mode
+        self._on_theme_change = on_theme_change
         self._items: list[tuple[ft.Container, ft.Icon, ft.Text]] = []
 
         navigation = ft.Column(
@@ -64,7 +68,7 @@ class Sidebar:
             active = position == index
             container.bgcolor = theme.SURFACE if active else None
             icon.color = theme.PURPLE if active else theme.MUTED
-            label.color = theme.TEXT if active else "#C9CBDC"
+            label.color = theme.TEXT if active else theme.SUBTLE_TEXT
         self._refresh()
 
     def _item(
@@ -77,7 +81,7 @@ class Sidebar:
         label_control = ft.Text(
             label,
             size=14,
-            color="#C9CBDC",
+            color=theme.SUBTLE_TEXT,
             expand=True,
         )
         container = ft.Container(
@@ -137,25 +141,64 @@ class Sidebar:
         )
 
     def _footer(self) -> ft.Control:
+        self._theme_hint = ft.Text(
+            "Reabra o aplicativo para aplicar",
+            size=theme.FONT_XS,
+            color=theme.YELLOW,
+            visible=False,
+        )
+        self._theme_button = ft.TextButton(
+            self._theme_action_label(),
+            icon=self._theme_action_icon(),
+            on_click=self._toggle_theme,
+            style=ft.ButtonStyle(
+                padding=ft.Padding.symmetric(horizontal=8, vertical=4),
+                text_style=ft.TextStyle(size=theme.FONT_SM),
+                color=theme.SUBTLE_TEXT,
+                icon_color=theme.MUTED,
+            ),
+        )
         return ft.Container(
-            content=ft.Row(
+            content=ft.Column(
                 controls=[
-                    ft.Container(
-                        width=7,
-                        height=7,
-                        border_radius=999,
-                        bgcolor=theme.GREEN,
+                    ft.Row(
+                        controls=[
+                            ft.Container(
+                                width=7,
+                                height=7,
+                                border_radius=999,
+                                bgcolor=theme.GREEN,
+                            ),
+                            ft.Text(
+                                "uv · Python 3.15",
+                                size=theme.FONT_XS,
+                                color=theme.MUTED,
+                            ),
+                        ],
+                        spacing=7,
                     ),
-                    ft.Text(
-                        "uv · Python 3.15",
-                        size=theme.FONT_XS,
-                        color=theme.MUTED,
-                    ),
+                    self._theme_button,
+                    self._theme_hint,
                 ],
-                spacing=7,
+                spacing=2,
             ),
             padding=ft.Padding.only(left=10, top=10),
         )
+
+    def _theme_action_label(self) -> str:
+        return "Tema claro" if self._theme_mode == "dark" else "Tema escuro"
+
+    def _theme_action_icon(self) -> ft.IconData:
+        return ft.Icons.LIGHT_MODE if self._theme_mode == "dark" else ft.Icons.DARK_MODE
+
+    def _toggle_theme(self, _event: object = None) -> None:
+        self._theme_mode = "light" if self._theme_mode == "dark" else "dark"
+        self._theme_button.content = self._theme_action_label()
+        self._theme_button.icon = self._theme_action_icon()
+        self._theme_hint.visible = True
+        if self._on_theme_change is not None:
+            self._on_theme_change(self._theme_mode)
+        self._refresh()
 
     def _refresh(self) -> None:
         with contextlib.suppress(RuntimeError):

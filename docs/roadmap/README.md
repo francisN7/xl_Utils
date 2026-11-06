@@ -14,6 +14,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | Arquivo | Estado | O que é |
 |---|---|---|
 | [`main.md`](main.md) | **ativo** | ciclo atual e backlog |
+| [`0005-polimento.md`](0005-polimento.md) | fechado | histórico do ciclo de polimento |
 | [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md) | fechado | histórico do ciclo de execução e robustez |
 | [`0003-qualidade.md`](0003-qualidade.md) | fechado | histórico do ciclo de qualidade e clareza |
 | [`0002-migracao.md`](0002-migracao.md) | fechado | histórico do ciclo de migração e publicação |
@@ -27,6 +28,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | [`0002-migracao.md`](0002-migracao.md) | Migração e publicação | 2026-11-04 |
 | [`0003-qualidade.md`](0003-qualidade.md) | Qualidade e clareza | 2026-11-04 |
 | [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md) | Execução e robustez | 2026-11-04 |
+| [`0005-polimento.md`](0005-polimento.md) | Polimento | 2026-11-06 |
 
 ## Convenção de nomes
 

@@ -11,9 +11,6 @@ from xl_utils.ui.state import ToolState
 
 Selection = dict[Path, set[str]]
 
-_SELECTED_BG = "#2D2A47"
-_CHIP_TEXT = "#B8BCD0"
-
 
 class SheetSelector:
     """Chips por arquivo, além de "Todas"/"Limpar" e um contador ao vivo."""
@@ -69,7 +66,7 @@ class SheetSelector:
                                 "Abas",
                                 size=theme.FONT_XS,
                                 weight=ft.FontWeight.BOLD,
-                                color=_CHIP_TEXT,
+                                color=theme.CHIP_TEXT,
                             ),
                             self._counter,
                             self._all_button,
@@ -183,7 +180,7 @@ class SheetSelector:
                     ft.Text(
                         name,
                         size=theme.FONT_XS,
-                        color=theme.TEXT if selected else _CHIP_TEXT,
+                        color=theme.TEXT if selected else theme.CHIP_TEXT,
                         max_lines=1,
                         overflow=ft.TextOverflow.ELLIPSIS,
                     ),
@@ -192,7 +189,7 @@ class SheetSelector:
                 tight=True,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            bgcolor=_SELECTED_BG if selected else theme.BACKGROUND_DEEP,
+            bgcolor=theme.SELECTED_BG if selected else theme.BACKGROUND_DEEP,
             border=ft.Border.all(1, theme.PURPLE if selected else theme.BORDER),
             border_radius=999,
             padding=ft.Padding.symmetric(vertical=6, horizontal=10),

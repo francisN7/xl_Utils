@@ -135,26 +135,45 @@ painel entra em **“Pronto para salvar”**: a prévia aparece, mas nenhum arqu
 - valores vazios aparecem como célula vazia, não como `nan`;
 - a planilha original nunca é alterada.
 
-## Tema Dracula (dark)
+## Temas (escuro e claro)
 
-| Token | Hex | Uso |
-|---|---|---|
-| Fundo | `#282A36` | fundo do app |
-| Fundo profundo | `#21222C` | sidebar, barras |
-| Superfície | `#343746` | cartões |
-| Borda | `#44475A` | divisores e contornos |
-| Texto | `#F8F8F2` | texto principal |
-| Muted | `#6272A4` | texto secundário |
-| Primária | `#BD93F9` | botão e seleção |
-| Destaque | `#FF79C6` | realces |
-| Sucesso | `#50FA7B` | conclusão |
-| Aviso | `#FFB86C` | atenção |
-| Erro | `#FF5555` | falha |
-| Info | `#8BE9FD` | links e caminhos |
+O app abre no tema salvo em `%LOCALAPPDATA%/xl_utils/settings.json` (fallback
+`~/.xl_utils/settings.json`), chave `theme` com `dark` ou `light`. Arquivo
+ausente, inválido ou com valor desconhecido abre no escuro. A preferência é
+gravada na sidebar; a troca só vale na próxima abertura.
 
-No Flet: `page.theme_mode = ft.ThemeMode.DARK` e
-`page.theme = ft.Theme(color_scheme=ft.ColorScheme(...))`. O tema claro fica
-fora do escopo inicial.
+O tema claro é a variante Alucard do Dracula: fundo creme quente, sem branco
+puro, com os mesmos matizes de roxo, rosa, verde, amarelo, ciano e laranja
+escurecidos para manter o contraste AA.
+
+| Token | Escuro | Claro | Uso |
+|---|---|---|---|
+| Fundo | `#282A36` | `#F2EEE1` | fundo do app |
+| Fundo profundo | `#21222C` | `#E9E4D4` | sidebar, barras |
+| Superfície | `#343746` | `#FBF7E9` | cartões |
+| Borda | `#44475A` | `#D7D0BC` | divisores e contornos |
+| Texto | `#F8F8F2` | `#1F1F1F` | texto principal |
+| Muted | `#6272A4` | `#6C664B` | texto secundário |
+| Texto sutil | `#C9CBDC` | `#4B4636` | itens inativos e log |
+| Texto de chip | `#B8BCD0` | `#4B4636` | chips e títulos de cartão |
+| Primária | `#BD93F9` | `#644AC9` | botão e seleção |
+| Destaque | `#FF79C6` | `#A3144D` | realces |
+| Sucesso | `#50FA7B` | `#14710A` | conclusão |
+| Aviso | `#FFB86C` | `#A34D14` | atenção na entrada |
+| Andamento | `#F1FA8C` | `#75600F` | execução e aviso de reabertura |
+| Erro | `#FF5555` | `#B02A1C` | falha |
+| Info | `#8BE9FD` | `#036A96` | links e caminhos |
+| Fundo de sucesso | `#22342A` | `#E6F2DB` | selo “Pronto” |
+| Borda de sucesso | `#2C4A38` | `#A9C79A` | contorno do selo |
+| Fundo de erro | `#3A2428` | `#F8E3DD` | bloco de erro |
+| Fundo de info | `#1F3438` | `#E1EEF2` | bloco informativo |
+| Seleção | `#2D2A47` | `#E7E1F5` | chip de aba selecionado |
+| Fundo do ícone | `#332B45` | `#ECE6F8` | ícone do cartão do hub |
+
+No Flet: `page.theme_mode` recebe `DARK` ou `LIGHT`; `page.theme` usa a paleta
+clara e `page.dark_theme` a escura. Os componentes leem `theme.X` no momento em
+que montam o controle, nunca a constante importada direto, porque
+`theme.apply(mode)` troca o conjunto ativo antes da UI ser montada.
 
 A tipografia usa a escala de `ui/theme.py`: mínimo de **12 px** (`FONT_XS`) para
 dicas, contadores, log e células; 13 px (`FONT_SM`) para corpo e rótulos; 15 px
@@ -176,6 +195,7 @@ abaixo de `FONT_XS`.
 
 ## Acessibilidade
 
-- Contraste mínimo AA sobre o fundo Dracula.
+- Contraste mínimo AA para o texto principal nos dois temas; a paleta clara
+  também passa AA nos textos secundários, chips e cores de status.
 - Navegação por teclado no seletor e na barra de ação.
 - Nunca usar cor como único sinal de status: sempre ícone + texto.

@@ -38,3 +38,6 @@ dono também pediu tema **Dracula dark**.
 - **Drag & drop real:** exigiria PySide6/Qt ou um hook Windows-only; fica para
   uma melhoria separada.
 - **Tema claro também:** fica para o backlog.
+
+> **Adendo (2026-11-06):** o tema claro deixou o backlog e foi entregue como
+> opção salva, aplicada ao reabrir; ver [ADR 0013](0013-tema-claro-e-preferencia.md).

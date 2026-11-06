@@ -39,8 +39,9 @@ app.py                          monta a janela e a navegação
 
 ### 1. Shell e navegação — `src/xl_utils/app.py`
 
-`main` monta a sidebar, o hub e o conteúdo. `show(index)` troca a página e
-`TOOLS`, em `ui/pages/registry.py`, é a única lista de ferramentas. Para
+`main` monta a sidebar, o hub e o conteúdo. Antes de qualquer controle, lê o
+tema de `shared/settings.py` e chama `theme.apply(mode)`; `show(index)` troca a
+página e `TOOLS`, em `ui/pages/registry.py`, é a única lista de ferramentas. Para
 entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 
 **Observe:** o estado de cada ferramenta vive em `ui/state.py`, não na página.
@@ -150,6 +151,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
 | mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |
 | mudar o log ao vivo ou o cancelamento | `shared/progress.py` + `ui/components/tool_layout.py` + páginas |
+| mudar tema ou preferência salva | `ui/theme.py` + `shared/settings.py` + `ui/components/sidebar.py` |
 
 ## Invariantes
 

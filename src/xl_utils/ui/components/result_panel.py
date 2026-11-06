@@ -116,7 +116,7 @@ class ResultPanel:
             "",
             size=theme.FONT_XS,
             font_family="Consolas",
-            color="#C9CBDC",
+            color=theme.SUBTLE_TEXT,
             selectable=True,
         )
         self._log_box = ft.Container(

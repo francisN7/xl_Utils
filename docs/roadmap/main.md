@@ -1,29 +1,10 @@
 # Roadmap atual
 
-Ciclo ativo: **0005 — Polimento**. O ciclo anterior está em
-[`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md).
+Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
+[`0005-polimento.md`](0005-polimento.md).
 
-## Fase 1 — Execução visível
-
-Objetivo: mostrar o que cada ferramenta está fazendo durante a execução e
-separar a origem da linha na mesclagem.
-
-- [x] **S6a — Mesclagem com `ORIGEM` e `LINHA_ORIGEM`.** `ORIGEM` passa a ser
-  `<stem> - <aba>` e `LINHA_ORIGEM` numera as linhas do resultado inteiro com
-  zeros à esquerda. Ver adendo do ADR 0005.
-- [x] **S6b — Progresso e log por estágio.** As quatro ferramentas registram
-  leitura, planilha carregada e cálculo no log ao vivo; a barra fica
-  indeterminada durante cada arquivo e avança ao concluí-lo. Ver adendo do
-  ADR 0011.
-
-## Fase 2 — Aparência
-
-Objetivo: permitir leitura confortável em ambiente claro sem mudar o layout nem
-o fluxo das ferramentas.
-
-- [ ] **S6c — Tema claro opcional.** Tokenizar as cores hoje constantes,
-  alternar entre Dracula e claro e manter a preferência do usuário. A troca é
-  aplicada ao reabrir o app. Custo M. Ver spec.
+Nenhuma sessão está marcada: o dono escolhe o próximo item e a spec nasce antes
+do código.
 
 ## Backlog
 
@@ -101,16 +82,3 @@ de descrição está vazio e como tratar variações de grafia do mesmo nome.
 - Renomear o arquivo original do usuário para “corrigir” extensão — proibido
   por design; a leitura usa o tipo real sem tocar no arquivo.
 - Normalizar quebras de linha automaticamente — rejeitado; preservar o texto.
-
-## Notas do ciclo
-
-- As duas adições do dono ao backlog viraram S6a (merge) e S6b (etapas); o tema
-  claro segue como S6c.
-- `LINHA_ORIGEM` usa a largura do total do resultado (12 linhas → `01`..`12`) e
-  não reinicia por arquivo/aba.
-- A barra indeterminada mostra atividade dentro de um arquivo; a fração só
-  aparece quando o arquivo termina.
-- O dono adicionou dois itens ao backlog: envio direto do Google Drive (login
-  OAuth, múltiplas contas, link ou seletor) e vinculação entre AGENDA, CLIENTES,
-  FINANCEIRO e PROCESSOS, com protocolo detalhado acima. Nenhum dos dois tem
-  sessão marcada.

@@ -128,7 +128,7 @@ class ToolLayout:
                             color=theme.GREEN,
                         ),
                         bgcolor=theme.SUCCESS_BG,
-                        border=ft.Border.all(1, "#2C4A38"),
+                        border=ft.Border.all(1, theme.SUCCESS_BORDER),
                         border_radius=999,
                         padding=ft.Padding.symmetric(
                             vertical=5,
@@ -638,7 +638,7 @@ def _card(
                     title,
                     size=theme.FONT_SM,
                     weight=ft.FontWeight.BOLD,
-                    color="#B8BCD0",
+                    color=theme.CHIP_TEXT,
                 ),
                 content,
             ],

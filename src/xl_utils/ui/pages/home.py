@@ -22,7 +22,7 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                                     size=20,
                                     color=theme.PURPLE,
                                 ),
-                                bgcolor="#332B45",
+                                bgcolor=theme.ICON_BG,
                                 border_radius=8,
                                 padding=8,
                             ),

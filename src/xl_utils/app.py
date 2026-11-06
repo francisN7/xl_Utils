@@ -1,7 +1,10 @@
 """Shell do aplicativo: barra lateral, hub inicial e páginas de ferramenta."""
 
+import contextlib
+
 import flet as ft
 
+from xl_utils.shared import settings
 from xl_utils.ui import theme
 from xl_utils.ui.components.sidebar import Sidebar
 from xl_utils.ui.pages import TOOLS
@@ -11,12 +14,14 @@ from xl_utils.ui.theme import build_theme
 
 def main(page: ft.Page) -> None:
     """Monta a janela principal."""
+    mode = theme.apply(settings.load_theme())
+
     page.title = "xl_Utils"
     page.padding = 0
     page.bgcolor = theme.BACKGROUND
-    page.theme_mode = ft.ThemeMode.DARK
-    page.theme = build_theme()
-    page.dark_theme = build_theme()
+    page.theme_mode = ft.ThemeMode.LIGHT if mode == "light" else ft.ThemeMode.DARK
+    page.theme = build_theme("light")
+    page.dark_theme = build_theme("dark")
     page.window.width = 1200
     page.window.height = 800
     page.window.min_width = 980
@@ -43,7 +48,16 @@ def main(page: ft.Page) -> None:
     def handle_select(index: int) -> None:
         show(index)
 
-    sidebar = Sidebar(TOOLS, handle_select)
+    def change_theme(next_mode: str) -> None:
+        with contextlib.suppress(OSError):
+            settings.save_theme(next_mode)
+
+    sidebar = Sidebar(
+        TOOLS,
+        handle_select,
+        theme_mode=mode,
+        on_theme_change=change_theme,
+    )
     home = build_home(open_tool)
 
     page.add(
