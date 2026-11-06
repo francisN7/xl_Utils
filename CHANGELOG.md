@@ -100,6 +100,15 @@ decisões nos ADRs.
   `shared/settings.py` (`%LOCALAPPDATA%/xl_utils/settings.json`) e o botão da
   sidebar troca na hora, recolorindo a árvore sem perder o estado nem os cantos
   arredondados. Ver ADR 0013.
+- Vinculação AGENDA × PROCESSOS: a quinta ferramenta lê as duas planilhas
+  padrão, compara CNJ, PASTA e PROTOCOLO pelo valor bruto na prioridade
+  CNJ → PASTA → PROTOCOLO e grava `VINCULA?`. Sem vínculo, o protocolo é
+  preservado na descrição e o campo vira `MIGRAÇÃO`; reexecução pede
+  confirmação e não duplica a linha. Ver ADR 0014.
+- Cabeçalhos padrão empacotados em `src/xl_utils/configs/headers.json`, lidos
+  por `importlib.resources`, com override opcional em
+  `%LOCALAPPDATA%/xl_utils/headers.json`. Segredos e tokens ficam fora do
+  repositório e do wheel. Ver ADR 0015.
 
 ### Changed
 

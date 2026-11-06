@@ -3,7 +3,7 @@
 import asyncio
 import contextlib
 import traceback
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Protocol
 
@@ -13,6 +13,12 @@ from xl_utils.core.io import list_sheets
 from xl_utils.core.mime import FormatCheck, check_format
 from xl_utils.core.save import SaveError, SaveItem, save_chosen, save_to_output
 from xl_utils.core.tools.all_str import WorkbookReadError
+from xl_utils.core.tools.link import (
+    AlreadyProcessedError,
+    ConfigError,
+    InvalidCnjError,
+    MissingColumnsError,
+)
 from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.shared.progress import (
     CancelToken,
@@ -30,6 +36,8 @@ RunHandler = Callable[
     [ToolState, ResultPanel, ProgressReporter | NullReporter, CancelToken],
     None,
 ]
+
+PreRun = Callable[[ToolState], str | None]
 
 
 class OptionsPanel(Protocol):
@@ -55,16 +63,33 @@ class ToolLayout:
         note: str = "",
         multiple_files: bool = False,
         default_all_sheets: bool = False,
+        inputs: Sequence[str] | None = None,
+        pre_run: PreRun | None = None,
         run_handler: RunHandler | None = None,
     ) -> None:
         self.state = ToolState()
         self._title = title
         self._run_handler = run_handler
+        self._pre_run = pre_run
         self._default_all_sheets = default_all_sheets
-        self.file_input = FileInput(
-            self._files_changed,
-            multiple=multiple_files,
-        )
+        self._input_labels = tuple(inputs or ())
+        self._pre_checking = False
+        self._input_files: dict[str, Path | None] = {
+            label: None for label in self._input_labels
+        }
+        self._file_inputs: dict[str, FileInput] = {}
+        if self._input_labels:
+            for label in self._input_labels:
+                self._file_inputs[label] = FileInput(
+                    lambda files, name=label: self._labeled_changed(name, files),
+                    multiple=False,
+                )
+            self.file_input = next(iter(self._file_inputs.values()))
+        else:
+            self.file_input = FileInput(
+                self._files_changed,
+                multiple=multiple_files,
+            )
         self.result = ResultPanel(
             on_save=self._save_clicked,
             on_save_output=self._save_output_clicked,
@@ -80,8 +105,13 @@ class ToolLayout:
             on_change=self._selection_changed,
         )
 
+        initial_summary = (
+            " · ".join(f"{label}: —" for label in self._input_labels)
+            if self._input_labels
+            else "Nenhum arquivo selecionado."
+        )
         self._summary = ft.Text(
-            "Nenhum arquivo selecionado.",
+            initial_summary,
             size=theme.FONT_SM,
             color=theme.MUTED,
             expand=True,
@@ -141,11 +171,28 @@ class ToolLayout:
             padding=ft.Padding.only(bottom=16),
         )
 
-        entrada_controls: list[ft.Control] = [
-            self.file_input.control,
-            ft.Divider(height=1, color=theme.BORDER),
-            self.sheet_selector.control,
-        ]
+        if self._input_labels:
+            entrada_controls: list[ft.Control] = [
+                ft.Column(
+                    controls=[
+                        ft.Text(
+                            label,
+                            size=theme.FONT_XS,
+                            weight=ft.FontWeight.BOLD,
+                            color=theme.CHIP_TEXT,
+                        ),
+                        self._file_inputs[label].control,
+                    ],
+                    spacing=6,
+                )
+                for label in self._input_labels
+            ]
+        else:
+            entrada_controls = [
+                self.file_input.control,
+                ft.Divider(height=1, color=theme.BORDER),
+                self.sheet_selector.control,
+            ]
         if note:
             entrada_controls.append(
                 ft.Text(
@@ -235,11 +282,56 @@ class ToolLayout:
         self._refresh()
         self._start_sheet_load()
 
+    def _labeled_changed(self, label: str, files: list[Path]) -> None:
+        """Guarda a planilha de uma entrada rotulada e atualiza o botão."""
+        self._input_files[label] = files[-1] if files else None
+        selected = [path for path in self._input_files.values() if path is not None]
+        self.state.select_files(selected)
+        self.state.inputs = {
+            name: path for name, path in self._input_files.items() if path is not None
+        }
+        self.state.options.pop("reprocess", None)
+        self._check_formats()
+        self.result.set_idle()
+        self._update_summary()
+        self._run_button.disabled = not self._ready()
+        self._refresh_options()
+        self._refresh()
+
+    def _ready(self) -> bool:
+        """Diz se todas as entradas rotuladas (ou a lista comum) estão prontas."""
+        if self._input_labels:
+            return all(
+                self._input_files.get(label) is not None for label in self._input_labels
+            )
+        return bool(self.state.files)
+
+    def _update_summary(self) -> None:
+        if self._input_labels:
+            parts = [
+                f"{label}: {path.name}" if path is not None else f"{label}: —"
+                for label, path in self._input_files.items()
+            ]
+            self._summary.value = " · ".join(parts)
+        elif self.state.files:
+            self._summary.value = (
+                f"{len(self.state.files)} arquivo(s), "
+                f"{self.state.selected_count} aba(s)."
+            )
+        else:
+            self._summary.value = "Nenhum arquivo selecionado."
+
+    def _file_input_controls(self) -> list[FileInput]:
+        return (
+            list(self._file_inputs.values()) if self._file_inputs else [self.file_input]
+        )
+
     def _check_formats(self) -> list[FormatCheck]:
         """Detecta o formato real de cada arquivo e o mostra na entrada."""
         checks = [check_format(path) for path in self.state.files]
         self._formats = {check.path: check for check in checks}
-        self.file_input.set_formats(checks)
+        for control in self._file_input_controls():
+            control.set_formats(checks)
         return checks
 
     def _start_sheet_load(self) -> None:
@@ -308,7 +400,7 @@ class ToolLayout:
             self._options_refresh()
 
     def _run(self, _event=None) -> None:
-        if self._running:
+        if self._running or self._pre_checking:
             return
         if self._sheet_loading:
             self.result.set_info(
@@ -327,12 +419,95 @@ class ToolLayout:
                 "A lógica será conectada na sessão desta ferramenta.",
             )
             return
+        if self._pre_run is not None and not self.state.options.get("reprocess"):
+            page = self._page()
+            if page is not None and hasattr(page, "run_task"):
+                self._start_preflight(checks)
+                return
+        self._start_run(checks)
+
+    def _start_run(self, checks: list[FormatCheck]) -> None:
+        """Começa a execução, seja logo após o formato, seja após confirmar."""
+        self._update_summary()
         self._begin(checks)
         page = self._page()
         if page is None or not hasattr(page, "run_task"):
             self._execute_sync()
         else:
             page.run_task(self._execute_async)
+
+    def _start_preflight(self, checks: list[FormatCheck]) -> None:
+        """Confere a planilha fora do loop antes de perguntar qualquer coisa."""
+        files = tuple(self.state.files)
+        self._pre_checking = True
+        self._run_button.disabled = True
+        self._summary.value = "Conferindo a planilha..."
+        self._refresh()
+        page = self._page()
+        if page is None:
+            self._pre_checking = False
+            self._start_run(checks)
+            return
+        page.run_task(self._preflight_async, checks, files)
+
+    async def _preflight_async(
+        self,
+        checks: list[FormatCheck],
+        files: tuple[Path, ...],
+    ) -> None:
+        try:
+            warning = await asyncio.to_thread(self._pre_run, self.state)
+        except Exception:  # noqa: BLE001 - a execução real mostra o erro
+            warning = None
+        self._pre_checking = False
+        if tuple(self.state.files) != files:
+            self._update_summary()
+            self._run_button.disabled = not self._ready()
+            self._refresh()
+            return
+        if warning:
+            self._ask_confirmation(warning, checks)
+        else:
+            self._start_run(checks)
+
+    def _ask_confirmation(self, message: str, checks: list[FormatCheck]) -> None:
+        """Mostra o aviso de reexecução e só continua depois do aceite."""
+        page = self._page()
+        if page is None:
+            self._start_run(checks)
+            return
+
+        def close(_event=None) -> None:
+            page.pop_dialog()
+            self._update_summary()
+            self._run_button.disabled = not self._ready()
+            self._refresh()
+
+        def confirm(_event=None) -> None:
+            page.pop_dialog()
+            self.state.options["reprocess"] = True
+            self._start_run(checks)
+
+        def dismissed(_event=None) -> None:
+            if self.state.running:
+                return
+            self._update_summary()
+            self._run_button.disabled = not self._ready()
+            self._refresh()
+
+        page.show_dialog(
+            ft.AlertDialog(
+                modal=True,
+                title=ft.Text("Planilha já processada"),
+                content=ft.Text(message),
+                actions=[
+                    ft.TextButton("Cancelar", on_click=close),
+                    ft.FilledButton("Continuar mesmo assim", on_click=confirm),
+                ],
+                actions_alignment=ft.MainAxisAlignment.END,
+                on_dismiss=dismissed,
+            )
+        )
 
     def _begin(self, checks: list[FormatCheck]) -> None:
         """Prepara o estado e o painel antes de entregar o trabalho à thread."""
@@ -433,6 +608,18 @@ class ToolLayout:
         except WorkbookReadError as error:
             failure = error
             self._fail(error, "Não foi possível ler a planilha")
+        except AlreadyProcessedError as error:
+            failure = error
+            self._fail(error, "Planilha já processada")
+        except ConfigError as error:
+            failure = error
+            self._fail(error, "Configuração de cabeçalhos inválida")
+        except InvalidCnjError as error:
+            failure = error
+            self._fail(error, "CNJ fora do padrão")
+        except MissingColumnsError as error:
+            failure = error
+            self._fail(error, "Colunas padrão ausentes")
         except ValueError as error:
             failure = error
             self._fail(error, "Confira a seleção")
@@ -454,21 +641,16 @@ class ToolLayout:
         """Devolve o controle à janela depois da execução."""
         self._running = False
         self.state.running = False
-        if self.state.files:
-            self._summary.value = (
-                f"{len(self.state.files)} arquivo(s), "
-                f"{self.state.selected_count} aba(s)."
-            )
-        else:
-            self._summary.value = "Nenhum arquivo selecionado."
+        self._update_summary()
         self._set_busy(False)
 
     def _set_busy(self, busy: bool) -> None:
         self._run_button.visible = not busy
-        self._run_button.disabled = busy or self._sheet_loading or not self.state.files
+        self._run_button.disabled = busy or self._sheet_loading or not self._ready()
         self._cancel_button.visible = busy
         self._cancel_button.disabled = not busy
-        self.file_input.set_busy(busy)
+        for control in self._file_input_controls():
+            control.set_busy(busy)
         self.sheet_selector.set_busy(busy)
         self._refresh()
 

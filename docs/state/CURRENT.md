@@ -4,47 +4,46 @@
 
 ## Sessão
 
-- **Última concluída:** S6c — tema claro opcional; ciclo 0005 fechado
-- **Próxima:** escolher um item do backlog (vinculação, alinhamento em tela
-  cheia ou Drive) e escrever a spec antes de codar
+- **Última concluída:** S7a — vinculação AGENDA × PROCESSOS
+- **Próxima:** S7b — FINANCEIRO + CLIENTES
 - **Ciclo:** 0006 — Backlog
-- **Decisões:** tema trocado ao vivo via `theme.restyle`; settings em
-  `%LOCALAPPDATA%/xl_utils/settings.json`; ADR 0013
+- **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO`
+  sempre; config empacotada em `src/xl_utils/configs/headers.json`; ADR 0014
+  (regra) e ADR 0015 (config × estado)
 
 ## Pronto
 
-- S6c: `DARK`/`LIGHT` em `ui/theme.py`, `theme.apply(mode)` antes de montar a
-  UI e botão na sidebar grava e aplica na hora via `theme.restyle`, sem perder
-  o estado; settings ausente/corrompido cai no escuro. Contraste AA coberto.
-- S6b: log por etapa e barra indeterminada por arquivo nas quatro ferramentas.
-- S6a: `ORIGEM` = `<stem> - <aba>` e `LINHA_ORIGEM` no resultado inteiro.
+- S7a: motor puro em `core/tools/link.py`; página com duas entradas rotuladas
+  (AGENDA e PROCESSOS); `VINCULA?` na prioridade CNJ → PASTA → PROTOCOLO;
+  protocolo preservado na descrição e campo vira `MIGRAÇÃO`; pop-up de
+  reexecução; saída preserva colunas e abas.
+- S6c: tema claro/escuro ao vivo via `theme.restyle`, sem perder estado.
+- S6b/S6a: log por etapa e `ORIGEM`/`LINHA_ORIGEM` no merge.
 
 ## Próximo passo
 
-Escolher o item do backlog com o dono e criar `docs/sessions/S7a-*.md` a partir
-do `_TEMPLATE.md`; nenhuma spec existe ainda.
+Ler `docs/sessions/S7b-vinculacao-financeiro.md` e implementar FINANCEIRO +
+CLIENTES, `VINCULA (POR NOME)?` e a opção de nome na descrição.
 
 ## Arquivos-chave
 
-- `ui/theme.py`, `shared/settings.py`, `app.py`, `ui/components/sidebar.py`
-- `tests/test_theme.py`, `tests/test_settings.py`
-- `docs/reference/ui.md`, `docs/adr/0013-tema-claro-e-preferencia.md`
-- `shared/progress.py`, `controllers/*.py` (etapas)
-- `core/tools/merge.py` (`ORIGEM`/`LINHA_ORIGEM`)
+- `core/tools/link.py`, `controllers/link.py`, `ui/pages/link.py`
+- `shared/configs.py`, `src/xl_utils/configs/headers.json`
+- `ui/components/tool_layout.py`, `ui/state.py`, `ui/pages/registry.py`
+- `tests/test_link.py`, `tests/test_configs.py`
+- `docs/adr/0014-regra-de-vinculacao.md`,
+  `docs/adr/0015-config-empacotada.md`
 
 ## Armadilhas
 
-- Tokens mudam com `theme.apply`; componente novo deve ler `theme.X` na
-  montagem, nunca `from ...theme import TEXT`.
-- `theme.restyle` só toca campos de cor; não percorrer `value`/`data`, senão
-  um log com hex seria alterado. Controles são mutados no lugar, mas `Border`,
-  `BorderSide`, `TextStyle`, `ButtonStyle` e `Gradient` são recriados inteiros:
-  mutar `BorderSide` ao vivo faz o `Container` perder o `border_radius`.
-- `settings.json` guarda só preferência, nunca caminho de planilha.
-- Flet não é thread-safe: UI só no loop da página.
-- Sem `await asyncio.sleep(0)` entre eventos, lotes rápidos acumulam no fim.
+- Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula; é esperado.
+- CNJ numérico no Excel perde precisão antes da leitura; a coluna deve ser texto.
+- `PROCESSO ORIGINÁRIO` contém “PROCESSO”; o match é exato, nunca substring.
+- Cabeçalho dobra caixa/acento/espaço; valor de célula não é tocado.
+- `MIGRAÇÃO` na AGENDA dispara o pop-up; confirmar não reescreve o protocolo.
+- Config empacotada via `importlib.resources`; override em `%LOCALAPPDATA%`.
+- Flet não é thread-safe: `pre_run` roda em thread e só devolve texto.
 - Cancelar não interrompe pandas: só vale entre arquivos.
-- `LINHA_ORIGEM` usa a largura do total do resultado.
 - `.xls` não tem leitor alternativo; falha do calamine é final.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 

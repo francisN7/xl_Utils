@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "columns": {
+    "vincula": "VINCULA?",
+    "vincula_nome": "VINCULA (POR NOME)?"
+  },
+  "sheets": {
+    "AGENDA": {
+      "standard": [
+        "DATA COMPROMISSO",
+        "HORA COMPROMISSO",
+        "DATA CONCLUSÃO",
+        "REMETENTE",
+        "DESTINATÁRIO",
+        "TAREFA",
+        "DESCRIÇÃO",
+        "NUMERO DO PROCESSO",
+        "PROTOCOLO",
+        "PASTA"
+      ],
+      "fields": {
+        "descricao": "DESCRIÇÃO",
+        "cnj": "NUMERO DO PROCESSO",
+        "protocolo": "PROTOCOLO",
+        "pasta": "PASTA"
+      },
+      "required": ["descricao", "cnj", "protocolo", "pasta"],
+      "description_separator": "\n"
+    },
+    "PROCESSOS": {
+      "standard": [
+        "NOME DO CLIENTE",
+        "PARTE CONTRÁRIA",
+        "TIPO DE AÇÃO",
+        "GRUPO DE AÇÃO",
+        "FASE PROCESSUAL",
+        "ETAPA",
+        "NÚMERO DO PROCESSO",
+        "PROCESSO ORIGINÁRIO",
+        "TRIBUNAL",
+        "VARA",
+        "COMARCA",
+        "PROTOCOLO",
+        "EXPECTATIVA/VALOR DA CAUSA",
+        "VALOR HONORÁRIOS",
+        "PASTA",
+        "DATA CADASTRO",
+        "DATA FECHAMENTO",
+        "DATA TRANSITO",
+        "DATA ARQUIVAMENTO",
+        "DATA REQUERIMENTO",
+        "RESPONSÁVEL",
+        "ANOTAÇÕES GERAIS"
+      ],
+      "fields": {
+        "nome": "NOME DO CLIENTE",
+        "cnj": "NÚMERO DO PROCESSO",
+        "protocolo": "PROTOCOLO",
+        "pasta": "PASTA"
+      },
+      "required": ["nome", "cnj", "protocolo", "pasta"],
+      "description_separator": "\n"
+    },
+    "FINANCEIRO": {
+      "standard": [
+        "TIPO",
+        "CONTA/CARTÃO",
+        "CENTRO DE CUSTO",
+        "SETOR/UNIDADE",
+        "CATEGORIA",
+        "DATA DE VENCIMENTO",
+        "DATA DE COMPETENCIA",
+        "DATA DE RECEBIMENTO/PAGAMENTO",
+        "DESCRIÇÃO",
+        "VALOR",
+        "PROCESSO",
+        "PROTOCOLO",
+        "PASTA",
+        "NOME DO CLIENTE"
+      ],
+      "fields": {
+        "descricao": "DESCRIÇÃO",
+        "cnj": "PROCESSO",
+        "protocolo": "PROTOCOLO",
+        "pasta": "PASTA",
+        "nome": "NOME DO CLIENTE"
+      },
+      "required": ["descricao", "cnj", "protocolo", "pasta", "nome"],
+      "description_separator": " | "
+    },
+    "CLIENTES": {
+      "standard": [
+        "NOME",
+        "CPF CNPJ",
+        "RG",
+        "NACIONALIDADE",
+        "DATA DE NASCIMENTO",
+        "ESTADO CIVIL",
+        "PROFISSÃO",
+        "SEXO",
+        "CELULAR",
+        "TELEFONE",
+        "EMAIL",
+        "PAIS",
+        "ESTADO",
+        "CIDADE",
+        "BAIRRO",
+        "ENDEREÇO",
+        "CEP",
+        "PIS PASEP",
+        "CTPS",
+        "CID",
+        "NOME DA MÃE",
+        "ORIGEM DO CLIENTE",
+        "ANOTAÇÕES GERAIS"
+      ],
+      "fields": {
+        "nome": "NOME"
+      },
+      "required": ["nome"],
+      "description_separator": "\n"
+    }
+  }
+}

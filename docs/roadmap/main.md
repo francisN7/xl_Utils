@@ -3,56 +3,86 @@
 Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 [`0005-polimento.md`](0005-polimento.md).
 
-Nenhuma sessão está marcada: o dono escolhe o próximo item e a spec nasce antes
-do código.
+## Sessões
 
-## Backlog
+| Sessão | Entrega | Estado |
+|---|---|---|
+| S7a | Vinculação I — motor + AGENDA × PROCESSOS | [x] |
+| S7b | Vinculação II — FINANCEIRO + CLIENTES | [ ] |
+| S7c | Vinculação III — campo único, log e acabamento | [ ] |
+| S8 | Alinhamento de colunas em tela cheia no merge | [ ] |
+| S9a | Drive I — ADR, OAuth, contas e shell | [ ] |
+| S9b | Drive II — link/seletor e escrita do resultado | [ ] |
+| S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
-| Item | Valor | Custo | Pré-requisito |
-|---|---|---|---|
-| **Vinculação entre AGENDA, CLIENTES, FINANCEIRO e PROCESSOS** | Alto | G | Preencher `VINCULA?` em AGENDA e `VINCULA?` + `VINCULA (POR NOME)?` em FINANCEIRO, cruzando as quatro planilhas por CNJ, PASTA, nome e PROTOCOLO. Ver detalhe abaixo |
-| Alinhamento de colunas em tela cheia (mesclar) | Alto | M | Botão maximizar ao lado de “Alinhamento de colunas”; a seleção ocupa a tela inteira; restaurar no mesmo botão ou em “CONFIRMAR”, exibido no canto inferior direito só quando maximizado. Mantém a largura de cada card e usa toda a largura da tela para distribuí-los lado a lado, sem esticá-los. Não muda o modelo de grupos |
-| Envio direto do Google Drive (link ou seletor) | Alto | G | Duas entradas: link da planilha ou seletor de arquivos do Drive. Vem junto o login pelo navegador (OAuth), com suporte a múltiplas contas e opção de “sair” na tela inicial; o menu hamburger fica num dos cantos superiores, na posição que ficar melhor. Decidir antes de começar: quais ferramentas exportam local, quais gravam direto no link e, no caso do link, se o resultado vai numa aba extra da mesma planilha ou numa pasta `output` ao lado. Exige ADR de autenticação/escopo e escolha da lib de Drive API |
+Ordem definida pelo dono: **vinculação → tela cheia → Drive**. O Drive fica por
+último porque muda o caminho de saída de todas as ferramentas; a S9 só vira
+duas ou três sessões depois do ADR de autenticação.
 
-### Detalhe: vinculação
+## S7a — entregue
 
-**Planilhas e campos.** Quatro planilhas padrão — AGENDA, CLIENTES, FINANCEIRO e
-PROCESSOS — ligadas por NOME DO CLIENTE, N° DE CNJ, PROTOCOLO e PASTA; os nomes
-das colunas variam. Prioridade de vínculo: 1) CNJ, 2) PASTA, 3) NOME DO
-CLIENTE, 4) PROTOCOLO.
+Motor puro em `core/tools/link.py`, duas entradas rotuladas (AGENDA e
+PROCESSOS), `VINCULA?` e preservação do protocolo na descrição com
+`MIGRAÇÃO`. A config empacotada nasceu em `src/xl_utils/configs/headers.json`
+e o override por máquina em `%LOCALAPPDATA%/xl_utils/headers.json`. Detalhes na
+[spec](../sessions/S7a-vinculacao-agenda.md) e nos ADRs 0014 e 0015.
+
+## S7b — FINANCEIRO e CLIENTES
+
+Acrescenta as outras duas entradas rotuladas. No FINANCEIRO, `VINCULA?` usa a
+mesma prioridade CNJ → PASTA → PROTOCOLO; `VINCULA (POR NOME)?` recebe
+SIM/NÃO comparando o nome com a lista única de PROCESSOS (split por `;`) e
+CLIENTES. A descrição usa `" | "` e o prefixo `NOME DO CLIENTE: X`. Opção
+“nome sem vínculo na descrição”. Ver
+[spec](../sessions/S7b-vinculacao-financeiro.md).
+
+## S7c — acabamento da vinculação
+
+Opção “manter apenas um campo vinculante” (AGENDA, FINANCEIRO ou ambos),
+etapas no log, cartão no Início e revisão dos textos. Fecha a regra de
+vinculação com um ADR de adendo, se necessário.
+
+## S8 — tela cheia no merge
+
+Botão maximizar ao lado de “Alinhamento de colunas”; a seleção ocupa a tela
+inteira e restaura no mesmo botão ou em “CONFIRMAR”, exibido no canto inferior
+direito só quando maximizado. Mantém a largura de cada card e usa toda a
+largura para distribuí-los lado a lado, sem esticá-los. Não muda o modelo de
+grupos.
+
+## S9 — Google Drive
+
+Duas entradas: link da planilha ou seletor de arquivos do Drive. Login pelo
+navegador (OAuth), múltiplas contas e “sair” na tela inicial; menu hamburger
+num dos cantos superiores. Antes do código, o ADR decide escopo, lib e destino
+da saída (aba extra ou pasta `output` ao lado). S9a entrega só a autenticação;
+S9b, a transferência; S9c, a exportação nas demais ferramentas.
+
+## Backlog detalhado — vinculação
+
+**Planilhas e campos.** Quatro planilhas padrão — AGENDA, CLIENTES, FINANCEIRO
+e PROCESSOS — ligadas por NOME DO CLIENTE, CNJ, PROTOCOLO e PASTA. Os rótulos
+reais vivem em `headers.json`; a comparação de cabeçalho dobra caixa, acento e
+espaço, mas os valores das células são comparados como estão.
 
 | Planilha | Vincula a | Campos |
 |---|---|---|
-| AGENDA | PROCESSOS | CNJ, PROTOCOLO e PASTA |
-| CLIENTES | PROCESSOS, FINANCEIRO | NOME DO CLIENTE |
-| FINANCEIRO | PROCESSOS, CLIENTES | CNJ, PROTOCOLO, PASTA e NOME |
-| PROCESSOS | AGENDA, CLIENTES, FINANCEIRO | CNJ, PROTOCOLO, PASTA e NOME |
+| AGENDA | PROCESSOS | CNJ, PASTA e PROTOCOLO |
+| CLIENTES | PROCESSOS, FINANCEIRO | NOME |
+| FINANCEIRO | PROCESSOS, CLIENTES | CNJ, PASTA, PROTOCOLO e NOME |
+| PROCESSOS | AGENDA, CLIENTES, FINANCEIRO | CNJ, PASTA, PROTOCOLO e NOME |
 
-- **NOME DO CLIENTE:** múltiplos valores por célula em PROCESSOS, separados por
-  `;`; valor único em CLIENTES e FINANCEIRO.
-- **N° DE CNJ:** valor único, formato CNJ com máscara.
-- **PROTOCOLO e PASTA:** valor único, campo livre.
-- Células vazias são permitidas; se todos os campos estiverem vazios, não
+- **CNJ:** máscara canônica `NNNNNNN-NN.NNNN.N.NN.NNNN` ou 20 dígitos crus;
+  qualquer outra forma preenchida interrompe tudo e lista os casos.
+- **NOME:** valor único em CLIENTES e FINANCEIRO; em PROCESSOS, vários nomes na
+  mesma célula separados por `;`.
+- **Células vazias:** permitidas; se todos os campos estiverem vazios, não
   vincula.
-
-**Saída em AGENDA.** Nova coluna `VINCULA?`. Testa CNJ → PASTA → PROTOCOLO e
-para no primeiro vínculo, gravando `VINCULA POR CNJ`, `VINCULA POR PASTA` ou
-`VINCULA POR PROTOCOLO`. Sem vínculo: `NÃO vincula, apenas processo
-consultivo`; se houver protocolo, ele vai para o fim da descrição e no lugar
-entra `MIGRAÇÃO` (sem isso a migração vira comentário não editável).
-
-**Saída em FINANCEIRO.** `VINCULA?` com a mesma regra, mas sem mover protocolo
-para a descrição nem usar `MIGRAÇÃO`. `VINCULA (POR NOME)?` recebe só SIM/NÃO,
-comparando o nome do financeiro com uma lista única montada a partir dos nomes
-de PROCESSOS (separados por `;`) e de CLIENTES, sem duplicatas e ordenada.
-
-**Opções.** *Nome sem vínculo na descrição* (só FINANCEIRO): prefixa a descrição
-com `NOME + " | " + DESCRIÇÃO` quando não há vínculo por nome. *Manter apenas um
-campo vinculante* (AGENDA, FINANCEIRO ou ambos): mantém só o vínculo de maior
-prioridade e concatena os demais ao fim da descrição, sem mover `MIGRAÇÃO`.
-
-**Pendências.** Onde cada opção é ligada na UI, como concatenar quando o campo
-de descrição está vazio e como tratar variações de grafia do mesmo nome.
+- **Sem vínculo na AGENDA:** `NÃO vincula, apenas processo consultivo`, o
+  protocolo vai para o fim da descrição e o campo vira `MIGRAÇÃO` — sempre.
+- **Sem vínculo no FINANCEIRO:** não move protocolo nem usa `MIGRAÇÃO`.
+- **Saída:** mesma lógica das demais ferramentas (`output/` ou pasta
+  escolhida), preservando todas as colunas de entrada.
 
 ## Manutenção
 
@@ -65,7 +95,7 @@ de descrição está vazio e como tratar variações de grafia do mesmo nome.
 
 - Suporte a macOS/Linux — só entra quando houver máquina para testar.
 - Empacotamento, instalador e release — só entram quando o dono decidir
-  distribuir.
+  distribuir. A config já nasce pronta para o wheel.
 - Internacionalização — só entra se aparecer usuário fora do PT-BR.
 - Drag & drop real de arquivos — só entra se migrar para PySide6 ou houver hook
   Windows-only.

@@ -14,6 +14,7 @@ texto seguro antes de chegar à ferramenta.
 | Extrair CNJs | Encontra e padroniza numerações CNJ em uma planilha | pronta |
 | Recortar Planilha | Divide uma planilha em arquivos por quantidade de linhas | pronta |
 | Mesclar Planilhas | Concatena as abas selecionadas com a origem de cada linha | pronta |
+| Vincular Planilhas | Cruza AGENDA e PROCESSOS e marca o vínculo de cada linha | pronta (AGENDA × PROCESSOS) |
 
 ## Requisitos
 
@@ -57,6 +58,7 @@ src/xl_utils/
   core/        regras puras (io, mime, paths, text, tools)
   controllers/ orquestração entre UI e core
   ui/          páginas e componentes Flet
+  configs/     headers.json empacotado (padrão)
   shared/      logging, config e clipboard
 tests/         testes do core
 docs/          documentação e memória entre sessões

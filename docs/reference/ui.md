@@ -8,7 +8,7 @@ responde:** regras de negócio (ver `architecture.md`) nem o porquê (ver
 
 Sidebar fixa de 260 px + área de conteúdo. A sidebar é um `Column` próprio, não
 um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
-forma consistente. Ela tem o logo, o item **Início** e as quatro ferramentas.
+forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas.
 O conteúdo abre em uma das duas formas:
 
 - **Início:** hub com cartões das ferramentas.
@@ -24,6 +24,7 @@ O conteúdo abre em uma das duas formas:
 │ CNJ      │ 1. Entrada        │ 3. Resultado           │
 │ Recortar │    dropzone       │    status + caminho    │
 │ Mesclar  │ 2. Opções         │    log + prévia        │
+│ Vincular │                   │                        │
 │          ├───────────────────┴────────────────────────┤
 │          │ [resumo]                    [Executar]     │
 └──────────┴────────────────────────────────────────────┘
@@ -45,21 +46,23 @@ O conteúdo abre em uma das duas formas:
 
 | Componente | Responsabilidade |
 |---|---|
-| `sidebar` | Logo, Início e as quatro ferramentas, com item ativo destacado. |
+| `sidebar` | Logo, Início e as cinco ferramentas, com item ativo destacado. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
 | `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
-| `tool_layout` | Cabeçalho, cartões, barra de ação e estados. |
+| `tool_layout` | Cabeçalho, cartões, barra de ação e estados; aceita entradas rotuladas (AGENDA/PROCESSOS) no lugar da lista única. |
 
 ### Entrada de arquivos
 
 O Flet 1.0 não expõe arrastar e soltar arquivos do sistema operacional. O
 dropzone é uma área clicável que abre o `FilePicker` nativo; o texto "clique
-para selecionar" substitui a promessa de drop. Todas as ferramentas aceitam
+para selecionar" substitui a promessa de drop. As ferramentas em lote aceitam
 vários arquivos: depois do primeiro, o dropzone vira “Adicionar outro arquivo” e
-a lista permite remover cada um.
+a lista permite remover cada um. A vinculação é a exceção: tem duas entradas
+rotuladas (AGENDA e PROCESSOS), uma planilha em cada, sem lista acumulada e sem
+seletor de abas — a aba é achada pelo bloco padrão.
 
 Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
 extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:
@@ -104,12 +107,25 @@ para ela. Cada aba pode contribuir com no máximo uma coluna por saída. O quadr
 e aba) e `LINHA_ORIGEM` (posição da linha no resultado, com zeros à esquerda)
 como primeiras colunas.
 
+### Vinculação
+
+A ferramenta **Vincular Planilhas** usa duas entradas rotuladas — AGENDA e
+PROCESSOS — e não mostra o seletor de abas: cada arquivo pode ter várias abas e
+a ferramenta escolhe a primeira que contém o bloco padrão. “Executar” só libera
+quando as duas planilhas estão escolhidas. A prévia mostra a AGENDA já com
+`VINCULA?`; as demais abas continuam no arquivo salvo, mas não na prévia.
+
+Se a coluna de protocolo da AGENDA já contém `MIGRAÇÃO`, antes de executar
+aparece um `AlertDialog` com “Cancelar” e “Continuar mesmo assim”. Continuar
+recalcula `VINCULA?` e não acrescenta o protocolo de novo à descrição. O aviso
+só volta se o arquivo for trocado.
+
 ## Início
 
-O hub mostra quatro cartões em uma linha no desktop, dois no médio e um no
-mobile, com 200 px de altura. Cada cartão tem ícone, nome, descrição e o atalho
-“Abrir ferramenta”. Novas ferramentas entram da esquerda para a direita; a
-próxima linha também começa à esquerda.
+O hub mostra um cartão por ferramenta, com 200 px de altura: até quatro por
+linha no desktop, dois no médio e um no mobile. Cada cartão tem ícone, nome,
+descrição e o atalho “Abrir ferramenta”. Novas ferramentas entram da esquerda
+para a direita; a próxima linha também começa à esquerda.
 
 ## Resultado e prévia
 
@@ -194,6 +210,7 @@ abaixo de `FONT_XS`.
 | Formato desconhecido | Linha vermelha na entrada; Executar mostra “Não foi possível identificar o formato”. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
 | Executando | Status amarelo, barra indeterminada e log de etapas crescendo. |
+| Já processada | `AlertDialog` de reexecução; “Continuar” recalcula sem repetir o protocolo. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |
 | Erro | Status vermelho, título tipado, mensagem original e diagnóstico copiável. |
 

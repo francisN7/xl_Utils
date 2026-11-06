@@ -29,6 +29,15 @@ htmlcov/
 output/
 samples/
 
+#===========#
+# SECRETS   #
+#===========#
+# Rede de segurança: o estado real fica em %LOCALAPPDATA%/xl_utils/google/.
+client_secret*.json
+token*.json
+credentials*.json
+*.pem
+
 #=================#
 # LOCAL / PERSONAL #
 #=================#

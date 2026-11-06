@@ -30,9 +30,12 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 | `core/tools/cnj.py` | regra do CNJ | `extract_cnjs`, `normalize_cnj`, `summarize_cnjs` |
 | `core/tools/cut.py` | regra do recorte | `split_frame`, `split_workbook` |
 | `core/tools/merge.py` | regra do merge | `ColumnRef`, `ColumnGroup`, `merge_sheets`, `move_column` |
+| `core/tools/link.py` | regra da vinculação | `LinkConfig`, `SheetSpec`, `link_agenda`, `find_target_sheet` |
 
-Erros tipados: `WorkbookReadError` (leitura), `SaveError` (gravação) e
-`ValueError` para seleção ou regra inválida.
+Erros tipados: `WorkbookReadError` (leitura), `SaveError` (gravação),
+`ConfigError`, `InvalidCnjError`, `MissingColumnsError` e
+`AlreadyProcessedError` (vinculação), além de `ValueError` para seleção ou
+regra inválida.
 
 ## Fluxo de dados
 
@@ -208,6 +211,7 @@ os chips de abas e “Executar” ficam desabilitados até `_finish`. Ver ADR 00
 | Extrair CNJs | `core/tools/cnj.py` | pronta |
 | Recortar planilha | `core/tools/cut.py` | pronta |
 | Mesclar planilhas | `core/tools/merge.py` | pronta |
+| Vincular planilhas | `core/tools/link.py` | S7a: AGENDA × PROCESSOS |
 
 ## Extração de CNJ
 
@@ -221,6 +225,30 @@ padronizado mesmo inválido. `normalize_cnj` devolve sempre o formato pontuado;
 `(achados, únicos ordenados)`. `collect_cnjs` e `count_cnjs` continuam como
 atalhos. `controllers/cnj.py` prepara `SaveItem` com `<nome> lista cnj.xlsx` na
 coluna `PROCESSOS` e registra encontrados, duplicados e únicos no log.
+
+## Vinculação
+
+`core/tools/link.py` recebe as abas da AGENDA e de PROCESSOS e o `LinkConfig`
+carregado de `headers.json`. O casamento de cabeçalho usa `fold_header`, que
+dobra caixa, acento e espaço só no rótulo; os valores das células são brutos.
+`find_target_sheet` escolhe a primeira aba que tem todos os campos exigidos e,
+se nenhuma tiver, lista o que faltou por aba.
+
+O CNJ é validado antes de qualquer vínculo: só a máscara canônica ou 20 dígitos
+contínuos passam; os demais valores preenchidos levantam `InvalidCnjError` com
+arquivo, aba, linha, coluna e valor. A prioridade é CNJ → PASTA → PROTOCOLO e o
+resultado é `VINCULA POR ...` ou `NÃO vincula, apenas processo consultivo`.
+Sem vínculo na AGENDA, o protocolo vira `<cabeçalho real>: <valor>` no fim da
+descrição e o campo recebe `MIGRAÇÃO`; a reexecução exige `allow_migrated` e
+não repete a linha. `VINCULA?` é inserida depois do bloco padrão e antes das
+extras, ou sobrescrita no lugar. As demais abas da AGENDA são preservadas.
+
+`shared/configs.py` lê `src/xl_utils/configs/headers.json` por
+`importlib.resources` e, se existir, o override em
+`%LOCALAPPDATA%/xl_utils/headers.json`. Segredos e estado de login ficam em
+`%LOCALAPPDATA%/xl_utils/google/`, fora do Git (ADR 0015). O JSON traz as quatro
+planilhas padrão, os campos usados, o bloco padrão na ordem e o separador de
+descrição (quebra de linha na AGENDA, `" | "` no FINANCEIRO).
 
 ## Recorte
 
@@ -276,6 +304,11 @@ livre, cancelamento, `SaveError` e recusa de arquivo no lote. O `.xls` é uma
 fixture binária mínima em `tests/fixtures/minimo.xls`, gerada uma vez com `xlwt`
 e **sem** adicionar a dependência ao projeto.
 
+`tests/test_link.py` cobre prioridade, comparação bruta, CNJ inválido,
+`MIGRAÇÃO`, reexecução, colunas e abas preservadas, com cabeçalhos fictícios.
+`tests/test_configs.py` carrega o JSON empacotado e um override temporário. O
+end-to-end com arquivo real continua no smoke manual.
+
 ## Limites conhecidos
 
 - Datas do Excel chegam como texto ISO (`2024-01-02 00:00:00`), não no formato
@@ -296,3 +329,7 @@ e **sem** adicionar a dependência ao projeto.
   texto.
 - [ADR 0011](../adr/0011-execucao-fora-da-ui.md) — execução fora da UI thread e
   progresso por arquivo.
+- [ADR 0014](../adr/0014-regra-de-vinculacao.md) — vinculação por valor bruto e
+  `MIGRAÇÃO`.
+- [ADR 0015](../adr/0015-config-empacotada.md) — config empacotada e estado por
+  máquina.

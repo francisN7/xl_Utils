@@ -96,6 +96,31 @@ def test_run_handler_leaves_the_ui_thread(xlsx_file: Path, monkeypatch) -> None:
     assert "1 de 1 arquivo(s) concluído(s)" in " ".join(_texts(layout.result.control))
 
 
+def test_labeled_inputs_require_all_entries(
+    xlsx_file: Path,
+    tmp_path: Path,
+) -> None:
+    agenda = tmp_path / "agenda.xlsx"
+    processos = tmp_path / "processos.xlsx"
+    agenda.write_bytes(xlsx_file.read_bytes())
+    processos.write_bytes(xlsx_file.read_bytes())
+
+    layout = ToolLayout("Vinculação", "Teste", inputs=("AGENDA", "PROCESSOS"))
+    layout._file_inputs["AGENDA"].set_files([agenda])
+
+    assert layout._run_button.disabled
+    assert layout.state.inputs == {"AGENDA": agenda}
+
+    layout._file_inputs["PROCESSOS"].set_files([processos])
+
+    assert not layout._run_button.disabled
+    assert layout.state.inputs == {"AGENDA": agenda, "PROCESSOS": processos}
+    texts = _texts(layout.control)
+    assert "AGENDA" in texts
+    assert "PROCESSOS" in texts
+    assert "Abas" not in texts
+
+
 def test_execute_button_becomes_cancel_while_running(xlsx_file: Path) -> None:
     layout = ToolLayout(
         "Cancelamento",

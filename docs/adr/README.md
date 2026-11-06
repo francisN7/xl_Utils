@@ -18,6 +18,8 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0011](0011-execucao-fora-da-ui.md) | Execução fora da UI thread e progresso por arquivo | Aceita |
 | [0012](0012-cnj-texto-sujo.md) | CNJ em texto sujo sem validar o dígito verificador | Aceita |
 | [0013](0013-tema-claro-e-preferencia.md) | Tema claro opcional e preferência salva | Aceita |
+| [0014](0014-regra-de-vinculacao.md) | Vinculação por valor bruto e `MIGRAÇÃO` | Aceita |
+| [0015](0015-config-empacotada.md) | Config empacotada e estado por máquina | Aceita |
 
 ## Como ler
 

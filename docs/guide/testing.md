@@ -59,6 +59,10 @@ formatos. Para criar uma amostra local em `samples/` (fora do Git):
 uv run python scripts/make_fixture.py
 ```
 
+`tests/test_link.py` usa cabeçalhos fictícios e não depende dos rótulos reais;
+`tests/test_configs.py` é quem confere o `headers.json` empacotado e o override
+temporário em `%LOCALAPPDATA%`.
+
 ## Convenções
 
 - Um arquivo de teste por módulo de core: `tests/test_all_str.py`, etc.

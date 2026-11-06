@@ -20,6 +20,7 @@ class ToolState:
     """
 
     files: list[Path] = field(default_factory=list)
+    inputs: dict[str, Path] = field(default_factory=dict)
     result: dict[str, pd.DataFrame] | None = None
     save_items: list[SaveItem] = field(default_factory=list)
     options: dict[str, object] = field(default_factory=dict)
@@ -44,6 +45,7 @@ class ToolState:
     def select_files(self, files: list[Path]) -> None:
         """Substitui a seleção e descarta qualquer resultado anterior."""
         self.files = list(files)
+        self.inputs = {}
         self.result = None
         self.save_items.clear()
         self.sheet_names = {}
@@ -78,6 +80,7 @@ class ToolState:
     def reset(self) -> None:
         """Limpa tudo desta ferramenta."""
         self.files.clear()
+        self.inputs.clear()
         self.result = None
         self.save_items.clear()
         self.options.clear()

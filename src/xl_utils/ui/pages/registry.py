@@ -14,6 +14,7 @@ from xl_utils.ui.pages.all_str import run as run_all_str
 from xl_utils.ui.pages.cnj import run as run_cnj
 from xl_utils.ui.pages.cut import options as cut_options
 from xl_utils.ui.pages.cut import run as run_cut
+from xl_utils.ui.pages.link import build as build_link
 from xl_utils.ui.pages.merge import options as merge_options
 from xl_utils.ui.pages.merge import run as run_merge
 
@@ -101,5 +102,12 @@ TOOLS: tuple[ToolPage, ...] = (
         merge_options,
         multiple_files=True,
         run_handler=run_merge,
+    ),
+    ToolPage(
+        id="link",
+        label="Vincular Planilhas",
+        icon=ft.Icons.LINK,
+        description="Cruza AGENDA e PROCESSOS e marca o vínculo de cada linha.",
+        build=build_link,
     ),
 )

@@ -1,8 +1,8 @@
 # AGENTS.md — xl_Utils
 
-Aplicativo desktop em Flet que reúne quatro utilitários de planilha:
-tratamento de texto (inclui remoção de emojis), extração de CNJ, recorte e
-mesclagem.
+Aplicativo desktop em Flet que reúne cinco utilitários de planilha:
+tratamento de texto (inclui remoção de emojis), extração de CNJ, recorte,
+mesclagem e vinculação entre AGENDA e PROCESSOS.
 
 **Stack:** Python 3.15 · uv · Flet 1.x · pandas 3.x · pytest · ruff
 
@@ -52,11 +52,11 @@ src/xl_utils/
   ui/pages/         Início + uma página por ferramenta
   ui/components/    entrada, resultado, prévia e layout
   ui/theme.py       tokens e tema Dracula
-  shared/           log de execução e abertura de pasta
+  configs/          headers.json empacotado (padrão, não estado)
+  shared/           log, configuração e abertura de pasta
 tests/              testes do core
 scripts/            automação de docs
 docs/               mapa, estado, roadmap, guias, ADRs
-*.py (raiz)         scripts legados, migrados um a um para src/
 ```
 
 ## Convenções
@@ -95,5 +95,6 @@ docs/               mapa, estado, roadmap, guias, ADRs
 ## Segurança (repo público)
 
 - Nunca commitar `.env`, credenciais, chaves, backups ou dados reais.
+- Configuração pública em `configs/`; segredos em `%LOCALAPPDATA%/xl_utils/`.
 - Planilhas de teste usam dados fictícios.
 - `output/` e artefatos locais ficam fora do Git.

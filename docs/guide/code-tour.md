@@ -20,7 +20,7 @@ depois de ver o fluxo funcionando uma vez.
 
 ```text
 app.py                          monta a janela e a navegação
-└─ ui/pages/registry.py         lista as quatro ferramentas
+└─ ui/pages/registry.py         lista as ferramentas
    └─ ui/pages/<ferramenta>.py  conecta a página ao controller
       └─ ui/components/tool_layout.py
          │                      ciclo: entrada → formato → execução em segundo plano → prévia
@@ -49,8 +49,10 @@ entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 ### 2. Ciclo de uma ferramenta — `ui/components/tool_layout.py`
 
 `_run` é o coração: valida o `ToolState`, chama `_check_formats`, bloqueia
-formato não identificado e entrega o handler a `_execute_async`. Com página, o
-trabalho vai para `asyncio.to_thread`; sem página, roda no próprio loop. Os
+formato não identificado e entrega o handler a `_execute_async`. Quando a página
+define `pre_run` (vinculação), ele roda antes e pode abrir o diálogo de
+reexecução. Com página, o trabalho vai para `asyncio.to_thread`; sem página,
+roda no próprio loop. Os
 marcos de `shared/progress.py` e as etapas dos controllers voltam por uma fila
 e atualizam barra, texto e log no loop. Enquanto um arquivo roda, a barra fica
 indeterminada; entre arquivos, ela avança. O botão vira “Cancelar” durante a
@@ -78,7 +80,7 @@ de leitura e cálculo.
 `prepare_workbook`, filtra com `filter_sheets` e devolve `AllStrOutcome` com
 `SaveItem` e `RunLog`. As etapas são registradas com `reporter.note(...)`: vão
 para o log final e aparecem durante a execução. Os demais controllers seguem o
-mesmo desenho: `CnjOutcome`, `CutOutcome` e `MergeOutcome`.
+mesmo desenho: `CnjOutcome`, `CutOutcome`, `MergeOutcome` e `LinkOutcome`.
 
 **Observe:** nada é gravado; o controller devolve dados em memória.
 
@@ -111,6 +113,10 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 - `merge.py`: `ColumnRef`/`ColumnGroup`, `move_column` e `merge_sheets`; o
   resultado abre com `ORIGEM` (stem · aba) e `LINHA_ORIGEM` (linha de dados
   numerada no total, com zeros à esquerda).
+- `link.py`: `LinkConfig`/`SheetSpec`, `find_target_sheet` e `link_agenda`;
+  compara CNJ/PASTA/PROTOCOLO brutos, grava `VINCULA?`, `MIGRAÇÃO` e devolve
+  as abas da AGENDA com as demais preservadas. `shared/configs.py` carrega o
+  `headers.json` empacotado ou o override local.
 
 **Observe:** nenhum módulo daqui importa Flet ou abre diálogo.
 
@@ -135,6 +141,8 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_save.py` | nada é gravado antes da escolha e o lote usa pasta |
 | `test_format_check.py` | conteúdo vence o nome e `.xlsm` não é divergência |
 | `test_progress.py` | contagem, log ao vivo, token e cancelamento entre arquivos |
+| `test_link.py` | prioridade, valor bruto, CNJ inválido e `MIGRAÇÃO` |
+| `test_configs.py` | JSON empacotado e override por `%LOCALAPPDATA%` |
 | `test_integration.py` | as quatro ferramentas rodam nos quatro formatos |
 
 ## Onde mexer para…
@@ -147,6 +155,8 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | mudar nome de arquivo de saída | `controllers/cut.py` ou `core/paths.py` |
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |
 | mudar a regra do merge | `core/tools/merge.py` |
+| mudar a regra da vinculação | `core/tools/link.py` + `controllers/link.py` + `ui/pages/link.py` |
+| mudar um cabeçalho padrão | `src/xl_utils/configs/headers.json` (ou override local) |
 | mudar a regra do recorte | `core/tools/cut.py` + `controllers/cut.py` + `ui/pages/cut.py` |
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
 | mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |
