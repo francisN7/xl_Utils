@@ -70,6 +70,16 @@ num dos cantos superiores. Antes do código, o ADR decide escopo, lib e destino
 da saída (aba extra ou pasta `output` ao lado). S9a entrega só a autenticação;
 S9b, a transferência; S9c, a exportação nas demais ferramentas.
 
+## Backlog
+
+- **Responsividade do Início e das ferramentas** — sem sessão marcada. Em
+  largura reduzida, os títulos dos cartões quebram no meio das palavras e a
+  descrição estoura o card, empurrando “Abrir ferramenta” para fora; em
+  “Verificar Vínculos” o texto mais longo piora o quadro. A correção deve
+  manter título, descrição e atalho dentro do cartão, truncar ou ocultar a
+  descrição com reticências quando faltar espaço e revisar o Início e as
+  páginas de ferramenta em larguras estreitas. Prioridade fica com o dono.
+
 ## Backlog detalhado — vinculação
 
 **Planilhas e campos.** Quatro planilhas padrão — AGENDA, CLIENTES, FINANCEIRO
