@@ -27,11 +27,11 @@ perder a seleção de colunas nem os grupos.
 
 ## Aceite
 
-- [ ] Maximizar ocupa a tela e restaura no mesmo botão.
-- [ ] “CONFIRMAR” aparece só maximizado e também restaura.
-- [ ] A largura de cada card não muda; a sobra vira espaçamento.
-- [ ] Grupos, seleção e ordem sobrevivem à ida e volta.
-- [ ] Lint, testes e docs verdes.
+- [x] Maximizar ocupa a tela e restaura no mesmo botão.
+- [x] “CONFIRMAR” aparece só maximizado e também restaura.
+- [x] A largura de cada card não muda; a sobra vira espaçamento.
+- [x] Grupos, seleção e ordem sobrevivem à ida e volta.
+- [x] Lint, testes e docs verdes.
 
 ## Orçamento de contexto (≤90 linhas)
 

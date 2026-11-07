@@ -74,5 +74,5 @@ node scripts/check-docs.mjs
   `.venv`.
 - **Lock dessincronizado:** `uv sync --locked`; se falhar, `uv lock` e revise o
   diff.
-- **`docs:check` quebrado:** o alvo do link provavelmente foi movido; corrija o
+- **Check de docs quebrado:** o alvo do link provavelmente foi movido; corrija o
   caminho relativo ou remova o link morto.

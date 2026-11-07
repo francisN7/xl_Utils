@@ -1,6 +1,7 @@
 # Qualidade e clareza — o que foi entregue (2026-11-04)
 
 Ciclo 0003 fechado. O detalhe completo está no Git; as decisões ficam nos ADRs.
+O ciclo anterior está em [`0002-migracao.md`](0002-migracao.md).
 
 | Sessão | Entrega | Aceite |
 |---|---|---|

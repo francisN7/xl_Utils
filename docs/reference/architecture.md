@@ -256,10 +256,11 @@ CLIENTES; cada um gera um `SaveItem`. As demais abas são preservadas.
 
 `shared/configs.py` lê `src/xl_utils/configs/headers.json` por
 `importlib.resources` e, se existir, o override em
-`%LOCALAPPDATA%/xl_utils/headers.json`. Segredos e estado de login ficam em
-`%LOCALAPPDATA%/xl_utils/google/`, fora do Git (ADR 0015). O JSON traz as quatro
-planilhas padrão, os campos usados, o bloco padrão na ordem e o separador de
-descrição (quebra de linha na AGENDA, `" | "` no FINANCEIRO).
+`%LOCALAPPDATA%/xl_utils/headers.json`. Quando o Drive entrar (S9a), segredos e
+estado de login ficarão em `%LOCALAPPDATA%/xl_utils/google/`, fora do Git
+(ADR 0015). O JSON traz as quatro planilhas padrão, os campos usados, o bloco
+padrão na ordem e o separador de descrição (quebra de linha na AGENDA, `" | "`
+no FINANCEIRO).
 
 ## Recorte
 
@@ -298,11 +299,12 @@ quando arquivos ou abas mudam.
 
 ## Testes
 
-O core é testado com `pytest` e `tmp_path`; a UI é validada por smoke manual
-enquanto não houver regressão que justifique teste de widget. O teste funcional
-do `all_str` gera 1.000 linhas fictícias em memória, roda em CSV e XLSX e
-confere zeros à esquerda, numeração CNJ-like, remoção de emojis e quebras de
-linha.
+O core é testado com `pytest` e `tmp_path`; a UI tem testes headless para
+layout, tema, estado e quadro do merge (`test_layout.py`, `test_merge_page.py`,
+`test_theme.py`, `test_settings.py`, `test_ui_state.py`), além do smoke manual
+para o visual. O teste funcional do `all_str` gera 1.000 linhas fictícias em
+memória, roda em CSV e XLSX e confere zeros à esquerda, numeração CNJ-like,
+remoção de emojis e quebras de linha.
 
 `tests/test_formats.py` percorre `.xlsx`, `.xls`, `.csv` e `.html` com as mesmas
 linhas fictícias e confere `read_workbook`, `list_sheets`, `read_headers` e

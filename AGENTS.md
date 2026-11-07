@@ -51,10 +51,10 @@ src/xl_utils/
   controllers/      ponte entre UI e core
   ui/pages/         Início + uma página por ferramenta
   ui/components/    entrada, resultado, prévia e layout
-  ui/theme.py       tokens e tema Dracula
+  ui/theme.py       tokens e temas (Dracula/Alucard)
   configs/          headers.json empacotado (padrão, não estado)
   shared/           log, configuração e abertura de pasta
-tests/              testes do core
+tests/              testes do core e da UI (headless)
 scripts/            automação de docs
 docs/               mapa, estado, roadmap, guias, ADRs
 ```

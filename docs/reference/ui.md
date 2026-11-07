@@ -30,12 +30,6 @@ O conteúdo abre em uma das duas formas:
 └──────────┴────────────────────────────────────────────┘
 ```
 
-## Capturas
-
-![Tela inicial](../assets/ui-base.png)
-
-![Página de ferramenta](../assets/ui-tool.png)
-
 ## Navegação e estado
 
 - Trocar de ferramenta **mantém** o estado dela (arquivo, opções e resultado).

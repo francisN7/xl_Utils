@@ -111,7 +111,7 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 - `cut.py`: `split_frame`/`split_workbook` e `split_frame_by_parts`/
   `split_workbook_by_parts`, sem tocar no disco.
 - `merge.py`: `ColumnRef`/`ColumnGroup`, `move_column` e `merge_sheets`; o
-  resultado abre com `ORIGEM` (stem · aba) e `LINHA_ORIGEM` (linha de dados
+  resultado abre com `ORIGEM` (`stem - aba`) e `LINHA_ORIGEM` (linha de dados
   numerada no total, com zeros à esquerda).
 - `link.py`: `LinkConfig`/`SheetSpec`, `find_target_sheet`, `link_agenda` e
   `link_financeiro`; compara CNJ/PASTA/PROTOCOLO/nome brutos, grava `VINCULA?`
@@ -144,6 +144,11 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_progress.py` | contagem, log ao vivo, token e cancelamento entre arquivos |
 | `test_link.py` | prioridade, valor bruto, CNJ, FINANCEIRO, opções, `MIGRAÇÃO` e log por etapa |
 | `test_link_page.py` | fluxos exigidos e opções habilitadas por arquivo |
+| `test_layout.py` | o layout alterna cartões e preserva o estado do quadro |
+| `test_merge_page.py` | a tela cheia preserva grupos, seleção e ordem |
+| `test_theme.py` | contraste e troca de tema sem perder a estrutura |
+| `test_settings.py` | a preferência de tema persiste e cai no escuro |
+| `test_ui_state.py` | trocar o arquivo reseta o resultado sem perder opções |
 | `test_configs.py` | JSON empacotado e override por `%LOCALAPPDATA%` |
 | `test_integration.py` | as ferramentas de lote rodam nos quatro formatos |
 

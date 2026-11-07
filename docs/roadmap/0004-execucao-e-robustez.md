@@ -2,7 +2,7 @@
 
 Ciclo 0004 fechado. O detalhe completo está no Git; as decisões ficam nos ADRs.
 O ciclo anterior está em [`0003-qualidade.md`](0003-qualidade.md); o tema claro
-seguiu para o ciclo 0005.
+seguiu para o [ciclo 0005](0005-polimento.md).
 
 | Sessão | Entrega | Aceite |
 |---|---|---|
@@ -22,4 +22,5 @@ de CNJ tolerante a texto sujo e recorte por quantidade de arquivos por aba.
 ## Validação de fechamento
 
 `uv run ruff check src tests`, `uv run pytest` e `node scripts/check-docs.mjs`
-verdes antes do fechamento. O ciclo seguinte começa em [`main.md`](main.md).
+verdes antes do fechamento. O ciclo seguinte começa em
+[`0005-polimento.md`](0005-polimento.md); o ativo, em [`main.md`](main.md).

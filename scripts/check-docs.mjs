@@ -6,9 +6,9 @@
  * 2. orçamento de linhas de AGENTS, CURRENT e specs de sessão;
  * 3. histórico disfarçado de referência ("## Cobertura da SXX").
  *
- * Histórico: CHANGELOG, `docs/releases/` e ADRs não entram na checagem de link.
- * Specs de fases fechadas saem do working tree; o orçamento vale para as que
- * ficam (a próxima e as em andamento).
+ * Histórico: CHANGELOG, specs de sessão e o corpo dos ADRs não entram na
+ * checagem de link; o índice `docs/adr/README.md` entra. O orçamento de spec
+ * vale para as que ficam (a próxima e as em andamento).
  *
  * Uso: node scripts/check-docs.mjs
  */
@@ -21,6 +21,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const SKIP_DIRS = new Set([
   '.git',
+  '.flet',
+  '.pytest_cache',
   '.expo',
   'backups',
   'dist',
@@ -32,7 +34,7 @@ const SKIP_DIRS = new Set([
 ]);
 
 /** Documentos históricos: não são reescritos nem têm links cobrados. */
-const SKIP_LINKS = ['CHANGELOG.md', 'docs/sessions/', 'docs/adr/'];
+const SKIP_LINKS = ['CHANGELOG.md', 'docs/sessions/'];
 
 const BUDGETS = [
   { file: 'AGENTS.md', max: 100 },
@@ -69,6 +71,7 @@ function lineCount(file) {
 function checkLinks(file) {
   const rel = relative(file);
   if (SKIP_LINKS.some((skip) => rel === skip || rel.startsWith(skip))) return;
+  if (rel.startsWith('docs/adr/') && rel !== 'docs/adr/README.md') return;
 
   const text = readFileSync(file, 'utf8');
   const lines = text.split(/\r?\n/);

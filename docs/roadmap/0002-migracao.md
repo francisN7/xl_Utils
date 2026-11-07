@@ -1,7 +1,8 @@
 # Migração e publicação — o que foi entregue (2026-11-04)
 
 Ciclo 0002 fechado. O detalhe completo está no Git; as decisões ficam nos ADRs.
-O fechamento administrativo previsto para a S4a foi absorvido pela S4b.
+O ciclo anterior está em [`0001-fundacao.md`](0001-fundacao.md). O fechamento
+administrativo previsto para a S4a foi absorvido pela S4b.
 
 | Sessão | Entrega | Aceite |
 |---|---|---|

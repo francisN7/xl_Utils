@@ -133,7 +133,8 @@ decisões nos ADRs.
   PT-BR; o diagnóstico foi revisado sem incluir conteúdo de célula.
 - Documentação: o backlog passa a registrar o envio direto do Google Drive e a
   vinculação entre AGENDA, CLIENTES, FINANCEIRO e PROCESSOS, com decisões em
-  aberto e protocolo detalhado; nenhuma das duas foi implementada.
+  aberto e protocolo detalhado; naquele momento, nenhuma das duas estava
+  implementada.
 - Ferramenta de vinculação renomeada para **Verificar Vínculos** na sidebar, no
   cabeçalho e na documentação; a descrição acompanha o novo vocabulário. O
   `id`, os módulos `link` e a regra não mudaram.

@@ -81,45 +81,11 @@ S9b, a transferência; S9c, a exportação nas demais ferramentas.
   descrição com reticências quando faltar espaço e revisar o Início e as
   páginas de ferramenta em larguras estreitas. Prioridade fica com o dono.
 
-## Backlog detalhado — vinculação
-
-**Planilhas e campos.** Quatro planilhas padrão — AGENDA, CLIENTES, FINANCEIRO
-e PROCESSOS — ligadas por NOME DO CLIENTE, CNJ, PROTOCOLO e PASTA. Os rótulos
-reais vivem em `headers.json`; a comparação de cabeçalho dobra caixa, acento e
-remove espaço, mas os valores das células são comparados como estão.
-
-| Planilha | Vincula a | Campos |
-|---|---|---|
-| AGENDA | PROCESSOS | CNJ, PASTA e PROTOCOLO |
-| CLIENTES | PROCESSOS, FINANCEIRO | NOME |
-| FINANCEIRO | PROCESSOS, CLIENTES | CNJ, PASTA, PROTOCOLO e NOME |
-| PROCESSOS | AGENDA, CLIENTES, FINANCEIRO | CNJ, PASTA, PROTOCOLO e NOME |
-
-- **Fluxos:** a presença do arquivo define o que roda. AGENDA exige PROCESSOS;
-  FINANCEIRO exige PROCESSOS ou CLIENTES; um fluxo gera uma saída.
-- **CNJ:** máscara canônica `NNNNNNN-NN.NNNN.N.NN.NNNN` ou 20 dígitos crus;
-  qualquer outra forma preenchida interrompe tudo e lista os casos.
-- **NOME:** valor único em CLIENTES e FINANCEIRO; em PROCESSOS, vários nomes na
-  mesma célula separados por `;`, divididos sem trim.
-- **Células vazias:** permitidas; se todos os campos estiverem vazios, não
-  vincula.
-- **Sem vínculo na AGENDA:** `NÃO vincula, apenas processo consultivo`, o
-  protocolo vai para o fim da descrição e o campo vira `MIGRAÇÃO` — sempre.
-  `MIGRAÇÃO` é sentinela: nunca é comparada e é limpa quando a linha vincula.
-- **Sem vínculo no FINANCEIRO:** não move protocolo nem usa `MIGRAÇÃO`.
-- **Só CLIENTES:** o FINANCEIRO gera apenas `VINCULA (POR NOME)?`; `VINCULA?`
-  não é criada nem alterada.
-- **Opções:** “nome sem vínculo na descrição” (FINANCEIRO) e “manter apenas um
-  campo vinculante” (AGENDA e/ou FINANCEIRO); ambas desligadas. A segunda move
-  os números perdedores para a descrição e esvazia as colunas.
-- **Saída:** mesma lógica das demais ferramentas (`output/` ou pasta
-  escolhida), preservando todas as colunas de entrada.
-
 ## Manutenção
 
 - Rodar `uv lock --upgrade` no início do ciclo e validar pandas/Flet — critério:
   testes verdes e app abrindo.
-- Revisar `docs:check` no CI a cada mudança de documentação.
+- Revisar o check de docs no CI a cada mudança de documentação.
 - Atualizar o code tour quando um módulo do core mudar de papel.
 
 ## Gatilhos (não são backlog)

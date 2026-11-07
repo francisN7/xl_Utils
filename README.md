@@ -4,17 +4,21 @@ Aplicativo desktop que reúne pequenos utilitários de planilha em uma única
 interface. O núcleo é compartilhado: toda leitura passa por um pipeline de
 texto seguro antes de chegar à ferramenta.
 
-![Tela inicial do xl_Utils](docs/assets/ui-base.png)
-
 ## Ferramentas
 
 | Ferramenta | O que faz | Estado |
 |---|---|---|
 | Tratamento de Texto | Converte tudo para texto, remove emojis e repara metadados | pronta |
-| Extrair CNJs | Encontra e padroniza numerações CNJ em uma planilha | pronta |
-| Recortar Planilha | Divide uma planilha em arquivos por quantidade de linhas | pronta |
+| Extrair CNJs | Encontra e padroniza numerações CNJ em uma ou mais planilhas | pronta |
+| Recortar Planilha | Divide planilhas em arquivos por quantidade de linhas | pronta |
 | Mesclar Planilhas | Concatena as abas selecionadas com a origem de cada linha | pronta |
 | Verificar Vínculos | Confere os vínculos entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES | pronta |
+
+> **Escopo pessoal:** algumas ferramentas nasceram de fluxos de trabalho
+> específicos e não fazem sentido para qualquer usuário. Verificar Vínculos é o
+> exemplo mais claro: ele espera planilhas AGENDA, PROCESSOS, FINANCEIRO e
+> CLIENTES com cabeçalhos próprios. O app é um kit pessoal, não um produto
+> genérico.
 
 ## Requisitos
 
@@ -42,6 +46,25 @@ uv tool install --editable .
 xl-utils
 ```
 
+## Exemplo de uso
+
+1. Abra o app, escolha uma ferramenta e anexe uma planilha pelo seletor nativo.
+2. Confira as abas marcadas e ajuste as opções, quando existirem.
+3. Execute, veja a prévia e só então salve em `output/` ou na pasta escolhida.
+4. Em **Verificar Vínculos**, anexe AGENDA e PROCESSOS (ou FINANCEIRO com
+   PROCESSOS/CLIENTES); a ferramenta escolhe a aba pelo bloco de cabeçalhos
+   padrão e gera uma saída por fluxo.
+
+## Problemas comuns
+
+- **A janela não abre:** confirme `flet[desktop]` no `pyproject.toml` e rode
+  `uv sync`.
+- **Python errado:** `uv python pin 3.15` e `uv sync` recriam o `.venv`.
+- **Link quebrado nas docs:** `node scripts/check-docs.mjs` mostra o arquivo e a
+  linha; corrija o caminho relativo.
+
+Mais detalhes em [setup e execução](docs/guide/setup.md#problemas-comuns).
+
 ## Desenvolvimento
 
 ```bash
@@ -57,10 +80,10 @@ src/xl_utils/
   app.py       shell Flet e navegação
   core/        regras puras (io, mime, paths, text, tools)
   controllers/ orquestração entre UI e core
-  ui/          páginas e componentes Flet
+  ui/          páginas, componentes e tema
   configs/     headers.json empacotado (padrão)
-  shared/      logging, config e clipboard
-tests/         testes do core
+  shared/      log, config, progresso e abertura de pasta
+tests/         testes do core e da UI (headless)
 docs/          documentação e memória entre sessões
 ```
 
@@ -80,6 +103,11 @@ alterações.
 
 O ponto estável é a tag
 [`legacy-v1`](https://github.com/francisN7/xl_Utils/tree/legacy-v1).
+
+## Contribuindo
+
+Este é um projeto pessoal e não há processo formal de contribuição. Sugestões e
+relatos podem ser abertos como issue no repositório.
 
 ## Licença
 

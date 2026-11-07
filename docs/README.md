@@ -10,6 +10,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 
 | Você quer… | Leia |
 |---|---|
+| entender o projeto e ver as ferramentas | [`../README.md`](../README.md) |
 | saber onde paramos | [`state/CURRENT.md`](state/CURRENT.md) |
 | saber o que vem agora | [`roadmap/main.md`](roadmap/main.md) |
 | ver o que já foi entregue | [`roadmap/README.md`](roadmap/README.md) |
@@ -21,7 +22,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | entender a UI e o tema | [`reference/ui.md`](reference/ui.md) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da sessão atual | [`sessions/`](sessions/) |
+| ler a spec da próxima sessão | [`sessions/S9a-drive-autenticacao.md`](sessions/S9a-drive-autenticacao.md) |
 
 ## Por seção (atalho)
 
@@ -49,18 +50,25 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que CSV/HTML são lidos com separador e `NA` | `adr/0010-leitura-fiel-csv-html.md` | 30 |
 | por que a execução sai da UI thread | `adr/0011-execucao-fora-da-ui.md` | 35 |
 | por que CNJ sujo é extraído sem validar o dígito | `adr/0012-cnj-texto-sujo.md` | 35 |
+| por que existe tema claro e preferência salva | `adr/0013-tema-claro-e-preferencia.md` | 40 |
+| por que a vinculação compara valor bruto | `adr/0014-regra-de-vinculacao.md` | 45 |
+| por que a config viaja no pacote | `adr/0015-config-empacotada.md` | 40 |
+| por que os fluxos da vinculação vêm dos anexos | `adr/0016-fluxos-e-opcoes-da-vinculacao.md` | 45 |
+| por que a tela cheia é overlay no conteúdo | `adr/0017-tela-cheia-do-quadro.md` | 35 |
 
 ## Regras do mapa
 
 - **Guide** responde "como eu faço"; **reference**, "como X é".
 - **ADR** guarda o **por quê** e não muda depois de aceito.
-- **Spec de sessão** é escopo fechado e temporário: entregou, sai do caminho.
+- **Spec de sessão** é escopo fechado e temporário; as specs do ciclo ativo
+  saem quando o ciclo fecha.
 - **CURRENT** é estado, não narrativa: sem medições, diffs ou tabelas antigas.
 - Referência não conta em que sessão a coisa foi feita; isso é histórico.
 - Documento novo só entra se responder uma pergunta que nenhum outro responde.
 
 ## O que é histórico
 
-`CHANGELOG.md`, `docs/releases/` e os ADRs registram o passado: nomes de
-documentos e sessões citados neles podem não existir mais. O check de docs
-valida os documentos vivos e ignora esses três.
+`CHANGELOG.md`, os ADRs e os ciclos fechados em `roadmap/NNNN-*.md` registram o
+passado: nomes de documentos e sessões citados neles podem não existir mais. O
+check de docs valida os documentos vivos, ignora o corpo do CHANGELOG, das specs
+de sessão e dos ADRs, e confere os índices, inclusive `adr/README.md`.

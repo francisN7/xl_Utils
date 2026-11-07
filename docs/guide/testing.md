@@ -18,8 +18,10 @@ uv run ruff check src tests
 - Use `tmp_path` para arquivos temporários e dados fictícios.
 - Cubra o caminho feliz e uma borda por função: arquivo vazio, extensão errada,
   planilha sem abas, nome de aba inválido.
-- A UI é validada por smoke manual: abrir o app e executar a ferramenta com um
-  arquivo real. Testes de widget ficam para quando houver regressão recorrente.
+- A UI tem testes headless (`test_layout.py`, `test_merge_page.py`,
+  `test_theme.py`, `test_settings.py`, `test_ui_state.py`) para o que dá para
+  montar sem janela. O smoke manual continua para o visual: abrir o app e
+  executar a ferramenta com um arquivo real.
 
 ## Exemplo
 
