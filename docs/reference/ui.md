@@ -118,10 +118,10 @@ dos dois fluxos precisa estar anexado. Com AGENDA sem PROCESSOS, o botão fica
 bloqueado. O resumo diz o que falta.
 
 O card “2. Opções” tem três caixas, todas desligadas e habilitadas conforme os
-arquivos: “Nome sem vínculo na descrição” (FINANCEIRO), “Manter um campo
-vinculante — AGENDA” e “Manter um campo vinculante — FINANCEIRO” (esta só com
-PROCESSOS). A prévia combina as abas transformadas dos fluxos presentes; as
-demais abas continuam no arquivo salvo.
+arquivos: “Nome sem vínculo na descrição” (FINANCEIRO), “Manter apenas um campo
+vinculante — AGENDA” e “Manter apenas um campo vinculante — FINANCEIRO” (esta
+só com PROCESSOS). A prévia combina as abas transformadas dos fluxos
+presentes; as demais abas continuam no arquivo salvo.
 
 Se a coluna de protocolo da AGENDA já contém `MIGRAÇÃO`, antes de executar
 aparece um `AlertDialog` com “Cancelar” e “Continuar mesmo assim”. Continuar
@@ -134,7 +134,9 @@ trocado.
 O hub mostra um cartão por ferramenta, com 200 px de altura: até quatro por
 linha no desktop, dois no médio e um no mobile. Cada cartão tem ícone, nome,
 descrição e o atalho “Abrir ferramenta”. Novas ferramentas entram da esquerda
-para a direita; a próxima linha também começa à esquerda.
+para a direita; a próxima linha também começa à esquerda. O cartão de Verificar
+Vínculos lista as quatro planilhas e avisa que a presença do arquivo define o
+fluxo.
 
 ## Resultado e prévia
 

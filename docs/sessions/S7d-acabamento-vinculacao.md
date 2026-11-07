@@ -23,11 +23,11 @@ Início e revisão dos textos, sem mudar a regra entregue na S7c.
 
 ## Aceite
 
-- [ ] Log mostra leitura e totais dos dois fluxos.
-- [ ] Início descreve a ferramenta com as quatro planilhas.
-- [ ] Textos sem “AGENDA e PROCESSOS” onde já são quatro.
-- [ ] Grupo 1 bate com o gabarito.
-- [ ] Lint, testes e docs verdes.
+- [x] Log mostra leitura e totais dos dois fluxos.
+- [x] Início descreve a ferramenta com as quatro planilhas.
+- [x] Textos sem “AGENDA e PROCESSOS” onde já são quatro.
+- [x] Grupo 1 bate com o gabarito.
+- [x] Lint, testes e docs verdes.
 
 ## Orçamento de contexto (≤90 linhas)
 

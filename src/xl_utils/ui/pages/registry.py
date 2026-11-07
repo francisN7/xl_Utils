@@ -14,6 +14,7 @@ from xl_utils.ui.pages.all_str import run as run_all_str
 from xl_utils.ui.pages.cnj import run as run_cnj
 from xl_utils.ui.pages.cut import options as cut_options
 from xl_utils.ui.pages.cut import run as run_cut
+from xl_utils.ui.pages.link import DESCRIPTION as LINK_DESCRIPTION
 from xl_utils.ui.pages.link import build as build_link
 from xl_utils.ui.pages.merge import options as merge_options
 from xl_utils.ui.pages.merge import run as run_merge
@@ -107,9 +108,7 @@ TOOLS: tuple[ToolPage, ...] = (
         id="link",
         label="Verificar Vínculos",
         icon=ft.Icons.LINK,
-        description=(
-            "Confere os vínculos entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES."
-        ),
+        description=LINK_DESCRIPTION,
         build=build_link,
     ),
 )

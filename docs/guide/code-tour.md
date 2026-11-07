@@ -142,10 +142,10 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_save.py` | nada é gravado antes da escolha e o lote usa pasta |
 | `test_format_check.py` | conteúdo vence o nome e `.xlsm` não é divergência |
 | `test_progress.py` | contagem, log ao vivo, token e cancelamento entre arquivos |
-| `test_link.py` | prioridade, valor bruto, CNJ, FINANCEIRO, opções e `MIGRAÇÃO` |
+| `test_link.py` | prioridade, valor bruto, CNJ, FINANCEIRO, opções, `MIGRAÇÃO` e log por etapa |
 | `test_link_page.py` | fluxos exigidos e opções habilitadas por arquivo |
 | `test_configs.py` | JSON empacotado e override por `%LOCALAPPDATA%` |
-| `test_integration.py` | as quatro ferramentas rodam nos quatro formatos |
+| `test_integration.py` | as ferramentas de lote rodam nos quatro formatos |
 
 ## Onde mexer para…
 

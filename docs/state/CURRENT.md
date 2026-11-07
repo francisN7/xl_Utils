@@ -4,8 +4,8 @@
 
 ## Sessão
 
-- **Última concluída:** S7c — FINANCEIRO, CLIENTES e opções
-- **Próxima:** S7d — log e acabamento
+- **Última concluída:** S7d — acabamento da vinculação
+- **Próxima:** S8 — tela cheia no merge
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
   sentinela e nunca é comparada; config empacotada em
@@ -15,20 +15,19 @@
 
 ## Pronto
 
-- S7c: quatro entradas sem checkbox de fluxo; AGENDA exige PROCESSOS e
-  FINANCEIRO exige PROCESSOS ou CLIENTES; só CLIENTES gera apenas
-  `VINCULA (POR NOME)?`; cabeçalho casa sem espaços; `MIGRAÇÃO` limpa em linha
-  vinculada; opções de nome na descrição e campo único (AGENDA/FINANCEIRO).
-- S7b: “Vincular Planilhas” virou “Verificar Vínculos” na sidebar, no
-  cabeçalho, no README e na referência.
-- S7a: motor puro, AGENDA × PROCESSOS, `VINCULA?`, protocolo na descrição e
-  `MIGRAÇÃO`; pop-up de reexecução; saída preserva colunas e abas.
+- S7d: log por etapa nos dois fluxos, com totais de CNJ/PASTA/PROTOCOLO e
+  nome; cartão do Início e cabeçalho com as quatro planilhas e o fluxo pelo
+  anexo; textos e docs revisados; grupo 1 confere com o gabarito.
+- S7c: quatro entradas, fluxos pelo anexo, opções de nome e campo único;
+  `MIGRAÇÃO` limpa em linha vinculada e o cabeçalho casa sem espaços.
+- S7a/S7b: motor puro AGENDA × PROCESSOS, `VINCULA?`, pop-up de reexecução e
+  o nome “Verificar Vínculos”.
 - S6c: tema claro/escuro ao vivo. S6b/S6a: log por etapa e `ORIGEM` no merge.
 
 ## Próximo passo
 
-Ler `docs/sessions/S7d-acabamento-vinculacao.md` e fechar o log por etapa, o
-cartão no Início e a revisão dos textos da vinculação.
+Ler `docs/sessions/S8-tela-cheia-merge.md` e preparar a maximização do quadro
+de alinhamento de colunas.
 
 ## Arquivos-chave
 

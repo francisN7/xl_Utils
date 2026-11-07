@@ -18,6 +18,10 @@ from xl_utils.ui.pages.batch import append_outcomes
 from xl_utils.ui.state import ToolState
 
 LABELS = ("AGENDA", "PROCESSOS", "FINANCEIRO", "CLIENTES")
+DESCRIPTION = (
+    "Confere os vínculos entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES; "
+    "a presença do arquivo define o fluxo."
+)
 NOTE = (
     "A AGENDA exige PROCESSOS; o FINANCEIRO exige PROCESSOS ou CLIENTES. "
     "Com só CLIENTES, testa apenas o nome. A saída preserva colunas e abas."
@@ -32,7 +36,7 @@ def build() -> ft.Control:
 
     layout = ToolLayout(
         "Verificar Vínculos",
-        "Confere os vínculos entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES.",
+        DESCRIPTION,
         note=NOTE,
         inputs=LABELS,
         options=make_options,

@@ -1,6 +1,9 @@
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
+import xl_utils.controllers.link as controller
 from xl_utils.core.tools.link import (
     MIGRACAO,
     NAO,
@@ -784,3 +787,54 @@ def test_financeiro_both_columns_keep_the_order() -> None:
         "VINCULA (POR NOME)?",
         "EXTRA",
     ]
+
+
+def test_run_link_logs_reading_stages_and_totals(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    agenda = tmp_path / "AGENDA.xlsx"
+    processos = tmp_path / "PROCESSOS.xlsx"
+    financeiro = tmp_path / "FINANCEIRO.xlsx"
+    clientes = tmp_path / "CLIENTES.xlsx"
+    books = {
+        agenda.name: {"Agenda": _agenda([_linha(CNJ_A, "P1", "A1")])},
+        processos.name: {
+            "Processos": _processos([_processo(CNJ_A, "P1", "A1", nome="Cliente Alfa")])
+        },
+        financeiro.name: {
+            "Fin": _financeiro([_fin_linha(CNJ_A, "P1", "A1", nome="Cliente Alfa")])
+        },
+        clientes.name: {"Clientes": pd.DataFrame({"NOME": ["Cliente Alfa"]})},
+    }
+
+    monkeypatch.setattr(controller, "prepare_workbook", lambda path: books[path.name])
+    monkeypatch.setattr(controller, "load_link_config", _config)
+
+    outcomes = controller.run_link(
+        agenda,
+        processos,
+        financeiro=financeiro,
+        clientes=clientes,
+    )
+
+    agenda_log = outcomes[0].log
+    assert agenda_log.to_text().count("AGENDA: AGENDA.xlsx") == 1
+    assert "[INFO] AGENDA: lendo e limpando planilha" in agenda_log
+    assert "[INFO] AGENDA: planilha carregada · 1 aba(s)" in agenda_log
+    assert "[INFO] PROCESSOS: planilha carregada · 1 aba(s)" in agenda_log
+    assert "[INFO] Vinculando AGENDA por CNJ, PASTA e PROTOCOLO" in agenda_log
+    assert "[INFO] AGENDA: vinculação concluída" in agenda_log
+    assert "[INFO] Vínculos: CNJ 1 · PASTA 0 · PROTOCOLO 0" in agenda_log
+
+    financeiro_log = outcomes[1].log
+    assert financeiro_log.to_text().count("FINANCEIRO: FINANCEIRO.xlsx") == 1
+    assert "[INFO] PROCESSOS: PROCESSOS.xlsx (já carregada)" in financeiro_log
+    assert "[INFO] CLIENTES: planilha carregada · 1 aba(s)" in financeiro_log
+    assert (
+        "[INFO] Vinculando FINANCEIRO por CNJ, PASTA, PROTOCOLO e NOME"
+        in financeiro_log
+    )
+    assert "[INFO] FINANCEIRO: vinculação concluída" in financeiro_log
+    assert "[INFO] Vínculos: CNJ 1 · PASTA 0 · PROTOCOLO 0" in financeiro_log
+    assert "[INFO] Nome: 1 SIM · 0 NÃO" in financeiro_log

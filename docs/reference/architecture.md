@@ -211,7 +211,7 @@ os chips de abas e “Executar” ficam desabilitados até `_finish`. Ver ADR 00
 | Extrair CNJs | `core/tools/cnj.py` | pronta |
 | Recortar planilha | `core/tools/cut.py` | pronta |
 | Mesclar planilhas | `core/tools/merge.py` | pronta |
-| Verificar vínculos | `core/tools/link.py` | S7a: AGENDA × PROCESSOS |
+| Verificar vínculos | `core/tools/link.py` | pronta: quatro planilhas em dois fluxos |
 
 ## Extração de CNJ
 

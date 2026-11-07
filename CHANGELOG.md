@@ -137,6 +137,10 @@ decisões nos ADRs.
 - Cabeçalho de vínculo casa sem espaços (`VINCULA(POR NOME)?` e
   `VINCULA (POR NOME)?` são a mesma coluna) e `MIGRAÇÃO` passa a ser sentinela:
   não entra na comparação e é limpa nas linhas que vinculam.
+- Log da vinculação sem o nome do arquivo duplicado: leitura, planilha
+  carregada, vinculação concluída e totais de CNJ/PASTA/PROTOCOLO/nome aparecem
+  uma vez nos dois fluxos. O cartão do Início e o cabeçalho citam as quatro
+  planilhas e o fluxo definido pelo anexo.
 
 ### Removed
 

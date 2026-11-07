@@ -10,7 +10,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S7a | Vinculação I — motor + AGENDA × PROCESSOS | [x] |
 | S7b | Trocar nome de "Vincular Planilhas" para "Verificar Vínculos". | [x] |
 | S7c | Vinculação II — FINANCEIRO, CLIENTES e opções | [x] |
-| S7d | Vinculação III — log e acabamento | [ ] |
+| S7d | Vinculação III — log e acabamento | [x] |
 | S8 | Alinhamento de colunas em tela cheia no merge | [ ] |
 | S9a | Drive I — ADR, OAuth, contas e shell | [ ] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
@@ -46,10 +46,13 @@ apenas a coluna de nome. Duas opções: “nome sem vínculo na descrição” e
 desligadas. `MIGRAÇÃO` é sentinela e o cabeçalho casa sem espaços. Ver
 [spec](../sessions/S7c-vinculacao-financeiro.md) e ADR 0016.
 
-## S7d — acabamento da vinculação
+## S7d — entregue
 
-Etapas no log, cartão no Início e revisão dos textos. A opção de campo único
-entrou na S7c; aqui fica só o acabamento.
+Log por etapa nos dois fluxos, com leitura, planilha carregada, vinculação
+concluída e totais de CNJ/PASTA/PROTOCOLO/nome, sem duplicar o nome do arquivo.
+O cartão do Início e o cabeçalho citam as quatro planilhas e o fluxo definido
+pelo anexo; textos e docs foram revisados. O grupo 1 dos exemplos confere com o
+gabarito; o grupo 2 para no CNJ inválido como esperado.
 
 ## S8 — tela cheia no merge
 

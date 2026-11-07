@@ -81,7 +81,7 @@ def run_link(
 
     if agenda is not None:
         assert processos is not None
-        log = RunLog().info(f"AGENDA: {agenda.name}")
+        log = RunLog()
         agenda_sheets = reader.read(agenda, "AGENDA", log)
         processos_sheets = reader.read(processos, "PROCESSOS", log)
         reporter.note(log, "Vinculando AGENDA por CNJ, PASTA e PROTOCOLO")
@@ -119,7 +119,7 @@ def run_link(
         )
 
     if financeiro is not None:
-        log = RunLog().info(f"FINANCEIRO: {financeiro.name}")
+        log = RunLog()
         financeiro_sheets = reader.read(financeiro, "FINANCEIRO", log)
         processos_sheets = (
             reader.read(processos, "PROCESSOS", log) if processos is not None else None
