@@ -71,6 +71,14 @@ num dos cantos superiores. Antes do código, o ADR decide escopo, lib e destino
 da saída (aba extra ou pasta `output` ao lado). S9a entrega só a autenticação;
 S9b, a transferência; S9c, a exportação nas demais ferramentas.
 
+## Auditoria pública — entregue
+
+Auditoria de segurança e privacidade em 2026-11-07: repositório sem segredos ou
+PII, `.gitignore` ampliado, `SECURITY.md`, licença explícita, CI com
+`contents: read` e actions pinadas, secret scanning/push protection, PVR,
+Dependabot só de alertas, ruleset da `main`, histórico reescrito e repositório
+recriado. O backlog de plugins entrou em seguida.
+
 ## Backlog
 
 - **Responsividade do Início e das ferramentas** — sem sessão marcada. Em

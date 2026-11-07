@@ -180,6 +180,8 @@ decisões nos ADRs.
   `.flet/`, chaves, bancos locais e lixo de sistema; `SECURITY.md` define o
   canal privado de relato; o CI declara `contents: read` e pina as actions por
   SHA; e o README passa a declarar todos os direitos reservados.
+- Histórico reescrito e repositório recriado para eliminar metadados pessoais
+  das refs públicas; o PR e os SHAs antigos deixaram de existir.
 
 ## v0.1.0 — 2026-11-04
 

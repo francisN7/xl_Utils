@@ -4,38 +4,38 @@
 
 ## Sessão
 
-- **Última concluída:** S8 — tela cheia no merge
+- **Última concluída:** auditoria pública, endurecimento e backlog de plugins
 - **Próxima:** S9a — Drive I (ADR, OAuth, contas e shell)
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
   sentinela; config empacotada em `src/xl_utils/configs/headers.json`;
-  ADRs 0014 (regra), 0015 (config), 0016 (fluxos) e 0017 (tela cheia por
-  overlay no conteúdo). O `id`, os módulos `link` e “vinculação” continuam.
+  ADRs 0014–0017; plugins em `.7z` com repositório privado e contrato público
+  (ADR 0018 pendente). O `id`, os módulos `link` e “vinculação” continuam.
 
 ## Pronto
 
-- S8: maximizar ao lado de “Alinhamento de colunas” cobre o conteúdo, mantém
-  os cards em 196 px com a sobra como espaçamento e volta pelo mesmo ícone ou
-  por “CONFIRMAR” no canto inferior direito. Grupos, seleção e ordem
-  sobrevivem; o tema recolore o painel escondido. Confirmado no app.
-- S7d/S7c/S7a/S7b: vinculação completa — quatro entradas, fluxos pelo anexo,
-  opções, log por etapa, `MIGRAÇÃO` como sentinela e o nome “Verificar
-  Vínculos”. S6: tema ao vivo e `ORIGEM` no merge.
+- Auditoria pública: sem segredos/PII; `.gitignore`, `SECURITY.md`, licença
+  explícita, CI com `contents: read` e actions pinadas; secret scanning, push
+  protection, PVR e Dependabot de alertas ligados; `main`, `legacy` e tag
+  protegidas; histórico reescrito e repositório recriado sem refs antigas.
+- S8: tela cheia do merge; grupos, seleção e ordem sobrevivem. Confirmado no
+  app.
+- S7d/S7c/S7a/S7b: vinculação completa; S6: tema ao vivo e `ORIGEM`.
 
 ## Próximo passo
 
 Ler `docs/sessions/S9a-drive-autenticacao.md` e escrever o ADR 0018 antes de
-qualquer código de Drive.
+qualquer código de Drive. O backlog de plugins está em `roadmap/main.md` e
+também exige ADR antes do código.
 
 ## Arquivos-chave
 
-- `ui/components/tool_layout.py` (`OverlayHost`), `ui/pages/merge.py`
+- `ui/components/tool_layout.py`, `ui/pages/merge.py`, `ui/pages/link.py`
 - `ui/state.py`, `ui/pages/registry.py`, `ui/theme.py`
-- `core/tools/link.py`, `controllers/link.py`, `ui/pages/link.py`
+- `core/tools/link.py`, `controllers/link.py`
 - `shared/configs.py`, `src/xl_utils/configs/headers.json`
-- `tests/test_merge_page.py`, `tests/test_layout.py`, `tests/test_link.py`
-- `docs/adr/0017-tela-cheia-do-quadro.md`,
-  `docs/adr/0016-fluxos-e-opcoes-da-vinculacao.md`
+- `SECURITY.md`, `.github/workflows/ci.yml`
+- `docs/roadmap/main.md`, `docs/sessions/S9a-drive-autenticacao.md`
 
 ## Armadilhas
 
@@ -51,8 +51,8 @@ qualquer código de Drive.
 - Só CLIENTES: não valida CNJ e não cria nem altera `VINCULA?`.
 - Config empacotada via `importlib.resources`; override em `%LOCALAPPDATA%`.
 - Flet não é thread-safe: `pre_run` roda em thread e só devolve texto.
-- Cancelar não interrompe pandas: só vale entre arquivos.
-- `.xls` não tem leitor alternativo; falha do calamine é final.
+- Cancelar não interrompe pandas; `.xls` sem leitor alternativo falha no calamine.
+- Plugins: `.7z` precisa recusar path traversal, symlink e zip bomb.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 
 ## Como rodar
