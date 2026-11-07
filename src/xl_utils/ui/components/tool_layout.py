@@ -44,6 +44,38 @@ ReadyCheck = Callable[[ToolState, Mapping[str, Path | None]], bool]
 Hint = Callable[[ToolState, Mapping[str, Path | None]], str | None]
 
 
+class OverlayHost:
+    """Área que cobre o conteúdo da página e hospeda um painel temporário."""
+
+    def __init__(self) -> None:
+        self._slot = ft.Container(expand=True)
+        self.control = ft.Container(
+            content=self._slot,
+            visible=False,
+            bgcolor=theme.BACKGROUND,
+            expand=True,
+            on_click=lambda _event: None,
+        )
+
+    def mount(self, content: ft.Control) -> None:
+        """Deixa o painel na árvore para acompanhar a troca de tema."""
+        self._slot.content = content
+
+    def show(self) -> None:
+        """Exibe o painel sobre o restante da página."""
+        self.control.visible = True
+        self._refresh()
+
+    def hide(self) -> None:
+        """Devolve a página ao estado normal."""
+        self.control.visible = False
+        self._refresh()
+
+    def _refresh(self) -> None:
+        with contextlib.suppress(RuntimeError):
+            self.control.update()
+
+
 class OptionsPanel(Protocol):
     """Controle de opções que se reconstrói quando a entrada muda."""
 
@@ -52,7 +84,7 @@ class OptionsPanel(Protocol):
     def refresh(self) -> None: ...
 
 
-OptionsFactory = Callable[[ToolState], ft.Control | OptionsPanel]
+OptionsFactory = Callable[[ToolState, OverlayHost], ft.Control | OptionsPanel]
 
 
 class ToolLayout:
@@ -217,9 +249,11 @@ class ToolLayout:
             spacing=10,
         )
 
+        self._overlay = OverlayHost()
         options_control, self._options_refresh = _build_options(
             options,
             self.state,
+            self._overlay,
         )
         left_controls: list[ft.Control] = [_card("1. Entrada", entrada)]
         if options_control is not None:
@@ -267,13 +301,18 @@ class ToolLayout:
             padding=ft.Padding.only(top=16),
         )
 
-        self.control = ft.Container(
+        page = ft.Container(
             content=ft.Column(
                 controls=[header, body, action_bar],
                 spacing=0,
                 expand=True,
             ),
             padding=24,
+            expand=True,
+        )
+        self.control = ft.Stack(
+            controls=[page, self._overlay.control],
+            fit=ft.StackFit.EXPAND,
             expand=True,
         )
 
@@ -865,13 +904,14 @@ def _card(
 def _build_options(
     options: OptionsFactory | ft.Control | None,
     state: ToolState,
+    overlay: OverlayHost,
 ) -> tuple[ft.Control | None, Callable[[], None] | None]:
     if options is None:
         return None, None
     if isinstance(options, ft.Control):
         return options, None
 
-    panel = options(state)
+    panel = options(state, overlay)
     if isinstance(panel, ft.Control):
         return panel, None
     return panel.control, panel.refresh

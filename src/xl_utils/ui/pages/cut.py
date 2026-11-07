@@ -8,6 +8,7 @@ from xl_utils.controllers.cut import run_cut
 from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.components.tool_layout import OverlayHost
 from xl_utils.ui.pages.batch import (
     append_outcomes,
     pending_files,
@@ -22,7 +23,7 @@ MODE_ROWS = "rows"
 MODE_PARTS = "parts"
 
 
-def options(state: ToolState) -> ft.Control:
+def options(state: ToolState, _overlay: OverlayHost | None = None) -> ft.Control:
     """Monta o seletor de modo e o campo numérico correspondente."""
     mode = ft.Dropdown(
         label="Modo de recorte",

@@ -52,7 +52,7 @@ O conteúdo abre em uma das duas formas:
 | `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
-| `tool_layout` | Cabeçalho, cartões, barra de ação e estados; aceita entradas rotuladas no lugar da lista única. |
+| `tool_layout` | Cabeçalho, cartões, barra de ação, estados e a área de tela cheia; aceita entradas rotuladas no lugar da lista única. |
 
 ### Entrada de arquivos
 
@@ -103,9 +103,17 @@ ignorada na execução. Colunas com o mesmo nome já nascem juntas; para separar
 uma correspondência automática, crie uma coluna vazia e arraste um dos chips
 para ela. Cada aba pode contribuir com no máximo uma coluna por saída. O quadro
 é refeito quando os arquivos ou as abas mudam e o estado vive em
-`ToolState.options`. A saída `Merge.xlsx` mostra `ORIGEM` (arquivo sem extensão
-e aba) e `LINHA_ORIGEM` (posição da linha no resultado, com zeros à esquerda)
-como primeiras colunas.
+`ToolState.options`.
+
+O ícone de tela cheia ao lado do título abre o quadro sobre o conteúdo inteiro
+da página. Os cards mantêm a largura fixa e a sobra vira espaçamento entre eles;
+nada é esticado. “CONFIRMAR” aparece no canto inferior direito e, como o mesmo
+ícone, restaura o cartão sem refazer os grupos: seleção e ordem continuam
+válidas. O restante da página fica atrás da área maximizada e não recebe cliques.
+
+A saída `Merge.xlsx` mostra `ORIGEM` (arquivo sem extensão e aba) e
+`LINHA_ORIGEM` (posição da linha no resultado, com zeros à esquerda) como
+primeiras colunas.
 
 ### Vinculação
 

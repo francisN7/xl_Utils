@@ -11,7 +11,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S7b | Trocar nome de "Vincular Planilhas" para "Verificar Vínculos". | [x] |
 | S7c | Vinculação II — FINANCEIRO, CLIENTES e opções | [x] |
 | S7d | Vinculação III — log e acabamento | [x] |
-| S8 | Alinhamento de colunas em tela cheia no merge | [ ] |
+| S8 | Alinhamento de colunas em tela cheia no merge | [x] |
 | S9a | Drive I — ADR, OAuth, contas e shell | [ ] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
@@ -54,13 +54,14 @@ O cartão do Início e o cabeçalho citam as quatro planilhas e o fluxo definido
 pelo anexo; textos e docs foram revisados. O grupo 1 dos exemplos confere com o
 gabarito; o grupo 2 para no CNJ inválido como esperado.
 
-## S8 — tela cheia no merge
+## S8 — entregue
 
-Botão maximizar ao lado de “Alinhamento de colunas”; a seleção ocupa a tela
-inteira e restaura no mesmo botão ou em “CONFIRMAR”, exibido no canto inferior
-direito só quando maximizado. Mantém a largura de cada card e usa toda a
-largura para distribuí-los lado a lado, sem esticá-los. Não muda o modelo de
-grupos.
+Botão de tela cheia ao lado de “Alinhamento de colunas”. O `OverlayHost` do
+`ToolLayout` cobre o conteúdo da página e distribui os cards de 196 px com a
+sobra como espaçamento; “CONFIRMAR” fica no canto inferior direito e o mesmo
+ícone restaura. Grupos, seleção e ordem não são reconstruídos, e o tema
+recolore o painel escondido. Ver a [spec](../sessions/S8-tela-cheia-merge.md)
+e o ADR 0017.
 
 ## S9 — Google Drive
 

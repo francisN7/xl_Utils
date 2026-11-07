@@ -15,6 +15,7 @@ from xl_utils.core.tools.merge import (
 from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 from xl_utils.ui import theme
 from xl_utils.ui.components.result_panel import ResultPanel
+from xl_utils.ui.components.tool_layout import OverlayHost
 from xl_utils.ui.pages.batch import append_outcomes, pending_files, report_cancelled
 from xl_utils.ui.state import ToolState
 
@@ -26,8 +27,9 @@ _CHIP_WIDTH = 176
 class MergeOptions:
     """Quadro arrastável em que cada coluna reúne as origens de uma saída."""
 
-    def __init__(self, state: ToolState) -> None:
+    def __init__(self, state: ToolState, overlay: OverlayHost) -> None:
         self._state = state
+        self._overlay = overlay
         self._files: tuple[Path, ...] = ()
         self._refs: list[ColumnRef] = []
         self._groups: list[list[ColumnRef]] = []
@@ -40,6 +42,13 @@ class MergeOptions:
             size=theme.FONT_SM,
             weight=ft.FontWeight.BOLD,
         )
+        self._maximize_button = ft.IconButton(
+            icon=ft.Icons.FULLSCREEN,
+            icon_size=18,
+            tooltip="Maximizar o alinhamento",
+            visible=False,
+            on_click=lambda _event: self._maximize(),
+        )
         self._hint = ft.Text(size=theme.FONT_XS, color=theme.MUTED)
         self._error = ft.Text(
             "",
@@ -49,9 +58,81 @@ class MergeOptions:
         )
         self._board = ft.Row(wrap=True, spacing=10, run_spacing=10)
         self.control = ft.Column(
-            controls=[self._title, self._hint, self._error, self._board],
+            controls=[
+                ft.Row(
+                    controls=[self._title, self._maximize_button],
+                    spacing=4,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                ),
+                self._hint,
+                self._error,
+                self._board,
+            ],
             spacing=8,
         )
+
+        self._full_hint = ft.Text(size=theme.FONT_XS, color=theme.MUTED)
+        self._full_error = ft.Text(
+            "",
+            size=theme.FONT_XS,
+            color=theme.RED,
+            visible=False,
+        )
+        self._full_board = ft.Row(
+            wrap=True,
+            spacing=10,
+            run_spacing=10,
+            alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+        )
+        self._restore_button = ft.IconButton(
+            icon=ft.Icons.FULLSCREEN_EXIT,
+            icon_size=18,
+            tooltip="Restaurar o alinhamento",
+            on_click=lambda _event: self._restore(),
+        )
+        self._confirm = ft.FilledButton(
+            "CONFIRMAR",
+            icon=ft.Icons.CHECK,
+            visible=False,
+            on_click=lambda _event: self._restore(),
+        )
+        self._panel = ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Row(
+                        controls=[
+                            ft.Text(
+                                "Alinhamento de colunas",
+                                size=theme.FONT_SM,
+                                weight=ft.FontWeight.BOLD,
+                            ),
+                            self._restore_button,
+                        ],
+                        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                        vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                    ),
+                    self._full_hint,
+                    self._full_error,
+                    ft.Column(
+                        controls=[self._full_board],
+                        spacing=0,
+                        expand=True,
+                        scroll=ft.ScrollMode.HIDDEN,
+                        horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
+                    ),
+                    ft.Row(
+                        controls=[self._confirm],
+                        alignment=ft.MainAxisAlignment.END,
+                    ),
+                ],
+                spacing=10,
+                expand=True,
+            ),
+            padding=24,
+            bgcolor=theme.BACKGROUND,
+            expand=True,
+        )
+        overlay.mount(self._panel)
         self.refresh()
 
     def refresh(self) -> None:
@@ -107,16 +188,45 @@ class MergeOptions:
             for group_index, group in enumerate(self._groups)
             for chip_index, ref in enumerate(group)
         }
-        self._board.controls = [
+        self._board.controls = self._cards()
+        self._full_board.controls = self._cards()
+        self._maximize_button.visible = bool(self._refs)
+        if not self._refs and self._overlay.control.visible:
+            self._restore()
+        self._sync_texts()
+        self._refresh()
+
+    def _cards(self) -> list[ft.Control]:
+        """Monta um conjunto novo de cards para cada quadro."""
+        controls = [
             self._card(group_index, group)
             for group_index, group in enumerate(self._groups)
         ]
         if self._refs:
-            self._board.controls.append(self._new_column_button())
+            controls.append(self._new_column_button())
+        return controls
+
+    def _sync_texts(self) -> None:
+        """Mantém dica e erro iguais no cartão e na tela cheia."""
         self._hint.value = self._message
         self._hint.visible = bool(self._message)
+        self._full_hint.value = self._message
+        self._full_hint.visible = bool(self._message)
         self._error.visible = bool(self._error.value)
-        self._refresh()
+        self._full_error.value = self._error.value
+        self._full_error.visible = bool(self._error.value)
+
+    def _maximize(self) -> None:
+        """Abre o quadro sobre a página, sem reconstruir os grupos."""
+        if not self._refs:
+            return
+        self._confirm.visible = True
+        self._overlay.show()
+
+    def _restore(self) -> None:
+        """Volta ao cartão de opções preservando grupos e ordem."""
+        self._confirm.visible = False
+        self._overlay.hide()
 
     def _card(self, group_index: int, group: list[ColumnRef]) -> ft.Control:
         controls: list[ft.Control] = []
@@ -302,7 +412,7 @@ class MergeOptions:
             )
         except ValueError as error:
             self._error.value = str(error)
-            self._error.visible = True
+            self._sync_texts()
             self._refresh()
             return
 
@@ -326,9 +436,9 @@ class MergeOptions:
             self.control.update()
 
 
-def options(state: ToolState) -> MergeOptions:
+def options(state: ToolState, overlay: OverlayHost) -> MergeOptions:
     """Monta o quadro arrastável de colunas desta página."""
-    return MergeOptions(state)
+    return MergeOptions(state, overlay)
 
 
 def run(

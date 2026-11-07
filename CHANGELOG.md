@@ -117,6 +117,9 @@ decisões nos ADRs.
 - Opções da vinculação: nome sem vínculo na descrição (FINANCEIRO) e manter
   apenas um campo vinculante (AGENDA e/ou FINANCEIRO), desligadas por padrão;
   os números perdedores vão para o fim da descrição e as colunas ficam vazias.
+- Tela cheia no quadro de alinhamento do merge: botão ao lado do título, cards
+  com largura fixa e sobra como espaçamento, “CONFIRMAR” no canto inferior
+  direito e retorno pelo mesmo ícone sem perder grupos, seleção ou ordem.
 
 ### Changed
 

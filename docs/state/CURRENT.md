@@ -4,43 +4,44 @@
 
 ## Sessão
 
-- **Última concluída:** S7d — acabamento da vinculação
-- **Próxima:** S8 — tela cheia no merge
+- **Última concluída:** S8 — tela cheia no merge
+- **Próxima:** S9a — Drive I (ADR, OAuth, contas e shell)
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
-  sentinela e nunca é comparada; config empacotada em
-  `src/xl_utils/configs/headers.json`; ADR 0014 (regra), 0015 (config) e 0016
-  (fluxos e opções). O `id`, os módulos `link` e a palavra “vinculação”
-  continuam.
+  sentinela; config empacotada em `src/xl_utils/configs/headers.json`;
+  ADRs 0014 (regra), 0015 (config), 0016 (fluxos) e 0017 (tela cheia por
+  overlay no conteúdo). O `id`, os módulos `link` e “vinculação” continuam.
 
 ## Pronto
 
-- S7d: log por etapa nos dois fluxos, com totais de CNJ/PASTA/PROTOCOLO e
-  nome; cartão do Início e cabeçalho com as quatro planilhas e o fluxo pelo
-  anexo; textos e docs revisados; grupo 1 confere com o gabarito.
-- S7c: quatro entradas, fluxos pelo anexo, opções de nome e campo único;
-  `MIGRAÇÃO` limpa em linha vinculada e o cabeçalho casa sem espaços.
-- S7a/S7b: motor puro AGENDA × PROCESSOS, `VINCULA?`, pop-up de reexecução e
-  o nome “Verificar Vínculos”.
-- S6c: tema claro/escuro ao vivo. S6b/S6a: log por etapa e `ORIGEM` no merge.
+- S8: maximizar ao lado de “Alinhamento de colunas” cobre o conteúdo, mantém
+  os cards em 196 px com a sobra como espaçamento e volta pelo mesmo ícone ou
+  por “CONFIRMAR” no canto inferior direito. Grupos, seleção e ordem
+  sobrevivem; o tema recolore o painel escondido. Confirmado no app.
+- S7d/S7c/S7a/S7b: vinculação completa — quatro entradas, fluxos pelo anexo,
+  opções, log por etapa, `MIGRAÇÃO` como sentinela e o nome “Verificar
+  Vínculos”. S6: tema ao vivo e `ORIGEM` no merge.
 
 ## Próximo passo
 
-Ler `docs/sessions/S8-tela-cheia-merge.md` e preparar a maximização do quadro
-de alinhamento de colunas.
+Ler `docs/sessions/S9a-drive-autenticacao.md` e escrever o ADR 0018 antes de
+qualquer código de Drive.
 
 ## Arquivos-chave
 
+- `ui/components/tool_layout.py` (`OverlayHost`), `ui/pages/merge.py`
+- `ui/state.py`, `ui/pages/registry.py`, `ui/theme.py`
 - `core/tools/link.py`, `controllers/link.py`, `ui/pages/link.py`
-- `ui/components/tool_layout.py`, `ui/state.py`, `ui/pages/registry.py`
 - `shared/configs.py`, `src/xl_utils/configs/headers.json`
-- `tests/test_link.py`, `tests/test_link_page.py`, `tests/test_layout.py`
-- `docs/adr/0014-regra-de-vinculacao.md`,
+- `tests/test_merge_page.py`, `tests/test_layout.py`, `tests/test_link.py`
+- `docs/adr/0017-tela-cheia-do-quadro.md`,
   `docs/adr/0016-fluxos-e-opcoes-da-vinculacao.md`
 
 ## Armadilhas
 
-- Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula; é esperado.
+- A tela cheia cobre só o conteúdo; a sidebar continua clicável.
+- O painel é montado uma vez: não recriar grupos ao maximizar/restaurar.
+- Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula.
 - CNJ numérico no Excel perde precisão antes da leitura; a coluna deve ser texto.
 - `PROCESSO ORIGINÁRIO` contém “PROCESSO”; o match é exato, nunca substring.
 - Cabeçalho dobra caixa/acento e remove espaços; valor de célula não é tocado.
