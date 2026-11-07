@@ -171,6 +171,13 @@ decisões nos ADRs.
 - Reexecução da AGENDA não confunde mais `MIGRAÇÃO` com um protocolo real do
   PROCESSOS; a sentinela é limpa nas linhas que vinculam.
 
+### Security
+
+- Endurecimento do repositório público: `.gitignore` cobre variantes de `.env`,
+  `.flet/`, chaves, bancos locais e lixo de sistema; `SECURITY.md` define o
+  canal privado de relato; o CI declara `contents: read` e pina as actions por
+  SHA; e o README passa a declarar todos os direitos reservados.
+
 ## v0.1.0 — 2026-11-04
 
 ### Added

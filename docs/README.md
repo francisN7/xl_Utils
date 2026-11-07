@@ -15,6 +15,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | saber o que vem agora | [`roadmap/main.md`](roadmap/main.md) |
 | ver o que já foi entregue | [`roadmap/README.md`](roadmap/README.md) |
 | entender as regras do agente | [`../AGENTS.md`](../AGENTS.md) |
+| relatar uma falha de segurança | [`../SECURITY.md`](../SECURITY.md) |
 | rodar o projeto | [`guide/setup.md`](guide/setup.md) |
 | testar | [`guide/testing.md`](guide/testing.md) |
 | entender como o código é organizado | [`reference/architecture.md`](reference/architecture.md) |

@@ -104,6 +104,13 @@ alterações.
 O ponto estável é a tag
 [`legacy-v1`](https://github.com/francisN7/xl_Utils/tree/legacy-v1).
 
+## Segurança
+
+O app processa planilhas locais e não faz chamadas de rede nesta versão. Para
+relatar uma falha, use o relato privado de vulnerabilidades do GitHub — o canal
+está descrito em [`SECURITY.md`](SECURITY.md). Não abra issue pública com dados
+reais, credenciais ou passos que exponham terceiros.
+
 ## Contribuindo
 
 Este é um projeto pessoal e não há processo formal de contribuição. Sugestões e
@@ -111,4 +118,7 @@ relatos podem ser abertos como issue no repositório.
 
 ## Licença
 
-Ainda não definida.
+O código é público para consulta, mas **não há licença de uso**. Todos os
+direitos são reservados: não é permitido copiar, modificar ou distribuir sem
+autorização por escrito. Para reutilizar, entre em contato pelo perfil do
+GitHub.

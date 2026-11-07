@@ -5,6 +5,8 @@
 venv/
 advbox_venv/
 .env
+.env.*
+!.env.example
 
 #===========#
 # PYTHON    #
@@ -20,14 +22,19 @@ dist/
 #===========#
 .pytest_cache/
 .ruff_cache/
+.flet/
 .coverage
 htmlcov/
+*.log
 
 #===========#
 # OUTPUTS   #
 #===========#
 output/
 samples/
+*.db
+*.sqlite
+*.sqlite3
 
 #===========#
 # SECRETS   #
@@ -37,6 +44,14 @@ client_secret*.json
 token*.json
 credentials*.json
 *.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+.npmrc
+.pypirc
+.netrc
 
 #=================#
 # LOCAL / PERSONAL #
@@ -46,3 +61,8 @@ captureds.py
 *temp*
 !docs/sessions/_TEMPLATE.md
 PJE.py
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini

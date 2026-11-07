@@ -57,6 +57,10 @@ Campos manuais permitidos: `description`, `readme`, `authors`,
 `[project.gui-scripts]`, `[build-system]`, `[tool.ruff]` e
 `[tool.pytest.ini_options]`.
 
+Não há Dependabot de PR automático: as vulnerabilidades aparecem como alerta na
+aba **Security** e a atualização é manual. Rode `uv lock --upgrade`, revise o
+diff e valide com lint, testes e check de docs antes de commitar.
+
 ## Verificações
 
 ```bash
