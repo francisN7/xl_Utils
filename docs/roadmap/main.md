@@ -9,8 +9,8 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 |---|---|---|
 | S7a | Vinculação I — motor + AGENDA × PROCESSOS | [x] |
 | S7b | Trocar nome de "Vincular Planilhas" para "Verificar Vínculos". | [x] |
-| S7c | Vinculação II — FINANCEIRO + CLIENTES | [ ] |
-| S7d | Vinculação III — campo único, log e acabamento | [ ] |
+| S7c | Vinculação II — FINANCEIRO, CLIENTES e opções | [x] |
+| S7d | Vinculação III — log e acabamento | [ ] |
 | S8 | Alinhamento de colunas em tela cheia no merge | [ ] |
 | S9a | Drive I — ADR, OAuth, contas e shell | [ ] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
@@ -34,20 +34,22 @@ e o override por máquina em `%LOCALAPPDATA%/xl_utils/headers.json`. Detalhes na
 cabeçalho da página, no README e na referência. A descrição acompanha o novo
 vocabulário. O `id` interno, os módulos e a regra de vinculação não mudam.
 
-## S7c — FINANCEIRO e CLIENTES
+## S7c — entregue
 
-Acrescenta as outras duas entradas rotuladas. No FINANCEIRO, `VINCULA?` usa a
-mesma prioridade CNJ → PASTA → PROTOCOLO; `VINCULA (POR NOME)?` recebe
-SIM/NÃO comparando o nome com a lista única de PROCESSOS (split por `;`) e
-CLIENTES. A descrição usa `" | "` e o prefixo `NOME DO CLIENTE: X`. Opção
-“nome sem vínculo na descrição”. Ver
-[spec](../sessions/S7c-vinculacao-financeiro.md).
+Quatro entradas rotuladas, sem checkbox de fluxo: AGENDA e/ou FINANCEIRO
+anexados definem o que roda. AGENDA exige PROCESSOS; FINANCEIRO exige
+PROCESSOS ou CLIENTES. No FINANCEIRO, `VINCULA?` usa a mesma prioridade
+CNJ → PASTA → PROTOCOLO; `VINCULA (POR NOME)?` recebe SIM/NÃO comparando o
+nome com a lista de PROCESSOS (split cru por `;`) e CLIENTES. Só CLIENTES gera
+apenas a coluna de nome. Duas opções: “nome sem vínculo na descrição” e
+“manter apenas um campo vinculante” (AGENDA e/ou FINANCEIRO), ambas
+desligadas. `MIGRAÇÃO` é sentinela e o cabeçalho casa sem espaços. Ver
+[spec](../sessions/S7c-vinculacao-financeiro.md) e ADR 0016.
 
 ## S7d — acabamento da vinculação
 
-Opção “manter apenas um campo vinculante” (AGENDA, FINANCEIRO ou ambos),
-etapas no log, cartão no Início e revisão dos textos. Fecha a regra de
-vinculação com um ADR de adendo, se necessário.
+Etapas no log, cartão no Início e revisão dos textos. A opção de campo único
+entrou na S7c; aqui fica só o acabamento.
 
 ## S8 — tela cheia no merge
 
@@ -70,7 +72,7 @@ S9b, a transferência; S9c, a exportação nas demais ferramentas.
 **Planilhas e campos.** Quatro planilhas padrão — AGENDA, CLIENTES, FINANCEIRO
 e PROCESSOS — ligadas por NOME DO CLIENTE, CNJ, PROTOCOLO e PASTA. Os rótulos
 reais vivem em `headers.json`; a comparação de cabeçalho dobra caixa, acento e
-espaço, mas os valores das células são comparados como estão.
+remove espaço, mas os valores das células são comparados como estão.
 
 | Planilha | Vincula a | Campos |
 |---|---|---|
@@ -79,15 +81,23 @@ espaço, mas os valores das células são comparados como estão.
 | FINANCEIRO | PROCESSOS, CLIENTES | CNJ, PASTA, PROTOCOLO e NOME |
 | PROCESSOS | AGENDA, CLIENTES, FINANCEIRO | CNJ, PASTA, PROTOCOLO e NOME |
 
+- **Fluxos:** a presença do arquivo define o que roda. AGENDA exige PROCESSOS;
+  FINANCEIRO exige PROCESSOS ou CLIENTES; um fluxo gera uma saída.
 - **CNJ:** máscara canônica `NNNNNNN-NN.NNNN.N.NN.NNNN` ou 20 dígitos crus;
   qualquer outra forma preenchida interrompe tudo e lista os casos.
 - **NOME:** valor único em CLIENTES e FINANCEIRO; em PROCESSOS, vários nomes na
-  mesma célula separados por `;`.
+  mesma célula separados por `;`, divididos sem trim.
 - **Células vazias:** permitidas; se todos os campos estiverem vazios, não
   vincula.
 - **Sem vínculo na AGENDA:** `NÃO vincula, apenas processo consultivo`, o
   protocolo vai para o fim da descrição e o campo vira `MIGRAÇÃO` — sempre.
+  `MIGRAÇÃO` é sentinela: nunca é comparada e é limpa quando a linha vincula.
 - **Sem vínculo no FINANCEIRO:** não move protocolo nem usa `MIGRAÇÃO`.
+- **Só CLIENTES:** o FINANCEIRO gera apenas `VINCULA (POR NOME)?`; `VINCULA?`
+  não é criada nem alterada.
+- **Opções:** “nome sem vínculo na descrição” (FINANCEIRO) e “manter apenas um
+  campo vinculante” (AGENDA e/ou FINANCEIRO); ambas desligadas. A segunda move
+  os números perdedores para a descrição e esvazia as colunas.
 - **Saída:** mesma lógica das demais ferramentas (`output/` ou pasta
   escolhida), preservando todas as colunas de entrada.
 

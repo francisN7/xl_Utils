@@ -228,20 +228,31 @@ coluna `PROCESSOS` e registra encontrados, duplicados e únicos no log.
 
 ## Vinculação
 
-`core/tools/link.py` recebe as abas da AGENDA e de PROCESSOS e o `LinkConfig`
-carregado de `headers.json`. O casamento de cabeçalho usa `fold_header`, que
-dobra caixa, acento e espaço só no rótulo; os valores das células são brutos.
+`core/tools/link.py` recebe as abas das planilhas e o `LinkConfig` carregado de
+`headers.json`. `column_map` casa o cabeçalho com `header_key`, que dobra caixa
+e acento e remove todos os espaços; os valores das células continuam brutos.
 `find_target_sheet` escolhe a primeira aba que tem todos os campos exigidos e,
 se nenhuma tiver, lista o que faltou por aba.
 
-O CNJ é validado antes de qualquer vínculo: só a máscara canônica ou 20 dígitos
-contínuos passam; os demais valores preenchidos levantam `InvalidCnjError` com
-arquivo, aba, linha, coluna e valor. A prioridade é CNJ → PASTA → PROTOCOLO e o
-resultado é `VINCULA POR ...` ou `NÃO vincula, apenas processo consultivo`.
-Sem vínculo na AGENDA, o protocolo vira `<cabeçalho real>: <valor>` no fim da
-descrição e o campo recebe `MIGRAÇÃO`; a reexecução exige `allow_migrated` e
-não repete a linha. `VINCULA?` é inserida depois do bloco padrão e antes das
-extras, ou sobrescrita no lugar. As demais abas da AGENDA são preservadas.
+A AGENDA usa `link_agenda`: valida o CNJ, compara CNJ → PASTA → PROTOCOLO e
+grava `VINCULA?`. Sem vínculo, o protocolo vira `<cabeçalho real>: <valor>` no
+fim da descrição e o campo recebe `MIGRAÇÃO`. A sentinela nunca entra na
+comparação; em linha vinculada ela é limpa. A reexecução exige
+`allow_migrated` e não repete a linha.
+
+O FINANCEIRO usa `link_financeiro`: com PROCESSOS, grava `VINCULA?` na mesma
+prioridade e `VINCULA (POR NOME)?` (SIM/NÃO) com a união dos nomes de
+PROCESSOS (split cru por `;`) e de CLIENTES. Só com CLIENTES, grava apenas a
+coluna de nome e não toca em `VINCULA?`. As duas colunas entram depois do bloco
+padrão e antes das extras, na ordem `VINCULA?` e `VINCULA (POR NOME)?`; uma
+coluna existente, mesmo com grafia sem espaço, é sobrescrita no lugar.
+
+As opções `single_field` (AGENDA e/ou FINANCEIRO) mantêm o campo vencedor e
+movem os outros dois para o fim da descrição como `<cabeçalho real>: <valor>`,
+esvaziando as colunas; `MIGRAÇÃO` não é movida. `name_in_description` prefixa
+`NOME DO CLIENTE: <valor>` no FINANCEIRO quando o nome não vincula. Os fluxos
+são independentes: AGENDA exige PROCESSOS; FINANCEIRO exige PROCESSOS ou
+CLIENTES; cada um gera um `SaveItem`. As demais abas são preservadas.
 
 `shared/configs.py` lê `src/xl_utils/configs/headers.json` por
 `importlib.resources` e, se existir, o override em

@@ -2,7 +2,7 @@
 
 Aplicativo desktop em Flet que reúne cinco utilitários de planilha:
 tratamento de texto (inclui remoção de emojis), extração de CNJ, recorte,
-mesclagem e vinculação entre AGENDA e PROCESSOS.
+mesclagem e vinculação entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES.
 
 **Stack:** Python 3.15 · uv · Flet 1.x · pandas 3.x · pytest · ruff
 

@@ -20,6 +20,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0013](0013-tema-claro-e-preferencia.md) | Tema claro opcional e preferência salva | Aceita |
 | [0014](0014-regra-de-vinculacao.md) | Vinculação por valor bruto e `MIGRAÇÃO` | Aceita |
 | [0015](0015-config-empacotada.md) | Config empacotada e estado por máquina | Aceita |
+| [0016](0016-fluxos-e-opcoes-da-vinculacao.md) | Fluxos independentes e opções da vinculação | Aceita |
 
 ## Como ler
 

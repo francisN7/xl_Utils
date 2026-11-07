@@ -113,9 +113,10 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 - `merge.py`: `ColumnRef`/`ColumnGroup`, `move_column` e `merge_sheets`; o
   resultado abre com `ORIGEM` (stem · aba) e `LINHA_ORIGEM` (linha de dados
   numerada no total, com zeros à esquerda).
-- `link.py`: `LinkConfig`/`SheetSpec`, `find_target_sheet` e `link_agenda`;
-  compara CNJ/PASTA/PROTOCOLO brutos, grava `VINCULA?`, `MIGRAÇÃO` e devolve
-  as abas da AGENDA com as demais preservadas. `shared/configs.py` carrega o
+- `link.py`: `LinkConfig`/`SheetSpec`, `find_target_sheet`, `link_agenda` e
+  `link_financeiro`; compara CNJ/PASTA/PROTOCOLO/nome brutos, grava `VINCULA?`
+  e `VINCULA (POR NOME)?`, trata `MIGRAÇÃO` como sentinela e aplica as opções
+  de nome na descrição e campo único. `shared/configs.py` carrega o
   `headers.json` empacotado ou o override local.
 
 **Observe:** nenhum módulo daqui importa Flet ou abre diálogo.
@@ -141,7 +142,8 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_save.py` | nada é gravado antes da escolha e o lote usa pasta |
 | `test_format_check.py` | conteúdo vence o nome e `.xlsm` não é divergência |
 | `test_progress.py` | contagem, log ao vivo, token e cancelamento entre arquivos |
-| `test_link.py` | prioridade, valor bruto, CNJ inválido e `MIGRAÇÃO` |
+| `test_link.py` | prioridade, valor bruto, CNJ, FINANCEIRO, opções e `MIGRAÇÃO` |
+| `test_link_page.py` | fluxos exigidos e opções habilitadas por arquivo |
 | `test_configs.py` | JSON empacotado e override por `%LOCALAPPDATA%` |
 | `test_integration.py` | as quatro ferramentas rodam nos quatro formatos |
 

@@ -121,6 +121,41 @@ def test_labeled_inputs_require_all_entries(
     assert "Abas" not in texts
 
 
+def test_custom_ready_and_hint_drive_the_button(
+    xlsx_file: Path,
+    tmp_path: Path,
+) -> None:
+    agenda = tmp_path / "agenda.xlsx"
+    processos = tmp_path / "processos.xlsx"
+    agenda.write_bytes(xlsx_file.read_bytes())
+    processos.write_bytes(xlsx_file.read_bytes())
+
+    def ready(_state: ToolState, files: dict[str, Path | None]) -> bool:
+        return files.get("AGENDA") is not None and files.get("PROCESSOS") is not None
+
+    def hint(_state: ToolState, files: dict[str, Path | None]) -> str | None:
+        if files.get("AGENDA") is not None and files.get("PROCESSOS") is None:
+            return "AGENDA: falta PROCESSOS"
+        return None
+
+    layout = ToolLayout(
+        "Fluxo",
+        "Teste",
+        inputs=("AGENDA", "PROCESSOS"),
+        ready=ready,
+        hint=hint,
+    )
+    layout._file_inputs["AGENDA"].set_files([agenda])
+
+    assert layout._run_button.disabled
+    assert layout._summary.value == "AGENDA: falta PROCESSOS"
+
+    layout._file_inputs["PROCESSOS"].set_files([processos])
+
+    assert not layout._run_button.disabled
+    assert layout._summary.value == "AGENDA: agenda.xlsx · PROCESSOS: processos.xlsx"
+
+
 def test_execute_button_becomes_cancel_while_running(xlsx_file: Path) -> None:
     layout = ToolLayout(
         "Cancelamento",

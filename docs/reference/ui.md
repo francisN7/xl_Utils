@@ -52,7 +52,7 @@ O conteúdo abre em uma das duas formas:
 | `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
-| `tool_layout` | Cabeçalho, cartões, barra de ação e estados; aceita entradas rotuladas (AGENDA/PROCESSOS) no lugar da lista única. |
+| `tool_layout` | Cabeçalho, cartões, barra de ação e estados; aceita entradas rotuladas no lugar da lista única. |
 
 ### Entrada de arquivos
 
@@ -60,9 +60,9 @@ O Flet 1.0 não expõe arrastar e soltar arquivos do sistema operacional. O
 dropzone é uma área clicável que abre o `FilePicker` nativo; o texto "clique
 para selecionar" substitui a promessa de drop. As ferramentas em lote aceitam
 vários arquivos: depois do primeiro, o dropzone vira “Adicionar outro arquivo” e
-a lista permite remover cada um. A vinculação é a exceção: tem duas entradas
-rotuladas (AGENDA e PROCESSOS), uma planilha em cada, sem lista acumulada e sem
-seletor de abas — a aba é achada pelo bloco padrão.
+a lista permite remover cada um. A vinculação é a exceção: tem quatro entradas
+rotuladas (AGENDA, PROCESSOS, FINANCEIRO e CLIENTES), uma planilha em cada, sem
+lista acumulada e sem seletor de abas — a aba é achada pelo bloco padrão.
 
 Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
 extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:
@@ -109,16 +109,25 @@ como primeiras colunas.
 
 ### Vinculação
 
-A ferramenta **Verificar Vínculos** usa duas entradas rotuladas — AGENDA e
-PROCESSOS — e não mostra o seletor de abas: cada arquivo pode ter várias abas e
-a ferramenta escolhe a primeira que contém o bloco padrão. “Executar” só libera
-quando as duas planilhas estão escolhidas. A prévia mostra a AGENDA já com
-`VINCULA?`; as demais abas continuam no arquivo salvo, mas não na prévia.
+A ferramenta **Verificar Vínculos** usa quatro entradas rotuladas — AGENDA,
+PROCESSOS, FINANCEIRO e CLIENTES — e não mostra o seletor de abas: cada arquivo
+pode ter várias abas e a ferramenta escolhe a primeira que contém o bloco
+padrão. Não há checkbox de fluxo: a presença do arquivo define o que roda.
+AGENDA exige PROCESSOS; FINANCEIRO exige PROCESSOS ou CLIENTES; pelo menos um
+dos dois fluxos precisa estar anexado. Com AGENDA sem PROCESSOS, o botão fica
+bloqueado. O resumo diz o que falta.
+
+O card “2. Opções” tem três caixas, todas desligadas e habilitadas conforme os
+arquivos: “Nome sem vínculo na descrição” (FINANCEIRO), “Manter um campo
+vinculante — AGENDA” e “Manter um campo vinculante — FINANCEIRO” (esta só com
+PROCESSOS). A prévia combina as abas transformadas dos fluxos presentes; as
+demais abas continuam no arquivo salvo.
 
 Se a coluna de protocolo da AGENDA já contém `MIGRAÇÃO`, antes de executar
 aparece um `AlertDialog` com “Cancelar” e “Continuar mesmo assim”. Continuar
-recalcula `VINCULA?` e não acrescenta o protocolo de novo à descrição. O aviso
-só volta se o arquivo for trocado.
+recalcula `VINCULA?`, limpa a sentinela nas linhas que vinculam e não
+acrescenta o protocolo de novo à descrição. O aviso só volta se o arquivo for
+trocado.
 
 ## Início
 

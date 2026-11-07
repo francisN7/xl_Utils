@@ -107,7 +107,9 @@ TOOLS: tuple[ToolPage, ...] = (
         id="link",
         label="Verificar Vínculos",
         icon=ft.Icons.LINK,
-        description="Confere os vínculos entre AGENDA e PROCESSOS e marca cada linha.",
+        description=(
+            "Confere os vínculos entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES."
+        ),
         build=build_link,
     ),
 )

@@ -4,48 +4,51 @@
 
 ## Sessão
 
-- **Última concluída:** S7b — renomear a ferramenta para “Verificar Vínculos”
-- **Próxima:** S7c — FINANCEIRO + CLIENTES
+- **Última concluída:** S7c — FINANCEIRO, CLIENTES e opções
+- **Próxima:** S7d — log e acabamento
 - **Ciclo:** 0006 — Backlog
-- **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO`
-  sempre; config empacotada em `src/xl_utils/configs/headers.json`; ADR 0014
-  (regra) e ADR 0015 (config × estado). O nome visível mudou, mas o `id`,
-  os módulos `link` e a palavra “vinculação” continuam.
+- **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
+  sentinela e nunca é comparada; config empacotada em
+  `src/xl_utils/configs/headers.json`; ADR 0014 (regra), 0015 (config) e 0016
+  (fluxos e opções). O `id`, os módulos `link` e a palavra “vinculação”
+  continuam.
 
 ## Pronto
 
+- S7c: quatro entradas sem checkbox de fluxo; AGENDA exige PROCESSOS e
+  FINANCEIRO exige PROCESSOS ou CLIENTES; só CLIENTES gera apenas
+  `VINCULA (POR NOME)?`; cabeçalho casa sem espaços; `MIGRAÇÃO` limpa em linha
+  vinculada; opções de nome na descrição e campo único (AGENDA/FINANCEIRO).
 - S7b: “Vincular Planilhas” virou “Verificar Vínculos” na sidebar, no
-  cabeçalho, no README e na referência; a descrição acompanha o nome.
-- S7a: motor puro em `core/tools/link.py`; página com duas entradas rotuladas
-  (AGENDA e PROCESSOS); `VINCULA?` na prioridade CNJ → PASTA → PROTOCOLO;
-  protocolo preservado na descrição e campo vira `MIGRAÇÃO`; pop-up de
-  reexecução; saída preserva colunas e abas.
-- S6c: tema claro/escuro ao vivo via `theme.restyle`, sem perder estado.
-- S6b/S6a: log por etapa e `ORIGEM`/`LINHA_ORIGEM` no merge.
+  cabeçalho, no README e na referência.
+- S7a: motor puro, AGENDA × PROCESSOS, `VINCULA?`, protocolo na descrição e
+  `MIGRAÇÃO`; pop-up de reexecução; saída preserva colunas e abas.
+- S6c: tema claro/escuro ao vivo. S6b/S6a: log por etapa e `ORIGEM` no merge.
 
 ## Próximo passo
 
-Ler `docs/sessions/S7c-vinculacao-financeiro.md` e implementar FINANCEIRO +
-CLIENTES, `VINCULA (POR NOME)?` e a opção de nome na descrição.
+Ler `docs/sessions/S7d-acabamento-vinculacao.md` e fechar o log por etapa, o
+cartão no Início e a revisão dos textos da vinculação.
 
 ## Arquivos-chave
 
 - `core/tools/link.py`, `controllers/link.py`, `ui/pages/link.py`
-- `shared/configs.py`, `src/xl_utils/configs/headers.json`
 - `ui/components/tool_layout.py`, `ui/state.py`, `ui/pages/registry.py`
-- `tests/test_link.py`, `tests/test_configs.py`
+- `shared/configs.py`, `src/xl_utils/configs/headers.json`
+- `tests/test_link.py`, `tests/test_link_page.py`, `tests/test_layout.py`
 - `docs/adr/0014-regra-de-vinculacao.md`,
-  `docs/adr/0015-config-empacotada.md`
+  `docs/adr/0016-fluxos-e-opcoes-da-vinculacao.md`
 
 ## Armadilhas
 
-- As planilhas reais para validar a vinculação ainda não foram corrigidas pelo
-  dono; a S7c pode ficar bloqueada até isso acontecer.
 - Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula; é esperado.
 - CNJ numérico no Excel perde precisão antes da leitura; a coluna deve ser texto.
 - `PROCESSO ORIGINÁRIO` contém “PROCESSO”; o match é exato, nunca substring.
-- Cabeçalho dobra caixa/acento/espaço; valor de célula não é tocado.
+- Cabeçalho dobra caixa/acento e remove espaços; valor de célula não é tocado.
+- Nome de PROCESSOS com `;` é dividido cru: `"A; B"` produz `" B"`.
 - `MIGRAÇÃO` na AGENDA dispara o pop-up; confirmar não reescreve o protocolo.
+- AGENDA sem PROCESSOS bloqueia tudo, mesmo com FINANCEIRO e CLIENTES.
+- Só CLIENTES: não valida CNJ e não cria nem altera `VINCULA?`.
 - Config empacotada via `importlib.resources`; override em `%LOCALAPPDATA%`.
 - Flet não é thread-safe: `pre_run` roda em thread e só devolve texto.
 - Cancelar não interrompe pandas: só vale entre arquivos.
@@ -54,5 +57,4 @@ CLIENTES, `VINCULA (POR NOME)?` e a opção de nome na descrição.
 
 ## Como rodar
 
-`uv run xl-utils` · `uv run ruff check src tests` · `uv run ruff format --check
-src tests` · `uv run pytest` · `node scripts/check-docs.mjs`
+`uv run xl-utils` · `uv run ruff check src tests` · `uv run ruff format --check src tests` · `uv run pytest` · `node scripts/check-docs.mjs`

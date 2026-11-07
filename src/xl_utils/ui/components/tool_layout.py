@@ -3,7 +3,7 @@
 import asyncio
 import contextlib
 import traceback
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Protocol
 
@@ -39,6 +39,10 @@ RunHandler = Callable[
 
 PreRun = Callable[[ToolState], str | None]
 
+ReadyCheck = Callable[[ToolState, Mapping[str, Path | None]], bool]
+
+Hint = Callable[[ToolState, Mapping[str, Path | None]], str | None]
+
 
 class OptionsPanel(Protocol):
     """Controle de opções que se reconstrói quando a entrada muda."""
@@ -64,6 +68,8 @@ class ToolLayout:
         multiple_files: bool = False,
         default_all_sheets: bool = False,
         inputs: Sequence[str] | None = None,
+        ready: ReadyCheck | None = None,
+        hint: Hint | None = None,
         pre_run: PreRun | None = None,
         run_handler: RunHandler | None = None,
     ) -> None:
@@ -71,6 +77,8 @@ class ToolLayout:
         self._title = title
         self._run_handler = run_handler
         self._pre_run = pre_run
+        self._ready_check = ready
+        self._hint = hint
         self._default_all_sheets = default_all_sheets
         self._input_labels = tuple(inputs or ())
         self._pre_checking = False
@@ -118,6 +126,9 @@ class ToolLayout:
             max_lines=1,
             overflow=ft.TextOverflow.ELLIPSIS,
         )
+        if self._hint is not None:
+            self._update_summary()
+
         self._run_button = ft.FilledButton(
             "Executar",
             icon=ft.Icons.PLAY_ARROW,
@@ -299,14 +310,21 @@ class ToolLayout:
         self._refresh()
 
     def _ready(self) -> bool:
-        """Diz se todas as entradas rotuladas (ou a lista comum) estão prontas."""
-        if self._input_labels:
-            return all(
-                self._input_files.get(label) is not None for label in self._input_labels
-            )
-        return bool(self.state.files)
+        """Diz se as entradas exigidas pelo fluxo atual estão prontas."""
+        if not self._input_labels:
+            return bool(self.state.files)
+        if self._ready_check is not None:
+            return self._ready_check(self.state, self._input_files)
+        return all(
+            self._input_files.get(label) is not None for label in self._input_labels
+        )
 
     def _update_summary(self) -> None:
+        if self._hint is not None:
+            text = self._hint(self.state, self._input_files)
+            if text:
+                self._summary.value = text
+                return
         if self._input_labels:
             parts = [
                 f"{label}: {path.name}" if path is not None else f"{label}: —"
@@ -801,6 +819,14 @@ class ToolLayout:
             error=error,
             traceback_text=self.state.error_detail,
         )
+
+    def refresh(self) -> None:
+        """Reavalia o resumo e o botão depois de mudar uma opção."""
+        self._update_summary()
+        self._run_button.disabled = (
+            self._running or self._sheet_loading or not self._ready()
+        )
+        self._refresh()
 
     def _refresh(self) -> None:
         with contextlib.suppress(RuntimeError):

@@ -109,6 +109,14 @@ decisões nos ADRs.
   por `importlib.resources`, com override opcional em
   `%LOCALAPPDATA%/xl_utils/headers.json`. Segredos e tokens ficam fora do
   repositório e do wheel. Ver ADR 0015.
+- Vinculação FINANCEIRO × PROCESSOS/CLIENTES: quatro entradas rotuladas,
+  fluxos definidos pelos arquivos anexados (AGENDA exige PROCESSOS; FINANCEIRO
+  exige PROCESSOS ou CLIENTES), `VINCULA?` e `VINCULA (POR NOME)?` no
+  FINANCEIRO, com nomes de PROCESSOS (split cru por `;`) e CLIENTES. Só
+  CLIENTES gera apenas a coluna de nome. Ver ADR 0016.
+- Opções da vinculação: nome sem vínculo na descrição (FINANCEIRO) e manter
+  apenas um campo vinculante (AGENDA e/ou FINANCEIRO), desligadas por padrão;
+  os números perdedores vão para o fim da descrição e as colunas ficam vazias.
 
 ### Changed
 
@@ -126,6 +134,9 @@ decisões nos ADRs.
 - Ferramenta de vinculação renomeada para **Verificar Vínculos** na sidebar, no
   cabeçalho e na documentação; a descrição acompanha o novo vocabulário. O
   `id`, os módulos `link` e a regra não mudaram.
+- Cabeçalho de vínculo casa sem espaços (`VINCULA(POR NOME)?` e
+  `VINCULA (POR NOME)?` são a mesma coluna) e `MIGRAÇÃO` passa a ser sentinela:
+  não entra na comparação e é limpa nas linhas que vinculam.
 
 ### Removed
 
@@ -149,6 +160,8 @@ decisões nos ADRs.
   decimais com vírgula não quebram a linha.
 - O reparo de `.xls` deixou de repetir a mesma leitura: o formato falha com
   mensagem de “sem leitor alternativo” quando o calamine não consegue abrir.
+- Reexecução da AGENDA não confunde mais `MIGRAÇÃO` com um protocolo real do
+  PROCESSOS; a sentinela é limpa nas linhas que vinculam.
 
 ## v0.1.0 — 2026-11-04
 
