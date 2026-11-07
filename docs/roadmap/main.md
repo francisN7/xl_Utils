@@ -80,6 +80,54 @@ S9b, a transferência; S9c, a exportação nas demais ferramentas.
   manter título, descrição e atalho dentro do cartão, truncar ou ocultar a
   descrição com reticências quando faltar espaço e revisar o Início e as
   páginas de ferramenta em larguras estreitas. Prioridade fica com o dono.
+- **Sistema de plugins** — sem sessão marcada. Ferramentas opcionais deixam de
+  vir no app e passam a ser instaladas por um arquivo `.7z`. O que é seguro
+  pode virar padrão; o que é arriscado fica num repositório privado do dono, só
+  de plugins. A área de plugins terá um botão de informação que abre a
+  documentação pública no GitHub: como o plugin deve ser feito, como se integra
+  à UI e o que o pacote precisa conter.
+
+### Detalhe: plugins
+
+**Objetivo.** Separar o núcleo estável das ferramentas pessoais ou arriscadas.
+O app padrão carrega só o que é seguro; o resto é instalado sob demanda, sem
+baixar nada sozinho.
+
+**Pacote.** Um `.7z` com manifesto, código e assets. O app valida o manifesto,
+mostra nome, versão, autor e descrição, e instala em
+`%LOCALAPPDATA%/xl_utils/plugins/` — nunca dentro do repositório. Instalação e
+remoção acontecem pela área de plugins, com confirmação e sem sobrescrever
+versão em uso.
+
+**Contrato do plugin.** Antes do código, um ADR define:
+
+- o manifesto (nome, id, versão, compatibilidade, entrypoint e permissões);
+- a API de UI (como a página declara entradas, opções, progresso, log e
+  resultado sem importar o shell inteiro);
+- o ciclo de vida (descoberta, carregamento, falha isolada e desinstalação);
+- o que o plugin pode e não pode fazer (rede, filesystem, subprocesso);
+- versionamento e compatibilidade com o app.
+
+**Confiança.** O `.7z` vem de um repositório privado do dono; o app não baixa
+plugin sozinho. Instalar é ato explícito. O manifesto pode exigir hash do
+pacote e o app registra a origem. Plugin quebrado não derruba o núcleo.
+
+**Segurança do pacote.** A extração recusa caminho absoluto, `..`, symlink e
+zip bomb; o app confere hash e tamanho antes de instalar e nunca executa código
+durante a extração. O plugin roda com o mesmo usuário do app, então a confiança
+é explícita e reversível.
+
+**UI.** Nova área “Plugins” na navegação, com lista, instalar, remover e um
+botão de informação que abre a documentação pública: estrutura do `.7z`,
+manifesto, API de UI, exemplo mínimo e checklist de segurança.
+
+**Docs.** O contrato do plugin é público, mesmo que os plugins em si fiquem no
+repositório privado. A página de informação da UI aponta para essa documentação.
+
+**Pendências.** ADR do contrato; lib de `.7z`; se o plugin roda no mesmo
+processo ou em subprocesso; como versionar a API; se plugins declaram
+dependências; política de assinatura/hash; modo seguro para iniciar sem
+plugins.
 
 ## Manutenção
 

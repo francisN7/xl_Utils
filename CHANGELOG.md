@@ -135,6 +135,9 @@ decisões nos ADRs.
   vinculação entre AGENDA, CLIENTES, FINANCEIRO e PROCESSOS, com decisões em
   aberto e protocolo detalhado; naquele momento, nenhuma das duas estava
   implementada.
+- Documentação: o backlog passa a registrar o sistema de plugins — ferramentas
+  opcionais em `.7z`, repositório privado para os plugins arriscados e
+  documentação pública do contrato; nada implementado.
 - Ferramenta de vinculação renomeada para **Verificar Vínculos** na sidebar, no
   cabeçalho e na documentação; a descrição acompanha o novo vocabulário. O
   `id`, os módulos `link` e a regra não mudaram.
