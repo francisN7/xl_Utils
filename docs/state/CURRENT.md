@@ -15,7 +15,7 @@
 
 - S9a4: segredo do cliente cifrado por DPAPI; download apagado após importar.
 - S9a5: login pede `userinfo.email`; o Google devolve o canônico e o fluxo fecha.
-- S9a6: janela em 80,60; atalho global reinstalado e Flet preso em 1.0.x.
+- S9a6: atalho global reinstalado; janela não é reposicionada; Flet 1.1.2.
 - S9a3: site no GitHub Pages (home + privacidade) para publicar o app no Google.
 
 ## Próximo passo

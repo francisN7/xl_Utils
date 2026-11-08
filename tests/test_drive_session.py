@@ -242,9 +242,6 @@ def test_app_shell_puts_the_drive_menu_at_the_top_right(
     page = _FakePage()
     app.main(page)
 
-    assert page.window.left == 80
-    assert page.window.top == 60
-
     shell = page.added[0]
     sidebar = shell.controls[0]
     body = shell.controls[1]
