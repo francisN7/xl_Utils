@@ -207,39 +207,53 @@ recriado. O backlog de plugins entrou em seguida.
 
 ## Backlog
 
-- **Seletor de arquivos integrado à UI** — sem sessão marcada. Hoje o arquivo
-  local abre no diálogo nativo do Windows e o do Drive abre uma aba do
-  navegador; os dois saem do visual e do fluxo da janela. Estudar um seletor
-  próprio (lista de pastas e arquivos, filtros por formato, recentes e, no
-  Drive, as pastas já concedidas) que siga o tema e caiba no app, mantendo o
-  seletor nativo e o Picker como fallback. A decisão depende de o Flet suportar
-  ou de migrar para webview/PySide6; medir antes.
-- **Drive sem consentimento repetido** — sem sessão marcada. O Picker de desktop
-  exige `prompt=consent` e abre o navegador a cada escolha, então o login
-  inicial parece não servir para nada. Investigar um pipeline que use o token
-  do login para listar e escolher arquivos e pastas dentro do app — por exemplo
-  o Picker web com API key e webview, ou o escopo `drive` com um navegador
-  próprio — e comparar com o desenho atual (`drive.file` + Picker + concessão
-  de pasta): consentimento único, verificação do Google, acesso mínimo, esforço
-  e risco. Não trocar o escopo sem ADR.
-- **Responsividade do Início e das ferramentas** — sem sessão marcada. Em
-  largura reduzida, os títulos dos cartões quebram no meio das palavras e a
-  descrição estoura o card, empurrando “Abrir ferramenta” para fora; em
-  “Verificar Vínculos” o texto mais longo piora o quadro. A correção deve
-  manter título, descrição e atalho dentro do cartão, truncar ou ocultar a
-  descrição com reticências quando faltar espaço e revisar o Início e as
-  páginas de ferramenta em larguras estreitas. Prioridade fica com o dono.
-- **E-mail longo no menu de perfis** — sem sessão marcada. No menu hamburger, o
-  e-mail do perfil pode estourar o campo do item. Truncar com reticências
-  (`…`) quando não couber e mostrar o e-mail completo apenas em tooltip, com
-  atraso de hover (alguns segundos) para não abrir a cada passada do mouse.
-  Vale para o item de perfil e para qualquer outro ponto que exiba o e-mail.
-- **Sistema de plugins** — sem sessão marcada. Ferramentas opcionais deixam de
-  vir no app e passam a ser instaladas por um arquivo `.7z`. O que é seguro
-  pode virar padrão; o que é arriscado fica num repositório privado do dono, só
-  de plugins. A área de plugins terá um botão de informação que abre a
-  documentação pública no GitHub: como o plugin deve ser feito, como se integra
-  à UI e o que o pacote precisa conter.
+Ordem revisada pelo dono em 2026-11-08 (antes da S10): versão e polimento →
+primeira release → plugins → investigações pesadas.
+
+1. **S11 — Versão 0.2.0 e polimento de UI** — uma sessão só, com três frentes:
+   - **Versão 0.2.0:** alinhar `pyproject.toml`, `uv.lock` (depois de
+     `uv lock`), `src/xl_utils/__init__.py` (`__version__`), o diagnóstico e
+     onde mais a versão aparecer — hoje tudo marca `0.1.0`. É só a marcação; o
+     instalador fica para a S12.
+   - **Responsividade do Início e das ferramentas:** em largura reduzida, os
+     títulos dos cartões quebram no meio das palavras e a descrição estoura o
+     card, empurrando “Abrir ferramenta” para fora; em “Verificar Vínculos” o
+     texto mais longo piora o quadro. Manter título, descrição e atalho dentro
+     do cartão, truncar ou ocultar a descrição com reticências quando faltar
+     espaço e revisar o Início e as páginas em larguras estreitas.
+   - **E-mail longo no menu de perfis:** o e-mail pode estourar o campo do item.
+     Truncar com reticências (`…`) quando não couber e mostrar o e-mail completo
+     apenas em tooltip, com atraso de hover de alguns segundos para não abrir a
+     cada passada do mouse. Vale para o item de perfil e para qualquer outro
+     ponto que exiba o e-mail.
+2. **S12 — Empacotar a primeira versão, 0.3.0** — sem sessão marcada. Gerar o
+   instalador do Windows pronto para instalação, com Python e dependências
+   **embutidos**, a partir do wheel: entrada no menu Iniciar, atalho **opcional**
+   na área de trabalho, ícone do app, desinstalação limpa e publicação do
+   artefato e das notas na página de Releases do GitHub. Decidir a ferramenta
+   (PyInstaller + Inno Setup, NSIS ou MSIX) e o que entra no pacote (cliente
+   OAuth, `configs/`, documentação). A versão passa a 0.3.0 nesta sessão.
+3. **Sistema de plugins** — sem sessão marcada. Ferramentas opcionais deixam de
+   vir no app e passam a ser instaladas por um arquivo `.7z`. O que é seguro
+   pode virar padrão; o que é arriscado fica num repositório privado do dono, só
+   de plugins. A área de plugins terá um botão de informação que abre a
+   documentação pública no GitHub: como o plugin deve ser feito, como se integra
+   à UI e o que o pacote precisa conter.
+4. **Seletor de arquivos integrado à UI** — sem sessão marcada. Hoje o arquivo
+   local abre no diálogo nativo do Windows e o do Drive abre uma aba do
+   navegador; os dois saem do visual e do fluxo da janela. Estudar um seletor
+   próprio (lista de pastas e arquivos, filtros por formato, recentes e, no
+   Drive, as pastas já concedidas) que siga o tema e caiba no app, mantendo o
+   seletor nativo e o Picker como fallback. A decisão depende de o Flet suportar
+   ou de migrar para webview/PySide6; medir antes.
+5. **Drive sem consentimento repetido** — sem sessão marcada. O Picker de desktop
+   exige `prompt=consent` e abre o navegador a cada escolha, então o login
+   inicial parece não servir para nada. Investigar um pipeline que use o token
+   do login para listar e escolher arquivos e pastas dentro do app — por exemplo
+   o Picker web com API key e webview, ou o escopo `drive` com um navegador
+   próprio — e comparar com o desenho atual (`drive.file` + Picker + concessão
+   de pasta): consentimento único, verificação do Google, acesso mínimo, esforço
+   e risco. Não trocar o escopo sem ADR.
 
 ### Detalhe: plugins
 
@@ -293,11 +307,12 @@ plugins.
 ## Gatilhos (não são backlog)
 
 - Suporte a macOS/Linux — só entra quando houver máquina para testar.
-- Empacotamento, instalador e release — só entram quando o dono decidir
-  distribuir. A config já nasce pronta para o wheel.
 - Internacionalização — só entra se aparecer usuário fora do PT-BR.
 - Drag & drop real de arquivos — só entra se migrar para PySide6 ou houver hook
   Windows-only.
+- **Nuitka no empacotamento da 0.3.0** — verificar viabilidade (tamanho,
+  tempo de build e compatibilidade com o Flet) antes de fixar a ferramenta; se
+  não servir, seguir com PyInstaller + Inno Setup.
 
 ## Descartados (não voltam sem decisão nova)
 

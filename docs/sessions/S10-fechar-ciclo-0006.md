@@ -8,16 +8,17 @@ backlog revisado.
 
 ## Fora de escopo
 
-- Implementar qualquer item do backlog (responsividade, e-mail longo, plugins).
+- Implementar qualquer item do backlog (versão 0.2.0, responsividade, e-mail
+  longo, empacotamento 0.3.0, plugins).
 - Reabrir decisões do Drive; a S9c já validou gravação, pasta e nomes livres.
 
 ## Tarefas
 
 1. Rodar a validação completa e confirmar o app abrindo com uma gravação real no
    Drive (abrir, processar, salvar na pasta, repetir e ver `_001`).
-2. Revisar o backlog em `docs/roadmap/main.md`: responsividade do Início e das
-   ferramentas, e-mail longo no menu de perfis, seletor de arquivos integrado à
-   UI, Drive sem consentimento repetido e sistema de plugins.
+2. Revisar o backlog em `docs/roadmap/main.md`, já reordenado em 2026-11-08:
+   S11 (0.2.0 + responsividade + e-mail longo) → S12 (0.3.0 empacotada) →
+   plugins → seletor integrado → Drive sem consentimento repetido.
 3. Fechar o ciclo: renomear `docs/roadmap/main.md` para `0006-backlog.md`,
    criar um `main.md` novo para o ciclo 0007 e atualizar
    `docs/roadmap/README.md`.
@@ -58,4 +59,5 @@ páginas de ferramenta.
 
 ## Próximo depois desta
 
-Abrir o ciclo 0007 com a primeira sessão escolhida no backlog revisado.
+Abrir o ciclo 0007 com a **S11 — versão 0.2.0 e polimento de UI**
+(responsividade e e-mail longo), seguida da **S12 — empacotar a 0.3.0**.

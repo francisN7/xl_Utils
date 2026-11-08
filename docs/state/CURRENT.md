@@ -24,9 +24,10 @@
 
 Ler `docs/sessions/S10-fechar-ciclo-0006.md`: arquivar o roadmap em
 `0006-backlog.md`, tirar as specs fechadas do working tree, revisar o backlog
-(responsividade, e-mail longo, seletor integrado, consentimento do Drive e
-plugins) e abrir o ciclo 0007. Antes, validar no app abrir do Drive, salvar,
-repetir e ver `_001`.
+já reordenado (S11: 0.2.0 + responsividade + e-mail longo → S12: 0.3.0
+empacotada → plugins → seletor integrado → Drive sem consentimento repetido) e
+abrir o ciclo 0007. Antes, validar no app abrir do Drive, salvar, repetir e ver
+`_001`.
 
 ## Arquivos-chave
 
