@@ -15,6 +15,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S9a | Drive I — ADR, OAuth, contas e shell | [x] |
 | S9a1 | Drive I.1 — teste do login e importação do cliente | [x] |
 | S9a2 | Drive I.2 — menu de perfis no canto superior direito | [x] |
+| S9a3 | Site público e política de privacidade | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -106,6 +107,15 @@ marca a conta ativa, permite adicionar outra e sair. Sem conta, mostra
 **Entrar com Google**; se o cliente OAuth ainda não existir, o primeiro clique
 pede o JSON uma única vez e segue para o navegador. O cartão `drive_status` foi
 removido. Ver a [spec](../sessions/S9a2-menu-de-perfis.md).
+
+## S9a3 — entregue
+
+Site estático no GitHub Pages (`docs/`) com a página inicial do xl_Utils e a
+política de privacidade, para atender ao modo “Em produção” do Google Auth
+Platform. O `_config.yml` mantém ADRs, guias, roadmap, sessões e estado fora do
+site. Endereços: `https://francisn7.github.io/xl_Utils/` e
+`https://francisn7.github.io/xl_Utils/privacy.html`. Ver a
+[spec](../sessions/S9a3-site-publico.md).
 
 ## Auditoria pública — entregue
 

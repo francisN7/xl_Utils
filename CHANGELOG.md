@@ -133,6 +133,9 @@ decisões nos ADRs.
   sidebar, ícone de perfil, conta ativa marcada, adicionar conta e sair. O
   cartão do Drive saiu do hub; o primeiro **Entrar com Google** pede o JSON do
   cliente uma única vez e depois abre o navegador direto.
+- Site público no GitHub Pages (S9a3): página inicial e política de privacidade
+  para a publicação do app OAuth no Google Auth Platform; os documentos
+  internos ficam fora do site.
 
 ### Changed
 

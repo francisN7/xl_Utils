@@ -1,0 +1,10 @@
+# GitHub Pages: publica apenas o site público (home e política de privacidade).
+# Os documentos internos continuam no repositório, mas não são renderizados.
+exclude:
+  - README.md
+  - adr
+  - guide
+  - reference
+  - roadmap
+  - sessions
+  - state

@@ -21,6 +21,8 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | entender como o código é organizado | [`reference/architecture.md`](reference/architecture.md) |
 | ler o código em ordem guiada | [`guide/code-tour.md`](guide/code-tour.md) |
 | entender a UI e o tema | [`reference/ui.md`](reference/ui.md) |
+| ver o site público | [`index.html`](index.html) |
+| ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
 | ler a spec da próxima sessão | [`sessions/S9b-drive-planilha.md`](sessions/S9b-drive-planilha.md) |

@@ -4,21 +4,19 @@
 
 ## Sessão
 
-- **Última concluída:** S9a2 — Drive I.2 (menu de perfis)
+- **Última concluída:** S9a3 — site público e política de privacidade
 - **Próxima:** S9b — Drive II (link, seletor e escrita)
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
-  sentinela; config empacotada; ADRs 0014–0018; plugins em `.7z` privado (ADR
-  pendente); `id`, `link` e “vinculação” continuam. Drive: PKCE/`state`,
-  `drive.file`, contas com DPAPI, cliente pedido uma vez no 1º login.
+  sentinela; config empacotada; ADRs 0014–0018; plugins em `.7z` privado; `id`,
+  `link` e “vinculação” continuam. Drive: PKCE/`state`, `drive.file`, DPAPI.
 
 ## Pronto
 
+- S9a3: site no GitHub Pages (`docs/index.html` e `privacy.html`) para a
+  publicação no Google; docs internos ficam fora pelo `_config.yml`.
 - S9a2: hamburger no canto superior direito; menu de perfis com ícone, conta
-  ativa, adicionar e sair; cartão do hub removido; primeiro login pede o JSON
-  uma vez e segue para o navegador. Spec e adendo ao ADR 0018.
-- S9a1: importação validada (64 KB, UTF-8, HTTPS no Google) e teste offline
-  com Google falso (PKCE, `state`, negação, timeout).
+  ativa e sair; cartão do hub removido; 1º login pede o JSON uma vez.
 
 ## Próximo passo
 
@@ -35,6 +33,7 @@ escolher Google Picker ou escopo `drive` em Testing antes de qualquer código.
 - `configs/drive_client.json`, `configs/headers.json`, `shared/configs.py`
 - `core/tools/link.py`, `ui/components/tool_layout.py`, `ui/theme.py`
 - `docs/adr/0018-drive-autenticacao.md`, `docs/sessions/S9b-drive-planilha.md`
+- `docs/index.html`, `docs/privacy.html`, `docs/_config.yml`
 
 ## Armadilhas
 
@@ -54,6 +53,7 @@ escolher Google Picker ou escopo `drive` em Testing antes de qualquer código.
 - Flet não é thread-safe: login e execução rodam fora da UI thread.
 - Plugins: `.7z` precisa recusar path traversal, symlink e zip bomb.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
+- Pages: ligar em `main` / `docs`; a URL precisa responder antes do Google.
 
 ## Como rodar
 
