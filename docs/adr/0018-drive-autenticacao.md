@@ -116,7 +116,13 @@ segunda autorização curta, que:
   novo, e o Google invalida os mais antigos quando o cliente acumula tokens;
 - serve apenas para baixar o arquivo recém-escolhido, com o token de acesso
   devolvido na hora;
-- confere `state` e PKCE como o login.
+- confere `state` e PKCE como o login;
+- leva o e-mail da conta escolhida no app em `login_hint`, para o Google
+  pré-selecionar a mesma conta no navegador.
+
+A tela de consentimento reaparece a cada escolha porque `prompt=consent` é
+exigido pelo Picker de desktop: não é reautenticação do login e não há como
+pular sem trocar para o Picker JavaScript, que precisaria de API key e webview.
 
 A concessão é por arquivo e por cliente: o token da conta passa a enxergar o
 arquivo escolhido sem mudar escopo nenhum, e as contas salvas continuam

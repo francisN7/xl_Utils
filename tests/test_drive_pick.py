@@ -204,6 +204,15 @@ def test_multiple_is_requested_when_the_tool_accepts_several_files(
     assert google.query["allow_multiple"] == ["true"]
 
 
+def test_login_hint_preselects_the_account_chosen_in_the_app(
+    google: _FakeGoogle,
+    browser: _Browser,
+) -> None:
+    pick_files(_client(google), login_hint="ana@example.com", timeout=10)
+
+    assert google.query["login_hint"] == ["ana@example.com"]
+
+
 def test_cancelled_picker_is_not_an_error(
     google: _FakeGoogle,
     browser: _Browser,

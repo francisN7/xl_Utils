@@ -476,7 +476,7 @@ def test_open_from_drive_leaves_a_local_copy_with_the_real_name(
     assert paths[0].read_bytes() == b"conteudo"
     assert paths[0].parent.parent == tmp_path
     assert client.calls == ["id-1"]
-    assert calls == [{"multiple": False}]
+    assert calls == [{"multiple": False, "login_hint": "ana@example.com"}]
     assert session.error is None
 
 
@@ -492,7 +492,7 @@ def test_open_from_drive_asks_for_multiple_when_the_tool_accepts_it(
 
     asyncio.run(session.open_from_drive(multiple=True))
 
-    assert calls == [{"multiple": True}]
+    assert calls == [{"multiple": True, "login_hint": "ana@example.com"}]
 
 
 def test_cancelled_picker_is_silent(

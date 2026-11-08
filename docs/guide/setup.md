@@ -84,7 +84,9 @@ só aparece se ainda não houver cliente.
 Ao abrir uma planilha do Drive, o app usa o **Picker de apps desktop**: uma
 segunda autorização, só com `drive.file` e sem acesso offline, abre o seletor no
 navegador e devolve o arquivo escolhido. Isso não muda o login nem as contas já
-salvas; sem a Picker API ativa, o Google recusa o seletor.
+salvas; sem a Picker API ativa, o Google recusa o seletor. Cada escolha mostra o
+consentimento de novo — exigência do Picker —, com a conta escolhida no app já
+pré-selecionada (`login_hint`).
 
 O app valida o arquivo (tamanho, UTF-8, HTTPS, domínio do Google), guarda só os
 campos que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e não move nem

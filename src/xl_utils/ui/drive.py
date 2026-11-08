@@ -126,7 +126,7 @@ class DriveSession:
 
     def _open_sync(self, account: Account, multiple: bool) -> list[Path]:
         """Parte bloqueante de :meth:`open_from_drive`."""
-        selection = self._picker(multiple=multiple)
+        selection = self._picker(multiple=multiple, login_hint=account.email)
         if selection.cancelled:
             return []
         client = (

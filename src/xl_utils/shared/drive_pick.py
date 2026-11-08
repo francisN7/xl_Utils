@@ -50,6 +50,7 @@ def pick_files(
     client: ClientConfig | None = None,
     *,
     multiple: bool = False,
+    login_hint: str = "",
     timeout: int = PICK_TIMEOUT,
     open_browser: bool = True,
 ) -> PickedFiles:
@@ -57,7 +58,8 @@ def pick_files(
 
     A página de retorno é servida por um servidor local efêmero em
     ``127.0.0.1``; nada é gravado em disco e o código de autorização morre
-    depois da troca pelo token.
+    depois da troca pelo token. ``login_hint`` leva o e-mail da conta escolhida
+    no app para o Google pré-selecionar a mesma conta no navegador.
     """
     client = client or load_client()
     server = _PickerServer()
@@ -74,6 +76,8 @@ def pick_files(
     }
     if multiple:
         extra["allow_multiple"] = "true"
+    if login_hint:
+        extra["login_hint"] = login_hint
     url, state = flow.authorization_url(**extra)
 
     if open_browser:
