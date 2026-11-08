@@ -64,6 +64,12 @@ a lista permite remover cada um. A vinculação é a exceção: tem quatro entra
 rotuladas (AGENDA, PROCESSOS, FINANCEIRO e CLIENTES), uma planilha em cada, sem
 lista acumulada e sem seletor de abas — a aba é achada pelo bloco padrão.
 
+Com uma conta do Drive conectada, um botão quadrado com o ícone do Drive aparece
+à direita da dropzone, na mesma linha e sem texto. Uma conta abre o Picker
+direto; duas ou mais abrem um diálogo para escolher qual. O arquivo escolhido é
+baixado para o cache local com o nome real e entra na lista como qualquer
+arquivo do computador.
+
 Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
 extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:
 .xls`). Se nem o conteúdo nem a extensão apontarem para um formato suportado, a

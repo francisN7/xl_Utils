@@ -19,8 +19,8 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S9a4 | Segredo do cliente OAuth protegido por DPAPI | [x] |
 | S9a5 | Login com escopo de e-mail canônico | [x] |
 | S9a6 | Janela abre na tela primária | [x] |
-| S9b | Drive II — link/seletor e escrita do resultado | [ ] |
-| S9c | Drive III — exportação nas demais e acabamento | [ ] |
+| S9b | Drive II — Picker, leitura e botão na entrada | [x] |
+| S9c | Drive III — gravação na pasta, exportação e acabamento | [ ] |
 
 Ordem definida pelo dono: **vinculação → tela cheia → Drive**. O Drive fica por
 último porque muda o caminho de saída de todas as ferramentas; a S9 só vira
@@ -86,9 +86,9 @@ gravação atômica. Menu hamburger e cartão do Drive no hub (substituídos na
 S9a2 pelo menu de perfis no canto superior direito); o login roda fora da UI
 thread. Ver a [spec](../sessions/S9a-drive-autenticacao.md) e o ADR 0018.
 
-Achado para a S9b: `drive.file` não lê planilha antiga por link colado — só
-arquivo criado pelo app ou escolhido no Google Picker. A S9b começa decidindo
-entre Picker e escopo `drive` em modo Testing.
+Achado que abriu a S9b: `drive.file` não lê planilha antiga por link colado — só
+arquivo criado pelo app ou escolhido no Picker. A S9b resolveu pelo Picker de
+desktop, sem API key nem webview; ver a seção da S9b.
 
 ## S9a1 — entregue
 
@@ -144,6 +144,27 @@ reinstalado com as dependências do Google. A posição da janela é escolhida p
 usuário — o monitor secundário é intencional — e não é mais fixada. O Flet fica
 sem teto de versão; o lock, o `.venv` e o tool estão em 1.1.2, e a suíte passa
 nessa versão. Ver a [spec](../sessions/S9a6-atalho-global.md).
+
+## S9b — entregue
+
+O Drive deixou de ser só login: a planilha escolhida no Picker entra no mesmo
+pipeline dos arquivos locais. O Picker usado é o de **apps desktop** — OAuth com
+`trigger_onepick=true`, retorno em `127.0.0.1`, sem API key, JavaScript ou
+webview. Como essa requisição aceita só `drive.file`, a escolha faz uma segunda
+autorização curta, sem acesso offline, para não acumular refresh tokens; as
+contas da S9a continuam válidas.
+
+`shared/drive_pick.py` escuta uma única resposta, confere `state` e PKCE e
+devolve os IDs (um ou vários). `shared/drive.py` lê metadados, baixa binários por
+`alt=media`, exporta planilha nativa por `files.export` e renova o token uma vez
+em 401, com mensagens em PT-BR. O download vira uma cópia temporária com o nome
+real em `%LOCALAPPDATA%/xl_utils/drive/cache/`.
+
+Na entrada, o botão quadrado do Drive fica na mesma linha da dropzone enquanto
+houver conta: uma conta abre o Picker direto, duas ou mais perguntam qual. Ler
+da pasta de origem e gravar de volta ficou para a S9c, porque `drive.file`
+concede arquivo por arquivo. Ver a [spec](../sessions/S9b-drive-planilha.md) e o
+adendo ao ADR 0018.
 
 ## Auditoria pública — entregue
 

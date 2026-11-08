@@ -1,77 +1,61 @@
-# S9b — Drive II: link, seletor e escrita do resultado
+# S9b — Drive II: Picker, leitura e botão na entrada
 
 ## Objetivo
 
-Ler uma planilha do Drive escolhida pelo usuário e gravar o resultado de volta
-no Drive, sem passar pelo `output/` local.
+Ler uma planilha escolhida no Drive e entregá-la ao mesmo pipeline dos arquivos
+locais, sem tocar em `output/`.
 
-## Fora de escopo
+## Decisão tomada
 
-- Exportar nas demais ferramentas e acabamento (S9c).
-- Mudar o fluxo local de `output/`.
-- Reautenticação silenciosa em segundo plano.
+Opção **(a) Google Picker**, mas pelo fluxo **desktop** documentado pelo Google:
+uma autorização OAuth com `trigger_onepick=true` e retorno no loopback
+`127.0.0.1`. Não há API key, JavaScript nem webview — o Flet 1.1.2 também não
+tem `WebView`.
 
-## Decisão que abre a sessão
+A requisição do Picker aceita só `drive.file`, então a escolha faz uma segunda
+autorização curta, **sem** `access_type=offline` (para não acumular refresh
+tokens que invalidam o login salvo). A concessão é por arquivo e por cliente; o
+token da conta passa a enxergar o arquivo escolhido.
 
-O ADR 0018 fixou `drive.file`, que só enxerga arquivo **criado pelo app ou
-escolhido no Google Picker** — link colado não basta. Antes do código, escolher:
+Pré-requisito no Cloud Console: **Google Picker API** ativa no mesmo projeto da
+Drive API. Nenhum cliente novo, nenhuma API key, contas salvas intactas.
 
-- **(a) Google Picker:** fiel ao escopo mínimo, mas exige API key, JS e uma
-  webview no Flet; peça nova só para escolher arquivo.
-- **(b) Escopo `drive` em modo Testing:** o dono entra como *test user*, sem
-  verificação; consentimento mais amplo e contas atuais precisam ser refeitas.
-- **(c) Híbrido:** `drive.file` para o que o app criou e link só para esses
-  arquivos; não cobre planilha antiga do usuário.
+## Entregue
 
-Recomendação: **(b)** enquanto o app é pessoal, com adendo no ADR 0018 dizendo
-o que muda ao publicar para terceiros.
-
-## Tarefas
-
-1. Adendo ao ADR 0018 com a decisão de acesso e o efeito nas contas já salvas.
-2. `shared/drive.py`: cliente REST com `requests` para baixar, exportar planilha
-   nativa (`files.export`, mime de `.xlsx`), listar quando o escopo permitir,
-   criar e atualizar (`files.create`/`files.update` multipart). Tratar 401,
-   403, 404 e quota com mensagem em PT-BR.
-3. Montar `Credentials` a partir da conta ativa (refresh token do store + client
-   config) e renovar fora da UI thread; token expirado renova uma vez.
-4. UI: no seletor de entrada da ferramenta, “Abrir do Drive” (link e/ou
-   seletor); no painel de resultado, “Salvar no Drive” só quando houver prévia.
-5. Pipeline: os bytes baixados viram arquivo temporário com o nome real e
-   entram no `all_str`; a saída gerada é enviada ao Drive sem criar nada em
-   `output/`.
-6. Testes offline com transporte falso: download, export, upload, refresh em
-   401 e erros legíveis. Nenhum teste faz rede.
-7. Fechar com lint, testes, docs e commit.
+- Adendo ao ADR 0018 com o fluxo, o escopo único e a ausência de offline.
+- `shared/drive_pick.py`: loopback efêmero, `state` e PKCE conferidos, retorno
+  com `picked_file_ids` (um ou vários), cancelamento silencioso e timeout.
+- `shared/drive.py`: metadados, download por `alt=media`, exportação de planilha
+  nativa por `files.export`, refresh único em 401 e erros em PT-BR (403, 404,
+  cota, exportação acima de 10 MB e Google ocupado).
+- `shared/drive_cache.py`: cópia temporária com nome real em
+  `%LOCALAPPDATA%/xl_utils/drive/cache/<sessão>/`, limpa na abertura do app.
+- `ui/drive.py`: `open_from_drive`, com o Picker e o download fora da UI thread.
+- `FileInput`: botão quadrado do Drive na mesma linha da dropzone, só com conta;
+  uma conta abre direto, duas ou mais pedem qual; o arquivo fica ligado à conta
+  escolhida.
+- “Salvar em `output/`” recusa entrada do Drive e manda usar “Salvar” com
+  destino escolhido.
+- Script manual `scripts/check-drive-picker.py`.
 
 ## Aceite
 
-- [ ] Planilha do Drive lida pelo link ou seletor e processada como local.
-- [ ] Resultado salvo no Drive sem arquivo em `output/`.
-- [ ] Token expirado renova uma vez; 403/404 viram mensagem clara.
-- [ ] Testes offline verdes; ferramentas locais intactas.
+- [x] Planilha do Drive escolhida no Picker entra no pipeline como local.
+- [x] Planilha nativa do Google é exportada como `.xlsx`.
+- [x] Cancelar não vira erro; 403/404/cota viram mensagem clara.
+- [x] Token expirado renova uma vez; o token nunca aparece em mensagem.
+- [x] Testes offline verdes; ferramentas locais intactas.
+- [x] Botão aparece e some conforme as contas; múltiplas contas perguntam antes.
 
-## Orçamento de contexto (≤90 linhas)
+## Fica para a S9c
 
-Ler `AGENTS.md`, `CURRENT.md`, esta spec, o ADR 0018, `shared/drive_auth.py`,
-`shared/accounts.py`, `ui/drive.py` e as assinaturas de `core/io.py` e
-`core/save.py`. Não abrir as páginas das cinco ferramentas.
+Gravar o resultado no Drive, dentro da pasta de origem, com a concessão da pasta
+guardada por conta; “Salvar no Drive” no painel de resultado; exportação nas
+demais ferramentas.
 
-## Arquivos prováveis
+## Riscos que sobraram
 
-- `docs/adr/0018-drive-autenticacao.md` (adendo), `docs/adr/README.md`
-- `src/xl_utils/shared/drive.py`, `src/xl_utils/shared/accounts.py`
-- `src/xl_utils/ui/drive.py`, `ui/components/file_input.py`
-- `ui/components/result_panel.py`, `ui/components/tool_layout.py`
-- `tests/test_drive_api.py`, `CHANGELOG.md`
-
-## Riscos
-
-- Escopo restrito pede consentimento novo: contas salvas param de valer.
-- Planilha nativa do Google não é `.xlsx`; sem `files.export` a leitura falha.
-- Nome duplicado no Drive e upload grande: não sobrescrever sem intenção.
-- Refresh token revogado vira erro claro, nunca loop de login.
-
-## Próximo depois desta
-
-S9c — Drive III: exportação nas demais ferramentas e acabamento.
+- A pasta do arquivo escolhido **não** vem concedida: gravar nela exigirá uma
+  escolha de pasta do usuário (ver S9c).
+- O fluxo desktop do Picker é novo; o teste manual com conta real é o juiz.
+- Exportação de planilha nativa tem limite de 10 MB no Google.

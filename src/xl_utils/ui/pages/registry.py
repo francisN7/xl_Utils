@@ -10,6 +10,7 @@ from xl_utils.ui.components.tool_layout import (
     RunHandler,
     ToolLayout,
 )
+from xl_utils.ui.drive import DriveSession
 from xl_utils.ui.pages.all_str import run as run_all_str
 from xl_utils.ui.pages.cnj import run as run_cnj
 from xl_utils.ui.pages.cut import options as cut_options
@@ -28,7 +29,7 @@ class ToolPage:
     label: str
     icon: ft.IconData
     description: str
-    build: Callable[[], ft.Control]
+    build: Callable[[DriveSession | None], ft.Control]
 
 
 def _tool(
@@ -43,7 +44,7 @@ def _tool(
     default_all_sheets: bool = False,
     run_handler: RunHandler | None = None,
 ) -> ToolPage:
-    def build() -> ft.Control:
+    def build(drive: DriveSession | None = None) -> ft.Control:
         return ToolLayout(
             label,
             description,
@@ -52,6 +53,7 @@ def _tool(
             multiple_files=multiple_files,
             default_all_sheets=default_all_sheets,
             run_handler=run_handler,
+            drive=drive,
         ).control
 
     return ToolPage(

@@ -794,6 +794,7 @@ dependencies = [
     { name = "puremagic" },
     { name = "pyperclip" },
     { name = "python-calamine" },
+    { name = "requests" },
     { name = "xlsxwriter" },
 ]
 
@@ -815,6 +816,7 @@ requires-dist = [
     { name = "puremagic", specifier = ">=2.2.0" },
     { name = "pyperclip", specifier = ">=1.11.0" },
     { name = "python-calamine", specifier = ">=0.9.1" },
+    { name = "requests", specifier = ">=2.32" },
     { name = "xlsxwriter", specifier = ">=3.3.1" },
 ]
 

@@ -4,7 +4,7 @@ import contextlib
 
 import flet as ft
 
-from xl_utils.shared import settings
+from xl_utils.shared import drive_cache, settings
 from xl_utils.ui import theme
 from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.components.sidebar import Sidebar
@@ -18,6 +18,7 @@ from xl_utils.ui.theme import build_theme
 def main(page: ft.Page) -> None:
     """Monta a janela principal."""
     mode = theme.apply(settings.load_theme())
+    drive_cache.reset()
     drive = DriveSession()
     client_import = ClientImport(drive)
 
@@ -40,7 +41,9 @@ def main(page: ft.Page) -> None:
             content.content = home
         else:
             tool = TOOLS[index - 1]
-            content.content = pages.setdefault(tool.id, tool.build())
+            if tool.id not in pages:
+                pages[tool.id] = tool.build(drive)
+            content.content = pages[tool.id]
         content.update()
 
     def open_tool(tool_id: str) -> None:

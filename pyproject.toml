@@ -17,6 +17,7 @@ dependencies = [
     "puremagic>=2.2.0",
     "pyperclip>=1.11.0",
     "python-calamine>=0.9.1",
+    "requests>=2.32",
     "xlsxwriter>=3.3.1",
 ]
 

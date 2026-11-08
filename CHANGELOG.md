@@ -136,6 +136,14 @@ decisões nos ADRs.
 - Site público no GitHub Pages (S9a3): página inicial e política de privacidade
   para a publicação do app OAuth no Google Auth Platform; os documentos
   internos ficam fora do site.
+- Drive II (S9b): abrir planilha do Drive pelo Picker de apps desktop (OAuth com
+  `trigger_onepick`, sem API key, JS ou webview) e processá-la como arquivo
+  local, com cópia temporária de nome real em `%LOCALAPPDATA%`.
+- Cliente REST da Drive API v3 com metadados, download, exportação de planilha
+  nativa e renovação única do token; erros de permissão, cota e tamanho em
+  PT-BR. Testes offline com transporte falso.
+- Botão do Drive ao lado do seletor local, visível só com conta: uma abre direto
+  e duas ou mais pedem qual conta usar.
 
 ### Changed
 

@@ -68,7 +68,8 @@ Cloud — é ele que o Google usa para identificar o app. O xl_Utils não traz u
 cliente embutido (o repositório é público), então o **primeiro** login pede o
 arquivo uma única vez:
 
-1. No Google Cloud Console, crie um projeto e ative a **Google Drive API**.
+1. No Google Cloud Console, crie um projeto e ative a **Google Drive API** e a
+   **Google Picker API** — o seletor de arquivos do Drive usa as duas.
 2. Em **Credenciais**, crie um cliente **App para computador** e baixe o JSON.
    No consentimento, os escopos são `openid`,
    `https://www.googleapis.com/auth/userinfo.email` e
@@ -79,6 +80,11 @@ arquivo uma única vez:
 Depois disso o fluxo é sempre o mesmo: menu → **Entrar com Google** → navegador
 → pronto. Não há cartão nem item de configuração na tela; o pedido do arquivo
 só aparece se ainda não houver cliente.
+
+Ao abrir uma planilha do Drive, o app usa o **Picker de apps desktop**: uma
+segunda autorização, só com `drive.file` e sem acesso offline, abre o seletor no
+navegador e devolve o arquivo escolhido. Isso não muda o login nem as contas já
+salvas; sem a Picker API ativa, o Google recusa o seletor.
 
 O app valida o arquivo (tamanho, UTF-8, HTTPS, domínio do Google), guarda só os
 campos que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e não move nem
@@ -106,6 +112,13 @@ uv run python scripts/check-drive-login.py
 
 O script imprime só e-mail, nome, escopos e a presença do refresh token; não
 grava conta nem mostra token. Depois disso, use o app para entrar de verdade.
+
+Para testar o Picker com uma conta real, o script abaixo baixa a planilha
+escolhida e imprime só nome, tipo e tamanho:
+
+```bash
+uv run python scripts/check-drive-picker.py
+```
 
 ## Verificações
 

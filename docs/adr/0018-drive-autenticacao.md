@@ -98,3 +98,39 @@ negado, `state` de outra requisição, timeout e ausência de token na mensagem 
 erro. O consentimento real do Google é o único passo manual e é exercitado por
 `scripts/check-drive-login.py`, que imprime só e-mail, nome, escopos e a
 presença do refresh token.
+
+## Adendo — Picker do Drive sem webview (S9b)
+
+O Picker da S9b não usa a API JavaScript, API key nem webview. O Google oferece
+o **Picker para apps desktop**, que é uma autorização OAuth comum: a URL de
+consentimento leva `trigger_onepick=true`, `prompt=consent` e
+`access_type=online`, e o retorno chega no mesmo loopback `127.0.0.1:porta` com
+`picked_file_ids` e `code`.
+
+Essa requisição aceita **só** `https://www.googleapis.com/auth/drive.file` — a
+documentação do Picker não permite combiná-lo com `openid` ou `userinfo.email`.
+Por isso o login da S9a continua como está e a escolha do arquivo faz uma
+segunda autorização curta, que:
+
+- **não** pede `access_type=offline`: cada escolha geraria um refresh token
+  novo, e o Google invalida os mais antigos quando o cliente acumula tokens;
+- serve apenas para baixar o arquivo recém-escolhido, com o token de acesso
+  devolvido na hora;
+- confere `state` e PKCE como o login.
+
+A concessão é por arquivo e por cliente: o token da conta passa a enxergar o
+arquivo escolhido sem mudar escopo nenhum, e as contas salvas continuam
+válidas. No Cloud Console isso exige a **Google Picker API** ativa no mesmo
+projeto; a Drive API já era necessária. Nada de cliente novo, API key ou
+reconsentimento.
+
+`picked_file_ids` pode trazer vários IDs (`allow_multiple=true`), o que a
+mesclagem usa. Planilha nativa do Google é exportada por `files.export` com o
+MIME de `.xlsx`; os demais formatos vêm por `alt=media`. O download vira um
+arquivo temporário em `%LOCALAPPDATA%/xl_utils/drive/cache/<sessão>/` com o nome
+real, e entra no pipeline normal — nada é gravado ao lado da origem do usuário.
+
+Gravar de volta na pasta de origem fica para a S9c: `drive.file` concede arquivo
+por arquivo, e a pasta do arquivo escolhido não vem junto. Será preciso o
+usuário conceder a pasta uma vez (`allow_folder_selection=true`) e guardar essa
+concessão por conta, ou aceitar a raiz do Meu Drive.

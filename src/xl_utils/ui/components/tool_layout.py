@@ -19,6 +19,7 @@ from xl_utils.core.tools.link import (
     InvalidCnjError,
     MissingColumnsError,
 )
+from xl_utils.shared import drive_cache
 from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.shared.progress import (
     CancelToken,
@@ -30,6 +31,7 @@ from xl_utils.ui import theme
 from xl_utils.ui.components.file_input import FileInput
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.components.sheet_selector import SheetSelector
+from xl_utils.ui.drive import DriveSession
 from xl_utils.ui.state import ToolState
 
 RunHandler = Callable[
@@ -104,6 +106,7 @@ class ToolLayout:
         hint: Hint | None = None,
         pre_run: PreRun | None = None,
         run_handler: RunHandler | None = None,
+        drive: DriveSession | None = None,
     ) -> None:
         self.state = ToolState()
         self._title = title
@@ -111,6 +114,7 @@ class ToolLayout:
         self._pre_run = pre_run
         self._ready_check = ready
         self._hint = hint
+        self._drive = drive
         self._default_all_sheets = default_all_sheets
         self._input_labels = tuple(inputs or ())
         self._pre_checking = False
@@ -123,12 +127,14 @@ class ToolLayout:
                 self._file_inputs[label] = FileInput(
                     lambda files, name=label: self._labeled_changed(name, files),
                     multiple=False,
+                    drive=drive,
                 )
             self.file_input = next(iter(self._file_inputs.values()))
         else:
             self.file_input = FileInput(
                 self._files_changed,
                 multiple=multiple_files,
+                drive=drive,
             )
         self.result = ResultPanel(
             on_save=self._save_clicked,
@@ -777,6 +783,14 @@ class ToolLayout:
         """Grava na pasta ``output/`` da origem sem abrir diálogo."""
         items = list(self.state.save_items)
         if not items:
+            return
+        if any(drive_cache.is_cached(path) for path in self.state.files):
+            self._save_failed(
+                SaveError(
+                    "Esta planilha veio do Drive. Use “Salvar” e escolha o "
+                    "destino — ela não tem pasta local de origem."
+                )
+            )
             return
         page = self._page()
         if page is None:

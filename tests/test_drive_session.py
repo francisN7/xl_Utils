@@ -5,7 +5,8 @@ from types import SimpleNamespace
 import flet as ft
 import pytest
 
-from xl_utils.shared import accounts
+from xl_utils.shared import accounts, drive_pick
+from xl_utils.shared.drive import DriveApiError, DriveFile
 from xl_utils.ui.components.top_menu import TopMenu
 from xl_utils.ui.drive import DriveSession
 
@@ -410,3 +411,154 @@ def test_menu_lists_profiles_and_actions(store: accounts.AccountStore) -> None:
     assert all("Configurar" not in str(content) for content in contents)
     checked = [item.content for item in menu.control.items if item.checked]
     assert checked == ["zeca@example.com"]
+
+
+class _FakeClient:
+    """Cliente da Drive API com conteudo fixo, sem rede."""
+
+    def __init__(self, *, fail: bool = False) -> None:
+        self.fail = fail
+        self.calls: list[str] = []
+
+    def metadata(self, file_id: str) -> DriveFile:
+        self.calls.append(file_id)
+        return DriveFile(
+            id=file_id,
+            name="AGENDA.xlsx",
+            mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
+    def payload(self, file: DriveFile) -> tuple[bytes, str]:
+        if self.fail:
+            raise DriveApiError("falha fictícia")
+        return b"conteudo", file.name
+
+
+def _drive_session(
+    store: accounts.AccountStore,
+    cache_root,
+    picked: drive_pick.PickedFiles,
+    *,
+    fail: bool = False,
+) -> tuple[DriveSession, _FakeClient, list[dict[str, object]]]:
+    calls: list[dict[str, object]] = []
+
+    def picker(**kwargs: object) -> drive_pick.PickedFiles:
+        calls.append(kwargs)
+        return picked
+
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=True,
+        picker=picker,
+        cache_root=cache_root,
+    )
+    asyncio.run(session.connect())
+    client = _FakeClient(fail=fail)
+    session._client_for_pick = lambda token: client
+    return session, client, calls
+
+
+def test_open_from_drive_leaves_a_local_copy_with_the_real_name(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    session, client, calls = _drive_session(
+        store,
+        tmp_path,
+        drive_pick.PickedFiles(ids=("id-1",), access_token="curto"),
+    )
+
+    paths = asyncio.run(session.open_from_drive())
+
+    assert [path.name for path in paths] == ["AGENDA.xlsx"]
+    assert paths[0].read_bytes() == b"conteudo"
+    assert paths[0].parent.parent == tmp_path
+    assert client.calls == ["id-1"]
+    assert calls == [{"multiple": False}]
+    assert session.error is None
+
+
+def test_open_from_drive_asks_for_multiple_when_the_tool_accepts_it(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    session, _, calls = _drive_session(
+        store,
+        tmp_path,
+        drive_pick.PickedFiles(ids=("id-1",), access_token="curto"),
+    )
+
+    asyncio.run(session.open_from_drive(multiple=True))
+
+    assert calls == [{"multiple": True}]
+
+
+def test_cancelled_picker_is_silent(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    cache = tmp_path / "cache"
+    session, _, _ = _drive_session(store, cache, drive_pick.PickedFiles())
+
+    paths = asyncio.run(session.open_from_drive())
+
+    assert paths == []
+    assert session.error is None
+    assert not cache.exists()
+
+
+def test_download_failure_is_reported_and_cleans_the_cache(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    cache = tmp_path / "cache"
+    session, _, _ = _drive_session(
+        store,
+        cache,
+        drive_pick.PickedFiles(ids=("id-1",), access_token="curto"),
+        fail=True,
+    )
+
+    paths = asyncio.run(session.open_from_drive())
+
+    assert paths == []
+    assert session.error == "falha fictícia"
+    assert list(cache.iterdir()) == []
+
+
+def test_open_from_drive_without_an_account_explains(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    calls: list[object] = []
+    session = DriveSession(
+        store=store,
+        picker=lambda **kwargs: calls.append(kwargs),
+        configured=True,
+        cache_root=tmp_path,
+    )
+
+    paths = asyncio.run(session.open_from_drive())
+
+    assert paths == []
+    assert session.error == "Entre no Google Drive para abrir uma planilha de lá."
+    assert calls == []
+
+
+def test_open_from_drive_is_ignored_while_busy(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    session, _, calls = _drive_session(
+        store,
+        tmp_path,
+        drive_pick.PickedFiles(ids=("id-1",), access_token="curto"),
+    )
+    session.busy = True
+
+    paths = asyncio.run(session.open_from_drive())
+
+    assert paths == []
+    assert calls == []

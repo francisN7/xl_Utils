@@ -14,6 +14,7 @@ from xl_utils.core.tools.link import FinanceiroStats
 from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.components.tool_layout import ToolLayout
+from xl_utils.ui.drive import DriveSession
 from xl_utils.ui.pages.batch import append_outcomes
 from xl_utils.ui.state import ToolState
 
@@ -28,7 +29,7 @@ NOTE = (
 )
 
 
-def build() -> ft.Control:
+def build(drive: DriveSession | None = None) -> ft.Control:
     """Monta a página com quatro entradas e as opções de vinculação."""
 
     def make_options(state: ToolState) -> LinkOptions:
@@ -44,6 +45,7 @@ def build() -> ft.Control:
         hint=_hint,
         pre_run=_pre_run,
         run_handler=run,
+        drive=drive,
     )
     return layout.control
 

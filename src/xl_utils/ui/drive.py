@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import shutil
 from collections.abc import Callable
 from pathlib import Path
 
-from xl_utils.shared import accounts, drive_auth
+from xl_utils.shared import accounts, drive_auth, drive_cache, drive_pick
 from xl_utils.shared.accounts import Account, AccountStore
+from xl_utils.shared.drive import DriveClient, static_token, token_provider
 
 
 class DriveSession:
@@ -23,9 +25,15 @@ class DriveSession:
         authorize: Callable[[], Account] | None = None,
         *,
         configured: bool | None = None,
+        picker: Callable[..., drive_pick.PickedFiles] | None = None,
+        client_factory: Callable[[Account], DriveClient] | None = None,
+        cache_root: Path | None = None,
     ) -> None:
         self._store = store or AccountStore()
         self._authorize = authorize or drive_auth.authorize
+        self._picker = picker or drive_pick.pick_files
+        self._client_factory = client_factory or _client_for
+        self._cache_root = cache_root
         self._listeners: list[Callable[[], None]] = []
         self.accounts: list[Account] = []
         self.active: str | None = None
@@ -82,6 +90,66 @@ class DriveSession:
             self.reload()
             self.notify()
 
+    async def open_from_drive(
+        self,
+        account: Account | None = None,
+        *,
+        multiple: bool = False,
+    ) -> list[Path]:
+        """Escolhe planilhas no Drive e devolve cópias locais temporárias.
+
+        O Picker, o download e a gravação no cache rodam fora da UI thread. Um
+        cancelamento não é erro: devolve lista vazia e nenhuma mensagem.
+        """
+        if self.busy:
+            return []
+        target = account or self.active_account
+        if target is None:
+            self.error = "Entre no Google Drive para abrir uma planilha de lá."
+            self.notify()
+            return []
+        self.busy = True
+        self.error = None
+        self.notify()
+        try:
+            paths = await asyncio.to_thread(self._open_sync, target, multiple)
+        except (drive_auth.DriveError, accounts.AccountsError) as error:
+            self.error = str(error)
+            paths = []
+        except Exception:  # noqa: BLE001 - nunca vazar token ou traceback
+            self.error = "Falha inesperada ao abrir do Google Drive."
+            paths = []
+        finally:
+            self.busy = False
+            self.notify()
+        return paths
+
+    def _open_sync(self, account: Account, multiple: bool) -> list[Path]:
+        """Parte bloqueante de :meth:`open_from_drive`."""
+        selection = self._picker(multiple=multiple)
+        if selection.cancelled:
+            return []
+        client = (
+            self._client_for_pick(selection.access_token)
+            if selection.access_token
+            else self._client_factory(account)
+        )
+        directory = drive_cache.new_session(self._cache_root)
+        try:
+            paths: list[Path] = []
+            for file_id in selection.ids:
+                metadata = client.metadata(file_id)
+                data, name = client.payload(metadata)
+                paths.append(drive_cache.store(directory, name, data))
+        except Exception:
+            shutil.rmtree(directory, ignore_errors=True)
+            raise
+        return paths
+
+    def _client_for_pick(self, token: str) -> DriveClient:
+        """Cliente que usa o token curto devolvido pelo próprio Picker."""
+        return DriveClient(static_token(token))
+
     def import_client(self, path: Path) -> None:
         """Importa o JSON do cliente OAuth escolhido pelo usuário."""
         try:
@@ -121,3 +189,8 @@ class DriveSession:
         self.error = None
         self.reload()
         self.notify()
+
+
+def _client_for(account: Account) -> DriveClient:
+    """Monta o cliente da Drive API com o refresh token da conta."""
+    return DriveClient(token_provider(account, drive_auth.load_client()))

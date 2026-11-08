@@ -7,9 +7,13 @@ from pathlib import Path
 import flet as ft
 
 from xl_utils.core.mime import FormatCheck
+from xl_utils.shared.accounts import Account
 from xl_utils.ui import theme
+from xl_utils.ui.drive import DriveSession
 
 ALLOWED_EXTENSIONS = ["xlsx", "xlsm", "xls", "csv", "html", "htm"]
+DRIVE_BUTTON_SIZE = 104
+DRIVE_SPACING = 10
 
 
 class FileInput:
@@ -20,9 +24,11 @@ class FileInput:
         on_change: Callable[[list[Path]], None],
         *,
         multiple: bool = False,
+        drive: DriveSession | None = None,
     ) -> None:
         self._on_change = on_change
         self._multiple = multiple
+        self._drive = drive
         self._files: list[Path] = []
         self._formats: dict[Path, FormatCheck] = {}
         self._busy = False
@@ -63,13 +69,36 @@ class FileInput:
             padding=22,
             bgcolor=theme.BACKGROUND_DEEP,
             ink=True,
+            expand=True,
+        )
+
+        self._drive_button = ft.Container(
+            content=ft.Icon(ft.Icons.ADD_TO_DRIVE, size=30, color=theme.PURPLE),
+            width=DRIVE_BUTTON_SIZE,
+            height=DRIVE_BUTTON_SIZE,
+            border=ft.Border.all(1, theme.BORDER),
+            border_radius=12,
+            bgcolor=theme.BACKGROUND_DEEP,
+            alignment=ft.Alignment.CENTER,
+            ink=True,
+            tooltip="Abrir do Drive",
+            on_click=self._open_drive,
+            visible=bool(drive and drive.accounts),
+        )
+
+        self._entry_row = ft.Row(
+            controls=[self._dropzone, self._drive_button],
+            spacing=DRIVE_SPACING,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER,
         )
 
         self.control = ft.Column(
-            controls=[self._dropzone, self._file_rows, self._hint],
+            controls=[self._entry_row, self._file_rows, self._hint],
             spacing=10,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
         )
+        if drive is not None:
+            drive.subscribe(self._drive_changed)
 
     def _open_picker(self, _event=None) -> None:
         try:
@@ -92,6 +121,99 @@ class FileInput:
         if paths:
             self.set_files(paths)
 
+    def _page(self) -> ft.Page | None:
+        try:
+            page = self.control.page
+        except RuntimeError:
+            return None
+        if page is None or not hasattr(page, "run_task"):
+            return None
+        return page
+
+    def _open_drive(self, _event=None) -> None:
+        """Abre o seletor do Drive; com mais de uma conta, pergunta qual."""
+        page = self._page()
+        if page is None or self._drive is None or self._busy:
+            return
+        accounts = self._drive.accounts
+        if not accounts:
+            return
+        if len(accounts) == 1:
+            page.run_task(self._drive_open, accounts[0])
+            return
+        self._choose_account(page, accounts)
+
+    def _choose_account(self, page: ft.Page, accounts: Sequence[Account]) -> None:
+        def choose(account: Account) -> None:
+            page.pop_dialog()
+            page.run_task(self._drive_open, account)
+
+        dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Abrir do Drive"),
+            content=ft.Column(
+                controls=[
+                    ft.ListTile(
+                        leading=ft.CircleAvatar(
+                            content=ft.Text(_initials(account), size=13),
+                        ),
+                        title=ft.Text(account.email, size=theme.FONT_SM),
+                        subtitle=ft.Text(
+                            account.name or "Conta do Google",
+                            size=theme.FONT_XS,
+                        ),
+                        on_click=lambda _event, item=account: choose(item),
+                    )
+                    for account in accounts
+                ],
+                tight=True,
+                spacing=2,
+            ),
+            actions=[
+                ft.TextButton(
+                    "Cancelar",
+                    on_click=lambda _event: page.pop_dialog(),
+                )
+            ],
+        )
+        page.show_dialog(dialog)
+
+    async def _drive_open(self, account: Account) -> None:
+        """Baixa as planilhas escolhidas e entrega ao mesmo fluxo do local."""
+        if self._drive is None:
+            return
+        self._drive_button.disabled = True
+        self._render_drive()
+        try:
+            paths = await self._drive.open_from_drive(
+                account,
+                multiple=self._multiple,
+            )
+        finally:
+            self._drive_button.disabled = self._busy
+            self._render_drive()
+        if paths:
+            self.set_files(paths)
+        elif self._drive.error:
+            self._show_error(self._drive.error)
+
+    def _drive_changed(self) -> None:
+        """Reaparece ou some o botão quando contas entram ou saem."""
+        if self._drive is None:
+            return
+        self._drive_button.visible = bool(self._drive.accounts)
+        self._drive_button.disabled = self._busy or self._drive.busy
+        self._render_drive()
+
+    def _render_drive(self) -> None:
+        with contextlib.suppress(RuntimeError):
+            self._drive_button.update()
+
+    def _show_error(self, message: str) -> None:
+        self._hint.value = message
+        self._hint.color = theme.RED
+        self._refresh()
+
     def set_files(self, paths: list[Path]) -> None:
         if self._multiple:
             for path in paths:
@@ -110,6 +232,9 @@ class FileInput:
     def set_busy(self, busy: bool) -> None:
         """Bloqueia a troca de arquivos enquanto uma execução está em andamento."""
         self._busy = busy
+        self._drive_button.disabled = busy or bool(
+            self._drive is not None and self._drive.busy
+        )
         self._render()
 
     def _remove(self, path: Path) -> None:
@@ -119,6 +244,7 @@ class FileInput:
 
     def _render(self) -> None:
         self._file_rows.controls = [self._file_row(path) for path in self._files]
+        self._hint.color = theme.MUTED
         if self._files:
             self._hint.value = f"{len(self._files)} arquivo(s) selecionado(s)."
             self._dropzone_text.value = (
@@ -131,7 +257,6 @@ class FileInput:
                 if self._multiple
                 else "Clique para selecionar a planilha"
             )
-        self._dropzone.visible = self._multiple or not self._files
         self._dropzone.disabled = self._busy
         self._refresh()
 
@@ -208,6 +333,12 @@ class FileInput:
     def _refresh(self) -> None:
         with contextlib.suppress(RuntimeError):
             self.control.update()
+
+
+def _initials(account: Account) -> str:
+    source = account.name or account.email
+    parts = [part for part in source.replace("@", " ").split() if part]
+    return "".join(part[0].upper() for part in parts[:2]) or "G"
 
 
 def _format_size(size: int) -> str:

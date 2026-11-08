@@ -275,6 +275,16 @@ DPAPI e escrita atômica; o e-mail ativo fica em `drive/active.json`. `ui/drive.
 é o estado compartilhado pelo menu de perfis no canto superior direito, e o
 login roda fora da thread da UI (ADR 0018).
 
+A leitura de planilhas usa três peças. `shared/drive_pick.py` faz o Picker de
+apps desktop: uma autorização separada, só com `drive.file` e sem acesso
+offline, escuta um único redirecionamento em `127.0.0.1`, confere `state` e PKCE
+e devolve os `picked_file_ids`. `shared/drive.py` é o cliente REST (metadados,
+`alt=media`, `files.export` para planilha nativa, renovação única em 401), com
+transporte injetável para os testes. `shared/drive_cache.py` grava os bytes em
+`%LOCALAPPDATA%/xl_utils/drive/cache/<sessão>/` com o nome real, limpa a pasta
+na abertura do app e diz se um caminho veio do Drive — usado para recusar
+“Salvar em `output/`” sem pasta de origem.
+
 ## Recorte
 
 `core/tools/cut.py` divide cada aba de dois modos: blocos de N linhas
