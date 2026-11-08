@@ -8,10 +8,7 @@ from xl_utils.ui import theme
 from xl_utils.ui.pages.registry import TOOLS
 
 
-def build_home(
-    on_open: Callable[[str], None],
-    drive: ft.Control | None = None,
-) -> ft.Control:
+def build_home(on_open: Callable[[str], None]) -> ft.Control:
     """Monta o hub que leva a cada ferramenta."""
     cards = [
         ft.Container(
@@ -90,8 +87,6 @@ def build_home(
             spacing=4,
         )
     ]
-    if drive is not None:
-        sections.append(drive)
     sections.extend(
         [
             ft.ResponsiveRow(

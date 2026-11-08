@@ -35,8 +35,8 @@ o que muda ao publicar para terceiros.
    403, 404 e quota com mensagem em PT-BR.
 3. Montar `Credentials` a partir da conta ativa (refresh token do store + client
    config) e renovar fora da UI thread; token expirado renova uma vez.
-4. UI: no cartão do Drive, “Abrir do Drive” (link e/ou seletor); no painel de
-   resultado, “Salvar no Drive” só quando houver prévia.
+4. UI: no seletor de entrada da ferramenta, “Abrir do Drive” (link e/ou
+   seletor); no painel de resultado, “Salvar no Drive” só quando houver prévia.
 5. Pipeline: os bytes baixados viram arquivo temporário com o nome real e
    entram no `all_str`; a saída gerada é enviada ao Drive sem criar nada em
    `output/`.
@@ -61,7 +61,7 @@ Ler `AGENTS.md`, `CURRENT.md`, esta spec, o ADR 0018, `shared/drive_auth.py`,
 
 - `docs/adr/0018-drive-autenticacao.md` (adendo), `docs/adr/README.md`
 - `src/xl_utils/shared/drive.py`, `src/xl_utils/shared/accounts.py`
-- `src/xl_utils/ui/drive.py`, `ui/components/drive_status.py`
+- `src/xl_utils/ui/drive.py`, `ui/components/file_input.py`
 - `ui/components/result_panel.py`, `ui/components/tool_layout.py`
 - `tests/test_drive_api.py`, `CHANGELOG.md`
 

@@ -20,12 +20,10 @@ class Sidebar:
         selected: int = 0,
         theme_mode: str = "dark",
         on_theme_change: Callable[[str], None] | None = None,
-        menu: ft.Control | None = None,
     ) -> None:
         self._on_select = on_select
         self._theme_mode = theme_mode
         self._on_theme_change = on_theme_change
-        self._menu = menu
         self._items: list[tuple[ft.Container, ft.Icon, ft.Text]] = []
 
         navigation = ft.Column(
@@ -137,8 +135,6 @@ class Sidebar:
             ),
             title,
         ]
-        if self._menu is not None:
-            controls.append(self._menu)
         return ft.Container(
             content=ft.Row(
                 controls=controls,

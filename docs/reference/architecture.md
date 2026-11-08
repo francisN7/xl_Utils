@@ -272,8 +272,8 @@ grava só os campos usados, de forma atômica; `is_configured` diz se há client
 válido. `shared/accounts.py` grava uma conta por e-mail em
 `%LOCALAPPDATA%/xl_utils/drive/accounts/`, com o `refresh_token` cifrado por
 DPAPI e escrita atômica; o e-mail ativo fica em `drive/active.json`. `ui/drive.py`
-é o estado compartilhado entre o menu do topo e o cartão do hub, e o login roda
-fora da thread da UI (ADR 0018).
+é o estado compartilhado pelo menu de perfis no canto superior direito, e o
+login roda fora da thread da UI (ADR 0018).
 
 ## Recorte
 

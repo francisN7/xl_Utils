@@ -63,17 +63,23 @@ diff e valide com lint, testes e check de docs antes de commitar.
 
 ## Google Drive (opcional)
 
-O Drive usa um cliente OAuth próprio, criado uma vez:
+Todo app com “Entrar com Google” tem um cliente OAuth registrado no Google
+Cloud — é ele que o Google usa para identificar o app. O xl_Utils não traz um
+cliente embutido (o repositório é público), então o **primeiro** login pede o
+arquivo uma única vez:
 
 1. No Google Cloud Console, crie um projeto e ative a **Google Drive API**.
 2. Em **Credenciais**, crie um cliente **App para computador** e baixe o JSON.
-3. Importe o JSON baixado — não é preciso editar nada à mão:
-   - no app, menu hamburger da sidebar → **Configurar cliente OAuth…**; ou
-   - pelo terminal: `uv run python scripts/check-drive-login.py --import-file <json>`.
+3. No app, clique no menu hamburger do canto superior direito → **Entrar com
+   Google** e selecione o JSON baixado.
 
-O app valida o arquivo (tamanho, HTTPS, domínio do Google), guarda só os campos
-que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e nunca copia o JSON
-original. As contas ficam em `%LOCALAPPDATA%/xl_utils/drive/`, com o
+Depois disso o fluxo é sempre o mesmo: menu → **Entrar com Google** → navegador
+→ pronto. Não há cartão nem item de configuração na tela; o pedido do arquivo
+só aparece se ainda não houver cliente.
+
+O app valida o arquivo (tamanho, UTF-8, HTTPS, domínio do Google), guarda só os
+campos que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e nunca copia o
+JSON original. As contas ficam em `%LOCALAPPDATA%/xl_utils/drive/`, com o
 `refresh_token` protegido por DPAPI. O repositório é público: nunca faça commit
 do JSON do cliente — o `.gitignore` cobre os nomes usuais, mas o caminho certo é
 o `%LOCALAPPDATA%`.
@@ -116,6 +122,6 @@ node scripts/check-docs.mjs
 - **Check de docs quebrado:** o alvo do link provavelmente foi movido; corrija o
   caminho relativo ou remova o link morto.
 - **Login do Drive falha:** rode `uv run python scripts/check-drive-login.py`
-  para ver a mensagem sem a UI. Se o cliente não estiver configurado, o app
-  oferece **Configurar cliente OAuth…** no menu; o JSON precisa ser do tipo
-  “App para computador”.
+  para ver a mensagem sem a UI. Se o cliente não estiver configurado, o menu
+  **Entrar com Google** pede o JSON baixado do Google Cloud uma única vez; ele
+  precisa ser do tipo “App para computador”.

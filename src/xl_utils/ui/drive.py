@@ -44,19 +44,6 @@ class DriveSession:
                 return account
         return None
 
-    @property
-    def status(self) -> str:
-        """Resume o estado do Drive para a tela inicial."""
-        if self.busy:
-            return "Conectando ao Google Drive…"
-        if not self.configured:
-            return "Drive: cliente OAuth não configurado"
-        if self.active:
-            return f"Drive: {self.active}"
-        if self.accounts:
-            return "Drive: escolha uma conta"
-        return "Drive: nenhuma conta conectada"
-
     def subscribe(self, listener: Callable[[], None]) -> None:
         """Registra um redesenho para quando o estado mudar."""
         self._listeners.append(listener)

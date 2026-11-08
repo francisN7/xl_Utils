@@ -211,7 +211,7 @@ class ToolLayout:
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
-            padding=ft.Padding.only(bottom=16),
+            padding=ft.Padding.only(bottom=16, right=64),
         )
 
         if self._input_labels:

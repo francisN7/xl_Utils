@@ -72,14 +72,15 @@ público por definição.
 
 ## Adendo — importação do cliente e teste do login (S9a1)
 
-O dono não deve editar JSON à mão. O app importa o arquivo baixado do Google
-Cloud Console pelo seletor nativo (menu ou cartão do hub) e valida antes de
-gravar: no máximo 64 KB, UTF-8, objeto JSON, `client_id` no alfabeto do Google,
-`auth_uri`/`token_uri` em HTTPS e em `google.com`/`googleapis.com`. Só os campos
-usados são copiados para `%LOCALAPPDATA%/xl_utils/drive_client.json`, de forma
-atômica; campos desconhecidos do arquivo original são descartados. O JSON
-empacotado continua vazio e um teste garante que ninguém commite credencial
-real.
+O dono não deve editar JSON à mão. No primeiro clique em **Entrar com Google**,
+quando ainda não há cliente, o app abre o seletor nativo e importa o arquivo
+baixado do Google Cloud Console; depois disso o login é só clicar → navegador.
+A validação ocorre antes de gravar: no máximo 64 KB, UTF-8, objeto JSON,
+`client_id` no alfabeto do Google, `auth_uri`/`token_uri` em HTTPS e em
+`google.com`/`googleapis.com`. Só os campos usados são copiados para
+`%LOCALAPPDATA%/xl_utils/drive_client.json`, de forma atômica; campos
+desconhecidos do arquivo original são descartados. O JSON empacotado continua
+vazio e um teste garante que ninguém commite credencial real.
 
 O `client_secret` fica em texto no perfil do usuário — para app desktop ele não
 é confidencial —, mas o `refresh_token` continua cifrado por DPAPI. A única

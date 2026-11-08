@@ -7,7 +7,6 @@ import flet as ft
 from xl_utils.shared import settings
 from xl_utils.ui import theme
 from xl_utils.ui.components.client_import import ClientImport
-from xl_utils.ui.components.drive_status import DriveStatus
 from xl_utils.ui.components.sidebar import Sidebar
 from xl_utils.ui.components.top_menu import TopMenu
 from xl_utils.ui.drive import DriveSession
@@ -66,6 +65,7 @@ def main(page: ft.Page) -> None:
         page.bgcolor = theme.BACKGROUND
         page.theme_mode = ft.ThemeMode.LIGHT if mode == "light" else ft.ThemeMode.DARK
         theme.restyle(sidebar.control, mapping)
+        theme.restyle(menu_overlay, mapping)
         theme.restyle(home, mapping)
         for view in pages.values():
             theme.restyle(view, mapping)
@@ -76,15 +76,18 @@ def main(page: ft.Page) -> None:
         handle_select,
         theme_mode=mode,
         on_theme_change=change_theme,
-        menu=TopMenu(drive, importer=client_import).control,
     )
-    home = build_home(
-        open_tool,
-        drive=DriveStatus(drive, importer=client_import).control,
+    home = build_home(open_tool)
+    top_menu = TopMenu(drive, importer=client_import)
+    menu_overlay = ft.Container(
+        content=top_menu.control,
+        right=16,
+        top=18,
     )
+    body = ft.Stack(controls=[content, menu_overlay], expand=True)
 
     shell = ft.Row(
-        controls=[sidebar.control, content],
+        controls=[sidebar.control, body],
         expand=True,
         vertical_alignment=ft.CrossAxisAlignment.STRETCH,
     )

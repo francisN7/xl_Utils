@@ -6,7 +6,6 @@ import flet as ft
 import pytest
 
 from xl_utils.shared import accounts
-from xl_utils.ui.components.drive_status import DriveStatus
 from xl_utils.ui.components.top_menu import TopMenu
 from xl_utils.ui.drive import DriveSession
 
@@ -145,19 +144,6 @@ def test_configuration_error_reaches_the_user(store: accounts.AccountStore) -> N
     assert session.error == "falta o client_id"
 
 
-def test_status_describes_each_state(store: accounts.AccountStore) -> None:
-    session = DriveSession(
-        store=store,
-        authorize=lambda: _account("ana@example.com"),
-        configured=True,
-    )
-    assert session.status == "Drive: nenhuma conta conectada"
-
-    asyncio.run(session.connect())
-
-    assert session.status == "Drive: ana@example.com"
-
-
 def test_listeners_are_notified_on_change(store: accounts.AccountStore) -> None:
     session = _session(store, "ana@example.com")
     calls: list[int] = []
@@ -181,7 +167,7 @@ def test_menu_offers_login_when_there_is_no_account(
 
     items = menu.control.items
 
-    assert [item.content for item in items] == ["Entrar no Google Drive"]
+    assert [item.content for item in items] == ["Entrar com Google"]
 
 
 def test_menu_lists_accounts_and_checks_the_active_one(
@@ -207,36 +193,6 @@ def test_menu_switches_the_account(store: accounts.AccountStore) -> None:
     )
 
     target.on_click(None)
-
-    assert session.active == "ana@example.com"
-
-
-def test_status_card_shows_the_active_account(
-    store: accounts.AccountStore,
-) -> None:
-    session = _session(store, "ana@example.com")
-    card = DriveStatus(session)
-    assert card._title.value == "Drive: nenhuma conta conectada"
-
-    asyncio.run(session.connect())
-
-    assert card._title.value == "Drive: ana@example.com"
-    assert card._logout.visible is True
-    assert card._switch.visible is False
-    assert isinstance(card.control, ft.Container)
-
-
-def test_status_card_offers_the_switch_with_two_accounts(
-    store: accounts.AccountStore,
-) -> None:
-    asyncio.run(_session(store, "ana@example.com").connect())
-    session = _session(store, "zeca@example.com")
-    asyncio.run(session.connect())
-    card = DriveStatus(session)
-
-    assert card._switch.visible is True
-
-    card._switch_clicked()
 
     assert session.active == "ana@example.com"
 
@@ -272,7 +228,7 @@ class _FakePage:
         return None
 
 
-def test_app_shell_carries_the_drive_menu_and_card(
+def test_app_shell_puts_the_drive_menu_at_the_top_right(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path,
 ) -> None:
@@ -288,20 +244,29 @@ def test_app_shell_carries_the_drive_menu_and_card(
 
     shell = page.added[0]
     sidebar = shell.controls[0]
-    content = shell.controls[1]
-    assert any(
-        isinstance(item, ft.PopupMenuButton)
-        for item in sidebar.content.controls[0].content.controls
+    body = shell.controls[1]
+    menu = body.controls[1]
+    home = body.controls[0]
+
+    assert isinstance(body, ft.Stack)
+    assert menu.right == 16
+    assert menu.top == 18
+    assert isinstance(menu.content, ft.PopupMenuButton)
+    logo = sidebar.content.controls[0]
+    assert not any(
+        isinstance(control, ft.PopupMenuButton) for control in logo.content.controls
     )
-    assert "Drive: cliente OAuth não configurado" in _texts(content)
+    assert not any("Drive:" in text for text in _texts(home))
 
 
 class _FakeImporter:
-    def __init__(self) -> None:
+    def __init__(self, *, ok: bool = True) -> None:
         self.pages: list[object] = []
+        self.ok = ok
 
-    async def pick(self, page) -> None:
+    async def pick(self, page) -> bool:
         self.pages.append(page)
+        return self.ok
 
 
 def test_missing_configuration_blocks_login(store: accounts.AccountStore) -> None:
@@ -318,7 +283,6 @@ def test_missing_configuration_blocks_login(store: accounts.AccountStore) -> Non
     assert session.error == "Configure o cliente OAuth do Drive antes de entrar."
     assert calls == []
     assert session.accounts == []
-    assert session.status == "Drive: cliente OAuth não configurado"
 
 
 def test_import_client_enables_login(
@@ -368,21 +332,59 @@ def test_import_client_reports_a_bad_file(
     assert "client_id" in session.error
 
 
-def test_status_card_offers_configuration(store: accounts.AccountStore) -> None:
+def test_first_login_imports_the_client_then_connects(
+    store: accounts.AccountStore,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    from xl_utils.shared import drive_auth
+
+    monkeypatch.setattr(
+        drive_auth, "client_path", lambda: tmp_path / "drive_client.json"
+    )
+    source = tmp_path / "client_secret_1.json"
+    source.write_text(
+        json.dumps({"installed": {"client_id": "abc.apps.googleusercontent.com"}}),
+        encoding="utf-8",
+    )
     session = DriveSession(
         store=store,
         authorize=lambda: _account("ana@example.com"),
         configured=False,
     )
-    card = DriveStatus(session, importer=_FakeImporter())
 
-    assert card._configure.visible is True
-    assert card._login.visible is False
-    assert card._logout.visible is False
-    assert "cliente OAuth" in card._title.value
+    class _Importer:
+        async def pick(self, _page) -> bool:
+            session.import_client(source)
+            return session.configured
+
+    menu = TopMenu(session, importer=_Importer())
+    asyncio.run(menu._login_with_client(object()))
+
+    assert session.active == "ana@example.com"
+    assert session.accounts[0].email == "ana@example.com"
 
 
-def test_menu_offers_configuration(store: accounts.AccountStore) -> None:
+def test_first_login_stops_when_the_picker_is_cancelled(
+    store: accounts.AccountStore,
+) -> None:
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=False,
+    )
+    menu = TopMenu(session, importer=_FakeImporter(ok=False))
+
+    asyncio.run(menu._login_with_client(object()))
+
+    assert session.active is None
+    assert session.accounts == []
+    assert session.error is None
+
+
+def test_menu_offers_only_login_when_unconfigured(
+    store: accounts.AccountStore,
+) -> None:
     session = DriveSession(
         store=store,
         authorize=lambda: _account("ana@example.com"),
@@ -390,18 +392,21 @@ def test_menu_offers_configuration(store: accounts.AccountStore) -> None:
     )
     menu = TopMenu(session, importer=_FakeImporter())
 
-    assert [item.content for item in menu.control.items] == [
-        "Configurar cliente OAuth…"
-    ]
+    assert [item.content for item in menu.control.items] == ["Entrar com Google"]
 
 
-def test_menu_keeps_configuration_after_login(
-    store: accounts.AccountStore,
-) -> None:
-    session = _session(store, "ana@example.com")
+def test_menu_lists_profiles_and_actions(store: accounts.AccountStore) -> None:
+    asyncio.run(_session(store, "ana@example.com").connect())
+    session = _session(store, "zeca@example.com")
     asyncio.run(session.connect())
     menu = TopMenu(session, importer=_FakeImporter())
 
-    assert [item.content for item in menu.control.items][-1] == (
-        "Configurar cliente OAuth…"
-    )
+    contents = [item.content for item in menu.control.items]
+
+    assert "ana@example.com" in contents
+    assert "zeca@example.com" in contents
+    assert "Adicionar conta" in contents
+    assert "Sair desta conta" in contents
+    assert all("Configurar" not in str(content) for content in contents)
+    checked = [item.content for item in menu.control.items if item.checked]
+    assert checked == ["zeca@example.com"]

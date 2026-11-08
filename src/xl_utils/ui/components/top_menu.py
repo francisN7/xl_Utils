@@ -1,4 +1,4 @@
-"""Menu hamburger do canto superior: contas do Google Drive."""
+"""Menu hamburger do canto superior direito: perfis do Google Drive."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from xl_utils.ui.drive import DriveSession
 
 
 class TopMenu:
-    """Botão hamburger que lista, troca e encerra as contas do Drive."""
+    """Botão hamburger que lista, troca e encerra os perfis do Drive."""
 
     def __init__(
         self,
@@ -26,14 +26,14 @@ class TopMenu:
             icon=ft.Icons.MENU,
             icon_color=theme.SUBTLE_TEXT,
             icon_size=20,
-            tooltip="Conta do Google Drive",
+            tooltip="Perfis do Google Drive",
             items=self._items(),
         )
         session.subscribe(self._refresh)
 
     @property
     def control(self) -> ft.Control:
-        """Devolve o botão para a sidebar montar no cabeçalho."""
+        """Devolve o botão para o cabeçalho da janela montar à direita."""
         return self._button
 
     def _items(self) -> list[ft.PopupMenuItem]:
@@ -65,22 +65,11 @@ class TopMenu:
                 )
             )
 
-        if not session.configured:
-            if self._importer is not None:
-                items.append(
-                    ft.PopupMenuItem(
-                        content="Configurar cliente OAuth…",
-                        icon=ft.Icons.SETTINGS,
-                        on_click=self._configure,
-                    )
-                )
-            return items
-
         if not session.accounts:
             items.append(
                 ft.PopupMenuItem(
-                    content="Entrar no Google Drive",
-                    icon=ft.Icons.LOGIN,
+                    content="Entrar com Google",
+                    icon=ft.Icons.ACCOUNT_CIRCLE,
                     on_click=self._login,
                 )
             )
@@ -89,7 +78,7 @@ class TopMenu:
         items.append(
             ft.PopupMenuItem(
                 content=ft.Text(
-                    "Conta do Drive",
+                    "Perfis do Google Drive",
                     size=theme.FONT_XS,
                     color=theme.MUTED,
                 ),
@@ -99,6 +88,7 @@ class TopMenu:
         items.extend(
             ft.PopupMenuItem(
                 content=account.email,
+                icon=ft.Icons.ACCOUNT_CIRCLE,
                 checked=account.email == session.active,
                 on_click=lambda _event, email=account.email: self._switch(email),
             )
@@ -106,7 +96,7 @@ class TopMenu:
         )
         items.append(
             ft.PopupMenuItem(
-                content="Adicionar outra conta",
+                content="Adicionar conta",
                 icon=ft.Icons.PERSON_ADD,
                 on_click=self._login,
             )
@@ -114,40 +104,37 @@ class TopMenu:
         if session.active:
             items.append(
                 ft.PopupMenuItem(
-                    content="Sair da conta ativa",
+                    content="Sair desta conta",
                     icon=ft.Icons.LOGOUT,
                     on_click=self._logout,
                 )
             )
-        if self._importer is not None:
-            items.append(
-                ft.PopupMenuItem(
-                    content="Configurar cliente OAuth…",
-                    icon=ft.Icons.SETTINGS,
-                    on_click=self._configure,
-                )
-            )
         return items
 
-    def _login(self, _event: object = None) -> None:
+    def _page(self) -> ft.Page | None:
         try:
             page = self._button.page
         except RuntimeError:
-            return
+            return None
         if page is None or not hasattr(page, "run_task"):
+            return None
+        return page
+
+    def _login(self, _event: object = None) -> None:
+        page = self._page()
+        if page is None:
+            return
+        if not self._session.configured and self._importer is not None:
+            page.run_task(self._login_with_client, page)
             return
         page.run_task(self._session.connect)
 
-    def _configure(self, _event: object = None) -> None:
+    async def _login_with_client(self, page: ft.Page) -> None:
+        """Pede o cliente uma única vez e, se importado, abre o navegador."""
         if self._importer is None:
             return
-        try:
-            page = self._button.page
-        except RuntimeError:
-            return
-        if page is None or not hasattr(page, "run_task"):
-            return
-        page.run_task(self._importer.pick, page)
+        if await self._importer.pick(page):
+            await self._session.connect()
 
     def _switch(self, email: str) -> None:
         self._session.switch(email)

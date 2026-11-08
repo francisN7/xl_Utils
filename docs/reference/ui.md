@@ -8,7 +8,9 @@ responde:** regras de negócio (ver `architecture.md`) nem o porquê (ver
 
 Sidebar fixa de 260 px + área de conteúdo. A sidebar é um `Column` próprio, não
 um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
-forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas.
+forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas. No
+canto superior direito da área de conteúdo fica o menu hamburger dos perfis do
+Google Drive — fora da sidebar, para não competir com a navegação.
 O conteúdo abre em uma das duas formas:
 
 - **Início:** hub com cartões das ferramentas.
@@ -35,16 +37,16 @@ O conteúdo abre em uma das duas formas:
 - Trocar de ferramenta **mantém** o estado dela (arquivo, opções e resultado).
 - Trocar o arquivo **reseta o resultado**; o valor das opções permanece.
 - A página inicial é o hub; o item “Início” volta para ele.
-- O menu hamburger no cabeçalho da sidebar abre as contas do Google Drive:
-  entrar, marcar a ativa e sair. Ele não interfere na navegação das ferramentas.
+- O menu hamburger no canto superior direito abre os perfis do Google Drive:
+  entrar, marcar a ativa, adicionar outra conta e sair. Ele não interfere na
+  navegação das ferramentas.
 
 ## Componentes
 
 | Componente | Responsabilidade |
 |---|---|
 | `sidebar` | Logo, Início e as cinco ferramentas, com item ativo destacado. |
-| `top_menu` | Menu hamburger no cabeçalho da sidebar com as contas do Drive. |
-| `drive_status` | Cartão do hub com a conta ativa e as ações de entrar, trocar e sair. |
+| `top_menu` | Menu hamburger no canto superior direito com os perfis do Drive. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
 | `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
@@ -146,22 +148,22 @@ fluxo.
 
 ## Drive
 
-O menu hamburger do cabeçalho da sidebar e o cartão do hub compartilham o mesmo
-estado (`ui/drive.py`). Sem cliente OAuth configurado, o cartão mostra
-“Drive: cliente OAuth não configurado” e o botão **Configurar**; o menu oferece
-**Configurar cliente OAuth…**. Os dois abrem o seletor nativo e importam o JSON
-baixado do Google Cloud Console, sem edição manual.
+O hamburger no canto superior direito abre o menu de perfis (`ui/drive.py`).
+Não existe cartão do Drive no hub: entrar é uma ação do menu, como em qualquer
+app com “Entrar com Google”.
 
-Com o cliente configurado, os dois oferecem “Entrar no Google Drive”; com uma ou
-mais contas, listam os e-mails e marcam a ativa. “Entrar” abre o navegador
-padrão e a tela mostra “Conectando ao Google Drive…” até o retorno; a navegação
-continua livre. Se o usuário negar o acesso ou o navegador não responder em três
-minutos, o cartão mostra a mensagem e nada fica travado.
+- **Sem conta:** o menu mostra **Entrar com Google** com ícone de perfil. Se o
+  cliente OAuth ainda não estiver configurado, o primeiro clique pede o JSON
+  baixado do Google Cloud Console, uma única vez; feito isso, o navegador abre.
+- **Com uma ou mais contas:** o menu lista os e-mails com ícone de perfil e
+  marca a ativa. Clicar em outro e-mail troca a conta ativa; **Adicionar conta**
+  abre o navegador para outro perfil; **Sair desta conta** remove só a ativa.
+- **Durante o login:** o menu mostra “Conectando ao Google…”. Se o usuário
+  negar o acesso ou o navegador não responder em três minutos, a mensagem
+  aparece no próprio menu e nada fica travado.
 
-“Trocar de conta” no cartão passa para o próximo e-mail da lista; no menu, basta
-clicar no e-mail desejado. “Sair” remove só a conta ativa: as demais continuam
-guardadas e o menu volta a oferecer “Entrar no Google Drive”. O token nunca
-aparece na tela, no log ou no diagnóstico; os detalhes ficam no ADR 0018.
+O token nunca aparece na tela, no log ou no diagnóstico; os detalhes ficam no
+ADR 0018.
 
 ## Resultado e prévia
 

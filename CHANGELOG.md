@@ -123,13 +123,16 @@ decisões nos ADRs.
 - Entrada no Google Drive pelo navegador (S9a): cliente OAuth de app instalado
   com PKCE e `state`, redirecionamento em `127.0.0.1` com porta efêmera e
   timeout, contas por e-mail em `%LOCALAPPDATA%/xl_utils/drive/` com
-  `refresh_token` protegido por DPAPI, menu hamburger na sidebar e cartão de
-  estado no hub para entrar, trocar e sair. Ver ADR 0018.
+  `refresh_token` protegido por DPAPI. Ver ADR 0018.
 - Importação do cliente OAuth do Drive pelo seletor nativo (S9a1), sem edição
   manual de JSON: validação de tamanho, UTF-8, HTTPS e domínio do Google, com
   escrita atômica em `%LOCALAPPDATA%`. Teste offline de ponta a ponta com Google
   falso (PKCE e `state`) e `scripts/check-drive-login.py` para o consentimento
   real.
+- Menu de perfis do Drive no canto superior direito (S9a2): hamburger fora da
+  sidebar, ícone de perfil, conta ativa marcada, adicionar conta e sair. O
+  cartão do Drive saiu do hub; o primeiro **Entrar com Google** pede o JSON do
+  cliente uma única vez e depois abre o navegador direto.
 
 ### Changed
 

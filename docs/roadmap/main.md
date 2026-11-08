@@ -14,6 +14,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S8 | Alinhamento de colunas em tela cheia no merge | [x] |
 | S9a | Drive I — ADR, OAuth, contas e shell | [x] |
 | S9a1 | Drive I.1 — teste do login e importação do cliente | [x] |
+| S9a2 | Drive I.2 — menu de perfis no canto superior direito | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -67,8 +68,8 @@ e o ADR 0017.
 ## S9 — Google Drive
 
 Duas entradas: link da planilha ou seletor de arquivos do Drive. Login pelo
-navegador (OAuth), múltiplas contas e “sair” na tela inicial; menu hamburger
-num dos cantos superiores. S9a entrega só a autenticação; S9b, a transferência;
+navegador (OAuth), múltiplas contas e “sair” no menu de perfis, com hamburger
+no canto superior direito. S9a entrega só a autenticação; S9b, a transferência;
 S9c, a exportação nas demais ferramentas e o destino da saída.
 
 ## S9a — entregue
@@ -77,9 +78,9 @@ ADR 0018 aceito: `google-auth-oauthlib` com PKCE e `state` automáticos,
 `drive.file`, loopback em `127.0.0.1` com porta efêmera e timeout, cliente
 OAuth empacotado com override em `%LOCALAPPDATA%`, contas por e-mail em
 `%LOCALAPPDATA%/xl_utils/drive/` com `refresh_token` cifrado por DPAPI e
-gravação atômica. Menu hamburger no cabeçalho da sidebar e cartão do Drive no
-hub com entrar, trocar e sair; o login roda fora da UI thread. Ver a
-[spec](../sessions/S9a-drive-autenticacao.md) e o ADR 0018.
+gravação atômica. Menu hamburger e cartão do Drive no hub (substituídos na
+S9a2 pelo menu de perfis no canto superior direito); o login roda fora da UI
+thread. Ver a [spec](../sessions/S9a-drive-autenticacao.md) e o ADR 0018.
 
 Achado para a S9b: `drive.file` não lê planilha antiga por link colado — só
 arquivo criado pelo app ou escolhido no Google Picker. A S9b começa decidindo
@@ -88,13 +89,23 @@ entre Picker e escopo `drive` em modo Testing.
 ## S9a1 — entregue
 
 Fecha a pendência do login: o JSON do cliente OAuth entra pelo seletor nativo
-(menu ou cartão), é validado (64 KB, UTF-8, HTTPS em domínio do Google) e
-gravado de forma atômica em `%LOCALAPPDATA%`; o dono não edita arquivo. O fluxo
-de navegador ganhou teste offline de ponta a ponta com um Google falso em
-`127.0.0.1` que confere PKCE e `state`, além de acesso negado, `state` estranho
-e timeout. `scripts/check-drive-login.py` cobre o consentimento real sem
-imprimir token. O JSON empacotado continua vazio, com teste de guarda. Ver a
-[spec](../sessions/S9a1-login-e-cliente.md) e o adendo ao ADR 0018.
+no primeiro clique em **Entrar com Google**, é validado (64 KB, UTF-8, HTTPS em
+domínio do Google) e gravado de forma atômica em `%LOCALAPPDATA%`; o dono não
+edita arquivo. O fluxo de navegador ganhou teste offline de ponta a ponta com um
+Google falso em `127.0.0.1` que confere PKCE e `state`, além de acesso negado,
+`state` estranho e timeout. `scripts/check-drive-login.py` cobre o consentimento
+real sem imprimir token. O JSON empacotado continua vazio, com teste de guarda.
+Ver a [spec](../sessions/S9a1-login-e-cliente.md) e o adendo ao ADR 0018.
+
+## S9a2 — entregue
+
+Ajuste de produto pedido pelo dono: o login deixa de ser um cartão grande no
+hub e vira uma ação do menu. O hamburger foi para o canto superior direito da
+área de conteúdo, fora da sidebar; o menu lista os perfis com ícone de perfil,
+marca a conta ativa, permite adicionar outra e sair. Sem conta, mostra
+**Entrar com Google**; se o cliente OAuth ainda não existir, o primeiro clique
+pede o JSON uma única vez e segue para o navegador. O cartão `drive_status` foi
+removido. Ver a [spec](../sessions/S9a2-menu-de-perfis.md).
 
 ## Auditoria pública — entregue
 

@@ -57,14 +57,14 @@ editar o JSON do cliente OAuth à mão.
 ## Orçamento de contexto (≤90 linhas)
 
 Ler `AGENTS.md`, `CURRENT.md`, esta spec, o ADR 0018 e
-`shared/drive_auth.py`. Consultar `ui/drive.py`, `ui/components/drive_status.py`
+`shared/drive_auth.py`. Consultar `ui/drive.py`, `ui/components/top_menu.py`
 e `tests/test_drive_flow.py` só no que a importação tocar.
 
 ## Arquivos prováveis
 
 - `src/xl_utils/shared/drive_auth.py`, `src/xl_utils/ui/drive.py`
 - `src/xl_utils/ui/components/client_import.py`,
-  `ui/components/drive_status.py`, `ui/components/top_menu.py`
+  `ui/components/top_menu.py`
 - `tests/test_drive_flow.py`, `tests/test_drive_auth.py`,
   `tests/test_drive_session.py`
 - `scripts/check-drive-login.py`, `.gitignore`, `SECURITY.md`
