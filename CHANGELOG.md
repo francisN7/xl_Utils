@@ -192,6 +192,9 @@ decisões nos ADRs.
 - A janela abre em `80,60`, na tela primária; antes o Flutter podia
   posicioná-la em coordenadas negativas de um monitor à esquerda e parecia que
   o app não iniciava.
+- O atalho global `xl-utils` voltou a abrir: o ambiente do `uv tool` foi
+  reinstalado com as dependências do Google, e `flet[desktop]` ficou preso em
+  `>=1.0.5,<1.1`, a versão testada.
 
 ### Security
 

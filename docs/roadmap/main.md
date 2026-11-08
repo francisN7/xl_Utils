@@ -142,7 +142,9 @@ pedir o escopo canônico; o consentimento real foi validado com `refresh_token`,
 A janela podia abrir fora da tela, em coordenadas negativas de um monitor à
 esquerda, e parecia que o `xl-utils` não iniciava. `app.main` fixa
 `left = 80` e `top = 60`, que ficam na tela primária; o shell de teste confere
-os valores. Ver a [spec](../sessions/S9a6-janela-na-tela.md).
+os valores. O atalho global do `uv tool` também foi reinstalado (estava sem as
+dependências do Google) e o Flet ficou preso em 1.0.x, a versão testada. Ver a
+[spec](../sessions/S9a6-janela-na-tela.md).
 
 ## Auditoria pública — entregue
 

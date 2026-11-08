@@ -48,6 +48,20 @@ Ler `AGENTS.md`, `CURRENT.md`, esta spec e `app.py`.
   usuário pode redimensionar/mover, e o mínimo de 980×640 continua valendo.
 - A posição fixa ignora onde o usuário deixou a janela na sessão anterior.
 
+## Adendo — atalho global do `xl-utils`
+
+O comando `xl-utils` no PATH vinha de um `uv tool install --editable .` antigo.
+O ambiente isolado do tool não acompanha o `.venv`: depois do S9a, ele ficou sem
+`google-auth-oauthlib` e o app morria com `ModuleNotFoundError: No module named
+'google'` antes de abrir a janela. Reinstalar com `uv tool install --editable .
+--force` resolve. Para o dia a dia, `uv run xl-utils` usa o `.venv` e é o
+caminho recomendado.
+
+O `uv tool install` também resolveu Flet 1.1.2, que ignorou a posição
+`left/top` e abriu a janela fora da tela. O `pyproject.toml` passou a exigir
+`flet[desktop]>=1.0.5,<1.1`, mantendo o atalho na mesma versão testada do
+`.venv` (1.0.5).
+
 ## Próximo depois desta
 
 S9b — Drive II: link/seletor e escrita do resultado.

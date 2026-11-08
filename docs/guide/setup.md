@@ -120,6 +120,10 @@ node scripts/check-docs.mjs
 
 - **A janela não abre:** confirme `flet[desktop]` no `pyproject.toml`. Só
   `flet` instala o runtime web, não o cliente desktop.
+- **`xl-utils` digitado no terminal não faz nada:** o atalho global criado com
+  `uv tool install --editable .` tem um ambiente próprio. Depois de mudar
+  dependências, rode `uv tool install --editable . --force`; para o dia a dia,
+  `uv run xl-utils` usa o `.venv` atualizado do projeto.
 - **Python errado:** rode `uv python pin 3.15` e `uv sync` para recriar o
   `.venv`.
 - **Lock dessincronizado:** `uv sync --locked`; se falhar, `uv lock` e revise o
