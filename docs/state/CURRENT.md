@@ -25,7 +25,7 @@
 Ler `docs/sessions/S9c-drive-escrita.md`. A primeira decisão é como gravar na
 pasta de origem: `drive.file` concede arquivo por arquivo, então a pasta precisa
 ser escolhida uma vez (`allow_folder_selection=true`) ou o resultado cai na raiz
-do Meu Drive. O teste real do Picker é `scripts/check-drive-picker.py`.
+do Meu Drive. O Picker foi validado com conta real em 2026-11-08.
 
 ## Arquivos-chave
 
