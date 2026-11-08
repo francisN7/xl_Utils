@@ -162,6 +162,11 @@ recriado. O backlog de plugins entrou em seguida.
   manter título, descrição e atalho dentro do cartão, truncar ou ocultar a
   descrição com reticências quando faltar espaço e revisar o Início e as
   páginas de ferramenta em larguras estreitas. Prioridade fica com o dono.
+- **E-mail longo no menu de perfis** — sem sessão marcada. No menu hamburger, o
+  e-mail do perfil pode estourar o campo do item. Truncar com reticências
+  (`…`) quando não couber e mostrar o e-mail completo apenas em tooltip, com
+  atraso de hover (alguns segundos) para não abrir a cada passada do mouse.
+  Vale para o item de perfil e para qualquer outro ponto que exiba o e-mail.
 - **Sistema de plugins** — sem sessão marcada. Ferramentas opcionais deixam de
   vir no app e passam a ser instaladas por um arquivo `.7z`. O que é seguro
   pode virar padrão; o que é arriscado fica num repositório privado do dono, só
