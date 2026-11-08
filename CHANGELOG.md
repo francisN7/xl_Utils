@@ -189,6 +189,9 @@ decisões nos ADRs.
   mensagem de “sem leitor alternativo” quando o calamine não consegue abrir.
 - Reexecução da AGENDA não confunde mais `MIGRAÇÃO` com um protocolo real do
   PROCESSOS; a sentinela é limpa nas linhas que vinculam.
+- A janela abre em `80,60`, na tela primária; antes o Flutter podia
+  posicioná-la em coordenadas negativas de um monitor à esquerda e parecia que
+  o app não iniciava.
 
 ### Security
 

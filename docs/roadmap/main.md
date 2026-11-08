@@ -18,6 +18,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S9a3 | Site público e política de privacidade | [x] |
 | S9a4 | Segredo do cliente OAuth protegido por DPAPI | [x] |
 | S9a5 | Login com escopo de e-mail canônico | [x] |
+| S9a6 | Janela abre na tela primária | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -135,6 +136,13 @@ O login real falhava com `Warning: Scope has changed`: o Google devolve
 atalho `email`, e o `oauthlib` trata a diferença como exceção. O app passou a
 pedir o escopo canônico; o consentimento real foi validado com `refresh_token`,
 `id_token` e os três escopos. Ver a [spec](../sessions/S9a5-escopo-email.md).
+
+## S9a6 — entregue
+
+A janela podia abrir fora da tela, em coordenadas negativas de um monitor à
+esquerda, e parecia que o `xl-utils` não iniciava. `app.main` fixa
+`left = 80` e `top = 60`, que ficam na tela primária; o shell de teste confere
+os valores. Ver a [spec](../sessions/S9a6-janela-na-tela.md).
 
 ## Auditoria pública — entregue
 

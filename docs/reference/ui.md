@@ -11,6 +11,8 @@ um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
 forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas. No
 canto superior direito da área de conteúdo fica o menu hamburger dos perfis do
 Google Drive — fora da sidebar, para não competir com a navegação.
+A janela nasce em `80,60`, na tela primária; a posição não é restaurada da
+sessão anterior.
 O conteúdo abre em uma das duas formas:
 
 - **Início:** hub com cartões das ferramentas.

@@ -4,7 +4,7 @@
 
 ## Sessão
 
-- **Última concluída:** S9a5 — login com escopo de e-mail canônico
+- **Última concluída:** S9a6 — janela abre na tela primária
 - **Próxima:** S9b — Drive II (link, seletor e escrita)
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
@@ -15,8 +15,8 @@
 
 - S9a4: segredo do cliente cifrado por DPAPI; download apagado após importar.
 - S9a5: login pede `userinfo.email`; o Google devolve o canônico e o fluxo fecha.
+- S9a6: janela abre em 80,60 na tela primária; não fica mais fora da tela.
 - S9a3: site no GitHub Pages (home + privacidade) para publicar o app no Google.
-- S9a2: hamburger no canto superior direito, menu de perfis, cartão removido.
 
 ## Próximo passo
 

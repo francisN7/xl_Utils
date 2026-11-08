@@ -31,6 +31,8 @@ def main(page: ft.Page) -> None:
     page.window.height = 800
     page.window.min_width = 980
     page.window.min_height = 640
+    page.window.left = 80
+    page.window.top = 60
 
     content = ft.Container(expand=True)
     pages: dict[str, ft.Control] = {}
