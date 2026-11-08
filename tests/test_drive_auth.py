@@ -36,7 +36,7 @@ def _credentials(*, refresh: str | None = "refresh-123") -> Credentials:
         id_token=_id_token(),
         token_uri=drive_auth.TOKEN_URI,
         client_id="123.apps.googleusercontent.com",
-        scopes=["openid", "email"],
+        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email"],
     )
     return credentials
 
@@ -263,6 +263,11 @@ def test_client_config_repr_hides_the_secret() -> None:
     )
 
     assert "segredo-que-nao-pode-aparecer" not in repr(client)
+
+
+def test_scopes_use_the_canonical_email_scope() -> None:
+    assert "https://www.googleapis.com/auth/userinfo.email" in drive_auth.SCOPES
+    assert "email" not in drive_auth.SCOPES
 
 
 def test_protected_secret_that_cannot_be_opened_is_a_config_error(

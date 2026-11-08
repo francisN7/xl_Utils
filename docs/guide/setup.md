@@ -70,6 +70,9 @@ arquivo uma única vez:
 
 1. No Google Cloud Console, crie um projeto e ative a **Google Drive API**.
 2. Em **Credenciais**, crie um cliente **App para computador** e baixe o JSON.
+   No consentimento, os escopos são `openid`,
+   `https://www.googleapis.com/auth/userinfo.email` e
+   `https://www.googleapis.com/auth/drive.file`.
 3. No app, clique no menu hamburger do canto superior direito → **Entrar com
    Google** e selecione o JSON baixado.
 

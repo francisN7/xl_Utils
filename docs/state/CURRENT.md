@@ -4,7 +4,7 @@
 
 ## Sessão
 
-- **Última concluída:** S9a4 — segredo do cliente protegido por DPAPI
+- **Última concluída:** S9a5 — login com escopo de e-mail canônico
 - **Próxima:** S9b — Drive II (link, seletor e escrita)
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
@@ -13,8 +13,8 @@
 
 ## Pronto
 
-- S9a4: segredo do cliente OAuth cifrado por DPAPI (`client_secret_dpapi`); o
-  download foi apagado após a importação.
+- S9a4: segredo do cliente cifrado por DPAPI; download apagado após importar.
+- S9a5: login pede `userinfo.email`; o Google devolve o canônico e o fluxo fecha.
 - S9a3: site no GitHub Pages (home + privacidade) para publicar o app no Google.
 - S9a2: hamburger no canto superior direito, menu de perfis, cartão removido.
 
@@ -53,7 +53,7 @@ escolher Google Picker ou escopo `drive` em Testing antes de qualquer código.
 - Flet não é thread-safe: login e execução rodam fora da UI thread.
 - Plugins: `.7z` precisa recusar path traversal, symlink e zip bomb.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
-- Pages: ligar em `main` / `docs`; a URL precisa responder antes do Google.
+- Google devolve `userinfo.email`, não `email`; peça o canônico.
 
 ## Como rodar
 

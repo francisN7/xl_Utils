@@ -206,6 +206,9 @@ decisões nos ADRs.
   `client_secret_dpapi`); em texto ele só existe em memória durante o login, e
   `ClientConfig` não o expõe em `repr`. O download original pode ser apagado
   depois da importação.
+- Login do Drive: pede o escopo canônico
+  `https://www.googleapis.com/auth/userinfo.email`; o Google devolve essa forma
+  e o `oauthlib` não trata mais a diferença como erro.
 
 ## v0.1.0 — 2026-11-04
 

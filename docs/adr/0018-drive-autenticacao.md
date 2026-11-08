@@ -13,10 +13,11 @@ público por definição.
 
 ## Decisão
 
-- **Escopos:** `openid`, `email` e
+- **Escopos:** `openid`, `https://www.googleapis.com/auth/userinfo.email` e
   `https://www.googleapis.com/auth/drive.file`. `drive.file` só enxerga o que
   o próprio app criou ou o usuário escolheu no seletor do Drive, e não exige
-  verificação do Google.
+  verificação do Google. O e-mail vai na forma canônica porque o Google devolve
+  `userinfo.email` mesmo quando o pedido usa o atalho `email`.
 - **Biblioteca:** `google-auth-oauthlib` (1.5.x) com `requests`, o caminho que
   o Google recomenda para apps instalados. Na 1.5 o PKCE S256
   (`autogenerate_code_verifier=True`) e o `state` já vêm ligados por padrão, e

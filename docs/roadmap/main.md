@@ -17,6 +17,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S9a2 | Drive I.2 — menu de perfis no canto superior direito | [x] |
 | S9a3 | Site público e política de privacidade | [x] |
 | S9a4 | Segredo do cliente OAuth protegido por DPAPI | [x] |
+| S9a5 | Login com escopo de e-mail canônico | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -126,6 +127,14 @@ existe em memória durante o login. Fora do Windows, o campo `client_secret`
 continua em texto (segredo de app desktop não é confidencial). O download
 original foi sobrescrito e apagado, e o `ClientConfig` não expõe mais o segredo
 em `repr`. Ver a [spec](../sessions/S9a4-segredo-protegido.md).
+
+## S9a5 — entregue
+
+O login real falhava com `Warning: Scope has changed`: o Google devolve
+`https://www.googleapis.com/auth/userinfo.email` mesmo quando o pedido usa o
+atalho `email`, e o `oauthlib` trata a diferença como exceção. O app passou a
+pedir o escopo canônico; o consentimento real foi validado com `refresh_token`,
+`id_token` e os três escopos. Ver a [spec](../sessions/S9a5-escopo-email.md).
 
 ## Auditoria pública — entregue
 

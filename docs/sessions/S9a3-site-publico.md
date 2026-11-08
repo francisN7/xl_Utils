@@ -22,7 +22,8 @@ apresentação do app e a política de privacidade.
   documentos internos continuam no Git, mas não viram páginas.
 - **HTML estático e autocontido:** sem tema, CDN ou dependência externa; o
   visual segue o Dracula do app.
-- **Política em PT-BR:** descreve escopos (`openid`, `email`, `drive.file`),
+- **Política em PT-BR:** descreve escopos (`openid`,
+  `https://www.googleapis.com/auth/userinfo.email`, `drive.file`),
   armazenamento local com DPAPI, ausência de servidor/telemetria, exclusão,
   revogação e conformidade com a Google API Services User Data Policy
   (Limited Use).
