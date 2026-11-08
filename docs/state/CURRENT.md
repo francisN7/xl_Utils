@@ -4,54 +4,50 @@
 
 ## Sessão
 
-- **Última concluída:** S9c — Drive III: gravação na pasta e exportação
-- **Próxima:** S10 — fechar o ciclo 0006 e revisar o backlog
-- **Ciclo:** 0006 — Backlog
+- **Última concluída:** S10 — fechamento do ciclo 0006 e arquivo do histórico
+- **Próxima:** S11 — versão 0.2.0 e polimento de UI
+- **Ciclo:** 0007 — Versão e distribuição
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
   sentinela; config empacotada; ADRs 0014–0019; plugins em `.7z` privado.
   Drive: PKCE/`state`, `drive.file`, DPAPI, Picker desktop sem API key, pasta
-  concedida por conta, raiz como fallback e nomes livres `_001`.
+  concedida por conta, raiz como fallback e nomes livres `_001`. Histórico em
+  texto, uma página por ciclo, sem arquivo comprimido (ADR 0020).
 
 ## Pronto
 
-- S9c: “Salvar no Drive” só com origem no Drive; `drive/folders.json` por
-  conta, upload multipart, `.xlsx` em memória, `_001`, “Abrir no Drive” e
-  fallback para a raiz. Teste real validado em 2026-11-08.
-- S9b: Picker desktop, leitura/exportação, botão na entrada e `login_hint`.
-- S9a: login por DPAPI, menu de perfis, site público e atalho global.
+- S10: ciclo 0006 arquivado em `docs/history/0006-backlog.md`; páginas 0001–0006
+  em `docs/history/`; 14 specs fechadas fora do working tree; ciclo 0007 aberto.
+- S9c: “Salvar no Drive” na pasta de origem, `drive/folders.json`, upload
+  multipart, nomes `_001` e fallback para a raiz. Validado no app em 2026-11-08.
+- S9a–S9b: OAuth por DPAPI, menu de perfis, Picker de desktop e leitura do Drive.
 
 ## Próximo passo
 
-Ler `docs/sessions/S10-fechar-ciclo-0006.md`: arquivar o roadmap em
-`0006-backlog.md`, tirar as specs fechadas do working tree, revisar o backlog
-já reordenado (S11: 0.2.0 + responsividade + e-mail longo → S12: 0.3.0
-empacotada → plugins → seletor integrado → Drive sem consentimento repetido) e
-abrir o ciclo 0007. Antes, validar no app abrir do Drive, salvar, repetir e ver
-`_001`.
+Ler `docs/sessions/S11-versao-0.2.0-e-polimento.md`: marcar 0.2.0 em
+`pyproject.toml`, `uv.lock`, `__version__`, diagnóstico e docs; corrigir o
+estouro dos cartões em largura estreita (Início e Verificar Vínculos) e truncar
+o e-mail do menu de perfis com tooltip atrasado. Sem mudança de regra de
+negócio.
 
 ## Arquivos-chave
 
-- `shared/drive.py`, `drive_pick.py`, `drive_cache.py`, `drive_store.py`,
-  `drive_auth.py`, `accounts.py`
-- `ui/drive.py`, `ui/components/result_panel.py`, `ui/components/tool_layout.py`
-- `core/io.py` (`dump_workbook`), `core/paths.py` (`free_name`)
-- `tests/test_drive_write.py`, `test_drive_api.py`, `test_drive_pick.py`,
-  `test_drive_session.py`
-- `scripts/check-drive-picker.py`, `docs/adr/0018-drive-autenticacao.md`
-- `docs/sessions/S10-fechar-ciclo-0006.md`
+- `src/xl_utils/ui/pages/home.py`, `registry.py`, `ui/components/top_menu.py`
+- `pyproject.toml`, `src/xl_utils/__init__.py`, `uv.lock`
+- `docs/history/README.md`, `docs/roadmap/main.md`, `docs/adr/0020-*.md`
+- `scripts/check-docs.mjs` (ignora links de `docs/history/`)
+- `docs/sessions/S11-versao-0.2.0-e-polimento.md`
 
 ## Armadilhas
 
-- `drive.file` só vê arquivo criado/escolhido; a pasta precisa ser concedida.
-- `drive.file` não lê `files/root` (404); origem na raiz grava sem `parents`.
-- Picker de desktop não tem “somente pastas”: `mimetypes` + validação.
-- `login_hint` não força a conta; 403/404 viram `FolderPermissionError`.
-- Nunca sobrescrever: `free_name` escolhe `_001`; `files.update` fora do escopo.
-- A listagem da pasta pode não ver arquivos antigos; nada é alterado.
-- Planilha nativa não é editada no lugar; o resultado é um `.xlsx` novo.
+- Ciclo fechado não volta ao working tree: o texto vive no Git e o resumo em
+  `docs/history/`; não criar `.7z`/`.zip` de docs.
 - Flet não é thread-safe: login, Picker, gravação e execução fora da UI thread.
-- Pages: push de código não publica; use Actions → Pages → Run workflow.
+- Tooltip do Flet pode não ter atraso nativo; medir antes de assumir `Timer`.
+- `uv lock` pode subir dependências: conferir o diff e rodar a suíte.
+- Páginas: push de código não publica; use Actions → Pages → Run workflow.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
+- `drive.file` só vê arquivo criado/escolhido; a pasta precisa ser concedida.
+- Nunca sobrescrever: `free_name` escolhe `_001`.
 
 ## Como rodar
 

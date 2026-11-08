@@ -4,6 +4,7 @@ exclude:
   - README.md
   - adr
   - guide
+  - history
   - reference
   - roadmap
   - sessions

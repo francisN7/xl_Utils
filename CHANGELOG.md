@@ -153,6 +153,10 @@ decisões nos ADRs.
 
 ### Changed
 
+- Documentação: o histórico passou a ter uma pasta própria, `docs/history/`,
+  com uma página de texto por ciclo fechado (ADR 0020). `docs/roadmap/` fica só
+  com o ciclo ativo e o guia do processo; nada de `.7z` ou `.zip` de docs no
+  repositório.
 - O site público passa a ser publicado por workflow com filtro de caminho: só
   `docs/*.html` gera deployment, e a origem do Pages é GitHub Actions.
 - CSV passa a detectar encoding e separador (`;`, tab e `|`); `NA`, `N/A` e
@@ -188,6 +192,9 @@ decisões nos ADRs.
 
 ### Removed
 
+- Specs das sessões dos ciclos 0001–0006 (14 arquivos) saíram do working tree no
+  fechamento do ciclo; o resumo está em `docs/history/0006-backlog.md` e o texto
+  completo continua no Git.
 - `all_str.py`, `cnjs.py`, `cut.py` e `merge.py` da raiz, substituídos por
   core + controller + página. Nenhum script legado permanece na raiz.
 - Branch `cli-app` e a tentativa de interface por linha de comando.

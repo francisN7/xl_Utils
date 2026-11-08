@@ -7,7 +7,8 @@
  * 3. histórico disfarçado de referência ("## Cobertura da SXX").
  *
  * Histórico: CHANGELOG, specs de sessão e o corpo dos ADRs não entram na
- * checagem de link; o índice `docs/adr/README.md` entra. O orçamento de spec
+ * checagem de link, nem as páginas de ciclo em docs/history/ (são imutáveis);
+ * o índice `docs/adr/README.md` entra. O orçamento de spec
  * vale para as que ficam (a próxima e as em andamento).
  *
  * Uso: node scripts/check-docs.mjs
@@ -34,7 +35,7 @@ const SKIP_DIRS = new Set([
 ]);
 
 /** Documentos históricos: não são reescritos nem têm links cobrados. */
-const SKIP_LINKS = ['CHANGELOG.md', 'docs/sessions/'];
+const SKIP_LINKS = ['CHANGELOG.md', 'docs/sessions/', 'docs/history/'];
 
 const BUDGETS = [
   { file: 'AGENTS.md', max: 100 },

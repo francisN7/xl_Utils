@@ -2,7 +2,7 @@
 
 Ciclo 0005 fechado. O detalhe completo está no Git; as decisões ficam nos ADRs.
 O ciclo anterior está em [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md);
-o próximo começa em [`main.md`](main.md).
+o próximo começa em [`main.md`](../roadmap/main.md).
 
 | Sessão | Entrega | Aceite |
 |---|---|---|

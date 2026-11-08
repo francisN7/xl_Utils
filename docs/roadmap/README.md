@@ -4,38 +4,26 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 
 ## Como funciona
 
-- **Fase** agrupa sessões com o mesmo tema.
-- **Sessão** é uma entrega vertical + testes + docs + commit. Só nasce quando a
-  fase é escolhida; a spec é escrita no fim da anterior.
+- **Ciclo** agrupa sessões com o mesmo tema e termina numa página de histórico.
+- **Sessão** é uma entrega vertical + testes + docs + commit. Só nasce quando o
+  ciclo é escolhido; a spec é escrita no fim da anterior.
 - **Ordem** é definida pelo dono. Sem prioridade declarada, o agente pergunta.
+- **Passado** não mora aqui: ciclo fechado vira página em
+  [`../history/`](../history/README.md).
 
 ## Artefatos
 
 | Arquivo | Estado | O que é |
 |---|---|---|
 | [`main.md`](main.md) | **ativo** | ciclo atual e backlog |
-| [`0005-polimento.md`](0005-polimento.md) | fechado | histórico do ciclo de polimento |
-| [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md) | fechado | histórico do ciclo de execução e robustez |
-| [`0003-qualidade.md`](0003-qualidade.md) | fechado | histórico do ciclo de qualidade e clareza |
-| [`0002-migracao.md`](0002-migracao.md) | fechado | histórico do ciclo de migração e publicação |
-| [`0001-fundacao.md`](0001-fundacao.md) | fechado | histórico do ciclo da fundação |
-
-## Ciclos fechados
-
-| Arquivo | Ciclo | Fechado em |
-|---|---|---|
-| [`0001-fundacao.md`](0001-fundacao.md) | Fundação | 2026-11-04 |
-| [`0002-migracao.md`](0002-migracao.md) | Migração e publicação | 2026-11-04 |
-| [`0003-qualidade.md`](0003-qualidade.md) | Qualidade e clareza | 2026-11-04 |
-| [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md) | Execução e robustez | 2026-11-04 |
-| [`0005-polimento.md`](0005-polimento.md) | Polimento | 2026-11-06 |
+| [`../history/README.md`](../history/README.md) | índice | ciclos fechados, um `NNNN-titulo.md` cada |
 
 ## Convenção de nomes
 
 - `main.md` é sempre o roadmap ativo; é o único que muda no dia a dia.
-- Quando um ciclo fecha, `main.md` vira `NNNN-titulo.md` (quatro dígitos, ordem
-  cronológica) e um novo `main.md` começa.
-- Este `README.md` é o índice; não guarda fases.
+- Quando um ciclo fecha, `main.md` vira `../history/NNNN-titulo.md` (quatro
+  dígitos, ordem de fechamento) e um novo `main.md` começa.
+- Este `README.md` explica o processo; não guarda fases nem ciclos.
 
 ## Definition of Ready (de uma spec)
 
@@ -51,9 +39,10 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 - lint, testes e docs verdes;
 - funciona no ambiente alvo;
 - docs, `CURRENT.md`, roadmap e `CHANGELOG.md` atualizados;
+- spec da sessão fora do working tree no fim do ciclo;
 - commit `SXX: resumo curto`.
 
 ## Numeração
 
 - Sessão dentro da mesma fase usa letra: `S0a`, `S0b`, `S1a`.
-- Fases/ciclos fechados ganham quatro dígitos no arquivo: `0001-fundacao.md`.
+- Ciclos fechados ganham quatro dígitos no arquivo: `0006-backlog.md`.

@@ -23,4 +23,5 @@ de CNJ tolerante a texto sujo e recorte por quantidade de arquivos por aba.
 
 `uv run ruff check src tests`, `uv run pytest` e `node scripts/check-docs.mjs`
 verdes antes do fechamento. O ciclo seguinte começa em
-[`0005-polimento.md`](0005-polimento.md); o ativo, em [`main.md`](main.md).
+[`0005-polimento.md`](0005-polimento.md); o ativo, em
+[`main.md`](../roadmap/main.md).
