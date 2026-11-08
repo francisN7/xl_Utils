@@ -91,6 +91,9 @@ def test_dropzone_and_drive_button_share_the_same_row() -> None:
     assert control._entry_row.controls == [control._dropzone, control._drive_button]
     assert control._dropzone.expand is True
     assert control._entry_row.spacing == 10
+    assert control._entry_row.vertical_alignment == ft.CrossAxisAlignment.START
+    assert control._drive_button.width == 44
+    assert control._drive_button.height == 44
 
 
 def test_dropzone_stays_visible_after_choosing_a_file(tmp_path: Path) -> None:
