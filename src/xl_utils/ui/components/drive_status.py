@@ -7,16 +7,28 @@ import contextlib
 import flet as ft
 
 from xl_utils.ui import theme
+from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.drive import DriveSession
 
 
 class DriveStatus:
     """Cartão do hub que mostra a conta ativa e as ações do Drive."""
 
-    def __init__(self, session: DriveSession) -> None:
+    def __init__(
+        self,
+        session: DriveSession,
+        *,
+        importer: ClientImport | None = None,
+    ) -> None:
         self._session = session
+        self._importer = importer
         self._title = ft.Text("", size=theme.FONT_MD, weight=ft.FontWeight.BOLD)
         self._detail = ft.Text("", size=theme.FONT_SM, color=theme.MUTED)
+        self._configure = ft.TextButton(
+            "Configurar",
+            icon=ft.Icons.SETTINGS,
+            on_click=self._configure_clicked,
+        )
         self._login = ft.OutlinedButton(
             "Entrar com Google",
             icon=ft.Icons.LOGIN,
@@ -51,7 +63,12 @@ class DriveStatus:
                         expand=True,
                     ),
                     ft.Row(
-                        controls=[self._login, self._switch, self._logout],
+                        controls=[
+                            self._configure,
+                            self._login,
+                            self._switch,
+                            self._logout,
+                        ],
                         spacing=4,
                         vertical_alignment=ft.CrossAxisAlignment.CENTER,
                     ),
@@ -81,6 +98,17 @@ class DriveStatus:
             return
         page.run_task(self._session.connect)
 
+    def _configure_clicked(self, _event: object = None) -> None:
+        if self._importer is None:
+            return
+        try:
+            page = self._control.page
+        except RuntimeError:
+            return
+        if page is None or not hasattr(page, "run_task"):
+            return
+        page.run_task(self._importer.pick, page)
+
     def _switch_clicked(self, _event: object = None) -> None:
         target = self._session.next_account()
         if target is not None:
@@ -96,6 +124,11 @@ class DriveStatus:
         if session.error:
             self._detail.value = session.error
             self._detail.color = theme.RED
+        elif not session.configured:
+            self._detail.value = (
+                "Importe o JSON do cliente OAuth baixado do Google Cloud Console."
+            )
+            self._detail.color = theme.ORANGE
         elif session.busy:
             self._detail.value = "Autorize no navegador; esta tela volta sozinha."
             self._detail.color = theme.YELLOW
@@ -118,9 +151,17 @@ class DriveStatus:
         self._login.content = (
             "Adicionar conta" if session.accounts else "Entrar com Google"
         )
+        self._login.visible = session.configured
         self._login.disabled = session.busy
-        self._switch.visible = len(session.accounts) > 1 and not session.busy
-        self._logout.visible = session.active is not None and not session.busy
+        self._configure.visible = (
+            not session.configured and self._importer is not None and not session.busy
+        )
+        self._switch.visible = (
+            session.configured and len(session.accounts) > 1 and not session.busy
+        )
+        self._logout.visible = (
+            session.configured and session.active is not None and not session.busy
+        )
 
         with contextlib.suppress(RuntimeError):
             self._control.update()

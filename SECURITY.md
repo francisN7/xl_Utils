@@ -24,8 +24,11 @@ pessoais.
 ## Escopo
 
 - Leitura de `.xlsx`, `.xls`, `.csv` e `.html` e gravação de saídas.
-- Aplicativo desktop local, sem servidor e sem chamadas de rede nesta versão.
-- A integração com o Google Drive (S9a) ainda não está implementada.
+- Aplicativo desktop local. A única chamada de rede é o login OAuth do Google
+  Drive (S9a), sempre em `https://` para domínios do Google e com retorno em
+  `127.0.0.1`; a leitura e a gravação de planilhas no Drive ainda não existem.
+- Tokens do Drive protegidos por DPAPI; o repositório nunca carrega cliente
+  OAuth, token ou conta real.
 
 ## Fora de escopo
 

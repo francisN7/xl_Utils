@@ -266,7 +266,10 @@ descrição (quebra de linha na AGENDA, `" | "` no FINANCEIRO).
 empacotado, override em `%LOCALAPPDATA%/xl_utils/drive_client.json`), roda o
 fluxo de app instalado com PKCE e `state` da `google-auth-oauthlib` em
 `127.0.0.1` numa porta efêmera e devolve uma `Account` com e-mail e nome lidos
-do `id_token`. `shared/accounts.py` grava uma conta por e-mail em
+do `id_token`. `import_client` aceita o JSON baixado do Google Cloud Console,
+recusa arquivo acima de 64 KB, exige HTTPS em `google.com`/`googleapis.com` e
+grava só os campos usados, de forma atômica; `is_configured` diz se há cliente
+válido. `shared/accounts.py` grava uma conta por e-mail em
 `%LOCALAPPDATA%/xl_utils/drive/accounts/`, com o `refresh_token` cifrado por
 DPAPI e escrita atômica; o e-mail ativo fica em `drive/active.json`. `ui/drive.py`
 é o estado compartilhado entre o menu do topo e o cartão do hub, e o login roda

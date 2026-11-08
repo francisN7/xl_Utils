@@ -65,6 +65,18 @@ uv run python scripts/make_fixture.py
 `tests/test_configs.py` é quem confere o `headers.json` empacotado e o override
 temporário em `%LOCALAPPDATA%`.
 
+## Drive sem credenciais
+
+`tests/test_drive_flow.py` roda o fluxo de navegador de ponta a ponta contra um
+Google falso em `127.0.0.1`: o servidor devolve o redirecionamento, confere o
+PKCE (S256) e o `state`, e responde ao pedido de token com dados fictícios. O
+navegador é substituído por uma função que busca a URL. Nenhum teste usa rede,
+conta ou cliente OAuth real.
+
+O consentimento real do Google é o único passo manual; ele é exercitado por
+`uv run python scripts/check-drive-login.py`, que imprime só e-mail, nome,
+escopos e a presença do refresh token.
+
 ## Convenções
 
 - Um arquivo de teste por módulo de core: `tests/test_all_str.py`, etc.

@@ -6,6 +6,7 @@ import flet as ft
 
 from xl_utils.shared import settings
 from xl_utils.ui import theme
+from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.components.drive_status import DriveStatus
 from xl_utils.ui.components.sidebar import Sidebar
 from xl_utils.ui.components.top_menu import TopMenu
@@ -19,6 +20,7 @@ def main(page: ft.Page) -> None:
     """Monta a janela principal."""
     mode = theme.apply(settings.load_theme())
     drive = DriveSession()
+    client_import = ClientImport(drive)
 
     page.title = "xl_Utils"
     page.padding = 0
@@ -74,9 +76,12 @@ def main(page: ft.Page) -> None:
         handle_select,
         theme_mode=mode,
         on_theme_change=change_theme,
-        menu=TopMenu(drive).control,
+        menu=TopMenu(drive, importer=client_import).control,
     )
-    home = build_home(open_tool, drive=DriveStatus(drive).control)
+    home = build_home(
+        open_tool,
+        drive=DriveStatus(drive, importer=client_import).control,
+    )
 
     shell = ft.Row(
         controls=[sidebar.control, content],

@@ -125,6 +125,11 @@ decisões nos ADRs.
   timeout, contas por e-mail em `%LOCALAPPDATA%/xl_utils/drive/` com
   `refresh_token` protegido por DPAPI, menu hamburger na sidebar e cartão de
   estado no hub para entrar, trocar e sair. Ver ADR 0018.
+- Importação do cliente OAuth do Drive pelo seletor nativo (S9a1), sem edição
+  manual de JSON: validação de tamanho, UTF-8, HTTPS e domínio do Google, com
+  escrita atômica em `%LOCALAPPDATA%`. Teste offline de ponta a ponta com Google
+  falso (PKCE e `state`) e `scripts/check-drive-login.py` para o consentimento
+  real.
 
 ### Changed
 
@@ -187,6 +192,10 @@ decisões nos ADRs.
   SHA; e o README passa a declarar todos os direitos reservados.
 - Histórico reescrito e repositório recriado para eliminar metadados pessoais
   das refs públicas; o PR e os SHAs antigos deixaram de existir.
+- Cliente OAuth do Drive importado só depois de validado (64 KB, UTF-8, HTTPS em
+  `google.com`/`googleapis.com`); campos desconhecidos são descartados e o
+  arquivo empacotado continua vazio, com teste de guarda. O `.gitignore` cobre
+  `drive_client.json` local e os nomes de download do Google.
 
 ## v0.1.0 — 2026-11-04
 

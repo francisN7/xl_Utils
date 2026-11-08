@@ -50,7 +50,7 @@ src/xl_utils/
   core/             regras puras: io, mime, paths, text, tools/
   controllers/      ponte entre UI e core
   ui/pages/         Início + uma página por ferramenta
-  ui/components/    entrada, resultado, prévia e layout
+  ui/components/    entrada, resultado, prévia, layout e menu do Drive
   ui/theme.py       tokens e temas (Dracula/Alucard)
   configs/          headers.json empacotado (padrão, não estado)
   shared/           log, config, contas e Drive

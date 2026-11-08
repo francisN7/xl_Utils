@@ -1,4 +1,5 @@
 import asyncio
+import json
 from types import SimpleNamespace
 
 import flet as ft
@@ -39,7 +40,11 @@ def _account(email: str) -> accounts.Account:
 
 
 def _session(store: accounts.AccountStore, email: str) -> DriveSession:
-    return DriveSession(store=store, authorize=lambda: _account(email))
+    return DriveSession(
+        store=store,
+        authorize=lambda: _account(email),
+        configured=True,
+    )
 
 
 def test_connect_saves_and_activates_the_account(
@@ -116,6 +121,7 @@ def test_failure_keeps_the_previous_accounts(store: accounts.AccountStore) -> No
     failing = DriveSession(
         store=store,
         authorize=lambda: (_ for _ in ()).throw(RuntimeError("boom")),
+        configured=True,
     )
 
     asyncio.run(failing.connect())
@@ -131,6 +137,7 @@ def test_configuration_error_reaches_the_user(store: accounts.AccountStore) -> N
     session = DriveSession(
         store=store,
         authorize=lambda: (_ for _ in ()).throw(DriveConfigError("falta o client_id")),
+        configured=True,
     )
 
     asyncio.run(session.connect())
@@ -139,7 +146,11 @@ def test_configuration_error_reaches_the_user(store: accounts.AccountStore) -> N
 
 
 def test_status_describes_each_state(store: accounts.AccountStore) -> None:
-    session = DriveSession(store=store, authorize=lambda: _account("ana@example.com"))
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=True,
+    )
     assert session.status == "Drive: nenhuma conta conectada"
 
     asyncio.run(session.connect())
@@ -161,7 +172,11 @@ def test_listeners_are_notified_on_change(store: accounts.AccountStore) -> None:
 def test_menu_offers_login_when_there_is_no_account(
     store: accounts.AccountStore,
 ) -> None:
-    session = DriveSession(store=store, authorize=lambda: _account("ana@example.com"))
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=True,
+    )
     menu = TopMenu(session)
 
     items = menu.control.items
@@ -278,4 +293,115 @@ def test_app_shell_carries_the_drive_menu_and_card(
         isinstance(item, ft.PopupMenuButton)
         for item in sidebar.content.controls[0].content.controls
     )
-    assert "Drive: nenhuma conta conectada" in _texts(content)
+    assert "Drive: cliente OAuth não configurado" in _texts(content)
+
+
+class _FakeImporter:
+    def __init__(self) -> None:
+        self.pages: list[object] = []
+
+    async def pick(self, page) -> None:
+        self.pages.append(page)
+
+
+def test_missing_configuration_blocks_login(store: accounts.AccountStore) -> None:
+    calls: list[int] = []
+
+    def authorize() -> accounts.Account:
+        calls.append(1)
+        return _account("ana@example.com")
+
+    session = DriveSession(store=store, authorize=authorize, configured=False)
+
+    asyncio.run(session.connect())
+
+    assert session.error == "Configure o cliente OAuth do Drive antes de entrar."
+    assert calls == []
+    assert session.accounts == []
+    assert session.status == "Drive: cliente OAuth não configurado"
+
+
+def test_import_client_enables_login(
+    store: accounts.AccountStore,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path,
+) -> None:
+    from xl_utils.shared import drive_auth
+
+    monkeypatch.setattr(
+        drive_auth, "client_path", lambda: tmp_path / "drive_client.json"
+    )
+    source = tmp_path / "client_secret_1.json"
+    source.write_text(
+        json.dumps({"installed": {"client_id": "abc.apps.googleusercontent.com"}}),
+        encoding="utf-8",
+    )
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=False,
+    )
+
+    session.import_client(source)
+    asyncio.run(session.connect())
+
+    assert session.configured is True
+    assert session.active == "ana@example.com"
+
+
+def test_import_client_reports_a_bad_file(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    source = tmp_path / "client.json"
+    source.write_text("{}", encoding="utf-8")
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=False,
+    )
+
+    session.import_client(source)
+
+    assert session.configured is False
+    assert session.error is not None
+    assert "client_id" in session.error
+
+
+def test_status_card_offers_configuration(store: accounts.AccountStore) -> None:
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=False,
+    )
+    card = DriveStatus(session, importer=_FakeImporter())
+
+    assert card._configure.visible is True
+    assert card._login.visible is False
+    assert card._logout.visible is False
+    assert "cliente OAuth" in card._title.value
+
+
+def test_menu_offers_configuration(store: accounts.AccountStore) -> None:
+    session = DriveSession(
+        store=store,
+        authorize=lambda: _account("ana@example.com"),
+        configured=False,
+    )
+    menu = TopMenu(session, importer=_FakeImporter())
+
+    assert [item.content for item in menu.control.items] == [
+        "Configurar cliente OAuth…"
+    ]
+
+
+def test_menu_keeps_configuration_after_login(
+    store: accounts.AccountStore,
+) -> None:
+    session = _session(store, "ana@example.com")
+    asyncio.run(session.connect())
+    menu = TopMenu(session, importer=_FakeImporter())
+
+    assert [item.content for item in menu.control.items][-1] == (
+        "Configurar cliente OAuth…"
+    )

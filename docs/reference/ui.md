@@ -147,8 +147,13 @@ fluxo.
 ## Drive
 
 O menu hamburger do cabeçalho da sidebar e o cartão do hub compartilham o mesmo
-estado (`ui/drive.py`). Sem conta, os dois oferecem “Entrar no Google Drive”;
-com uma ou mais, listam os e-mails e marcam a ativa. “Entrar” abre o navegador
+estado (`ui/drive.py`). Sem cliente OAuth configurado, o cartão mostra
+“Drive: cliente OAuth não configurado” e o botão **Configurar**; o menu oferece
+**Configurar cliente OAuth…**. Os dois abrem o seletor nativo e importam o JSON
+baixado do Google Cloud Console, sem edição manual.
+
+Com o cliente configurado, os dois oferecem “Entrar no Google Drive”; com uma ou
+mais contas, listam os e-mails e marcam a ativa. “Entrar” abre o navegador
 padrão e a tela mostra “Conectando ao Google Drive…” até o retorno; a navegação
 continua livre. Se o usuário negar o acesso ou o navegador não responder em três
 minutos, o cartão mostra a mensagem e nada fica travado.

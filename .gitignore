@@ -39,8 +39,11 @@ samples/
 #===========#
 # SECRETS   #
 #===========#
-# Rede de segurança: o estado real fica em %LOCALAPPDATA%/xl_utils/google/.
+# Rede de segurança: o estado real fica em %LOCALAPPDATA%/xl_utils/drive/.
 client_secret*.json
+*apps.googleusercontent.com.json
+drive_client.json
+!src/xl_utils/configs/drive_client.json
 token*.json
 credentials*.json
 *.pem

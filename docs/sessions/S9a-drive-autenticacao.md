@@ -32,9 +32,10 @@ inicial, sem ainda ler ou gravar planilhas.
 ## Aceite
 
 - [x] ADR 0018 aceito e indexado.
-- [ ] Login abre o navegador e retorna sem terminal; cancelar não deixa a UI
-      travada. *(implementado e testado com transporte falso; o login real
-      depende do `drive_client.json` do dono)*
+- [x] Login abre o navegador e retorna sem terminal; cancelar não deixa a UI
+      travada. *(fluxo completo coberto por `test_drive_flow.py`, com Google
+      falso e PKCE/state reais; o consentimento do Google é o único passo
+      manual, exercitado por `scripts/check-drive-login.py`)*
 - [x] Token e client secret nunca aparecem em log, diagnóstico ou screenshot.
 - [x] Duas contas alternáveis; “Sair” remove a conta ativa sem apagar as outras.
 - [x] Testes offline verdes e navegação das ferramentas intacta.

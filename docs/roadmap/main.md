@@ -13,6 +13,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S7d | Vinculação III — log e acabamento | [x] |
 | S8 | Alinhamento de colunas em tela cheia no merge | [x] |
 | S9a | Drive I — ADR, OAuth, contas e shell | [x] |
+| S9a1 | Drive I.1 — teste do login e importação do cliente | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -83,6 +84,17 @@ hub com entrar, trocar e sair; o login roda fora da UI thread. Ver a
 Achado para a S9b: `drive.file` não lê planilha antiga por link colado — só
 arquivo criado pelo app ou escolhido no Google Picker. A S9b começa decidindo
 entre Picker e escopo `drive` em modo Testing.
+
+## S9a1 — entregue
+
+Fecha a pendência do login: o JSON do cliente OAuth entra pelo seletor nativo
+(menu ou cartão), é validado (64 KB, UTF-8, HTTPS em domínio do Google) e
+gravado de forma atômica em `%LOCALAPPDATA%`; o dono não edita arquivo. O fluxo
+de navegador ganhou teste offline de ponta a ponta com um Google falso em
+`127.0.0.1` que confere PKCE e `state`, além de acesso negado, `state` estranho
+e timeout. `scripts/check-drive-login.py` cobre o consentimento real sem
+imprimir token. O JSON empacotado continua vazio, com teste de guarda. Ver a
+[spec](../sessions/S9a1-login-e-cliente.md) e o adendo ao ADR 0018.
 
 ## Auditoria pública — entregue
 

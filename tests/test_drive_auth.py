@@ -214,3 +214,159 @@ def test_authorize_requires_a_refresh_token(monkeypatch) -> None:
         drive_auth.authorize(_client())
 
     assert "token de atualização" in str(error.value)
+
+
+def _payload(client_id: str = "123-abc.apps.googleusercontent.com") -> dict:
+    return {"installed": {"client_id": client_id, "client_secret": "xyz"}}
+
+
+def test_save_client_normalizes_and_round_trips(tmp_path: Path) -> None:
+    target = tmp_path / "drive_client.json"
+
+    client = drive_auth.save_client(json.dumps(_payload()), target)
+
+    assert drive_auth.load_client(target) == client
+    saved = json.loads(target.read_text(encoding="utf-8"))
+    assert saved["installed"]["redirect_uris"] == ["http://127.0.0.1"]
+    assert not target.with_name("drive_client.json.tmp").exists()
+
+
+def test_save_client_drops_fields_it_does_not_use(tmp_path: Path) -> None:
+    target = tmp_path / "drive_client.json"
+    payload = _payload()
+    payload["installed"]["project_id"] = "nao-deve-ficar"
+
+    drive_auth.save_client(json.dumps(payload), target)
+
+    assert "nao-deve-ficar" not in target.read_text(encoding="utf-8")
+
+
+def test_import_client_keeps_the_downloaded_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(
+        drive_auth, "client_path", lambda: tmp_path / "drive_client.json"
+    )
+    source = tmp_path / "client_secret_1.json"
+    source.write_text(json.dumps(_payload()), encoding="utf-8")
+
+    drive_auth.import_client(source)
+
+    assert source.exists()
+    assert drive_auth.load_client().client_id == _payload()["installed"]["client_id"]
+
+
+def test_import_client_rejects_a_huge_file(tmp_path: Path) -> None:
+    source = tmp_path / "client.json"
+    source.write_text("x" * (drive_auth.MAX_CLIENT_BYTES + 1), encoding="utf-8")
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.import_client(source)
+
+    assert "grande demais" in str(error.value)
+
+
+def test_import_client_rejects_a_file_that_is_not_utf8(tmp_path: Path) -> None:
+    source = tmp_path / "client.json"
+    source.write_bytes(b"\xff\xfe{")
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.import_client(source)
+
+    assert "UTF-8" in str(error.value)
+
+
+def test_import_client_never_echoes_the_file_content(tmp_path: Path) -> None:
+    source = tmp_path / "client.json"
+    source.write_text(
+        json.dumps(
+            {
+                "installed": {
+                    "client_id": "conteudo-sensivel",
+                    "token_uri": "https://exemplo.invalido/token",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.import_client(source)
+
+    assert "conteudo-sensivel" not in str(error.value)
+
+
+def test_client_with_a_foreign_token_endpoint_is_rejected(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text(
+        json.dumps(
+            {
+                "installed": {
+                    "client_id": "abc",
+                    "token_uri": "https://exemplo.invalido/token",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.load_client(path)
+
+    assert "não é do Google" in str(error.value)
+
+
+def test_client_with_plain_http_is_rejected(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text(
+        json.dumps(
+            {
+                "installed": {
+                    "client_id": "abc",
+                    "auth_uri": "http://accounts.google.com/o/oauth2/auth",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(drive_auth.DriveConfigError):
+        drive_auth.load_client(path)
+
+
+def test_client_id_with_spaces_is_rejected(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text(json.dumps(_payload("id com espaco")), encoding="utf-8")
+
+    with pytest.raises(drive_auth.DriveConfigError):
+        drive_auth.load_client(path)
+
+
+def test_is_configured_follows_the_local_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(
+        drive_auth, "client_path", lambda: tmp_path / "drive_client.json"
+    )
+
+    assert drive_auth.is_configured() is False
+
+    drive_auth.save_client(json.dumps(_payload()))
+
+    assert drive_auth.is_configured() is True
+
+
+def test_packaged_client_has_no_credentials() -> None:
+    from importlib import resources
+
+    raw = (
+        resources.files("xl_utils.configs")
+        .joinpath(drive_auth.CLIENT_FILE)
+        .read_text(encoding="utf-8")
+    )
+    installed = json.loads(raw)["installed"]
+
+    assert installed["client_id"] == ""
+    assert installed["client_secret"] == ""

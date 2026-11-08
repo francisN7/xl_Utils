@@ -69,3 +69,27 @@ público por definição.
 - **Copiar/colar (OOB) ou esquema próprio de URI:** descontinuados pelo Google.
 - **Token em texto puro:** mais simples, mas qualquer backup ou leitura do
   perfil expõe a conta inteira; DPAPI custa poucas linhas via `ctypes`.
+
+## Adendo — importação do cliente e teste do login (S9a1)
+
+O dono não deve editar JSON à mão. O app importa o arquivo baixado do Google
+Cloud Console pelo seletor nativo (menu ou cartão do hub) e valida antes de
+gravar: no máximo 64 KB, UTF-8, objeto JSON, `client_id` no alfabeto do Google,
+`auth_uri`/`token_uri` em HTTPS e em `google.com`/`googleapis.com`. Só os campos
+usados são copiados para `%LOCALAPPDATA%/xl_utils/drive_client.json`, de forma
+atômica; campos desconhecidos do arquivo original são descartados. O JSON
+empacotado continua vazio e um teste garante que ninguém commite credencial
+real.
+
+O `client_secret` fica em texto no perfil do usuário — para app desktop ele não
+é confidencial —, mas o `refresh_token` continua cifrado por DPAPI. A única
+entrada não confiável é o JSON importado; `authorize` só recebe um
+`ClientConfig` já validado pelo app.
+
+O fluxo de navegador passa a ter teste ponta a ponta offline: um servidor falso
+em `127.0.0.1` faz o papel do Google, confere o PKCE (S256) e o `state`, e o
+navegador é substituído por uma função que busca a URL. Cobrem sucesso, acesso
+negado, `state` de outra requisição, timeout e ausência de token na mensagem de
+erro. O consentimento real do Google é o único passo manual e é exercitado por
+`scripts/check-drive-login.py`, que imprime só e-mail, nome, escopos e a
+presença do refresh token.

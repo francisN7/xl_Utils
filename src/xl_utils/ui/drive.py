@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+from pathlib import Path
 
 from xl_utils.shared import accounts, drive_auth
 from xl_utils.shared.accounts import Account, AccountStore
@@ -20,6 +21,8 @@ class DriveSession:
         self,
         store: AccountStore | None = None,
         authorize: Callable[[], Account] | None = None,
+        *,
+        configured: bool | None = None,
     ) -> None:
         self._store = store or AccountStore()
         self._authorize = authorize or drive_auth.authorize
@@ -28,6 +31,9 @@ class DriveSession:
         self.active: str | None = None
         self.busy = False
         self.error: str | None = None
+        self.configured = (
+            drive_auth.is_configured() if configured is None else configured
+        )
         self.reload()
 
     @property
@@ -43,6 +49,8 @@ class DriveSession:
         """Resume o estado do Drive para a tela inicial."""
         if self.busy:
             return "Conectando ao Google Drive…"
+        if not self.configured:
+            return "Drive: cliente OAuth não configurado"
         if self.active:
             return f"Drive: {self.active}"
         if self.accounts:
@@ -67,6 +75,10 @@ class DriveSession:
         """Abre o navegador e guarda a conta autorizada, fora da UI thread."""
         if self.busy:
             return
+        if not self.configured:
+            self.error = "Configure o cliente OAuth do Drive antes de entrar."
+            self.notify()
+            return
         self.busy = True
         self.error = None
         self.notify()
@@ -82,6 +94,17 @@ class DriveSession:
             self.busy = False
             self.reload()
             self.notify()
+
+    def import_client(self, path: Path) -> None:
+        """Importa o JSON do cliente OAuth escolhido pelo usuário."""
+        try:
+            drive_auth.import_client(path)
+        except (drive_auth.DriveError, OSError) as error:
+            self.error = str(error)
+        else:
+            self.configured = True
+            self.error = None
+        self.notify()
 
     def switch(self, email: str) -> None:
         """Troca a conta ativa sem apagar nenhuma outra."""

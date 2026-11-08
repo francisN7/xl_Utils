@@ -7,14 +7,21 @@ import contextlib
 import flet as ft
 
 from xl_utils.ui import theme
+from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.drive import DriveSession
 
 
 class TopMenu:
     """Botão hamburger que lista, troca e encerra as contas do Drive."""
 
-    def __init__(self, session: DriveSession) -> None:
+    def __init__(
+        self,
+        session: DriveSession,
+        *,
+        importer: ClientImport | None = None,
+    ) -> None:
         self._session = session
+        self._importer = importer
         self._button = ft.PopupMenuButton(
             icon=ft.Icons.MENU,
             icon_color=theme.SUBTLE_TEXT,
@@ -57,6 +64,17 @@ class TopMenu:
                     disabled=True,
                 )
             )
+
+        if not session.configured:
+            if self._importer is not None:
+                items.append(
+                    ft.PopupMenuItem(
+                        content="Configurar cliente OAuth…",
+                        icon=ft.Icons.SETTINGS,
+                        on_click=self._configure,
+                    )
+                )
+            return items
 
         if not session.accounts:
             items.append(
@@ -101,6 +119,14 @@ class TopMenu:
                     on_click=self._logout,
                 )
             )
+        if self._importer is not None:
+            items.append(
+                ft.PopupMenuItem(
+                    content="Configurar cliente OAuth…",
+                    icon=ft.Icons.SETTINGS,
+                    on_click=self._configure,
+                )
+            )
         return items
 
     def _login(self, _event: object = None) -> None:
@@ -111,6 +137,17 @@ class TopMenu:
         if page is None or not hasattr(page, "run_task"):
             return
         page.run_task(self._session.connect)
+
+    def _configure(self, _event: object = None) -> None:
+        if self._importer is None:
+            return
+        try:
+            page = self._button.page
+        except RuntimeError:
+            return
+        if page is None or not hasattr(page, "run_task"):
+            return
+        page.run_task(self._importer.pick, page)
 
     def _switch(self, email: str) -> None:
         self._session.switch(email)

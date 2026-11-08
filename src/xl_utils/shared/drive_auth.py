@@ -10,11 +10,13 @@ from __future__ import annotations
 import base64
 import json
 import os
+import re
 import webbrowser
 from dataclasses import dataclass
 from importlib import resources
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from google.auth.exceptions import GoogleAuthError
 from google.oauth2.credentials import Credentials
@@ -34,6 +36,9 @@ SCOPES = (
 CLIENT_FILE = "drive_client.json"
 LOGIN_TIMEOUT = 180
 SUCCESS_MESSAGE = "Autorização concluída. Volte ao xl_Utils e feche esta aba."
+MAX_CLIENT_BYTES = 64 * 1024
+_GOOGLE_HOSTS = ("google.com", "googleapis.com")
+_CLIENT_ID = re.compile(r"[A-Za-z0-9._-]{1,200}")
 
 
 class DriveError(Exception):
@@ -92,6 +97,53 @@ def load_client(path: Path | None = None) -> ClientConfig:
             f"Não foi possível ler {CLIENT_FILE} empacotado: {error}"
         ) from error
     return _parse(raw, CLIENT_FILE)
+
+
+def is_configured(path: Path | None = None) -> bool:
+    """Diz se existe um cliente OAuth válido, sem expor o motivo da falha."""
+    try:
+        load_client(path)
+    except DriveError:
+        return False
+    return True
+
+
+def save_client(raw: str, path: Path | None = None) -> ClientConfig:
+    """Valida o JSON do cliente e grava a versão normalizada, de forma atômica."""
+    client = _parse(raw, CLIENT_FILE)
+    target = path or client_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_name(f"{target.name}.tmp")
+    temporary.write_text(
+        json.dumps(client.as_installed(), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    os.replace(temporary, target)
+    return client
+
+
+def import_client(path: Path) -> ClientConfig:
+    """Importa o JSON baixado do Google Cloud Console, com limite de tamanho.
+
+    Só o que interessa é copiado para ``%LOCALAPPDATA%``: o arquivo original do
+    usuário não é movido nem alterado, e o conteúdo nunca entra em mensagem de
+    erro ou log.
+    """
+    try:
+        if path.stat().st_size > MAX_CLIENT_BYTES:
+            raise DriveConfigError(
+                "O arquivo escolhido é grande demais para ser um cliente OAuth."
+            )
+        raw = path.read_text(encoding="utf-8")
+    except OSError as error:
+        raise DriveConfigError(
+            "Não foi possível ler o arquivo do cliente OAuth."
+        ) from error
+    except UnicodeDecodeError as error:
+        raise DriveConfigError(
+            "O arquivo do cliente OAuth não está em UTF-8."
+        ) from error
+    return save_client(raw)
 
 
 def build_flow(client: ClientConfig) -> InstalledAppFlow:
@@ -223,12 +275,30 @@ def _parse(raw: str, source: str) -> ClientConfig:
             "“App para computador” no Google Cloud Console e salve o JSON em "
             f"{client_path()}."
         )
+    client_id = client_id.strip()
+    if not _CLIENT_ID.fullmatch(client_id):
+        raise DriveConfigError(
+            f"{source}: o client_id não parece um identificador do Google."
+        )
     secret = entry.get("client_secret")
-    auth_uri = entry.get("auth_uri")
-    token_uri = entry.get("token_uri")
     return ClientConfig(
-        client_id=client_id.strip(),
+        client_id=client_id,
         client_secret=secret if isinstance(secret, str) else "",
-        auth_uri=auth_uri if isinstance(auth_uri, str) else AUTH_URI,
-        token_uri=token_uri if isinstance(token_uri, str) else TOKEN_URI,
+        auth_uri=_google_uri(entry.get("auth_uri"), AUTH_URI, source),
+        token_uri=_google_uri(entry.get("token_uri"), TOKEN_URI, source),
     )
+
+
+def _google_uri(value: Any, default: str, source: str) -> str:
+    """Aceita só HTTPS em domínio do Google, para o token não vazar para fora."""
+    if not isinstance(value, str) or not value.strip():
+        return default
+    uri = value.strip()
+    parsed = urlparse(uri)
+    host = (parsed.hostname or "").lower()
+    allowed = any(host == name or host.endswith(f".{name}") for name in _GOOGLE_HOSTS)
+    if parsed.scheme != "https" or not allowed:
+        raise DriveConfigError(
+            f"{source}: o cliente OAuth aponta para um endereço que não é do Google."
+        )
+    return uri
