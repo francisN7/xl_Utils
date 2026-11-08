@@ -10,6 +10,7 @@ Erros: ``ValueError`` com o nome do arquivo quando a leitura falha.
 """
 
 import csv
+import io
 from collections.abc import Iterable, Mapping
 from pathlib import Path
 
@@ -144,6 +145,18 @@ def read_headers(path: Path) -> dict[str, list[str]]:
     raise ValueError(f"Formato não suportado: {path.suffix or path.name!r}")
 
 
+def dump_workbook(sheets: Mapping[str, pd.DataFrame]) -> bytes:
+    """Gera o ``.xlsx`` em memória, sem gravar em disco.
+
+    É o mesmo conteúdo de :func:`save_workbook`, usado quando o destino é o
+    Google Drive: o resultado vai direto para o upload, sem passar por
+    ``output/`` nem por um arquivo temporário.
+    """
+    buffer = io.BytesIO()
+    _write_workbook(sheets, buffer)
+    return buffer.getvalue()
+
+
 def save_workbook(sheets: Mapping[str, pd.DataFrame], destination: Path) -> Path:
     """Grava o mapa de DataFrames em um único ``.xlsx`` e devolve o caminho real.
 
@@ -152,17 +165,24 @@ def save_workbook(sheets: Mapping[str, pd.DataFrame], destination: Path) -> Path
     sobrescrito: ``unique_path`` escolhe um nome livre.
     """
     destination = unique_path(destination.parent, destination.stem, ".xlsx")
+    _write_workbook(sheets, destination)
+    return destination
+
+
+def _write_workbook(
+    sheets: Mapping[str, pd.DataFrame],
+    target: Path | io.BytesIO,
+) -> None:
+    """Escreve o livro no caminho ou no buffer informado."""
     used_names: set[str] = set()
 
-    with pd.ExcelWriter(destination, engine="xlsxwriter") as writer:
+    with pd.ExcelWriter(target, engine="xlsxwriter") as writer:
         for name, frame in sheets.items():
             frame.to_excel(
                 writer,
                 sheet_name=_safe_sheet_name(name, used_names),
                 index=False,
             )
-
-    return destination
 
 
 def _read_csv(

@@ -5,12 +5,28 @@ Saída: ``Path`` livre para gravação ou nome seguro para compor arquivo.
 Erros: nenhum; a pasta é criada quando necessário.
 """
 
+from collections.abc import Callable
 from pathlib import Path
 
 # O Windows recusa estes caracteres em nomes de arquivo e não aceita ponto ou
 # espaço no fim. O limite de 80 evita nomes gigantes ao juntar radical + aba.
 _INVALID_FILE_CHARS = frozenset('<>:"/\\|?*')
 _MAX_FILE_PART = 80
+
+
+def free_name(stem: str, suffix: str, exists: Callable[[str], bool]) -> str:
+    """Devolve ``stem.suffix`` ou ``stem_001.suffix``... até o nome estar livre.
+
+    ``exists`` recebe o nome completo e diz se ele já está ocupado. A mesma
+    convenção vale para o disco e para o Drive, para o usuário reconhecer o
+    resultado nos dois lugares.
+    """
+    candidate = f"{stem}{suffix}"
+    counter = 1
+    while exists(candidate):
+        candidate = f"{stem}_{counter:03}{suffix}"
+        counter += 1
+    return candidate
 
 
 def unique_path(directory: Path, stem: str, suffix: str = ".xlsx") -> Path:
@@ -20,12 +36,12 @@ def unique_path(directory: Path, stem: str, suffix: str = ".xlsx") -> Path:
     numérico aparece como ``stem_001.suffix``.
     """
     directory.mkdir(parents=True, exist_ok=True)
-    candidate = directory / f"{stem}{suffix}"
-    counter = 1
-    while candidate.exists():
-        candidate = directory / f"{stem}_{counter:03}{suffix}"
-        counter += 1
-    return candidate
+    name = free_name(
+        stem,
+        suffix,
+        lambda candidate: (directory / candidate).exists(),
+    )
+    return directory / name
 
 
 def default_output_dir(source: Path, name: str = "output") -> Path:

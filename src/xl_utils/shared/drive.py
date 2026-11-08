@@ -12,7 +12,9 @@ Erros: ``DriveError`` em PT-BR, com a causa resumida.
 
 from __future__ import annotations
 
+import json
 import threading
+import uuid
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -34,10 +36,12 @@ from xl_utils.shared.drive_auth import (
 )
 
 API = "https://www.googleapis.com/drive/v3/files"
+UPLOAD_API = "https://www.googleapis.com/upload/drive/v3/files"
 SHEET_MIME = "application/vnd.google-apps.spreadsheet"
+FOLDER_MIME = "application/vnd.google-apps.folder"
 NATIVE_PREFIX = "application/vnd.google-apps."
 XLSX_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-METADATA_FIELDS = "id,name,mimeType,size,parents"
+METADATA_FIELDS = "id,name,mimeType,size,parents,webViewLink"
 REQUEST_TIMEOUT = (10, 60)
 EXPORT_LIMIT = 10 * 1024 * 1024
 
@@ -63,6 +67,14 @@ class Transport(Protocol):
 class DriveApiError(DriveError):
     """O Google recusou ou não completou uma chamada da Drive API."""
 
+    def __init__(self, message: str, *, status: int = 0) -> None:
+        super().__init__(message)
+        self.status = status
+
+
+class FolderPermissionError(DriveApiError):
+    """A pasta de destino ainda não foi autorizada pelo usuário."""
+
 
 @dataclass(frozen=True, slots=True)
 class DriveFile:
@@ -73,6 +85,12 @@ class DriveFile:
     mime_type: str
     size: int | None = None
     parents: tuple[str, ...] = ()
+    web_view_link: str = ""
+
+    @property
+    def is_folder(self) -> bool:
+        """Diz se o item é uma pasta do Drive."""
+        return self.mime_type == FOLDER_MIME
 
     @property
     def is_native(self) -> bool:
@@ -116,7 +134,8 @@ class DriveClient:
 
     def metadata(self, file_id: str) -> DriveFile:
         """Lê nome, tipo, tamanho e pasta do arquivo."""
-        response = self._get(
+        response = self._request(
+            "GET",
             f"{API}/{_quoted(file_id)}",
             params={"fields": METADATA_FIELDS, "supportsAllDrives": "true"},
         )
@@ -124,6 +143,103 @@ class DriveClient:
         if not isinstance(data, dict):
             raise DriveApiError("O Google devolveu metadados inesperados.")
         return _file(data)
+
+    def root_id(self) -> str:
+        """Devolve o ID da raiz do Meu Drive da conta."""
+        response = self._request(
+            "GET",
+            f"{API}/root",
+            params={"fields": "id", "supportsAllDrives": "true"},
+        )
+        data = _json(response)
+        root = data.get("id") if isinstance(data, dict) else None
+        if not isinstance(root, str) or not root:
+            raise DriveApiError("O Google não devolveu a raiz do Meu Drive.")
+        return root
+
+    def user_email(self) -> str:
+        """Devolve o e-mail da conta dona do token, se o escopo permitir."""
+        response = self._request(
+            "GET",
+            "https://www.googleapis.com/drive/v3/about",
+            params={"fields": "user(emailAddress,displayName)"},
+        )
+        data = _json(response)
+        user = data.get("user") if isinstance(data, dict) else None
+        email = user.get("emailAddress") if isinstance(user, dict) else None
+        if not isinstance(email, str) or not email:
+            raise DriveApiError("O Google não devolveu o e-mail desta conta.")
+        return email
+
+    def exists(self, parent: str | None, name: str) -> bool:
+        """Diz se já existe um arquivo com esse nome na pasta (ou na raiz)."""
+        return bool(self.children(parent or "root", name=name, limit=1))
+
+    def children(
+        self,
+        parent: str,
+        *,
+        name: str | None = None,
+        limit: int = 100,
+    ) -> list[DriveFile]:
+        """Lista os itens visíveis na pasta, opcionalmente filtrando por nome."""
+        query = f"'{_query_value(parent)}' in parents and trashed = false"
+        if name:
+            query += f" and name = '{_query_value(name)}'"
+        response = self._request(
+            "GET",
+            API,
+            params={
+                "q": query,
+                "fields": "files(id,name,mimeType,size,parents,webViewLink)",
+                "pageSize": str(limit),
+                "supportsAllDrives": "true",
+            },
+        )
+        data = _json(response)
+        files = data.get("files") if isinstance(data, dict) else None
+        if not isinstance(files, list):
+            return []
+        return [_file(item) for item in files if isinstance(item, dict)]
+
+    def upload(
+        self,
+        name: str,
+        data: bytes,
+        *,
+        parent: str | None = None,
+        mime_type: str = XLSX_MIME,
+    ) -> DriveFile:
+        """Cria um arquivo novo na pasta informada, sem sobrescrever nada.
+
+        Sem ``parent``, o arquivo nasce na raiz do Meu Drive. Um 403 de
+        permissão vira :class:`FolderPermissionError`, para a UI oferecer a
+        concessão da pasta em vez de mostrar uma falha seca.
+        """
+        metadata: dict[str, Any] = {"name": name, "mimeType": mime_type}
+        if parent:
+            metadata["parents"] = [parent]
+        body, boundary = _multipart(metadata, data, mime_type)
+        response = self._request(
+            "POST",
+            UPLOAD_API,
+            params={
+                "uploadType": "multipart",
+                "supportsAllDrives": "true",
+                "fields": METADATA_FIELDS,
+            },
+            data=body,
+            headers={"Content-Type": f"multipart/related; boundary={boundary}"},
+            folder=parent is not None,
+        )
+        payload = _json(response)
+        if not isinstance(payload, dict):
+            raise DriveApiError("O Google não confirmou o arquivo gravado.")
+        return _file(payload)
+
+    def delete(self, file_id: str) -> None:
+        """Apaga um arquivo criado pelo app (usado por testes e diagnóstico)."""
+        self._request("DELETE", f"{API}/{_quoted(file_id)}", params={})
 
     def payload(self, file: DriveFile) -> tuple[bytes, str]:
         """Devolve o conteúdo e o nome local do arquivo escolhido."""
@@ -134,28 +250,44 @@ class DriveClient:
                 f"“{file.name}” não é uma planilha. Escolha um arquivo "
                 "do Sheets, Excel ou CSV."
             )
-        response = self._get(
+        response = self._request(
+            "GET",
             f"{API}/{_quoted(file.id)}",
             params={"alt": "media", "supportsAllDrives": "true"},
         )
         return response.content, _local_name(file)
 
     def _export(self, file: DriveFile) -> bytes:
-        response = self._get(
+        response = self._request(
+            "GET",
             f"{API}/{_quoted(file.id)}/export",
             params={"mimeType": XLSX_MIME},
         )
         return response.content
 
-    def _get(self, url: str, *, params: dict[str, str]) -> Response:
+    def _request(
+        self,
+        method: str,
+        url: str,
+        *,
+        params: dict[str, str],
+        data: bytes | None = None,
+        headers: dict[str, str] | None = None,
+        folder: bool = False,
+    ) -> Response:
+        """Executa a chamada renovando o token uma vez em caso de 401."""
         for attempt in range(2):
             token = self._token(attempt > 0)
+            request_headers = {"Authorization": f"Bearer {token}"}
+            if headers:
+                request_headers.update(headers)
             try:
                 response = self._transport.request(
-                    "GET",
+                    method,
                     url,
                     params=params,
-                    headers={"Authorization": f"Bearer {token}"},
+                    headers=request_headers,
+                    data=data,
                     timeout=self._timeout,
                 )
             except RequestException as error:
@@ -165,6 +297,13 @@ class DriveClient:
             if response.status_code == 401:
                 continue
             if response.status_code >= 400:
+                if folder and response.status_code in {403, 404}:
+                    raise FolderPermissionError(
+                        "O Google não deixou esta conta gravar na pasta. Use a "
+                        "mesma conta que abriu a planilha e autorize a pasta no "
+                        "seletor do Drive.",
+                        status=response.status_code,
+                    )
                 raise _error(response)
             return response
         raise DriveAuthError(
@@ -253,7 +392,31 @@ def _file(data: dict[str, Any]) -> DriveFile:
         parents=tuple(str(item) for item in parents)
         if isinstance(parents, list)
         else (),
+        web_view_link=str(data.get("webViewLink") or ""),
     )
+
+
+def _multipart(
+    metadata: dict[str, Any],
+    data: bytes,
+    mime_type: str,
+) -> tuple[bytes, str]:
+    """Monta o corpo ``multipart/related`` que a Drive API espera."""
+    boundary = f"xl_utils_{uuid.uuid4().hex}"
+    head = (
+        f"--{boundary}\r\n"
+        "Content-Type: application/json; charset=UTF-8\r\n\r\n"
+        f"{json.dumps(metadata, ensure_ascii=False)}\r\n"
+        f"--{boundary}\r\n"
+        f"Content-Type: {mime_type}\r\n\r\n"
+    ).encode()
+    tail = f"\r\n--{boundary}--\r\n".encode()
+    return head + data + tail, boundary
+
+
+def _query_value(value: str) -> str:
+    """Escapa um valor de consulta da Drive API (aspas e barra invertida)."""
+    return value.replace("\\", "\\\\").replace("'", "\\'")
 
 
 def _size(value: Any) -> int | None:
@@ -270,28 +433,37 @@ def _json(response: Response) -> Any:
 
 def _error(response: Response) -> DriveError:
     reason = _reason(response)
-    if response.status_code == 404:
+    status = response.status_code
+    if status == 404:
         return DriveApiError(
-            "Arquivo não encontrado no Drive. Ele pode ter sido movido ou excluído."
+            "Arquivo não encontrado no Drive. Ele pode ter sido movido ou excluído.",
+            status=status,
         )
-    if response.status_code == 403 and reason == "storageQuotaExceeded":
-        return DriveApiError("O Google Drive está sem espaço para gravar.")
-    if response.status_code == 403 and reason == "exportSizeLimitExceeded":
+    if status == 403 and reason == "storageQuotaExceeded":
+        return DriveApiError(
+            "O Google Drive está sem espaço para gravar.",
+            status=status,
+        )
+    if status == 403 and reason == "exportSizeLimitExceeded":
         return DriveApiError(
             "A planilha é grande demais para exportar pelo Google (limite de "
-            "10 MB). Baixe-a no Drive e abra pelo seletor local."
+            "10 MB). Baixe-a no Drive e abra pelo seletor local.",
+            status=status,
         )
-    if response.status_code == 403:
+    if status == 403:
         return DriveApiError(
             "O Google negou o acesso a este arquivo. Ele pode ter sido "
-            "movido ou o acesso removido."
+            "movido ou o acesso removido.",
+            status=status,
         )
-    if response.status_code in {429, 500, 502, 503, 504}:
+    if status in {429, 500, 502, 503, 504}:
         return DriveApiError(
-            "O Google está ocupado agora. Tente de novo em alguns instantes."
+            "O Google está ocupado agora. Tente de novo em alguns instantes.",
+            status=status,
         )
     return DriveApiError(
-        f"O Google Drive não concluiu o pedido (código {response.status_code})."
+        f"O Google Drive não concluiu o pedido (código {status}).",
+        status=status,
     )
 
 

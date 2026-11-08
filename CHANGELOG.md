@@ -144,6 +144,12 @@ decisões nos ADRs.
   PT-BR. Testes offline com transporte falso.
 - Botão do Drive ao lado do seletor local, visível só com conta: uma abre direto
   e duas ou mais pedem qual conta usar.
+- Drive III (S9c): salvar o resultado na pasta da planilha de origem, sem passar
+  por `output/`, com concessão de pasta lembrada por conta
+  (`drive/folders.json`), Picker restrito a pastas, upload multipart e nomes
+  livres (`_001`). O painel troca “Salvar em output/” por “Salvar no Drive”
+  quando a entrada veio do Drive, mostra “Abrir no Drive” e cai na raiz do Meu
+  Drive se o usuário recusar a pasta.
 
 ### Changed
 
@@ -155,6 +161,8 @@ decisões nos ADRs.
   cabeçalho; `.xlsm` deixou de ser tratado como divergência.
 - `save_workbook` normaliza o sufixo para `.xlsx`; `save_chosen` recusa arquivo
   como destino de lote; `safe_file_part` e `summarize_cnjs` foram para o core.
+- `save_workbook` reutiliza `dump_workbook`, que gera o `.xlsx` em memória para
+  o Drive; `free_name` centraliza a convenção `_001` no disco e na pasta remota.
 - Docstrings e comentários de `ui/`, `shared/`, shell e `__init__` passam para
   PT-BR; o diagnóstico foi revisado sem incluir conteúdo de célula.
 - Documentação: o backlog passa a registrar o envio direto do Google Drive e a
@@ -164,6 +172,9 @@ decisões nos ADRs.
 - Documentação: o backlog passa a registrar o sistema de plugins — ferramentas
   opcionais em `.7z`, repositório privado para os plugins arriscados e
   documentação pública do contrato; nada implementado.
+- Documentação: o backlog passa a registrar o seletor de arquivos integrado à UI
+  e um fluxo do Drive que não repita o consentimento a cada escolha; os dois
+  ficam para decisão de produto, sem sessão marcada.
 - Ferramenta de vinculação renomeada para **Verificar Vínculos** na sidebar, no
   cabeçalho e na documentação; a descrição acompanha o novo vocabulário. O
   `id`, os módulos `link` e a regra não mudaram.

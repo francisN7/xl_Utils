@@ -20,7 +20,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S9a5 | Login com escopo de e-mail canônico | [x] |
 | S9a6 | Janela abre na tela primária | [x] |
 | S9b | Drive II — Picker, leitura e botão na entrada | [x] |
-| S9c | Drive III — gravação na pasta, exportação e acabamento | [ ] |
+| S9c | Drive III — gravação na pasta, exportação e acabamento | [x] |
 
 Ordem definida pelo dono: **vinculação → tela cheia → Drive**. O Drive fica por
 último porque muda o caminho de saída de todas as ferramentas; a S9 só vira
@@ -169,6 +169,34 @@ ficou com 44 px no topo da linha e `login_hint` pré-seleciona a conta no
 navegador. Ver a [spec](../sessions/S9b-drive-planilha.md) e o adendo ao ADR
 0018.
 
+## S9c — entregue
+
+O resultado agora pode ser salvo no Drive, na pasta da planilha de origem, sem
+passar por `output/`. Quando a entrada veio do Drive, o painel troca “Salvar em
+output/” por **Salvar no Drive**; o botão abre o Picker de pasta na primeira
+gravação, guarda a concessão por conta em `drive/folders.json` e não pergunta
+de novo. A pasta escolhida vale para as próximas gravações; se o usuário
+recusar, o arquivo vai para a raiz do Meu Drive com aviso.
+
+O teste real confirmou que a concessão de pasta sobrevive ao token persistido
+da conta. O Picker não tem “somente pastas”, então o app soma
+`mimetypes=application/vnd.google-apps.folder` e recusa um arquivo se ele
+escapar. A conta do navegador precisa ser a mesma do app: `login_hint`
+pré-seleciona, mas não força; 403/404 viram `FolderPermissionError` e reabrem a
+concessão com a conta certa.
+
+Nada é sobrescrito: o app procura o nome livre e grava `Nome.xlsx`,
+`Nome_001.xlsx`... O `.xlsx` é gerado em memória por `core/io.dump_workbook`, o
+upload é multipart e o painel mostra “Abrir no Drive”. Com origens em pastas
+diferentes, o usuário escolhe uma pasta uma vez. Ver a
+[spec](../sessions/S9c-drive-escrita.md) e o adendo ao ADR 0018.
+
+## S10 — próxima
+
+Fechar o ciclo 0006, arquivar esta página em `0006-backlog.md`, limpar as specs
+fechadas e abrir o ciclo 0007 com o backlog revisado (responsividade, e-mail
+longo e plugins). Ver a [spec](../sessions/S10-fechar-ciclo-0006.md).
+
 ## Auditoria pública — entregue
 
 Auditoria de segurança e privacidade em 2026-11-07: repositório sem segredos ou
@@ -179,6 +207,21 @@ recriado. O backlog de plugins entrou em seguida.
 
 ## Backlog
 
+- **Seletor de arquivos integrado à UI** — sem sessão marcada. Hoje o arquivo
+  local abre no diálogo nativo do Windows e o do Drive abre uma aba do
+  navegador; os dois saem do visual e do fluxo da janela. Estudar um seletor
+  próprio (lista de pastas e arquivos, filtros por formato, recentes e, no
+  Drive, as pastas já concedidas) que siga o tema e caiba no app, mantendo o
+  seletor nativo e o Picker como fallback. A decisão depende de o Flet suportar
+  ou de migrar para webview/PySide6; medir antes.
+- **Drive sem consentimento repetido** — sem sessão marcada. O Picker de desktop
+  exige `prompt=consent` e abre o navegador a cada escolha, então o login
+  inicial parece não servir para nada. Investigar um pipeline que use o token
+  do login para listar e escolher arquivos e pastas dentro do app — por exemplo
+  o Picker web com API key e webview, ou o escopo `drive` com um navegador
+  próprio — e comparar com o desenho atual (`drive.file` + Picker + concessão
+  de pasta): consentimento único, verificação do Google, acesso mínimo, esforço
+  e risco. Não trocar o escopo sem ADR.
 - **Responsividade do Início e das ferramentas** — sem sessão marcada. Em
   largura reduzida, os títulos dos cartões quebram no meio das palavras e a
   descrição estoura o card, empurrando “Abrir ferramenta” para fora; em

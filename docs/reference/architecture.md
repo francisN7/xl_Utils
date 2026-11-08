@@ -12,7 +12,7 @@ guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 | Core | `src/xl_utils/core/` | Regra pura, sem Flet, sem diálogo, sem `print`. |
 | Controllers | `src/xl_utils/controllers/` | Orquestra o core e devolve dados em memória. |
 | UI | `src/xl_utils/ui/` | Coleta entrada, executa em segundo plano e exibe resultado; não contém regra. |
-| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso, abertura de pasta e contas do Drive. |
+| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso, abertura de pasta, contas e pastas do Drive. |
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 
@@ -20,9 +20,9 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 
 | Módulo | Papel | Superfície principal |
 |---|---|---|
-| `core/io.py` | lê e grava cada formato | `read_workbook`, `read_html_tables`, `list_sheets`, `read_headers`, `save_workbook` |
+| `core/io.py` | lê e grava cada formato | `read_workbook`, `read_html_tables`, `list_sheets`, `read_headers`, `save_workbook`, `dump_workbook` |
 | `core/mime.py` | decide o formato pelo conteúdo | `detect_suffix`, `resolve_suffix`, `check_format`, `FormatCheck` |
-| `core/paths.py` | caminhos e nomes seguros | `unique_path`, `default_output_dir`, `safe_file_part` |
+| `core/paths.py` | caminhos e nomes seguros | `unique_path`, `free_name`, `default_output_dir`, `safe_file_part` |
 | `core/save.py` | grava só depois da escolha | `SaveItem`, `save_chosen`, `save_to_output`, `save_item` |
 | `core/text.py` | limpeza de texto | `remove_emojis` |
 | `core/tools/all_str.py` | pipeline de leitura | `prepare_workbook` |
@@ -151,6 +151,11 @@ apagar a prévia.
 normalizado para `.xlsx` — com nomes saneados (limite de 31 caracteres e
 caracteres inválidos do Excel). O arquivo de origem nunca é alterado e nada é
 criado antes da escolha do usuário.
+
+Para o Google Drive, `core/io.dump_workbook` gera os mesmos bytes em memória,
+sem tocar no disco; `core/paths.free_name` aplica a mesma convenção `_001` a um
+nome de pasta remota. O upload e o destino ficam em `shared/drive.py` e
+`ui/drive.py`.
 
 ## Logging e erros
 
@@ -283,7 +288,17 @@ e devolve os `picked_file_ids`. `shared/drive.py` é o cliente REST (metadados,
 transporte injetável para os testes. `shared/drive_cache.py` grava os bytes em
 `%LOCALAPPDATA%/xl_utils/drive/cache/<sessão>/` com o nome real, limpa a pasta
 na abertura do app e diz se um caminho veio do Drive — usado para recusar
-“Salvar em `output/`” sem pasta de origem.
+“Salvar em `output/`” sem pasta de origem. O mesmo cache grava `_origins.json`
+com arquivo, pasta e conta de origem, para a gravação voltar ao lugar certo.
+
+A gravação usa o caminho inverso. `drive_pick` aceita `folders=True`: pede
+`allow_folder_selection=true` e restringe o seletor ao MIME de pasta. `drive.py`
+cria o arquivo por upload multipart, lista nomes para não sobrescrever e devolve
+`webViewLink`; `drive_store.py` guarda `drive/folders.json` por conta e pasta.
+`ui/drive.py` resolve a conta e a pasta, gera o `.xlsx` em memória e grava fora
+da UI thread; `ToolLayout` mostra o diálogo de concessão quando a pasta ainda
+não foi autorizada e cai na raiz se o usuário recusar. Ver o adendo da S9c ao
+ADR 0018.
 
 ## Recorte
 

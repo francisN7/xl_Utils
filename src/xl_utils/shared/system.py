@@ -3,6 +3,7 @@
 import os
 import subprocess
 import sys
+import webbrowser
 from pathlib import Path
 
 
@@ -15,3 +16,13 @@ def open_folder(path: Path) -> None:
         subprocess.Popen(["open", str(target)])
     else:
         subprocess.Popen(["xdg-open", str(target)])
+
+
+def open_url(url: str) -> bool:
+    """Abre um endereço no navegador padrão e diz se deu certo."""
+    if not url:
+        return False
+    try:
+        return webbrowser.open(url, new=2)
+    except webbrowser.Error:
+        return False

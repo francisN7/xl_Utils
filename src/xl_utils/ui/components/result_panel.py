@@ -3,6 +3,7 @@
 import contextlib
 from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import flet as ft
 import pandas as pd
@@ -10,9 +11,12 @@ import pyperclip
 
 from xl_utils.shared.log import LogEvent, RunLog
 from xl_utils.shared.progress import ProgressEvent
-from xl_utils.shared.system import open_folder
+from xl_utils.shared.system import open_folder, open_url
 from xl_utils.ui import theme
 from xl_utils.ui.components.preview_table import PreviewTable
+
+if TYPE_CHECKING:
+    from xl_utils.ui.drive import DriveSaved
 
 _LOG_MAX_HEIGHT = 160
 
@@ -27,10 +31,13 @@ class ResultPanel:
         *,
         on_save: Callable[[], None] | None = None,
         on_save_output: Callable[[], None] | None = None,
+        on_save_drive: Callable[[], None] | None = None,
     ) -> None:
         self._on_save = on_save
         self._on_save_output = on_save_output
+        self._on_save_drive = on_save_drive
         self._output: Path | None = None
+        self._drive_link = ""
         self._kind = "idle"
         self._diagnostics = ""
         self._dispatch: Dispatcher | None = None
@@ -80,10 +87,26 @@ class ResultPanel:
             icon=ft.Icons.FOLDER,
             on_click=self._save_output,
         )
+        self._save_drive_button = ft.OutlinedButton(
+            "Salvar no Drive",
+            icon=ft.Icons.CLOUD_UPLOAD,
+            on_click=self._save_drive,
+            visible=False,
+        )
+        self._drive_link_button = ft.OutlinedButton(
+            "Abrir no Drive",
+            icon=ft.Icons.OPEN_IN_NEW,
+            on_click=self._open_drive_link,
+            visible=False,
+        )
         self._save_row = ft.Column(
             controls=[
                 ft.Row(
-                    controls=[self._save_button, self._save_output_button],
+                    controls=[
+                        self._save_button,
+                        self._save_drive_button,
+                        self._save_output_button,
+                    ],
                     spacing=8,
                     wrap=True,
                 ),
@@ -178,8 +201,9 @@ class ResultPanel:
                 self._path,
                 self._save_row,
                 ft.Row(
-                    controls=[self._open_button],
+                    controls=[self._open_button, self._drive_link_button],
                     alignment=ft.MainAxisAlignment.START,
+                    spacing=8,
                 ),
                 self._log_section,
                 ft.Divider(height=1, color=theme.BORDER),
@@ -254,6 +278,8 @@ class ResultPanel:
         self._path.value = ""
         self._path.visible = False
         self._open_button.visible = False
+        self._drive_link_button.visible = False
+        self._drive_link = ""
         self._save_row.visible = False
         self._hide_progress()
         self.set_log([])
@@ -267,6 +293,7 @@ class ResultPanel:
         self._status.value = message
         self._detail.value = detail
         self._save_row.visible = False
+        self._drive_link_button.visible = False
         self._hide_progress()
         self._refresh()
 
@@ -277,6 +304,7 @@ class ResultPanel:
         self._status.value = message
         self._detail.value = ""
         self._save_row.visible = False
+        self._drive_link_button.visible = False
         self._refresh()
 
     def set_cancelling(self) -> None:
@@ -300,9 +328,22 @@ class ResultPanel:
         self._path.value = ""
         self._path.visible = False
         self._open_button.visible = False
+        self._drive_link_button.visible = False
+        self._drive_link = ""
         self._save_row.visible = True
         self._hide_progress()
         self.preview.set_frames(frames)
+        self._refresh()
+
+    def set_drive_mode(self, enabled: bool, available: bool = True) -> None:
+        """Troca “Salvar em output/” por “Salvar no Drive” para origens do Drive.
+
+        ``available`` diz se há conta conectada; sem ela o botão do Drive fica
+        visível, mas desabilitado, em vez de voltar ao atalho de ``output/``.
+        """
+        self._save_drive_button.visible = enabled
+        self._save_drive_button.disabled = enabled and not available
+        self._save_output_button.visible = not enabled
         self._refresh()
 
     def set_saving(self, message: str = "Salvando...") -> None:
@@ -312,6 +353,7 @@ class ResultPanel:
         self._status.value = message
         self._detail.value = ""
         self._save_row.visible = False
+        self._drive_link_button.visible = False
         self._hide_progress()
         self._refresh()
 
@@ -331,6 +373,44 @@ class ResultPanel:
         self._path.value = str(self._output)
         self._path.visible = True
         self._open_button.visible = True
+        self._drive_link_button.visible = False
+        self._drive_link = ""
+        self._save_row.visible = False
+        self._hide_progress()
+        self.preview.set_frames(frames)
+        self._refresh()
+
+    def set_drive_success(
+        self,
+        saved: Sequence[DriveSaved],
+        frames: dict[str, pd.DataFrame],
+        account: str = "",
+        note: str = "",
+    ) -> None:
+        """Mostra os arquivos recém-gravados no Drive, com link para abrir."""
+        self._output = None
+        self._kind = "success"
+        self._icon.name = ft.Icons.CLOUD_DONE
+        self._icon.color = theme.GREEN
+        folder = saved[0].folder_name if saved else "Meu Drive"
+        if len(saved) == 1:
+            self._status.value = "Salvo no Drive"
+            parts = [folder, saved[0].name]
+            self._path.value = f"{folder}/{saved[0].name}"
+            self._drive_link = saved[0].web_link
+        else:
+            self._status.value = f"{len(saved)} arquivos salvos no Drive"
+            parts = [folder, f"{len(saved)} arquivos"]
+            self._path.value = folder
+            self._drive_link = ""
+        if account:
+            parts.append(account)
+        if note:
+            parts.append(note)
+        self._detail.value = " · ".join(parts)
+        self._path.visible = True
+        self._open_button.visible = False
+        self._drive_link_button.visible = bool(self._drive_link)
         self._save_row.visible = False
         self._hide_progress()
         self.preview.set_frames(frames)
@@ -346,6 +426,7 @@ class ResultPanel:
         self._path.value = ""
         self._path.visible = False
         self._open_button.visible = False
+        self._drive_link_button.visible = False
         self._save_row.visible = True
         self._hide_progress()
         self._refresh()
@@ -366,6 +447,7 @@ class ResultPanel:
         self._path.value = ""
         self._path.visible = False
         self._open_button.visible = False
+        self._drive_link_button.visible = False
         self._save_row.visible = False
         self._hide_progress()
         self.preview.set_frames(frames)
@@ -386,6 +468,7 @@ class ResultPanel:
         self._detail.value = detail
         self._path.visible = False
         self._open_button.visible = False
+        self._drive_link_button.visible = False
         self._save_row.visible = False
         self._hide_progress()
         if not keep_preview:
@@ -429,9 +512,16 @@ class ResultPanel:
         if self._on_save_output is not None:
             self._on_save_output()
 
+    def _save_drive(self, _event=None) -> None:
+        if self._on_save_drive is not None:
+            self._on_save_drive()
+
     def _open_folder(self, _event=None) -> None:
         if self._output is not None:
             open_folder(self._output)
+
+    def _open_drive_link(self, _event=None) -> None:
+        open_url(self._drive_link)
 
     def _copy_log(self, _event=None) -> None:
         if not self._log.value:

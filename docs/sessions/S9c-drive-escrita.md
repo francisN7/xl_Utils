@@ -40,11 +40,11 @@ Recomendação: **(a)**, com (b) como saída quando o usuário recusar a pasta.
 
 ## Aceite
 
-- [ ] Resultado salvo na pasta do arquivo de origem, sem `output/`.
-- [ ] Segunda gravação na mesma pasta não pede permissão de novo.
-- [ ] Pasta recusada cai na raiz com mensagem clara, sem perder o resultado.
-- [ ] Arquivo existente nunca é sobrescrito sem confirmação.
-- [ ] Testes offline verdes; leitura da S9b intacta.
+- [x] Resultado salvo na pasta do arquivo de origem, sem `output/`.
+- [x] Segunda gravação na mesma pasta não pede permissão de novo.
+- [x] Pasta recusada cai na raiz com mensagem clara, sem perder o resultado.
+- [x] Arquivo existente nunca é sobrescrito sem confirmação.
+- [x] Testes offline verdes; leitura da S9b intacta.
 
 ## Orçamento de contexto (≤90 linhas)
 

@@ -126,11 +126,26 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 `SaveItem` guarda o nome sugerido, as abas e a pasta `output/` da origem.
 `save_chosen` grava um arquivo ou vários em uma pasta; `save_to_output` usa o
 atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
-`safe_file_part` prepara nome de arquivo a partir do nome da aba.
+`safe_file_part` prepara nome de arquivo a partir do nome da aba. Para o Drive,
+`io.dump_workbook` gera o `.xlsx` em memória e `paths.free_name` escolhe um nome
+livre na pasta remota com a mesma convenção.
 
 **Observe:** `SaveError` embrulha qualquer falha; a prévia não é apagada.
 
-### 9. Testes — `tests/`
+### 9. Drive — `shared/` e `ui/drive.py`
+
+`drive_auth.py` e `accounts.py` cuidam do OAuth e das contas; `drive_pick.py`
+faz o Picker de arquivo e de pasta; `drive.py` é o cliente REST (leitura,
+`files.create` multipart, nomes livres e `webViewLink`); `drive_cache.py` grava
+a cópia local e o manifesto de origem; `drive_store.py` guarda as pastas
+autorizadas por conta. `ui/drive.py` é o estado compartilhado e o
+`DriveSession.save_to_drive` roda fora da UI thread. `ToolLayout` decide entre
+“Salvar em output/” e “Salvar no Drive” e mostra o diálogo de concessão.
+
+**Observe:** nada de token em log ou mensagem; a pasta só é concedida uma vez e
+nada é sobrescrito.
+
+### 10. Testes — `tests/`
 
 | Arquivo | Prova que… |
 |---|---|
@@ -151,6 +166,10 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | `test_ui_state.py` | trocar o arquivo reseta o resultado sem perder opções |
 | `test_configs.py` | JSON empacotado e override por `%LOCALAPPDATA%` |
 | `test_integration.py` | as ferramentas de lote rodam nos quatro formatos |
+| `test_drive_api.py` | metadados, download, export, multipart e erro de pasta |
+| `test_drive_pick.py` | Picker de arquivo e pasta, PKCE/`state` e cancelamento |
+| `test_drive_session.py` | login, contas, leitura e cópia no cache |
+| `test_drive_write.py` | gravação, sufixo `_001`, pasta e diálogo de concessão |
 
 ## Onde mexer para…
 
@@ -161,6 +180,7 @@ atalho. `paths.unique_path` resolve colisão (`saida_001.xlsx`) e
 | mudar a leitura de texto/emojis | `core/tools/all_str.py` + `core/text.py` |
 | mudar nome de arquivo de saída | `controllers/cut.py` ou `core/paths.py` |
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |
+| mudar a gravação no Drive | `shared/drive.py` + `drive_pick.py` + `drive_store.py` + `ui/drive.py` + `tool_layout.py` |
 | mudar a regra do merge | `core/tools/merge.py` |
 | mudar a regra da vinculação | `core/tools/link.py` + `controllers/link.py` + `ui/pages/link.py` |
 | mudar um cabeçalho padrão | `src/xl_utils/configs/headers.json` (ou override local) |

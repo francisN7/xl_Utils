@@ -213,6 +213,17 @@ def test_login_hint_preselects_the_account_chosen_in_the_app(
     assert google.query["login_hint"] == ["ana@example.com"]
 
 
+def test_folder_picker_restricts_the_results_to_folders(
+    google: _FakeGoogle,
+    browser: _Browser,
+) -> None:
+    pick_files(_client(google), folders=True, timeout=10)
+
+    assert google.query["allow_folder_selection"] == ["true"]
+    assert google.query["mimetypes"] == [drive_pick.FOLDER_MIME]
+    assert "allow_multiple" not in google.query
+
+
 def test_cancelled_picker_is_not_an_error(
     google: _FakeGoogle,
     browser: _Browser,

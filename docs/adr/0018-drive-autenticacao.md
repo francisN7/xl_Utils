@@ -140,3 +140,36 @@ Gravar de volta na pasta de origem fica para a S9c: `drive.file` concede arquivo
 por arquivo, e a pasta do arquivo escolhido não vem junto. Será preciso o
 usuário conceder a pasta uma vez (`allow_folder_selection=true`) e guardar essa
 concessão por conta, ou aceitar a raiz do Meu Drive.
+
+## Adendo — gravação na pasta e nomes livres (S9c)
+
+O teste real de 2026-11-08 confirmou o desenho: o Picker de desktop aceita
+`allow_folder_selection=true` e a concessão da pasta **sobrevive ao token
+persistido da conta**, desde que o navegador use a mesma conta Google do app. O
+`login_hint` pré-seleciona essa conta, mas não a força; quando outra conta
+autoriza, o Drive responde 403/404 para o token salvo, o app esquece a
+concessão e reabre o diálogo explicando que a conta precisa ser a mesma.
+
+O Picker de desktop não tem um parâmetro “somente pastas”. A restrição usa o
+filtro documentado `mimetypes=application/vnd.google-apps.folder`, somado a
+`allow_folder_selection=true`; se o Google ainda devolver um arquivo, o app o
+recusa e pede a pasta de novo. O `ViewId.FOLDERS` do Picker web resolveria isso,
+mas exigiria API key e webview, descartados na S9b.
+
+A raiz do Meu Drive não é visível para `drive.file` (`files/root` responde 404).
+Por isso, arquivo cuja origem está na raiz é gravado na raiz sem `parents`, e a
+concessão de pasta só é pedida quando o arquivo tem uma pasta de origem.
+Arquivos com origens em pastas diferentes usam uma pasta escolhida uma vez, ou
+a raiz se o usuário recusar.
+
+`shared/drive_store.py` guarda `drive/folders.json` por conta e pasta, com
+escrita atômica. `shared/drive_cache.py` grava um manifesto `_origins.json` na
+sessão do cache com arquivo, pasta e conta de origem; a gravação não passa por
+`output/`. O upload é `files.create` multipart (`uploadType=multipart`,
+`supportsAllDrives=true`) e devolve `webViewLink` para o botão “Abrir no Drive”.
+
+Nada é sobrescrito: antes de criar, `files.list` procura o nome na pasta e
+`free_name` acrescenta `_001`, `_002`... como no disco local. `files.update`
+ficou fora do escopo. Limitação conhecida: com `drive.file`, a listagem pode
+mostrar apenas arquivos que o app criou ou escolheu; arquivos do usuário com o
+mesmo nome podem coexistir, mas nunca são alterados.

@@ -19,7 +19,10 @@ from xl_utils.core.tools.link import (
     InvalidCnjError,
     MissingColumnsError,
 )
-from xl_utils.shared import drive_cache
+from xl_utils.shared import drive_auth, drive_cache
+from xl_utils.shared.accounts import Account
+from xl_utils.shared.drive import FolderPermissionError
+from xl_utils.shared.drive_store import FolderGrant
 from xl_utils.shared.log import RunLog, build_diagnostics
 from xl_utils.shared.progress import (
     CancelToken,
@@ -31,7 +34,7 @@ from xl_utils.ui import theme
 from xl_utils.ui.components.file_input import FileInput
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.components.sheet_selector import SheetSelector
-from xl_utils.ui.drive import DriveSession
+from xl_utils.ui.drive import DriveSaved, DriveSession
 from xl_utils.ui.state import ToolState
 
 RunHandler = Callable[
@@ -139,7 +142,10 @@ class ToolLayout:
         self.result = ResultPanel(
             on_save=self._save_clicked,
             on_save_output=self._save_output_clicked,
+            on_save_drive=self._save_drive_clicked,
         )
+        if drive is not None:
+            drive.subscribe(self._drive_changed)
         self._formats: dict[Path, FormatCheck] = {}
         self._sheet_loading = False
         self._running = False
@@ -335,6 +341,7 @@ class ToolLayout:
             self._run_button.disabled = True
         self.result.set_idle()
         self._refresh_options()
+        self._update_drive_mode()
         self._refresh()
         self._start_sheet_load()
 
@@ -350,6 +357,7 @@ class ToolLayout:
         self._check_formats()
         self.result.set_idle()
         self._update_summary()
+        self._update_drive_mode()
         self._run_button.disabled = not self._ready()
         self._refresh_options()
         self._refresh()
@@ -797,6 +805,197 @@ class ToolLayout:
             self._save_failed(SaveError("A janela ainda não está pronta para gravar."))
             return
         page.run_task(self._write, lambda: save_to_output(items))
+
+    def _drive_changed(self) -> None:
+        """Reavalia o botão do Drive quando contas entram ou saem."""
+        self._update_drive_mode()
+        self._refresh()
+
+    def _update_drive_mode(self) -> None:
+        """Mostra “Salvar no Drive” só quando a entrada veio do Drive."""
+        has_origin = any(drive_cache.is_cached(path) for path in self.state.files)
+        available = self._drive is not None and bool(self._drive.accounts)
+        self.result.set_drive_mode(has_origin, available)
+
+    def _save_drive_clicked(self, _event=None) -> None:
+        """Leva o resultado para a pasta do Drive, pedindo a pasta se preciso."""
+        items = list(self.state.save_items)
+        if not items or self._drive is None:
+            return
+        page = self._page()
+        if page is None:
+            self._save_failed(
+                SaveError("A janela ainda não está pronta para gravar no Drive.")
+            )
+            return
+        origins = drive_cache.origins(self.state.files)
+        account = self._drive.account_for(origins)
+        if account is None:
+            self._save_failed(
+                SaveError("Entre no Google Drive para salvar o resultado lá.")
+            )
+            return
+        folders = drive_cache.parents(self.state.files)
+        if not folders:
+            page.run_task(self._drive_upload, account, items, None, True)
+            return
+        if len(folders) > 1:
+            self._ask_drive_folder(page, account, items, "")
+            return
+        grant = self._drive.folder_grant(account, folders[0])
+        if grant is None:
+            self._ask_drive_folder(page, account, items, folders[0])
+            return
+        page.run_task(self._drive_upload, account, items, grant, False)
+
+    def _ask_drive_folder(
+        self,
+        page: ft.Page,
+        account: Account,
+        items: list[SaveItem],
+        folder_id: str,
+    ) -> None:
+        """Explica a concessão de pasta e oferece a raiz como saída."""
+        know_folder = bool(folder_id)
+        title = (
+            "Autorizar a pasta no Drive" if know_folder else "Escolher a pasta no Drive"
+        )
+        content = (
+            "O Google só permite gravar na pasta do arquivo original depois "
+            "que você a escolhe uma vez no seletor do Drive. Escolha a pasta "
+            "de origem para liberar a gravação."
+            if know_folder
+            else "As planilhas vieram de pastas diferentes. Escolha uma pasta "
+            "de destino no Drive; a escolha fica lembrada para as próximas "
+            "gravações."
+        )
+        content = f"{content} Use a conta {account.email}."
+
+        def to_root(_event=None) -> None:
+            page.pop_dialog()
+            note = (
+                "A pasta de origem não foi autorizada; o resultado foi para a "
+                "raiz do Meu Drive."
+                if know_folder
+                else "A pasta não foi escolhida; o resultado foi para a raiz "
+                "do Meu Drive."
+            )
+            page.run_task(self._drive_upload, account, items, None, True, note)
+
+        def choose(_event=None) -> None:
+            page.pop_dialog()
+            page.run_task(self._drive_pick_folder, account, items)
+
+        page.show_dialog(
+            ft.AlertDialog(
+                modal=True,
+                title=ft.Text(title),
+                content=ft.Text(content),
+                actions=[
+                    ft.TextButton("Salvar na raiz", on_click=to_root),
+                    ft.FilledButton(
+                        "Autorizar pasta" if know_folder else "Escolher pasta",
+                        on_click=choose,
+                    ),
+                ],
+                actions_alignment=ft.MainAxisAlignment.END,
+            )
+        )
+
+    async def _drive_pick_folder(
+        self,
+        account: Account,
+        items: list[SaveItem],
+    ) -> None:
+        """Abre o seletor de pasta e tenta gravar de novo com a concessão."""
+        if self._drive is None:
+            return
+        self.result.set_saving("Autorizando a pasta no Drive...")
+        try:
+            grant = await self._drive.authorize_folder(account)
+        except drive_auth.DriveError as error:
+            self._save_failed(error)
+            return
+        except Exception as error:  # noqa: BLE001 - falha de autorização
+            self._save_failed(SaveError(f"Falha ao autorizar a pasta: {error}"))
+            return
+        if grant is None:
+            await self._drive_upload(
+                account,
+                items,
+                None,
+                True,
+                "A pasta não foi autorizada; o resultado foi para a raiz do Meu Drive.",
+            )
+            return
+        await self._drive_upload(account, items, grant, True)
+
+    async def _drive_upload(
+        self,
+        account: Account,
+        items: list[SaveItem],
+        folder: FolderGrant | None,
+        retry: bool,
+        note: str = "",
+    ) -> None:
+        """Grava os itens no Drive, fora da UI thread."""
+        if self._drive is None:
+            return
+        self.result.set_saving("Salvando no Drive...")
+        try:
+            saved = await self._drive.save_to_drive(account, items, folder)
+        except FolderPermissionError as error:
+            if retry:
+                self._save_failed(error)
+                return
+            if folder is not None:
+                self._drive.forget_folder(account, folder.folder_id)
+            page = self._page()
+            if page is None:
+                self._save_failed(error)
+                return
+            self._ask_drive_folder(
+                page,
+                account,
+                items,
+                folder.folder_id if folder else "",
+            )
+            return
+        except (drive_auth.DriveError, SaveError) as error:
+            self._save_failed(error)
+            return
+        except Exception as error:  # noqa: BLE001 - falha de gravação
+            self._save_failed(SaveError(f"Falha ao salvar no Drive: {error}"))
+            return
+        self._drive_saved(saved, account, note)
+
+    def _drive_saved(
+        self,
+        saved: Sequence[DriveSaved],
+        account: Account,
+        note: str = "",
+    ) -> None:
+        """Atualiza o painel e o log depois de gravar no Drive."""
+        if not saved:
+            self._save_failed(
+                SaveError("O Google não confirmou nenhum arquivo gravado.")
+            )
+            return
+        log = self.state.log or RunLog()
+        for item in saved:
+            log.success(f"Salvo no Drive: {item.name}")
+        if note:
+            log.warning(note)
+        self.state.log = log
+        self.result.set_drive_success(
+            saved,
+            self.state.result or {},
+            account.email,
+            note,
+        )
+        self.result.set_log(log)
+        self.result.set_diagnostics(self._diagnostics(None))
+        self._refresh()
 
     async def _write(self, work: Callable[[], list[Path] | None]) -> None:
         self.result.set_saving()

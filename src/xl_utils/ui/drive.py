@@ -4,12 +4,33 @@ from __future__ import annotations
 
 import asyncio
 import shutil
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 
+from xl_utils.core.io import dump_workbook
+from xl_utils.core.paths import free_name
+from xl_utils.core.save import SaveError, SaveItem
 from xl_utils.shared import accounts, drive_auth, drive_cache, drive_pick
 from xl_utils.shared.accounts import Account, AccountStore
-from xl_utils.shared.drive import DriveClient, static_token, token_provider
+from xl_utils.shared.drive import (
+    DriveApiError,
+    DriveClient,
+    FolderPermissionError,
+    static_token,
+    token_provider,
+)
+from xl_utils.shared.drive_store import FolderGrant, FolderStore
+
+
+@dataclass(frozen=True, slots=True)
+class DriveSaved:
+    """Um arquivo que acabou de ser gravado no Drive."""
+
+    name: str
+    web_link: str = ""
+    folder_id: str = ""
+    folder_name: str = ""
 
 
 class DriveSession:
@@ -28,12 +49,14 @@ class DriveSession:
         picker: Callable[..., drive_pick.PickedFiles] | None = None,
         client_factory: Callable[[Account], DriveClient] | None = None,
         cache_root: Path | None = None,
+        folders: FolderStore | None = None,
     ) -> None:
         self._store = store or AccountStore()
         self._authorize = authorize or drive_auth.authorize
         self._picker = picker or drive_pick.pick_files
         self._client_factory = client_factory or _client_for
         self._cache_root = cache_root
+        self._folders = folders or FolderStore(root=self._store.root)
         self._listeners: list[Callable[[], None]] = []
         self.accounts: list[Account] = []
         self.active: str | None = None
@@ -140,7 +163,14 @@ class DriveSession:
             for file_id in selection.ids:
                 metadata = client.metadata(file_id)
                 data, name = client.payload(metadata)
-                paths.append(drive_cache.store(directory, name, data))
+                origin = drive_cache.DriveOrigin(
+                    file_id=metadata.id,
+                    name=name,
+                    mime_type=metadata.mime_type,
+                    parent=metadata.parents[0] if metadata.parents else "",
+                    account=account.email,
+                )
+                paths.append(drive_cache.store(directory, name, data, origin=origin))
         except Exception:
             shutil.rmtree(directory, ignore_errors=True)
             raise
@@ -149,6 +179,136 @@ class DriveSession:
     def _client_for_pick(self, token: str) -> DriveClient:
         """Cliente que usa o token curto devolvido pelo próprio Picker."""
         return DriveClient(static_token(token))
+
+    def account_for(
+        self,
+        origins: Sequence[drive_cache.DriveOrigin],
+    ) -> Account | None:
+        """Escolhe a conta que abriu as planilhas; senão, a conta ativa."""
+        wanted = {item.account for item in origins if item.account}
+        for account in self.accounts:
+            if account.email in wanted:
+                return account
+        return self.active_account
+
+    def folder_grant(self, account: Account, folder_id: str) -> FolderGrant | None:
+        """Devolve a concessão já guardada para a pasta, se existir."""
+        return self._folders.get(account.email, folder_id)
+
+    def forget_folder(self, account: Account, folder_id: str) -> None:
+        """Esquece uma concessão que o Google deixou de aceitar."""
+        try:
+            self._folders.forget(account.email, folder_id)
+        except drive_auth.DriveError:
+            return
+
+    async def authorize_folder(self, account: Account) -> FolderGrant | None:
+        """Pede uma pasta no Picker e guarda a concessão por conta.
+
+        Roda fora da UI thread. Cancelar não é erro: devolve ``None`` para o
+        chamador cair na raiz do Meu Drive.
+        """
+        if self.busy:
+            return None
+        self.busy = True
+        self.error = None
+        self.notify()
+        try:
+            return await asyncio.to_thread(self._authorize_folder_sync, account)
+        except (drive_auth.DriveError, accounts.AccountsError) as error:
+            self.error = str(error)
+            raise
+        finally:
+            self.busy = False
+            self.notify()
+
+    def _authorize_folder_sync(self, account: Account) -> FolderGrant | None:
+        selection = self._picker(folders=True, login_hint=account.email)
+        if selection.cancelled:
+            return None
+        folder_id = selection.ids[0]
+        client = (
+            self._client_for_pick(selection.access_token)
+            if selection.access_token
+            else self._client_factory(account)
+        )
+        metadata = client.metadata(folder_id)
+        if not metadata.is_folder:
+            raise DriveApiError("O item escolhido não é uma pasta do Drive.")
+        return self._folders.save(account.email, folder_id, metadata.name)
+
+    async def save_to_drive(
+        self,
+        account: Account,
+        items: Sequence[SaveItem],
+        folder: FolderGrant | None = None,
+    ) -> list[DriveSaved]:
+        """Grava os resultados em ``.xlsx`` na pasta informada, fora da UI thread.
+
+        Cada item recebe um nome livre: ``Nome.xlsx``, ``Nome_001.xlsx``...
+        Nada é sobrescrito. Sem ``folder``, o destino é a raiz do Meu Drive.
+        """
+        if self.busy:
+            raise drive_auth.DriveError("O Google Drive ainda está ocupado.")
+        if not items:
+            return []
+        self.busy = True
+        self.error = None
+        self.notify()
+        try:
+            return await asyncio.to_thread(
+                self._save_sync,
+                account,
+                tuple(items),
+                folder,
+            )
+        finally:
+            self.busy = False
+            self.notify()
+
+    def _save_sync(
+        self,
+        account: Account,
+        items: Sequence[SaveItem],
+        folder: FolderGrant | None,
+    ) -> list[DriveSaved]:
+        client = self._client_factory(account)
+        parent = folder.folder_id if folder else None
+        if parent:
+            try:
+                client.metadata(parent)
+            except DriveApiError as error:
+                if error.status in {403, 404}:
+                    raise FolderPermissionError(
+                        "Esta conta não vê a pasta de destino. Use a mesma "
+                        "conta que abriu a planilha e autorize a pasta no "
+                        "seletor do Drive.",
+                        status=error.status,
+                    ) from error
+                raise
+        saved: list[DriveSaved] = []
+        for item in items:
+            try:
+                data = dump_workbook(item.sheets)
+            except Exception as error:  # noqa: BLE001 - vira falha de gravação
+                raise SaveError(
+                    f"Não foi possível preparar {item.suggested_name}: {error}"
+                ) from error
+            name = free_name(
+                Path(item.suggested_name).stem or "Planilha",
+                ".xlsx",
+                lambda candidate: client.exists(parent, candidate),
+            )
+            uploaded = client.upload(name, data, parent=parent)
+            saved.append(
+                DriveSaved(
+                    name=uploaded.name or name,
+                    web_link=uploaded.web_view_link,
+                    folder_id=parent or "",
+                    folder_name=folder.name if folder else "Meu Drive",
+                )
+            )
+        return saved
 
     def import_client(self, path: Path) -> None:
         """Importa o JSON do cliente OAuth escolhido pelo usuário."""

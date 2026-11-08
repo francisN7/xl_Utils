@@ -171,6 +171,12 @@ app com “Entrar com Google”.
 O token nunca aparece na tela, no log ou no diagnóstico; os detalhes ficam no
 ADR 0018.
 
+Com uma planilha aberta do Drive, o painel de resultado troca **Salvar em
+output/** por **Salvar no Drive**. A primeira gravação pede a pasta no Picker e
+lembra a concessão por conta; as seguintes gravam direto. Recusar a pasta manda
+o resultado para a raiz do Meu Drive, com aviso. O sucesso mostra o nome, a
+pasta e o botão **Abrir no Drive**.
+
 ## Resultado e prévia
 
 A prévia fica **sempre visível** no painel de resultado. Depois de executar, o
@@ -181,6 +187,10 @@ painel entra em **“Pronto para salvar”**: a prévia aparece, mas nenhum arqu
   sugerido editável, ou `get_directory_path` para várias saídas.
 - **Salvar em output/** grava no `output/` de cada origem, sem diálogo; o merge
   usa a pasta da primeira origem.
+- Quando a entrada veio do Drive, **Salvar em output/** dá lugar a **Salvar no
+  Drive**: a primeira gravação pede a pasta no Picker, a concessão fica
+  lembrada por conta e recusar cai na raiz do Meu Drive. Nome ocupado ganha
+  `_001`, `_002`... e o sucesso mostra “Abrir no Drive”.
 - Cancelar o seletor mantém a prévia e os botões; nada é gravado.
 - Nomes existentes ganham sufixo; o log registra o caminho real como
   `Salvo: <caminho>`.

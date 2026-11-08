@@ -29,8 +29,13 @@ from xl_utils.shared.drive_auth import (
 
 PICK_SCOPE = "https://www.googleapis.com/auth/drive.file"
 PICK_TIMEOUT = 180
+FOLDER_MIME = "application/vnd.google-apps.folder"
 SUCCESS_MESSAGE = "Arquivo escolhido. Volte ao xl_Utils e feche esta aba."
 CANCELLED_MESSAGE = "Nenhum arquivo escolhido. Volte ao xl_Utils e feche esta aba."
+FOLDER_SUCCESS_MESSAGE = "Escolha concluída. Volte ao xl_Utils e feche esta aba."
+FOLDER_CANCELLED_MESSAGE = (
+    "Nenhuma pasta escolhida. Volte ao xl_Utils e feche esta aba."
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +55,7 @@ def pick_files(
     client: ClientConfig | None = None,
     *,
     multiple: bool = False,
+    folders: bool = False,
     login_hint: str = "",
     timeout: int = PICK_TIMEOUT,
     open_browser: bool = True,
@@ -60,9 +66,14 @@ def pick_files(
     ``127.0.0.1``; nada é gravado em disco e o código de autorização morre
     depois da troca pelo token. ``login_hint`` leva o e-mail da conta escolhida
     no app para o Google pré-selecionar a mesma conta no navegador.
+    ``folders`` liga ``allow_folder_selection`` e restringe o seletor ao MIME de
+    pasta, para o usuário não escolher um arquivo por engano.
     """
     client = client or load_client()
-    server = _PickerServer()
+    server = _PickerServer(
+        success_message=FOLDER_SUCCESS_MESSAGE if folders else SUCCESS_MESSAGE,
+        cancelled_message=(FOLDER_CANCELLED_MESSAGE if folders else CANCELLED_MESSAGE),
+    )
     flow = InstalledAppFlow.from_client_config(
         client.as_installed(),
         [PICK_SCOPE],
@@ -76,6 +87,9 @@ def pick_files(
     }
     if multiple:
         extra["allow_multiple"] = "true"
+    if folders:
+        extra["allow_folder_selection"] = "true"
+        extra["mimetypes"] = FOLDER_MIME
     if login_hint:
         extra["login_hint"] = login_hint
     url, state = flow.authorization_url(**extra)
@@ -147,8 +161,15 @@ def _first(query: dict[str, list[str]], key: str) -> str:
 class _PickerServer:
     """Escuta um único redirecionamento e encerra."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        *,
+        success_message: str = SUCCESS_MESSAGE,
+        cancelled_message: str = CANCELLED_MESSAGE,
+    ) -> None:
         self.query: dict[str, list[str]] | None = None
+        self._success_message = success_message
+        self._cancelled_message = cancelled_message
         self._done = threading.Event()
         self._server = HTTPServer(("127.0.0.1", 0), self._handler())
         self._server.timeout = 1
@@ -191,9 +212,9 @@ class _PickerServer:
                     return
                 outer.query = parse_qs(parsed.query, keep_blank_values=True)
                 message = (
-                    SUCCESS_MESSAGE
+                    outer._success_message
                     if _first(outer.query, "picked_file_ids")
-                    else CANCELLED_MESSAGE
+                    else outer._cancelled_message
                 )
                 self._page(message)
                 outer._done.set()
