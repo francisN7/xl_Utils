@@ -1,0 +1,216 @@
+import base64
+import json
+from pathlib import Path
+from urllib.parse import parse_qs, urlparse
+
+import pytest
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import WSGITimeoutError
+
+from xl_utils.shared import drive_auth
+
+
+def _client() -> drive_auth.ClientConfig:
+    return drive_auth.ClientConfig(
+        client_id="123.apps.googleusercontent.com",
+        client_secret="segredo-de-app-desktop",
+    )
+
+
+def _id_token(email: str = "ana@example.com", name: str = "Ana") -> str:
+    header = _encode({"alg": "RS256"})
+    payload = _encode({"email": email, "name": name})
+    return f"{header}.{payload}.assinatura"
+
+
+def _encode(data: dict[str, str]) -> str:
+    raw = json.dumps(data).encode("utf-8")
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+
+
+def _credentials(*, refresh: str | None = "refresh-123") -> Credentials:
+    credentials = Credentials(
+        token="access-123",
+        refresh_token=refresh,
+        id_token=_id_token(),
+        token_uri=drive_auth.TOKEN_URI,
+        client_id="123.apps.googleusercontent.com",
+        scopes=["openid", "email"],
+    )
+    return credentials
+
+
+def test_installed_block_is_accepted(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text(
+        json.dumps(
+            {
+                "installed": {
+                    "client_id": "abc",
+                    "client_secret": "xyz",
+                    "token_uri": drive_auth.TOKEN_URI,
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    client = drive_auth.load_client(path)
+
+    assert client.client_id == "abc"
+    assert client.client_secret == "xyz"
+    assert client.token_uri == drive_auth.TOKEN_URI
+
+
+def test_flat_client_is_accepted(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text(json.dumps({"client_id": "abc"}), encoding="utf-8")
+
+    assert drive_auth.load_client(path).client_id == "abc"
+
+
+def test_missing_client_id_explains_how_to_fix(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text(json.dumps({"installed": {"client_secret": "x"}}), encoding="utf-8")
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.load_client(path)
+
+    assert "client_id" in str(error.value)
+
+
+def test_invalid_json_is_rejected(tmp_path: Path) -> None:
+    path = tmp_path / "client.json"
+    path.write_text("{", encoding="utf-8")
+
+    with pytest.raises(drive_auth.DriveConfigError):
+        drive_auth.load_client(path)
+
+
+def test_override_wins_over_the_packaged_file(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setenv("LOCALAPPDATA", str(tmp_path))
+    override = tmp_path / "xl_utils" / "drive_client.json"
+    override.parent.mkdir(parents=True)
+    override.write_text(json.dumps({"client_id": "do-usuario"}), encoding="utf-8")
+
+    assert drive_auth.load_client().client_id == "do-usuario"
+
+
+def test_packaged_placeholder_asks_for_configuration(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    monkeypatch.setattr(
+        drive_auth,
+        "client_path",
+        lambda: tmp_path / "drive_client.json",
+    )
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.load_client()
+
+    assert "drive_client.json" in str(error.value)
+
+
+def test_authorization_url_carries_pkce_state_and_scopes() -> None:
+    url, state = drive_auth.authorization_url(_client())
+
+    query = parse_qs(urlparse(url).query)
+
+    assert state
+    assert query["state"] == [state]
+    assert query["code_challenge_method"] == ["S256"]
+    assert len(query["code_challenge"][0]) >= 43
+    assert query["access_type"] == ["offline"]
+    assert "https://www.googleapis.com/auth/drive.file" in query["scope"][0]
+    assert query["redirect_uri"] == ["http://127.0.0.1:0/"]
+
+
+def test_identity_reads_email_and_name() -> None:
+    assert drive_auth.identity(_id_token("zeca@example.com", "Zeca")) == (
+        "zeca@example.com",
+        "Zeca",
+    )
+
+
+def test_identity_requires_a_token() -> None:
+    with pytest.raises(drive_auth.DriveAuthError):
+        drive_auth.identity(None)
+
+
+def test_identity_rejects_a_malformed_token() -> None:
+    with pytest.raises(drive_auth.DriveAuthError):
+        drive_auth.identity("sem-pontos")
+
+
+class _FakeFlow:
+    def __init__(self, *, credentials=None, error=None) -> None:
+        self.credentials = credentials
+        self.error = error
+        self.kwargs: dict[str, object] = {}
+
+    def run_local_server(self, **kwargs):
+        self.kwargs = kwargs
+        if self.error is not None:
+            raise self.error
+        return self.credentials
+
+
+def test_authorize_returns_a_protected_account(monkeypatch) -> None:
+    flow = _FakeFlow(credentials=_credentials())
+    monkeypatch.setattr(drive_auth, "build_flow", lambda _client: flow)
+
+    account = drive_auth.authorize(_client())
+
+    assert account.email == "ana@example.com"
+    assert account.name == "Ana"
+    assert account.refresh_token == "refresh-123"
+    assert account.client_id == "123.apps.googleusercontent.com"
+    assert flow.kwargs["host"] == "127.0.0.1"
+    assert flow.kwargs["port"] == 0
+    assert flow.kwargs["timeout_seconds"] == drive_auth.LOGIN_TIMEOUT
+    assert flow.kwargs["authorization_prompt_message"] is None
+
+
+def test_authorize_reports_a_timeout(monkeypatch) -> None:
+    flow = _FakeFlow(error=WSGITimeoutError("sem resposta"))
+    monkeypatch.setattr(drive_auth, "build_flow", lambda _client: flow)
+
+    with pytest.raises(drive_auth.DriveAuthError) as error:
+        drive_auth.authorize(_client())
+
+    assert "Tempo esgotado" in str(error.value)
+
+
+def test_authorize_reports_a_cancelled_login(monkeypatch) -> None:
+    denied = type("Denied", (Exception,), {"error": "access_denied"})("negado")
+    flow = _FakeFlow(error=denied)
+    monkeypatch.setattr(drive_auth, "build_flow", lambda _client: flow)
+
+    with pytest.raises(drive_auth.DriveAuthError) as error:
+        drive_auth.authorize(_client())
+
+    assert "cancelada" in str(error.value)
+
+
+def test_authorize_never_leaks_the_client_secret(monkeypatch) -> None:
+    flow = _FakeFlow(error=RuntimeError("segredo-de-app-desktop vazou"))
+    monkeypatch.setattr(drive_auth, "build_flow", lambda _client: flow)
+
+    with pytest.raises(drive_auth.DriveAuthError) as error:
+        drive_auth.authorize(_client())
+
+    assert "segredo-de-app-desktop" not in str(error.value)
+
+
+def test_authorize_requires_a_refresh_token(monkeypatch) -> None:
+    flow = _FakeFlow(credentials=_credentials(refresh=None))
+    monkeypatch.setattr(drive_auth, "build_flow", lambda _client: flow)
+
+    with pytest.raises(drive_auth.DriveAuthError) as error:
+        drive_auth.authorize(_client())
+
+    assert "token de atualização" in str(error.value)

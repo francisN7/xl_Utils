@@ -8,7 +8,10 @@ from xl_utils.ui import theme
 from xl_utils.ui.pages.registry import TOOLS
 
 
-def build_home(on_open: Callable[[str], None]) -> ft.Control:
+def build_home(
+    on_open: Callable[[str], None],
+    drive: ft.Control | None = None,
+) -> ft.Control:
     """Monta o hub que leva a cada ferramenta."""
     cards = [
         ft.Container(
@@ -69,39 +72,47 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
         for tool in TOOLS
     ]
 
-    return ft.Container(
-        content=ft.Column(
+    sections: list[ft.Control] = [
+        ft.Column(
             controls=[
-                ft.Column(
-                    controls=[
-                        ft.Text(
-                            "O que você precisa fazer hoje?",
-                            size=theme.FONT_HERO,
-                            weight=ft.FontWeight.BOLD,
-                        ),
-                        ft.Text(
-                            "Escolha uma ferramenta. O estado de cada uma é "
-                            "preservado enquanto você navega.",
-                            size=theme.FONT_SM,
-                            color=theme.MUTED,
-                        ),
-                    ],
-                    spacing=4,
-                ),
-                ft.ResponsiveRow(
-                    controls=cards,
-                    spacing=12,
-                    run_spacing=12,
-                    alignment=ft.MainAxisAlignment.START,
+                ft.Text(
+                    "O que você precisa fazer hoje?",
+                    size=theme.FONT_HERO,
+                    weight=ft.FontWeight.BOLD,
                 ),
                 ft.Text(
-                    "Toda leitura passa pelo pipeline de texto seguro: nada de "
-                    "notação científica, zeros perdidos ou emojis.",
-                    size=theme.FONT_XS,
+                    "Escolha uma ferramenta. O estado de cada uma é "
+                    "preservado enquanto você navega.",
+                    size=theme.FONT_SM,
                     color=theme.MUTED,
-                    italic=True,
                 ),
             ],
+            spacing=4,
+        )
+    ]
+    if drive is not None:
+        sections.append(drive)
+    sections.extend(
+        [
+            ft.ResponsiveRow(
+                controls=cards,
+                spacing=12,
+                run_spacing=12,
+                alignment=ft.MainAxisAlignment.START,
+            ),
+            ft.Text(
+                "Toda leitura passa pelo pipeline de texto seguro: nada de "
+                "notação científica, zeros perdidos ou emojis.",
+                size=theme.FONT_XS,
+                color=theme.MUTED,
+                italic=True,
+            ),
+        ]
+    )
+
+    return ft.Container(
+        content=ft.Column(
+            controls=sections,
             spacing=20,
             scroll=ft.ScrollMode.HIDDEN,
             expand=True,

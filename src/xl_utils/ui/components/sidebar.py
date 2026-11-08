@@ -20,10 +20,12 @@ class Sidebar:
         selected: int = 0,
         theme_mode: str = "dark",
         on_theme_change: Callable[[str], None] | None = None,
+        menu: ft.Control | None = None,
     ) -> None:
         self._on_select = on_select
         self._theme_mode = theme_mode
         self._on_theme_change = on_theme_change
+        self._menu = menu
         self._items: list[tuple[ft.Container, ft.Icon, ft.Text]] = []
 
         navigation = ft.Column(
@@ -103,39 +105,45 @@ class Sidebar:
         self._on_select(index)
 
     def _logo(self) -> ft.Control:
+        title = ft.Column(
+            controls=[
+                ft.Text(
+                    "xl_Utils",
+                    size=17,
+                    weight=ft.FontWeight.BOLD,
+                ),
+                ft.Text(
+                    "planilhas",
+                    size=theme.FONT_XS,
+                    color=theme.MUTED,
+                ),
+            ],
+            spacing=0,
+            expand=True,
+        )
+        controls = [
+            ft.Container(
+                content=ft.Text(
+                    "x",
+                    size=19,
+                    weight=ft.FontWeight.BOLD,
+                    color=theme.BACKGROUND_DEEP,
+                ),
+                width=36,
+                height=36,
+                bgcolor=theme.PURPLE,
+                border_radius=9,
+                alignment=ft.Alignment.CENTER,
+            ),
+            title,
+        ]
+        if self._menu is not None:
+            controls.append(self._menu)
         return ft.Container(
             content=ft.Row(
-                controls=[
-                    ft.Container(
-                        content=ft.Text(
-                            "x",
-                            size=19,
-                            weight=ft.FontWeight.BOLD,
-                            color=theme.BACKGROUND_DEEP,
-                        ),
-                        width=36,
-                        height=36,
-                        bgcolor=theme.PURPLE,
-                        border_radius=9,
-                        alignment=ft.Alignment.CENTER,
-                    ),
-                    ft.Column(
-                        controls=[
-                            ft.Text(
-                                "xl_Utils",
-                                size=17,
-                                weight=ft.FontWeight.BOLD,
-                            ),
-                            ft.Text(
-                                "planilhas",
-                                size=theme.FONT_XS,
-                                color=theme.MUTED,
-                            ),
-                        ],
-                        spacing=0,
-                    ),
-                ],
+                controls=controls,
                 spacing=10,
+                vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             padding=ft.Padding.only(left=8, top=6, bottom=20),
         )

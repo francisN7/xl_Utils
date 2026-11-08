@@ -61,6 +61,20 @@ Não há Dependabot de PR automático: as vulnerabilidades aparecem como alerta 
 aba **Security** e a atualização é manual. Rode `uv lock --upgrade`, revise o
 diff e valide com lint, testes e check de docs antes de commitar.
 
+## Google Drive (opcional)
+
+O Drive só funciona com um cliente OAuth próprio:
+
+1. No Google Cloud Console, crie um projeto e ative a **Google Drive API**.
+2. Em **Credenciais**, crie um cliente **App para computador**.
+3. Baixe o JSON e salve em `%LOCALAPPDATA%/xl_utils/drive_client.json` (ou
+   substitua `src/xl_utils/configs/drive_client.json` antes de empacotar).
+4. Rode o app e use o menu hamburger da sidebar → **Entrar no Google Drive**.
+
+O `client_id` é público; o `client_secret` de app desktop não é segredo. As
+contas ficam em `%LOCALAPPDATA%/xl_utils/drive/`, com o `refresh_token`
+protegido por DPAPI, e nunca entram no Git (ADR 0018).
+
 ## Verificações
 
 ```bash
@@ -80,3 +94,5 @@ node scripts/check-docs.mjs
   diff.
 - **Check de docs quebrado:** o alvo do link provavelmente foi movido; corrija o
   caminho relativo ou remova o link morto.
+- **Login do Drive falha:** confira o `drive_client.json`; a mensagem diz se
+  falta o `client_id` ou se o cliente não é do tipo “App para computador”.

@@ -53,7 +53,7 @@ src/xl_utils/
   ui/components/    entrada, resultado, prévia e layout
   ui/theme.py       tokens e temas (Dracula/Alucard)
   configs/          headers.json empacotado (padrão, não estado)
-  shared/           log, configuração e abertura de pasta
+  shared/           log, config, contas e Drive
 tests/              testes do core e da UI (headless)
 scripts/            automação de docs
 docs/               mapa, estado, roadmap, guias, ADRs

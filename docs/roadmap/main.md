@@ -12,7 +12,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S7c | Vinculação II — FINANCEIRO, CLIENTES e opções | [x] |
 | S7d | Vinculação III — log e acabamento | [x] |
 | S8 | Alinhamento de colunas em tela cheia no merge | [x] |
-| S9a | Drive I — ADR, OAuth, contas e shell | [ ] |
+| S9a | Drive I — ADR, OAuth, contas e shell | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -67,9 +67,22 @@ e o ADR 0017.
 
 Duas entradas: link da planilha ou seletor de arquivos do Drive. Login pelo
 navegador (OAuth), múltiplas contas e “sair” na tela inicial; menu hamburger
-num dos cantos superiores. Antes do código, o ADR decide escopo, lib e destino
-da saída (aba extra ou pasta `output` ao lado). S9a entrega só a autenticação;
-S9b, a transferência; S9c, a exportação nas demais ferramentas.
+num dos cantos superiores. S9a entrega só a autenticação; S9b, a transferência;
+S9c, a exportação nas demais ferramentas e o destino da saída.
+
+## S9a — entregue
+
+ADR 0018 aceito: `google-auth-oauthlib` com PKCE e `state` automáticos,
+`drive.file`, loopback em `127.0.0.1` com porta efêmera e timeout, cliente
+OAuth empacotado com override em `%LOCALAPPDATA%`, contas por e-mail em
+`%LOCALAPPDATA%/xl_utils/drive/` com `refresh_token` cifrado por DPAPI e
+gravação atômica. Menu hamburger no cabeçalho da sidebar e cartão do Drive no
+hub com entrar, trocar e sair; o login roda fora da UI thread. Ver a
+[spec](../sessions/S9a-drive-autenticacao.md) e o ADR 0018.
+
+Achado para a S9b: `drive.file` não lê planilha antiga por link colado — só
+arquivo criado pelo app ou escolhido no Google Picker. A S9b começa decidindo
+entre Picker e escopo `drive` em modo Testing.
 
 ## Auditoria pública — entregue
 

@@ -35,12 +35,16 @@ O conteúdo abre em uma das duas formas:
 - Trocar de ferramenta **mantém** o estado dela (arquivo, opções e resultado).
 - Trocar o arquivo **reseta o resultado**; o valor das opções permanece.
 - A página inicial é o hub; o item “Início” volta para ele.
+- O menu hamburger no cabeçalho da sidebar abre as contas do Google Drive:
+  entrar, marcar a ativa e sair. Ele não interfere na navegação das ferramentas.
 
 ## Componentes
 
 | Componente | Responsabilidade |
 |---|---|
 | `sidebar` | Logo, Início e as cinco ferramentas, com item ativo destacado. |
+| `top_menu` | Menu hamburger no cabeçalho da sidebar com as contas do Drive. |
+| `drive_status` | Cartão do hub com a conta ativa e as ações de entrar, trocar e sair. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
 | `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
@@ -139,6 +143,20 @@ descrição e o atalho “Abrir ferramenta”. Novas ferramentas entram da esque
 para a direita; a próxima linha também começa à esquerda. O cartão de Verificar
 Vínculos lista as quatro planilhas e avisa que a presença do arquivo define o
 fluxo.
+
+## Drive
+
+O menu hamburger do cabeçalho da sidebar e o cartão do hub compartilham o mesmo
+estado (`ui/drive.py`). Sem conta, os dois oferecem “Entrar no Google Drive”;
+com uma ou mais, listam os e-mails e marcam a ativa. “Entrar” abre o navegador
+padrão e a tela mostra “Conectando ao Google Drive…” até o retorno; a navegação
+continua livre. Se o usuário negar o acesso ou o navegador não responder em três
+minutos, o cartão mostra a mensagem e nada fica travado.
+
+“Trocar de conta” no cartão passa para o próximo e-mail da lista; no menu, basta
+clicar no e-mail desejado. “Sair” remove só a conta ativa: as demais continuam
+guardadas e o menu volta a oferecer “Entrar no Google Drive”. O token nunca
+aparece na tela, no log ou no diagnóstico; os detalhes ficam no ADR 0018.
 
 ## Resultado e prévia
 

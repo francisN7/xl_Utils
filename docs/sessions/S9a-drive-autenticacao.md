@@ -15,8 +15,8 @@ inicial, sem ainda ler ou gravar planilhas.
 ## Tarefas
 
 1. Escrever o ADR 0018 decidindo: escopo OAuth (`drive.file`), biblioteca,
-   formato do client ID/secret, armazenamento de tokens, identidade das contas
-   e destino da saída futura (aba extra ou `output/`). Ligar no índice.
+   formato do client ID/secret, armazenamento de tokens e identidade das contas.
+   O destino da saída fica para a S9c. Ligar no índice.
 2. Implementar o fluxo de autorização para app desktop: PKCE, `state`,
    redirecionamento em `127.0.0.1` com porta efêmera, abertura pelo navegador
    padrão e timeout claro quando o usuário cancela.
@@ -31,12 +31,13 @@ inicial, sem ainda ler ou gravar planilhas.
 
 ## Aceite
 
-- [ ] ADR 0018 aceito e indexado.
+- [x] ADR 0018 aceito e indexado.
 - [ ] Login abre o navegador e retorna sem terminal; cancelar não deixa a UI
-      travada.
-- [ ] Token e client secret nunca aparecem em log, diagnóstico ou screenshot.
-- [ ] Duas contas alternáveis; “Sair” remove a conta ativa sem apagar as outras.
-- [ ] Testes offline verdes e navegação das ferramentas intacta.
+      travada. *(implementado e testado com transporte falso; o login real
+      depende do `drive_client.json` do dono)*
+- [x] Token e client secret nunca aparecem em log, diagnóstico ou screenshot.
+- [x] Duas contas alternáveis; “Sair” remove a conta ativa sem apagar as outras.
+- [x] Testes offline verdes e navegação das ferramentas intacta.
 
 ## Orçamento de contexto (≤90 linhas)
 

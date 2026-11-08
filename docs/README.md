@@ -23,7 +23,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | entender a UI e o tema | [`reference/ui.md`](reference/ui.md) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S9a-drive-autenticacao.md`](sessions/S9a-drive-autenticacao.md) |
+| ler a spec da próxima sessão | [`sessions/S9b-drive-planilha.md`](sessions/S9b-drive-planilha.md) |
 
 ## Por seção (atalho)
 
@@ -56,6 +56,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que a config viaja no pacote | `adr/0015-config-empacotada.md` | 40 |
 | por que os fluxos da vinculação vêm dos anexos | `adr/0016-fluxos-e-opcoes-da-vinculacao.md` | 45 |
 | por que a tela cheia é overlay no conteúdo | `adr/0017-tela-cheia-do-quadro.md` | 35 |
+| por que o Drive usa OAuth, DPAPI e contas separadas | `adr/0018-drive-autenticacao.md` | 55 |
 
 ## Regras do mapa
 

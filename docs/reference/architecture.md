@@ -12,7 +12,7 @@ guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 | Core | `src/xl_utils/core/` | Regra pura, sem Flet, sem diálogo, sem `print`. |
 | Controllers | `src/xl_utils/controllers/` | Orquestra o core e devolve dados em memória. |
 | UI | `src/xl_utils/ui/` | Coleta entrada, executa em segundo plano e exibe resultado; não contém regra. |
-| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso e abertura de pasta. |
+| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso, abertura de pasta e contas do Drive. |
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 
@@ -256,11 +256,21 @@ CLIENTES; cada um gera um `SaveItem`. As demais abas são preservadas.
 
 `shared/configs.py` lê `src/xl_utils/configs/headers.json` por
 `importlib.resources` e, se existir, o override em
-`%LOCALAPPDATA%/xl_utils/headers.json`. Quando o Drive entrar (S9a), segredos e
-estado de login ficarão em `%LOCALAPPDATA%/xl_utils/google/`, fora do Git
-(ADR 0015). O JSON traz as quatro planilhas padrão, os campos usados, o bloco
-padrão na ordem e o separador de descrição (quebra de linha na AGENDA, `" | "`
-no FINANCEIRO).
+`%LOCALAPPDATA%/xl_utils/headers.json` (ADR 0015). O JSON traz as quatro
+planilhas padrão, os campos usados, o bloco padrão na ordem e o separador de
+descrição (quebra de linha na AGENDA, `" | "` no FINANCEIRO).
+
+## Drive
+
+`shared/drive_auth.py` monta o cliente OAuth (`configs/drive_client.json`
+empacotado, override em `%LOCALAPPDATA%/xl_utils/drive_client.json`), roda o
+fluxo de app instalado com PKCE e `state` da `google-auth-oauthlib` em
+`127.0.0.1` numa porta efêmera e devolve uma `Account` com e-mail e nome lidos
+do `id_token`. `shared/accounts.py` grava uma conta por e-mail em
+`%LOCALAPPDATA%/xl_utils/drive/accounts/`, com o `refresh_token` cifrado por
+DPAPI e escrita atômica; o e-mail ativo fica em `drive/active.json`. `ui/drive.py`
+é o estado compartilhado entre o menu do topo e o cartão do hub, e o login roda
+fora da thread da UI (ADR 0018).
 
 ## Recorte
 

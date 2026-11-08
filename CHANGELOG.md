@@ -120,6 +120,11 @@ decisões nos ADRs.
 - Tela cheia no quadro de alinhamento do merge: botão ao lado do título, cards
   com largura fixa e sobra como espaçamento, “CONFIRMAR” no canto inferior
   direito e retorno pelo mesmo ícone sem perder grupos, seleção ou ordem.
+- Entrada no Google Drive pelo navegador (S9a): cliente OAuth de app instalado
+  com PKCE e `state`, redirecionamento em `127.0.0.1` com porta efêmera e
+  timeout, contas por e-mail em `%LOCALAPPDATA%/xl_utils/drive/` com
+  `refresh_token` protegido por DPAPI, menu hamburger na sidebar e cartão de
+  estado no hub para entrar, trocar e sair. Ver ADR 0018.
 
 ### Changed
 
