@@ -163,8 +163,11 @@ real em `%LOCALAPPDATA%/xl_utils/drive/cache/`.
 Na entrada, o botão quadrado do Drive fica na mesma linha da dropzone enquanto
 houver conta: uma conta abre o Picker direto, duas ou mais perguntam qual. Ler
 da pasta de origem e gravar de volta ficou para a S9c, porque `drive.file`
-concede arquivo por arquivo. Ver a [spec](../sessions/S9b-drive-planilha.md) e o
-adendo ao ADR 0018.
+concede arquivo por arquivo. No acabamento, a página **Verificar Vínculos**
+voltou a abrir (a fábrica de opções não aceitava o overlay), o botão do Drive
+ficou com 44 px no topo da linha e `login_hint` pré-seleciona a conta no
+navegador. Ver a [spec](../sessions/S9b-drive-planilha.md) e o adendo ao ADR
+0018.
 
 ## Auditoria pública — entregue
 

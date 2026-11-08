@@ -16,6 +16,7 @@
 
 - S9b: Picker de desktop (`drive_pick.py`), cliente REST (`drive.py`), cache
   local (`drive_cache.py`), botão do Drive na entrada e escolha de conta.
+  Acabamento: vínculos voltou a abrir; botão 44 px no topo; `login_hint`.
 - S9a6: atalho global reinstalado; janela não é reposicionada; Flet 1.1.2.
 - S9a4/S9a5: segredo do cliente por DPAPI; e-mail canônico no login.
 - S9a3: site no GitHub Pages; publicação por workflow desde a S9b.
@@ -40,8 +41,7 @@ do Meu Drive. O Picker foi validado com conta real em 2026-11-08.
 
 - `drive.file` só vê arquivo criado pelo app ou escolhido no Picker.
 - A pasta do arquivo escolhido **não** vem concedida; gravar nela dá 403.
-- Picker desktop aceita só `drive.file`; não misturar com `openid`/e-mail.
-- Picker sem `access_type=offline`: evita refresh token novo a cada escolha.
+- Picker: só `drive.file`, sem `offline`, e consentimento a cada escolha.
 - Planilha nativa precisa de `files.export` (`.xlsx`); limite de 10 MB.
 - **Google Picker API** precisa estar ativa no projeto, além da Drive API.
 - Sem cliente, o 1º **Entrar com Google** pede o JSON uma vez; depois não pede.

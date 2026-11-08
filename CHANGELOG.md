@@ -187,6 +187,9 @@ decisões nos ADRs.
 
 ### Fixed
 
+- A página **Verificar Vínculos** voltava a falhar ao abrir: a fábrica de opções
+  não aceitava o parâmetro de overlay que o layout já passava. Um teste agora
+  monta as cinco páginas e denuncia a quebra.
 - Colunas de entrada e de resultado rolam sem barra visível; log limitado a
   160 px, prévia com 240 px e rolagem nos dois eixos. O conteúdo fica recortado
   no cartão e não cobre mais a linha divisória nem a barra de ação.
