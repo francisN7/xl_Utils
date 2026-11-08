@@ -82,8 +82,11 @@ A validação ocorre antes de gravar: no máximo 64 KB, UTF-8, objeto JSON,
 desconhecidos do arquivo original são descartados. O JSON empacotado continua
 vazio e um teste garante que ninguém commite credencial real.
 
-O `client_secret` fica em texto no perfil do usuário — para app desktop ele não
-é confidencial —, mas o `refresh_token` continua cifrado por DPAPI. A única
+No Windows, o `client_secret` é gravado cifrado por DPAPI no campo
+`client_secret_dpapi`; em texto ele só existe em memória durante o login. Em
+outros sistemas, ou no JSON empacotado no build, ele fica em texto, porque o
+segredo de app desktop não é confidencial. O `refresh_token` continua cifrado
+por DPAPI. A única
 entrada não confiável é o JSON importado; `authorize` só recebe um
 `ClientConfig` já validado pelo app.
 

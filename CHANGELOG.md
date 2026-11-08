@@ -202,6 +202,10 @@ decisões nos ADRs.
   `google.com`/`googleapis.com`); campos desconhecidos são descartados e o
   arquivo empacotado continua vazio, com teste de guarda. O `.gitignore` cobre
   `drive_client.json` local e os nomes de download do Google.
+- O segredo do cliente OAuth importado é cifrado com DPAPI no Windows (campo
+  `client_secret_dpapi`); em texto ele só existe em memória durante o login, e
+  `ClientConfig` não o expõe em `repr`. O download original pode ser apagado
+  depois da importação.
 
 ## v0.1.0 — 2026-11-04
 

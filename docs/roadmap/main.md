@@ -16,6 +16,7 @@ Ciclo ativo: **0006 — Backlog**. O ciclo anterior está em
 | S9a1 | Drive I.1 — teste do login e importação do cliente | [x] |
 | S9a2 | Drive I.2 — menu de perfis no canto superior direito | [x] |
 | S9a3 | Site público e política de privacidade | [x] |
+| S9a4 | Segredo do cliente OAuth protegido por DPAPI | [x] |
 | S9b | Drive II — link/seletor e escrita do resultado | [ ] |
 | S9c | Drive III — exportação nas demais e acabamento | [ ] |
 
@@ -116,6 +117,15 @@ Platform. O `_config.yml` mantém ADRs, guias, roadmap, sessões e estado fora d
 site. Endereços: `https://francisn7.github.io/xl_Utils/` e
 `https://francisn7.github.io/xl_Utils/privacy.html`. Ver a
 [spec](../sessions/S9a3-site-publico.md).
+
+## S9a4 — entregue
+
+O cliente OAuth baixado foi instalado em `%LOCALAPPDATA%` e o segredo passou a
+ser gravado cifrado por DPAPI no campo `client_secret_dpapi`; em texto ele só
+existe em memória durante o login. Fora do Windows, o campo `client_secret`
+continua em texto (segredo de app desktop não é confidencial). O download
+original foi sobrescrito e apagado, e o `ClientConfig` não expõe mais o segredo
+em `repr`. Ver a [spec](../sessions/S9a4-segredo-protegido.md).
 
 ## Auditoria pública — entregue
 

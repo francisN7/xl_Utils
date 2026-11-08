@@ -1,5 +1,6 @@
 import base64
 import json
+import sys
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -239,6 +240,51 @@ def test_save_client_drops_fields_it_does_not_use(tmp_path: Path) -> None:
     drive_auth.save_client(json.dumps(payload), target)
 
     assert "nao-deve-ficar" not in target.read_text(encoding="utf-8")
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="DPAPI só existe no Windows")
+def test_saved_client_secret_is_encrypted_at_rest(tmp_path: Path) -> None:
+    target = tmp_path / "drive_client.json"
+
+    drive_auth.save_client(json.dumps(_payload()), target)
+
+    raw = target.read_text(encoding="utf-8")
+    saved = json.loads(raw)["installed"]
+    assert "xyz" not in raw
+    assert saved["client_secret"] == ""
+    assert saved[drive_auth.SECRET_FIELD]
+    assert drive_auth.load_client(target).client_secret == "xyz"
+
+
+def test_client_config_repr_hides_the_secret() -> None:
+    client = drive_auth.ClientConfig(
+        client_id="abc",
+        client_secret="segredo-que-nao-pode-aparecer",
+    )
+
+    assert "segredo-que-nao-pode-aparecer" not in repr(client)
+
+
+def test_protected_secret_that_cannot_be_opened_is_a_config_error(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "drive_client.json"
+    path.write_text(
+        json.dumps(
+            {
+                "installed": {
+                    "client_id": "abc",
+                    "client_secret_dpapi": "lixo",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(drive_auth.DriveConfigError) as error:
+        drive_auth.load_client(path)
+
+    assert "segredo protegido" in str(error.value)
 
 
 def test_import_client_keeps_the_downloaded_file(

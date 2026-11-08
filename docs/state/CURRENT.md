@@ -4,7 +4,7 @@
 
 ## Sessão
 
-- **Última concluída:** S9a3 — site público e política de privacidade
+- **Última concluída:** S9a4 — segredo do cliente protegido por DPAPI
 - **Próxima:** S9b — Drive II (link, seletor e escrita)
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
@@ -13,10 +13,10 @@
 
 ## Pronto
 
-- S9a3: site no GitHub Pages (`docs/index.html` e `privacy.html`) para a
-  publicação no Google; docs internos ficam fora pelo `_config.yml`.
-- S9a2: hamburger no canto superior direito; menu de perfis com ícone, conta
-  ativa e sair; cartão do hub removido; 1º login pede o JSON uma vez.
+- S9a4: segredo do cliente OAuth cifrado por DPAPI (`client_secret_dpapi`); o
+  download foi apagado após a importação.
+- S9a3: site no GitHub Pages (home + privacidade) para publicar o app no Google.
+- S9a2: hamburger no canto superior direito, menu de perfis, cartão removido.
 
 ## Próximo passo
 
@@ -42,7 +42,7 @@ escolher Google Picker ou escopo `drive` em Testing antes de qualquer código.
 - O JSON importado é validado; `token_uri` fora do Google é recusado.
 - Login não é ferramenta: não recriar cartão do Drive no hub.
 - DPAPI é Windows-only; fora dele o store recusa gravar.
-- Token e client secret nunca em log, diagnóstico ou `repr`.
+- Segredo do cliente: DPAPI no Windows; nunca em log ou `repr`.
 - `drive_client.json` empacotado nasce vazio; teste impede credencial real.
 - Sair apaga só a conta ativa; trocar exige ferramenta ociosa.
 - Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula.

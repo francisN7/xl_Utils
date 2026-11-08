@@ -78,11 +78,13 @@ Depois disso o fluxo é sempre o mesmo: menu → **Entrar com Google** → naveg
 só aparece se ainda não houver cliente.
 
 O app valida o arquivo (tamanho, UTF-8, HTTPS, domínio do Google), guarda só os
-campos que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e nunca copia o
-JSON original. As contas ficam em `%LOCALAPPDATA%/xl_utils/drive/`, com o
-`refresh_token` protegido por DPAPI. O repositório é público: nunca faça commit
-do JSON do cliente — o `.gitignore` cobre os nomes usuais, mas o caminho certo é
-o `%LOCALAPPDATA%`.
+campos que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e não move nem
+altera o original. No Windows, o `client_secret` é gravado cifrado por DPAPI
+(campo `client_secret_dpapi`); em texto ele só existe em memória durante o
+login. As contas ficam em `%LOCALAPPDATA%/xl_utils/drive/`, com o
+`refresh_token` também protegido por DPAPI. Depois de importar, apague o JSON
+baixado. O repositório é público: nunca faça commit do JSON do cliente — o
+`.gitignore` cobre os nomes usuais, mas o caminho certo é o `%LOCALAPPDATA%`.
 
 ### Testar o login
 

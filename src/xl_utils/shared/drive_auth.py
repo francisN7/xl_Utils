@@ -11,8 +11,9 @@ import base64
 import json
 import os
 import re
+import sys
 import webbrowser
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib import resources
 from pathlib import Path
 from typing import Any
@@ -23,7 +24,7 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow, WSGITimeoutError
 from requests import RequestException
 
-from xl_utils.shared.accounts import Account
+from xl_utils.shared.accounts import Account, AccountsError, protect, unprotect
 from xl_utils.shared.settings import APP_DIR
 
 AUTH_URI = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -34,6 +35,7 @@ SCOPES = (
     "https://www.googleapis.com/auth/drive.file",
 )
 CLIENT_FILE = "drive_client.json"
+SECRET_FIELD = "client_secret_dpapi"
 LOGIN_TIMEOUT = 180
 SUCCESS_MESSAGE = "Autorização concluída. Volte ao xl_Utils e feche esta aba."
 MAX_CLIENT_BYTES = 64 * 1024
@@ -58,7 +60,7 @@ class ClientConfig:
     """Cliente OAuth do tipo “App para computador”."""
 
     client_id: str
-    client_secret: str = ""
+    client_secret: str = field(default="", repr=False)
     auth_uri: str = AUTH_URI
     token_uri: str = TOKEN_URI
 
@@ -109,17 +111,44 @@ def is_configured(path: Path | None = None) -> bool:
 
 
 def save_client(raw: str, path: Path | None = None) -> ClientConfig:
-    """Valida o JSON do cliente e grava a versão normalizada, de forma atômica."""
+    """Valida o JSON do cliente e grava a versão normalizada, de forma atômica.
+
+    No Windows, o segredo vai cifrado por DPAPI no campo ``client_secret_dpapi``;
+    o JSON nunca guarda o segredo em texto. Fora do Windows ele fica no campo
+    ``client_secret``, porque o segredo de app desktop não é confidencial.
+    """
     client = _parse(raw, CLIENT_FILE)
     target = path or client_path()
     target.parent.mkdir(parents=True, exist_ok=True)
+    payload = client.as_installed()
+    entry = payload["installed"]
+    if sys.platform == "win32" and client.client_secret:
+        entry["client_secret"] = ""
+        entry[SECRET_FIELD] = _protect_secret(client.client_secret)
     temporary = target.with_name(f"{target.name}.tmp")
     temporary.write_text(
-        json.dumps(client.as_installed(), ensure_ascii=False, indent=2),
+        json.dumps(payload, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     os.replace(temporary, target)
     return client
+
+
+def _protect_secret(secret: str) -> str:
+    """Cifra o segredo com DPAPI e devolve base64 (só Windows)."""
+    return base64.b64encode(protect(secret.encode("utf-8"))).decode("ascii")
+
+
+def _unprotect_secret(blob: str, source: str) -> str:
+    """Abre o segredo protegido sem expor o blob em mensagem de erro."""
+    try:
+        protected = base64.b64decode(blob, validate=True)
+        return unprotect(protected).decode("utf-8")
+    except (AccountsError, ValueError) as error:
+        raise DriveConfigError(
+            f"{source}: não foi possível abrir o segredo protegido. "
+            "Importe o JSON do cliente OAuth novamente."
+        ) from error
 
 
 def import_client(path: Path) -> ClientConfig:
@@ -281,9 +310,14 @@ def _parse(raw: str, source: str) -> ClientConfig:
             f"{source}: o client_id não parece um identificador do Google."
         )
     secret = entry.get("client_secret")
+    secret = secret if isinstance(secret, str) else ""
+    if not secret:
+        protected = entry.get(SECRET_FIELD)
+        if isinstance(protected, str) and protected:
+            secret = _unprotect_secret(protected, source)
     return ClientConfig(
         client_id=client_id,
-        client_secret=secret if isinstance(secret, str) else "",
+        client_secret=secret,
         auth_uri=_google_uri(entry.get("auth_uri"), AUTH_URI, source),
         token_uri=_google_uri(entry.get("token_uri"), TOKEN_URI, source),
     )
