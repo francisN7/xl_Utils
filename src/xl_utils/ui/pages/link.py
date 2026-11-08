@@ -13,7 +13,7 @@ from xl_utils.controllers.link import LinkOutcome, migration_warning, run_link
 from xl_utils.core.tools.link import FinanceiroStats
 from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 from xl_utils.ui.components.result_panel import ResultPanel
-from xl_utils.ui.components.tool_layout import ToolLayout
+from xl_utils.ui.components.tool_layout import OverlayHost, ToolLayout
 from xl_utils.ui.drive import DriveSession
 from xl_utils.ui.pages.batch import append_outcomes
 from xl_utils.ui.state import ToolState
@@ -32,7 +32,10 @@ NOTE = (
 def build(drive: DriveSession | None = None) -> ft.Control:
     """Monta a página com quatro entradas e as opções de vinculação."""
 
-    def make_options(state: ToolState) -> LinkOptions:
+    def make_options(
+        state: ToolState,
+        _overlay: OverlayHost | None = None,
+    ) -> LinkOptions:
         return LinkOptions(state, lambda: layout.refresh())
 
     layout = ToolLayout(

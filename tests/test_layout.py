@@ -212,3 +212,11 @@ def test_progress_bar_is_indeterminate_while_a_file_runs() -> None:
         ProgressEvent(kind="file_done", total=2, completed=1, name="a")
     )
     assert panel._progress_bar.value == 0.5
+
+
+def test_every_tool_page_can_be_built() -> None:
+    from xl_utils.ui.pages import TOOLS
+
+    for tool in TOOLS:
+        control = tool.build(None)
+        assert control is not None, tool.id

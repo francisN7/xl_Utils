@@ -12,7 +12,7 @@ from xl_utils.ui import theme
 from xl_utils.ui.drive import DriveSession
 
 ALLOWED_EXTENSIONS = ["xlsx", "xlsm", "xls", "csv", "html", "htm"]
-DRIVE_BUTTON_SIZE = 104
+DRIVE_BUTTON_SIZE = 56
 DRIVE_SPACING = 10
 
 
@@ -73,7 +73,7 @@ class FileInput:
         )
 
         self._drive_button = ft.Container(
-            content=ft.Icon(ft.Icons.ADD_TO_DRIVE, size=30, color=theme.PURPLE),
+            content=ft.Icon(ft.Icons.ADD_TO_DRIVE, size=26, color=theme.PURPLE),
             width=DRIVE_BUTTON_SIZE,
             height=DRIVE_BUTTON_SIZE,
             border=ft.Border.all(1, theme.BORDER),
