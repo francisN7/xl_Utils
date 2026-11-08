@@ -147,6 +147,8 @@ decisões nos ADRs.
 
 ### Changed
 
+- O site público passa a ser publicado por workflow com filtro de caminho: só
+  `docs/*.html` gera deployment, e a origem do Pages é GitHub Actions.
 - CSV passa a detectar encoding e separador (`;`, tab e `|`); `NA`, `N/A` e
   `NULL` são preservados como texto.
 - HTML com cabeçalho de dois níveis mantém zeros à esquerda e achata o

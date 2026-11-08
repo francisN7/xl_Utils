@@ -8,7 +8,7 @@
 - **Próxima:** S9c — gravação na pasta e exportação
 - **Ciclo:** 0006 — Backlog
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
-  sentinela; config empacotada; ADRs 0014–0018; plugins em `.7z` privado; `id`,
+  sentinela; config empacotada; ADRs 0014–0019; plugins em `.7z` privado; `id`,
   `link` e “vinculação” continuam. Drive: PKCE/`state`, `drive.file`, DPAPI,
   Picker de desktop sem API key e segunda autorização sem offline.
 
@@ -18,7 +18,7 @@
   local (`drive_cache.py`), botão do Drive na entrada e escolha de conta.
 - S9a6: atalho global reinstalado; janela não é reposicionada; Flet 1.1.2.
 - S9a4/S9a5: segredo do cliente por DPAPI; e-mail canônico no login.
-- S9a3: site no GitHub Pages (home + privacidade).
+- S9a3: site no GitHub Pages; publicação por workflow desde a S9b.
 
 ## Próximo passo
 
@@ -47,12 +47,12 @@ do Meu Drive. O teste real do Picker é `scripts/check-drive-picker.py`.
 - Sem cliente, o 1º **Entrar com Google** pede o JSON uma vez; depois não pede.
 - Login não é ferramenta: não recriar cartão do Drive no hub.
 - DPAPI é Windows-only; fora dele o store recusa gravar.
-- Comparação bruta: CNJ mascarado × 20 dígitos crus não vincula.
-- CNJ numérico no Excel perde precisão; a coluna deve ser texto.
+- Comparação bruta: CNJ mascarado × 20 dígitos não vincula; coluna em texto.
 - `PROCESSO ORIGINÁRIO` contém “PROCESSO”; o match é exato, nunca substring.
 - `MIGRAÇÃO` na AGENDA dispara o pop-up; confirmar não reescreve.
 - AGENDA sem PROCESSOS bloqueia tudo; só CLIENTES não valida CNJ.
 - Flet não é thread-safe: login, Picker e execução fora da UI thread.
+- Pages: push de código não publica; use Actions → Pages → Run workflow.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 
 ## Como rodar

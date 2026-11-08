@@ -59,6 +59,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que os fluxos da vinculação vêm dos anexos | `adr/0016-fluxos-e-opcoes-da-vinculacao.md` | 45 |
 | por que a tela cheia é overlay no conteúdo | `adr/0017-tela-cheia-do-quadro.md` | 35 |
 | por que o Drive usa OAuth, DPAPI e contas separadas | `adr/0018-drive-autenticacao.md` | 55 |
+| por que o site só publica quando o HTML muda | `adr/0019-publicacao-do-site.md` | 45 |
 
 ## Regras do mapa
 
