@@ -1,65 +1,51 @@
 # Roadmap atual
 
-Ciclo ativo: **0007 — Versão e distribuição**. Os ciclos fechados estão em
+Ciclo ativo: **0008 — Plugins**. Os ciclos fechados estão em
 [`../history/`](../history/README.md).
 
 ## Sessões
 
 | Sessão | Entrega | Estado |
 |---|---|---|
-| S11 | Versão 0.2.0 e polimento de UI | [x] |
-| S12 | Empacotar a primeira versão, 0.3.0 | [ ] |
-| — | Sistema de plugins | sem sessão |
+| S13 | Plugins I — contrato e extração segura | [ ] |
+| — | Plugins II — área de Plugins na UI | sem sessão |
 | — | Seletor de arquivos integrado à UI | sem sessão |
 | — | Drive sem consentimento repetido | sem sessão |
 
-Ordem revisada pelo dono em 2026-11-08: **versão e polimento → primeira
-release → plugins → investigações pesadas**.
+Ordem definida pelo dono: **primeira release → plugins → investigações
+pesadas**.
 
-## S11 — concluída
+## S13 — próxima
 
-App marcado como **0.2.0** (`pyproject.toml`, lock, `__version__`, diagnóstico).
-Cartões do Início com título em uma linha (reticências, sem quebra no meio da
-palavra), descrição em até duas linhas com `…` e tooltip, e recorte do conteúdo
-— o atalho não sai do cartão. E-mails longos no menu de perfis e no seletor de
-conta ficam com `…` e valor completo em tooltip de 3 s. Testes headless cobrem o
-cartão e o rótulo de e-mail. Sem mudança de regra de negócio.
-
-## S12 — próxima
-
-Gerar o instalador do Windows pronto para instalação, com Python e dependências
-**embutidos**, a partir do wheel: entrada no menu Iniciar, atalho **opcional** na
-área de trabalho, ícone do app, desinstalação limpa e publicação do artefato e
-das notas na página de Releases do GitHub. Decidir a ferramenta (PyInstaller +
-Inno Setup, NSIS ou MSIX) e o que entra no pacote (cliente OAuth, `configs/`,
-documentação). A versão passa a 0.3.0 nesta sessão. ADR obrigatório para a
-escolha do empacotador. Ver a
-[spec](../sessions/S12-empacotar-0.3.0.md).
+Sistema de plugins começa pelo contrato, não pela tela: ADR com manifesto,
+API de UI, ciclo de vida, permissões e versionamento; extração segura do pacote
+`.7z` em `%LOCALAPPDATA%/xl_utils/plugins/`, com recusa de caminho absoluto,
+`..`, symlink e zip bomb, hash/tamanho conferidos e nada executado durante a
+extração. A área “Plugins” na navegação e o primeiro plugin de exemplo ficam na
+sessão seguinte. Ver a [spec](../sessions/S13-plugins-contrato.md).
 
 ## Backlog
 
-### Sistema de plugins
+### Plugins II — área de Plugins na UI
 
-Ferramentas opcionais deixam de vir no app e passam a ser instaladas por um
-arquivo `.7z`. O que é seguro pode virar padrão; o que é arriscado fica num
-repositório privado do dono, só de plugins. Nada é baixado sozinho: instalar é
-ato explícito.
+Área “Plugins” na navegação com lista, instalar, remover e um botão de
+informação que abre a documentação pública: estrutura do `.7z`, manifesto, API,
+exemplo mínimo e checklist de segurança. Ferramentas opcionais deixam de vir no
+app e passam a ser instaladas por um `.7z`; o que é seguro pode virar padrão, o
+que é arriscado fica num repositório privado do dono. Nada é baixado sozinho:
+instalar é ato explícito.
 
 - **Pacote:** `.7z` com manifesto, código e assets, validado antes de instalar
-  em `%LOCALAPPDATA%/xl_utils/plugins/` — nunca no repositório. A extração
-  recusa caminho absoluto, `..`, symlink e zip bomb; confere hash e tamanho e
-  não executa código durante a extração.
-- **Contrato (ADR antes do código):** manifesto (nome, id, versão,
-  compatibilidade, entrypoint e permissões); API de UI (entradas, opções,
-  progresso, log e resultado sem importar o shell); ciclo de vida (descoberta,
-  carregamento, falha isolada, desinstalação); o que o plugin pode e não pode
-  fazer (rede, filesystem, subprocesso); versionamento da API.
-- **UI:** área “Plugins” na navegação com lista, instalar, remover e um botão de
-  informação que abre a documentação pública: estrutura do `.7z`, manifesto,
-  API, exemplo mínimo e checklist de segurança.
-- **Pendências:** ADR do contrato, lib de `.7z`, mesmo processo ou subprocesso,
-  dependências declaradas pelo plugin, assinatura/hash e modo seguro para
-  iniciar sem plugins.
+  em `%LOCALAPPDATA%/xl_utils/plugins/` — nunca no repositório.
+- **Pendências:** dependências declaradas pelo plugin, assinatura/hash e modo
+  seguro para iniciar sem plugins.
+
+### Ícone do aplicativo
+
+O instalador e o executável usam o ícone escolhido na S12 (`assets/icon.png` e
+`assets/icon.ico`); o cabeçalho do app continua com o ícone padrão. Trocar o
+ícone do canto superior esquerdo pelo mesmo desenho, legível em 24–32 px e sem
+quebrar o layout do menu.
 
 ### Seletor de arquivos integrado à UI
 
@@ -86,6 +72,8 @@ esforço e risco. Não trocar o escopo sem ADR.
   testes verdes e app abrindo.
 - Revisar o check de docs no CI a cada mudança de documentação.
 - Atualizar o code tour quando um módulo do core mudar de papel.
+- Refazer o instalador e a validação no Sandbox quando a versão ou o ícone
+  mudar; o roteiro está em [`../guide/release-windows.md`](../guide/release-windows.md).
 - Fechar o ciclo movendo esta página para `docs/history/NNNN-titulo.md` e
   limpando as specs do working tree.
 
@@ -95,9 +83,8 @@ esforço e risco. Não trocar o escopo sem ADR.
 - Internacionalização — só entra se aparecer usuário fora do PT-BR.
 - Drag & drop real de arquivos — só entra se migrar para PySide6 ou houver hook
   Windows-only.
-- **Nuitka no empacotamento da 0.3.0** — verificar viabilidade (tamanho, tempo
-  de build e compatibilidade com o Flet) antes de fixar a ferramenta; se não
-  servir, seguir com PyInstaller + Inno Setup.
+- Auto-update e assinatura de código — só entram se o SmartScreen incomodar
+  usuários de verdade.
 
 ## Descartados (não voltam sem decisão nova)
 
@@ -112,3 +99,5 @@ esforço e risco. Não trocar o escopo sem ADR.
   design; a leitura usa o tipo real sem tocar no arquivo.
 - Normalizar quebras de linha automaticamente — rejeitado; preservar o texto.
 - Arquivar documentação em `.7z`/`.zip` — o Git é o arquivo; ver ADR 0020.
+- Nuitka no empacotamento — sem integração com o cliente desktop do Flet; ver
+  ADR 0021.

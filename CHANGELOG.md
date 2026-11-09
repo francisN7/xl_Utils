@@ -4,6 +4,32 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 Uma entrada por **versão**; o detalhe por sessão está no roadmap numerado e as
 decisões nos ADRs.
 
+## v0.3.0 — 2026-11-09
+
+### Added
+
+- Instalador Windows x64 por usuário (Inno Setup): menu Iniciar, atalho opcional
+  na área de trabalho, ícone próprio, versão 0.3.0 nos metadados e desinstalação
+  que apaga também contas, tokens, preferências, cache, logs e o cache do
+  cliente Flet em `%USERPROFILE%\.flet`, com aviso prévio.
+- Build reproduzível em `scripts/build_windows.ps1`: wheel → venv limpo →
+  `flet pack` (PyInstaller onedir) → Inno Setup, com checksum SHA-256.
+- Ícone Dracula em `assets/icon.png` e `assets/icon.ico`, gerado por
+  `scripts/make_icons.py --pick conceito_2b_x_planilha_vazada` (arte completa em
+  48–256 px e simplificada em 16–32 px).
+- Guia `docs/guide/release-windows.md` com build, validação no Windows Sandbox,
+  aviso de SmartScreen e publicação da release.
+
+### Changed
+
+- Versão 0.3.0 em `pyproject.toml`, `uv.lock`, `__version__` e diagnóstico.
+- `pyinstaller` entra como dependência de desenvolvimento.
+
+### Fixed
+
+- `flet pack` no Windows com Flet 1.1.2: o build corrige o `open()` binário com
+  `encoding` no overlay do `flet.exe` (correção aplicada no venv do build).
+
 ## v0.2.0 — 2026-11-09
 
 ### Added

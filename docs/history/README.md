@@ -30,6 +30,7 @@ sai do repositório, só sai do caminho do dia a dia.
 | [`0004-execucao-e-robustez.md`](0004-execucao-e-robustez.md) | Execução e robustez | 2026-11-04 | execução fora da UI, cancelamento, CNJ sujo |
 | [`0005-polimento.md`](0005-polimento.md) | Polimento | 2026-11-06 | `ORIGEM`/`LINHA_ORIGEM`, tema claro |
 | [`0006-backlog.md`](0006-backlog.md) | Backlog | 2026-11-08 | vinculação, tela cheia, Google Drive |
+| [`0007-versoes-e-distribuicao.md`](0007-versoes-e-distribuicao.md) | Versão e distribuição | 2026-11-09 | 0.2.0, instalador 0.3.0 e release |
 
 ## Convenção de nomes
 

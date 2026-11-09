@@ -4,6 +4,14 @@ Aplicativo desktop que reúne pequenos utilitários de planilha em uma única
 interface. O núcleo é compartilhado: toda leitura passa por um pipeline de
 texto seguro antes de chegar à ferramenta.
 
+## Instalação (Windows)
+
+Baixe o instalador da última versão em
+[Releases](https://github.com/francisN7/xl_Utils/releases/latest) e confira o
+SHA-256 publicado junto. É uma instalação por usuário (sem administrador), com
+entrada no menu Iniciar e atalho opcional na área de trabalho; Python e `uv` não
+são necessários na máquina de destino.
+
 ## Ferramentas
 
 | Ferramenta | O que faz | Estado |
@@ -106,10 +114,11 @@ O ponto estável é a tag
 
 ## Segurança
 
-O app processa planilhas locais e não faz chamadas de rede nesta versão. Para
-relatar uma falha, use o relato privado de vulnerabilidades do GitHub — o canal
-está descrito em [`SECURITY.md`](SECURITY.md). Não abra issue pública com dados
-reais, credenciais ou passos que exponham terceiros.
+O app processa planilhas locais; o Google Drive é opcional e só acessa arquivos
+ou pastas que você escolher. Para relatar uma falha, use o relato privado de
+vulnerabilidades do GitHub — o canal está descrito em [`SECURITY.md`](SECURITY.md).
+Não abra issue pública com dados reais, credenciais ou passos que exponham
+terceiros.
 
 ## Contribuindo
 

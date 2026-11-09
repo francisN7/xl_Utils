@@ -18,6 +18,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | entender as regras do agente | [`../AGENTS.md`](../AGENTS.md) |
 | relatar uma falha de segurança | [`../SECURITY.md`](../SECURITY.md) |
 | rodar o projeto | [`guide/setup.md`](guide/setup.md) |
+| gerar e publicar o instalador | [`guide/release-windows.md`](guide/release-windows.md) |
 | testar | [`guide/testing.md`](guide/testing.md) |
 | entender como o código é organizado | [`reference/architecture.md`](reference/architecture.md) |
 | ler o código em ordem guiada | [`guide/code-tour.md`](guide/code-tour.md) |
@@ -26,7 +27,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S11-versao-0.2.0-e-polimento.md`](sessions/S11-versao-0.2.0-e-polimento.md) |
+| ler a spec da próxima sessão | [`sessions/S13-plugins-contrato.md`](sessions/S13-plugins-contrato.md) |
 
 ## Por seção (atalho)
 
@@ -61,6 +62,8 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que a tela cheia é overlay no conteúdo | `adr/0017-tela-cheia-do-quadro.md` | 35 |
 | por que o Drive usa OAuth, DPAPI e contas separadas | `adr/0018-drive-autenticacao.md` | 55 |
 | por que o site só publica quando o HTML muda | `adr/0019-publicacao-do-site.md` | 45 |
+| por que o histórico é uma página por ciclo | `adr/0020-arquivo-do-historico.md` | 35 |
+| por que o instalador usa PyInstaller e Inno Setup | `adr/0021-instalador-windows.md` | 70 |
 
 ## Regras do mapa
 
