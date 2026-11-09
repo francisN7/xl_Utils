@@ -9,6 +9,7 @@ import flet as ft
 from xl_utils.core.mime import FormatCheck
 from xl_utils.shared.accounts import Account
 from xl_utils.ui import theme
+from xl_utils.ui.components.account_label import email_text
 from xl_utils.ui.drive import DriveSession
 
 ALLOWED_EXTENSIONS = ["xlsx", "xlsm", "xls", "csv", "html", "htm"]
@@ -157,7 +158,7 @@ class FileInput:
                         leading=ft.CircleAvatar(
                             content=ft.Text(_initials(account), size=13),
                         ),
-                        title=ft.Text(account.email, size=theme.FONT_SM),
+                        title=email_text(account.email),
                         subtitle=ft.Text(
                             account.name or "Conta do Google",
                             size=theme.FONT_XS,

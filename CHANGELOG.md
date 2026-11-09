@@ -4,7 +4,7 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 Uma entrada por **versão**; o detalhe por sessão está no roadmap numerado e as
 decisões nos ADRs.
 
-## [Unreleased]
+## v0.2.0 — 2026-11-09
 
 ### Added
 
@@ -189,6 +189,8 @@ decisões nos ADRs.
   carregada, vinculação concluída e totais de CNJ/PASTA/PROTOCOLO/nome aparecem
   uma vez nos dois fluxos. O cartão do Início e o cabeçalho citam as quatro
   planilhas e o fluxo definido pelo anexo.
+- Versão marcada como `0.2.0` no `pyproject.toml`, no lock, em `__version__` e no
+  diagnóstico.
 
 ### Removed
 
@@ -225,6 +227,12 @@ decisões nos ADRs.
   pelo usuário e não é mais forçada.
 - Flet atualizado para 1.1.2 no `.venv`, no lock e no atalho global; a suíte
   passa nessa versão.
+- Cartões do Início e a página **Verificar Vínculos** pararam de estourar em
+  largura estreita: o nome fica em uma linha com reticências, a descrição em até
+  duas linhas com `…` e tooltip, e o cartão recorta o conteúdo — o atalho “Abrir
+  ferramenta” continua dentro do cartão.
+- E-mails longos no menu de perfis e no seletor de conta viram `…`; o valor
+  completo aparece em tooltip com 3 s de atraso.
 
 ### Security
 

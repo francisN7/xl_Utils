@@ -31,6 +31,9 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                                 size=theme.FONT_MD,
                                 weight=ft.FontWeight.BOLD,
                                 expand=True,
+                                max_lines=1,
+                                no_wrap=True,
+                                overflow=ft.TextOverflow.ELLIPSIS,
                             ),
                             ft.Icon(
                                 ft.Icons.ARROW_FORWARD,
@@ -45,6 +48,9 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
                         tool.description,
                         size=theme.FONT_SM,
                         color=theme.MUTED,
+                        max_lines=2,
+                        overflow=ft.TextOverflow.ELLIPSIS,
+                        tooltip=tool.description,
                     ),
                     ft.Container(expand=True),
                     ft.Text(
@@ -63,6 +69,7 @@ def build_home(on_open: Callable[[str], None]) -> ft.Control:
             border_radius=12,
             padding=16,
             height=200,
+            clip_behavior=ft.ClipBehavior.HARD_EDGE,
             ink=True,
             col={"sm": 12, "md": 6, "lg": 3},
         )

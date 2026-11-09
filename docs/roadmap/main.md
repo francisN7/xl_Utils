@@ -7,7 +7,7 @@ Ciclo ativo: **0007 — Versão e distribuição**. Os ciclos fechados estão em
 
 | Sessão | Entrega | Estado |
 |---|---|---|
-| S11 | Versão 0.2.0 e polimento de UI | [ ] |
+| S11 | Versão 0.2.0 e polimento de UI | [x] |
 | S12 | Empacotar a primeira versão, 0.3.0 | [ ] |
 | — | Sistema de plugins | sem sessão |
 | — | Seletor de arquivos integrado à UI | sem sessão |
@@ -16,25 +16,16 @@ Ciclo ativo: **0007 — Versão e distribuição**. Os ciclos fechados estão em
 Ordem revisada pelo dono em 2026-11-08: **versão e polimento → primeira
 release → plugins → investigações pesadas**.
 
-## S11 — próxima
+## S11 — concluída
 
-Três frentes numa sessão só. Ver a
-[spec](../sessions/S11-versao-0.2.0-e-polimento.md).
+App marcado como **0.2.0** (`pyproject.toml`, lock, `__version__`, diagnóstico).
+Cartões do Início com título em uma linha (reticências, sem quebra no meio da
+palavra), descrição em até duas linhas com `…` e tooltip, e recorte do conteúdo
+— o atalho não sai do cartão. E-mails longos no menu de perfis e no seletor de
+conta ficam com `…` e valor completo em tooltip de 3 s. Testes headless cobrem o
+cartão e o rótulo de e-mail. Sem mudança de regra de negócio.
 
-- **Versão 0.2.0:** alinhar `pyproject.toml`, `uv.lock` (depois de `uv lock`),
-  `src/xl_utils/__init__.py` (`__version__`), o diagnóstico e onde mais a versão
-  aparecer — hoje tudo marca `0.1.0`. É só a marcação; o instalador fica para a
-  S12.
-- **Responsividade:** em largura reduzida, os títulos dos cartões quebram no
-  meio das palavras e a descrição estoura o card, empurrando “Abrir ferramenta”
-  para fora; em “Verificar Vínculos” o texto longo piora o quadro. Manter
-  título, descrição e atalho dentro do cartão, truncar a descrição com
-  reticências e revisar o Início e as páginas em larguras estreitas.
-- **E-mail longo no menu de perfis:** truncar com `…` e mostrar o e-mail
-  completo em tooltip, com atraso de hover de alguns segundos. Vale para o item
-  de perfil e qualquer outro ponto que exiba o e-mail.
-
-## S12 — planejada
+## S12 — próxima
 
 Gerar o instalador do Windows pronto para instalação, com Python e dependências
 **embutidos**, a partir do wheel: entrada no menu Iniciar, atalho **opcional** na
@@ -42,7 +33,8 @@ Gerar o instalador do Windows pronto para instalação, com Python e dependênci
 das notas na página de Releases do GitHub. Decidir a ferramenta (PyInstaller +
 Inno Setup, NSIS ou MSIX) e o que entra no pacote (cliente OAuth, `configs/`,
 documentação). A versão passa a 0.3.0 nesta sessão. ADR obrigatório para a
-escolha do empacotador.
+escolha do empacotador. Ver a
+[spec](../sessions/S12-empacotar-0.3.0.md).
 
 ## Backlog
 

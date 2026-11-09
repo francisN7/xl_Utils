@@ -4,46 +4,45 @@
 
 ## Sessão
 
-- **Última concluída:** S10 — fechamento do ciclo 0006 e arquivo do histórico
-- **Próxima:** S11 — versão 0.2.0 e polimento de UI
+- **Última concluída:** S11 — versão 0.2.0 e polimento de UI
+- **Próxima:** S12 — empacotar a primeira versão, 0.3.0
 - **Ciclo:** 0007 — Versão e distribuição
 - **Decisões:** comparação bruta; CNJ máscara ou 20 dígitos; `MIGRAÇÃO` é
   sentinela; config empacotada; ADRs 0014–0019; plugins em `.7z` privado.
   Drive: PKCE/`state`, `drive.file`, DPAPI, Picker desktop sem API key, pasta
   concedida por conta, raiz como fallback e nomes livres `_001`. Histórico em
-  texto, uma página por ciclo, sem arquivo comprimido (ADR 0020).
+  texto, uma página por ciclo (ADR 0020). E-mail longo usa `ft.Tooltip` com 3 s.
 
 ## Pronto
 
-- S10: ciclo 0006 arquivado em `docs/history/0006-backlog.md`; páginas 0001–0006
-  em `docs/history/`; 14 specs fechadas fora do working tree; ciclo 0007 aberto.
-- S9c: “Salvar no Drive” na pasta de origem, `drive/folders.json`, upload
-  multipart, nomes `_001` e fallback para a raiz. Validado no app em 2026-11-08.
-- S9a–S9b: OAuth por DPAPI, menu de perfis, Picker de desktop e leitura do Drive.
+- S11: app marcado como `0.2.0` no pyproject, lock, `__version__` e diagnóstico;
+  cartões do Início com nome em uma linha, descrição em duas com `…`/tooltip e
+  recorte do conteúdo; e-mail truncado no menu de perfis e no seletor de conta,
+  com valor completo em tooltip de 3 s. Testes headless em `tests/test_home.py`.
+- S10: ciclo 0006 arquivado em `docs/history/0006-backlog.md`; ciclo 0007 aberto.
+- S9c: “Salvar no Drive” na pasta de origem, concessão por conta e `_001`.
 
 ## Próximo passo
 
-Ler `docs/sessions/S11-versao-0.2.0-e-polimento.md`: marcar 0.2.0 em
-`pyproject.toml`, `uv.lock`, `__version__`, diagnóstico e docs; corrigir o
-estouro dos cartões em largura estreita (Início e Verificar Vínculos) e truncar
-o e-mail do menu de perfis com tooltip atrasado. Sem mudança de regra de
-negócio.
+Ler `docs/sessions/S12-empacotar-0.3.0.md`: medir PyInstaller/Nuitka/MSIX e
+registrar o ADR, montar o build a partir do wheel, gerar o instalador Windows com
+Python embutido, marcar 0.3.0, validar sem Python e publicar a release `v0.3.0`.
 
 ## Arquivos-chave
 
-- `src/xl_utils/ui/pages/home.py`, `registry.py`, `ui/components/top_menu.py`
-- `pyproject.toml`, `src/xl_utils/__init__.py`, `uv.lock`
-- `docs/history/README.md`, `docs/roadmap/main.md`, `docs/adr/0020-*.md`
-- `scripts/check-docs.mjs` (ignora links de `docs/history/`)
-- `docs/sessions/S11-versao-0.2.0-e-polimento.md`
+- `docs/sessions/S12-empacotar-0.3.0.md`, `docs/roadmap/main.md`
+- `pyproject.toml`, `src/xl_utils/__init__.py`, `uv.lock`, `src/xl_utils/app.py`
+- `src/xl_utils/ui/pages/home.py`, `ui/components/account_label.py`, `top_menu.py`
+- `scripts/`, `.github/workflows/`, assets/ícone
 
 ## Armadilhas
 
-- Ciclo fechado não volta ao working tree: o texto vive no Git e o resumo em
-  `docs/history/`; não criar `.7z`/`.zip` de docs.
+- Flet 1.1.2 no empacotador: validar um build mínimo que abra a janela antes de
+  escrever o instalador; se falhar, trocar de ferramenta cedo.
+- A versão vive em `pyproject.toml`, `uv.lock`, `__version__` e diagnóstico:
+  conferir as quatro e rodar `uv lock` depois de editar.
 - Flet não é thread-safe: login, Picker, gravação e execução fora da UI thread.
-- Tooltip do Flet pode não ter atraso nativo; medir antes de assumir `Timer`.
-- `uv lock` pode subir dependências: conferir o diff e rodar a suíte.
+- Tooltip do Flet aceita `ft.Tooltip(wait_duration=…)`; não é preciso `Timer`.
 - Páginas: push de código não publica; use Actions → Pages → Run workflow.
 - Nunca `push --force` na `main`; `legacy` é somente leitura.
 - `drive.file` só vê arquivo criado/escolhido; a pasta precisa ser concedida.

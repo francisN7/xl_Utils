@@ -7,6 +7,7 @@ import contextlib
 import flet as ft
 
 from xl_utils.ui import theme
+from xl_utils.ui.components.account_label import email_text
 from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.drive import DriveSession
 
@@ -87,7 +88,7 @@ class TopMenu:
         )
         items.extend(
             ft.PopupMenuItem(
-                content=account.email,
+                content=email_text(account.email),
                 icon=ft.Icons.ACCOUNT_CIRCLE,
                 checked=account.email == session.active,
                 on_click=lambda _event, email=account.email: self._switch(email),

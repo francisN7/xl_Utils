@@ -181,7 +181,7 @@ def test_menu_lists_accounts_and_checks_the_active_one(
 
     checked = [item for item in menu.control.items if item.checked]
 
-    assert [item.content for item in checked] == ["zeca@example.com"]
+    assert [_texts(item.content) for item in checked] == [["zeca@example.com"]]
 
 
 def test_menu_switches_the_account(store: accounts.AccountStore) -> None:
@@ -190,7 +190,9 @@ def test_menu_switches_the_account(store: accounts.AccountStore) -> None:
     asyncio.run(session.connect())
     menu = TopMenu(session)
     target = next(
-        item for item in menu.control.items if item.content == "ana@example.com"
+        item
+        for item in menu.control.items
+        if _texts(item.content) == ["ana@example.com"]
     )
 
     target.on_click(None)
@@ -198,7 +200,27 @@ def test_menu_switches_the_account(store: accounts.AccountStore) -> None:
     assert session.active == "ana@example.com"
 
 
+def test_menu_truncates_a_long_email_and_keeps_the_full_value_in_tooltip(
+    store: accounts.AccountStore,
+) -> None:
+    long_email = "francisco.almeida@escritorio-advocacia.com.br"
+    session = _session(store, long_email)
+    asyncio.run(session.connect())
+    menu = TopMenu(session)
+
+    item = next(item for item in menu.control.items if item.checked)
+    text = item.content
+
+    assert isinstance(text, ft.Text)
+    assert text.value.endswith("…")
+    assert long_email.startswith(text.value[:-1])
+    assert isinstance(text.tooltip, ft.Tooltip)
+    assert text.tooltip.message == long_email
+
+
 def _texts(control: object) -> list[str]:
+    if isinstance(control, str):
+        return [control]
     if isinstance(control, ft.Text):
         return [str(control.value)]
     found: list[str] = []
@@ -402,14 +424,16 @@ def test_menu_lists_profiles_and_actions(store: accounts.AccountStore) -> None:
     asyncio.run(session.connect())
     menu = TopMenu(session, importer=_FakeImporter())
 
-    contents = [item.content for item in menu.control.items]
+    contents = [" ".join(_texts(item.content)) for item in menu.control.items]
 
     assert "ana@example.com" in contents
     assert "zeca@example.com" in contents
     assert "Adicionar conta" in contents
     assert "Sair desta conta" in contents
-    assert all("Configurar" not in str(content) for content in contents)
-    checked = [item.content for item in menu.control.items if item.checked]
+    assert all("Configurar" not in content for content in contents)
+    checked = [
+        " ".join(_texts(item.content)) for item in menu.control.items if item.checked
+    ]
     assert checked == ["zeca@example.com"]
 
 

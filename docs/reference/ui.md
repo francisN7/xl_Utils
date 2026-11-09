@@ -147,10 +147,13 @@ trocado.
 
 O hub mostra um cartão por ferramenta, com 200 px de altura: até quatro por
 linha no desktop, dois no médio e um no mobile. Cada cartão tem ícone, nome,
-descrição e o atalho “Abrir ferramenta”. Novas ferramentas entram da esquerda
-para a direita; a próxima linha também começa à esquerda. O cartão de Verificar
-Vínculos lista as quatro planilhas e avisa que a presença do arquivo define o
-fluxo.
+descrição e o atalho “Abrir ferramenta”. O nome ocupa uma única linha e ganha
+reticências quando falta espaço — nunca quebra no meio da palavra; a descrição
+fica em até duas linhas, também com `…`, e mostra o texto completo no tooltip.
+O cartão recorta o conteúdo, então o atalho permanece dentro da área mesmo em
+largura estreita. Novas ferramentas entram da esquerda para a direita; a próxima
+linha também começa à esquerda. O cartão de Verificar Vínculos lista as quatro
+planilhas e avisa que a presença do arquivo define o fluxo.
 
 ## Drive
 
@@ -162,8 +165,11 @@ app com “Entrar com Google”.
   cliente OAuth ainda não estiver configurado, o primeiro clique pede o JSON
   baixado do Google Cloud Console, uma única vez; feito isso, o navegador abre.
 - **Com uma ou mais contas:** o menu lista os e-mails com ícone de perfil e
-  marca a ativa. Clicar em outro e-mail troca a conta ativa; **Adicionar conta**
-  abre o navegador para outro perfil; **Sair desta conta** remove só a ativa.
+  marca a ativa. E-mails longos aparecem truncados com `…`; o valor completo fica
+  no tooltip, que surge depois de 3 s de hover. Clicar em outro e-mail troca a
+  conta ativa; **Adicionar conta** abre o navegador para outro perfil; **Sair
+  desta conta** remove só a ativa. O seletor de conta do Drive usa o mesmo
+  rótulo curto.
 - **Durante o login:** o menu mostra “Conectando ao Google…”. Se o usuário
   negar o acesso ou o navegador não responder em três minutos, a mensagem
   aparece no próprio menu e nada fica travado.
