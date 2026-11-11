@@ -30,7 +30,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S15-seletor-de-arquivos.md`](sessions/S15-seletor-de-arquivos.md) |
+| ler a spec da próxima sessão | [`sessions/S16-drive-sem-consentimento.md`](sessions/S16-drive-sem-consentimento.md) |
 
 ## Por seção (atalho)
 
@@ -73,6 +73,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que os ciclos fechados ficam no roadmap | `adr/0022-ciclos-no-roadmap.md` | 35 |
 | por que plugins usam `.tar.xz` e mesmo processo | `adr/0023-contrato-de-plugins.md` | 120 |
 | por que o plugin só é importado ao executar | `adr/0024-carregamento-sob-demanda.md` | 45 |
+| por que o seletor próprio é Flet puro e paginado | `adr/0025-seletor-de-arquivos.md` | 110 |
 
 ## Regras do mapa
 

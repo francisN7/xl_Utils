@@ -83,6 +83,12 @@ direto; duas ou mais abrem um diálogo para escolher qual. O arquivo escolhido �
 baixado para o cache local com o nome real e entra na lista como qualquer
 arquivo do computador.
 
+O seletor nativo continua sendo o padrão. O ADR 0025 decidiu que o próximo passo
+é um seletor próprio em Flet puro, dentro do tema, com navegação de pastas,
+busca, filtro por formato e recentes locais; a lista é paginada (300 itens por
+página) e a leitura do diretório sai da UI thread. O seletor nativo e o Picker
+do Drive continuam como fallback. A implementação ainda não está no app.
+
 Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
 extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:
 .xls`). Se nem o conteúdo nem a extensão apontarem para um formato suportado, a

@@ -4,49 +4,51 @@
 
 ## Sessão
 
-- **Última concluída:** S14 — área Plugins, carregamento sob demanda e guia
-- **Próxima:** S15 — seletor de arquivos integrado à UI (investigação)
+- **Última concluída:** S15 — seletor de arquivos (investigação)
+- **Próxima:** S16 — Drive sem consentimento repetido (investigação)
 - **Ciclo:** 0009 — Investigações de UI
-- **Decisões:** import do plugin só na primeira execução, pacote sintético e
-  cache (ADR 0024); `.tar.xz`, mesmo processo e permissões declarativas (ADR
-  0023); demais nos ADRs 0014–0022.
+- **Decisões:** ADR 0025 — seletor em Flet puro, paginado (300), listagem fora
+  da UI thread, nativo/Picker como fallback; demais nos ADRs 0014–0024.
 
 ## Pronto
 
-- S14: área Plugins (válidos/inválidos, instalar com confirmação, remover,
-  abrir pasta), carregamento sob demanda sem tocar no `sys.path`, página
-  declarativa com os quatro tipos de opção, slots nomeados, log, progresso e
-  cancelamento; CLI como `xl-utils-plugin`; guia e exemplos executáveis. 595
-  testes, docs ok, build com `_lzma` e exe abrindo.
+- S15: spike em Flet puro com 25.000 arquivos, filtro por formato, busca,
+  recentes, subpasta e seleção; nenhum fluxo padrão mudou. ADR 0025 com as
+  medições e a spec de implementação em `docs/sessions/S24-seletor-em-flet.md`.
+- S14: área Plugins (válidos/inválidos, instalar, remover, abrir pasta),
+  carregamento sob demanda, página declarativa, CLI e guia do autor. 595 testes.
 - S13: ADR 0023; `core/plugins/` e `shared/plugins/`; instalação atômica e CLI.
 - S12: `v0.3.0`, build Windows e instalador.
 
 ## Próximo passo
 
-Ler `docs/sessions/S15-seletor-de-arquivos.md`: medir o seletor próprio com
-spike descartável e decidir no ADR 0025, sem mudar o fluxo padrão. A release
-0.4.0 está no backlog; o dono decide quando empacotar.
+Ler `docs/sessions/S16-drive-sem-consentimento.md`: inventariar o fluxo atual
+(`drive.file` + Picker + concessão de pasta) e medir um spike de listagem com o
+token do login, sem trocar escopo. A decisão vira ADR 0026. O seletor próprio
+(S24) fica para depois da 0.4.0; a release é a S23.
 
 ## Arquivos-chave
 
-- `src/xl_utils/ui/pages/plugins.py`, `plugin_tool.py`
-- `src/xl_utils/shared/plugins/loader.py`, `controllers/plugins.py`
-- `src/xl_utils/core/plugins/page.py`
-- `src/xl_utils/plugin_cli.py`, `docs/plugins/`
-- `docs/adr/0024-carregamento-sob-demanda.md`
-- `tests/test_plugin_loader.py`, `test_plugins_ui.py`, `test_plugin_examples.py`
+- `docs/adr/0025-seletor-de-arquivos.md`, `docs/sessions/S16-*.md`
+- `docs/reference/ui.md` → Entrada de arquivos
+- `src/xl_utils/shared/drive.py`, `drive_auth.py`, `drive_pick.py`,
+  `drive_store.py`, `ui/drive.py`, `ui/components/file_input.py`
+- `artifacts/spike_selector/` (ignorado; spike descartável e captura local)
 
 ## Armadilhas
 
-- Abrir a área não importa `lib/`; só o primeiro Executar importa e o cache só
-  cai ao instalar/remover.
-- Imports entre arquivos do plugin são relativos; `sys.path` nunca muda.
+- Flet não virtualiza a lista no processo Python: 5.000 `ListTile` custam
+  ~10 MB e ~500 ms; paginar em 300 e listar em `asyncio.to_thread`.
+- `os.scandir` é ~2,7× mais rápido que `Path.iterdir` + `is_dir` (46 ms vs
+  125 ms em 10.000 itens); usar `DirEntry.is_dir`.
+- Largura fixa de diálogo corta em 125% de escala; calcular a partir de
+  `page.width` e testar 100/125/150%.
+- O spike tem caminho pessoal na captura; não commitar `artifacts/`.
+- Abrir a área de plugins não importa `lib/`; só o primeiro Executar importa.
 - Plugin em processo não tem sandbox; permissões são avisos.
-- Falha de import aparece no Executar, não na lista (lista = manifesto).
 - `.tar.xz` é tar + xz; sidecar SHA-256 obrigatório; nada de `extractall`.
 - `flet pack` apaga `build/`; artefatos em `artifacts/`; o build exige
-  `_lzma.pyd` no bundle.
-- Sem `python3t.dll` de `abi3t-compat/`, o google-auth quebra no exe.
+  `_lzma.pyd` e `python3t.dll` no bundle.
 - `.iss` é UTF-8 com BOM; `Set-Content` corrompe acentos.
 - Flet não é thread-safe: carregar e executar fora da UI thread.
 - Ciclos fechados ficam em `docs/roadmap/`; não recriar `docs/history/`.

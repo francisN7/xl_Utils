@@ -7,64 +7,63 @@ Ciclo ativo: **0009 — Investigações de UI**. Os ciclos fechados estão em
 
 | Sessão | Entrega | Estado |
 |---|---|---|
-| S15 | Seletor de arquivos integrado à UI — investigação | [ ] |
+| S15 | Seletor de arquivos integrado à UI — investigação | [x] |
 | S16 | Drive sem consentimento repetido — investigação | [ ] |
-| — | Release 0.4.0 (plugins + guia do autor) | no backlog; o dono decide |
-| — | Ícone do cabeçalho | sem sessão |
+| S17 | Ícone da sidebar e da janela | [ ] |
+| S18 | Plugins no rodapé da sidebar, fora do Início | [ ] |
+| S19 | Remover Verificar Vínculos e preparar o repo de plugins | [ ] |
+| S20 | Leitura de planilhas pelo host e API 2 dos plugins | [ ] |
+| S21 | Menu de perfis do Drive sem troca de conta | [ ] |
+| S22 | Auditoria dos docs e README com badges e screenshots | [ ] |
+| S23 | Release 0.4.0 e fechamento do ciclo | [ ] |
 
-Ordem definida pelo dono: **primeira release → plugins → investigações
-pesadas**. Plugins foram entregues no ciclo 0008; a 0.4.0 está pronta para
-empacotar quando o dono decidir.
+Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21 → S22 →
+S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
+Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 
-## S15 — próxima
+## S15 — concluída
 
-Medir um seletor de arquivos próprio, dentro do tema e do fluxo da janela, e
-decidir com evidências se o Flet 1.1 permite ou se a migração para
-webview/PySide6 é necessária. A decisão vira ADR 0025; o seletor nativo e o
-Picker continuam como fallback obrigatório. Ver a
-[spec](../sessions/S15-seletor-de-arquivos.md).
+O spike em Flet puro listou 25.000 arquivos, filtrou por formato, mostrou
+recentes e implementou a seleção dentro do tema. A decisão está no
+[ADR 0025](../adr/0025-seletor-de-arquivos.md): seletor próprio com paginação
+de 300 itens, listagem fora da UI thread e seletor nativo/Picker como fallback.
+A implementação fica para depois da 0.4.0; nenhum fluxo padrão mudou.
 
-## S16 — esboço
+## S16 — próxima
 
 Investigar um pipeline de Drive que use o token do login para listar e escolher
 arquivos e pastas dentro do app, comparando consentimento único, verificação do
 Google, acesso mínimo, esforço e risco com o desenho atual (`drive.file` +
-Picker + concessão de pasta). Não trocar o escopo sem ADR.
+Picker + concessão de pasta). Não trocar o escopo sem ADR. Ver a
+[spec](../sessions/S16-drive-sem-consentimento.md).
+
+## S17–S23 — próximas
+
+- **S17:** trocar o quadrado “x” da sidebar pelo ícone real e usar o `.ico` no
+  cabeçalho da janela; o build precisa levar `assets/` para o lado do exe.
+- **S18:** tirar **Plugins** do Início e fixar o item no rodapé da sidebar,
+  acima de `uv · Python 3.15`, sem quebrar o índice de navegação.
+- **S19:** remover Verificar Vínculos (código, config, testes, docs e site) e
+  criar o esqueleto do repo privado `xl_U-Plugins`, com o código atual como
+  referência e o guia reutilizável de criação de plugins.
+- **S20:** `PluginRequest.reader` para ler com o pipeline do host, incluindo
+  arquivos do cache do Drive; API 2 sem compatibilidade com a 1.
+- **S21:** menu de perfis nativo, sem `checked` e sem troca de conta; o “Sair
+  desta conta” aparece no submenu do e-mail. O salvamento do Drive continua
+  usando a conta de origem do arquivo.
+- **S22:** auditar todos os `.md`, atualizar README/site e adicionar banner,
+  badges, tagline animada e screenshots.
+- **S23:** versão 0.4.0, notas, build, Sandbox, publicação e fechamento do
+  ciclo 0009; o 0010 nasce limpo.
 
 ## Backlog
 
-### Release 0.4.0
+### Seletor próprio (implementação)
 
-O código dos plugins e o guia do autor estão no repositório; falta decidir a
-versão, regerar o instalador e publicar. Segue o roteiro de
-[`../guide/release-windows.md`](../guide/release-windows.md), incluindo o teste
-do exe com um plugin real instalado.
-
-### Ícone do aplicativo
-
-O instalador e o executável usam o ícone escolhido na S12 (`assets/icon.png` e
-`assets/icon.ico`); o cabeçalho do app continua com o ícone padrão. Trocar o
-ícone do canto superior esquerdo pelo mesmo desenho, legível em 24–32 px e sem
-quebrar o layout do menu.
-
-### Seletor de arquivos integrado à UI
-
-Hoje o arquivo local abre no diálogo nativo do Windows e o do Drive abre uma aba
-do navegador; os dois saem do visual e do fluxo da janela. Estudar um seletor
-próprio (pastas e arquivos, filtros por formato, recentes e, no Drive, as pastas
-já concedidas) que siga o tema e caiba no app, mantendo o seletor nativo e o
-Picker como fallback. A decisão depende de o Flet suportar ou de migrar para
-webview/PySide6; medir antes — é o escopo da S15.
-
-### Drive sem consentimento repetido
-
-O Picker de desktop exige `prompt=consent` e abre o navegador a cada escolha,
-então o login inicial parece não servir para nada. Investigar um pipeline que
-use o token do login para listar e escolher arquivos e pastas dentro do app —
-por exemplo o Picker web com API key e webview, ou o escopo `drive` com um
-navegador próprio — e comparar com o desenho atual (`drive.file` + Picker +
-concessão de pasta): consentimento único, verificação do Google, acesso mínimo,
-esforço e risco. Não trocar o escopo sem ADR.
+O ADR 0025 decidiu o caminho em Flet puro, com paginação, busca, filtro e
+recentes, mantendo o nativo e o Picker como fallback. A implementação fica para
+depois da 0.4.0; o escopo técnico está no próprio ADR e a
+[spec de backlog](../sessions/S24-seletor-em-flet.md).
 
 ## Manutenção
 
@@ -103,3 +102,5 @@ esforço e risco. Não trocar o escopo sem ADR.
 - Nuitka no empacotamento — sem integração com o cliente desktop do Flet; ver
   ADR 0021.
 - Importar todos os plugins na abertura do app — ver ADR 0024.
+- Migrar a stack para PySide6 ou embutir webview só para ter seletor de arquivos
+  — preterido no ADR 0025.
