@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import stat
 import subprocess
 import time
@@ -213,17 +214,25 @@ def test_uninstall_readonly_file(tmp_path: Path) -> None:
 
 
 def test_uninstall_junction_does_not_follow(tmp_path: Path) -> None:
+    if os.name != "nt":
+        pytest.skip("junction é específica do Windows")
+    cmd = shutil.which("cmd.exe") or os.environ.get("COMSPEC")
+    if not cmd:
+        pytest.skip("cmd.exe indisponível neste ambiente")
     root = tmp_path / "plugins"
     root.mkdir()
     target = tmp_path / "sentinel"
     target.mkdir()
     (target / "keep.txt").write_text("keep", encoding="utf-8")
     junction = root / "autor.junction"
-    created = subprocess.run(
-        ["cmd", "/c", "mklink", "/J", str(junction), str(target)],
-        capture_output=True,
-        check=False,
-    )
+    try:
+        created = subprocess.run(
+            [cmd, "/c", "mklink", "/J", str(junction), str(target)],
+            capture_output=True,
+            check=False,
+        )
+    except OSError as error:
+        pytest.skip(f"mklink /J indisponível: {error}")
     if created.returncode != 0:
         pytest.skip("mklink /J indisponível neste ambiente")
 
