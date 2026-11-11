@@ -1,6 +1,6 @@
 # ADR 0020 — Histórico em texto, uma página por ciclo
 
-- **Status:** aceita
+- **Status:** substituída pela [ADR 0022](0022-ciclos-no-roadmap.md)
 - **Data:** 2026-11-08
 
 ## Contexto

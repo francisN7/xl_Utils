@@ -1,7 +1,7 @@
 # Roadmap atual
 
 Ciclo ativo: **0008 — Plugins**. Os ciclos fechados estão em
-[`../history/`](../history/README.md).
+[`README.md`](README.md), nesta mesma pasta.
 
 ## Sessões
 
@@ -74,8 +74,9 @@ esforço e risco. Não trocar o escopo sem ADR.
 - Atualizar o code tour quando um módulo do core mudar de papel.
 - Refazer o instalador e a validação no Sandbox quando a versão ou o ícone
   mudar; o roteiro está em [`../guide/release-windows.md`](../guide/release-windows.md).
-- Fechar o ciclo movendo esta página para `docs/history/NNNN-titulo.md` e
+- Fechar o ciclo transformando esta página em `docs/roadmap/NNNN-titulo.md` e
   limpando as specs do working tree.
+- [x] S12b — devolver os ciclos fechados a `docs/roadmap/` (ADR 0022).
 
 ## Gatilhos (não são backlog)
 

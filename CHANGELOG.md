@@ -4,6 +4,15 @@ Formato baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/).
 Uma entrada por **versão**; o detalhe por sessão está no roadmap numerado e as
 decisões nos ADRs.
 
+## Não lançado
+
+### Changed
+
+- Documentação: `docs/history/` foi removida e os ciclos fechados 0001–0007
+  voltaram para `docs/roadmap/`; o índice fica em `roadmap/README.md` e o ADR
+  0022 substitui o 0020. O check de docs volta a validar os links das páginas de
+  ciclo.
+
 ## v0.3.0 — 2026-11-09
 
 ### Added

@@ -16,9 +16,8 @@ mesclagem e vinculação entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES.
 4. No fim da sessão, obrigatoriamente:
    - rodar `uv run ruff check src tests`, `uv run pytest` e
      `node scripts/check-docs.mjs`;
-   - atualizar `docs/state/CURRENT.md`, marcar a sessão em
-     `docs/roadmap/main.md` e escrever uma linha no `CHANGELOG.md`; ao fechar
-     o ciclo, mover `main.md` para `docs/history/` e tirar as specs;
+   - atualizar `CURRENT.md`, o roadmap e o `CHANGELOG.md`; no fechamento do
+     ciclo, virar `main.md` em `docs/roadmap/NNNN-titulo.md` e tirar as specs;
    - criar/atualizar um ADR se a decisão for relevante;
    - escrever a spec da próxima sessão;
    - commitar com `SXX: resumo curto`.
@@ -39,8 +38,9 @@ Toda resposta que conclui trabalho termina com uma linha de estado:
 Nunca esconder validação vermelha atrás do selo.
 
 Estado: `docs/state/CURRENT.md` · futuro: `docs/roadmap/main.md` · decisões:
-`docs/adr/` · passado: `docs/history/` · código: `docs/guide/code-tour.md`.
-Skills: `session-start`, `project-context-init`, `docs-review` (sob pedido).
+`docs/adr/` · passado: `docs/roadmap/NNNN-*.md` · código:
+`docs/guide/code-tour.md`. Skills: `session-start`, `project-context-init`,
+`docs-review` (sob pedido).
 
 ## Estrutura
 
@@ -56,7 +56,7 @@ src/xl_utils/
   shared/           log, config, contas e Drive
 tests/              testes do core e da UI (headless)
 scripts/            automação de docs
-docs/               mapa, estado, roadmap, histórico, guias, ADRs
+docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
 ```
 
 ## Convenções

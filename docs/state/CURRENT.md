@@ -4,17 +4,20 @@
 
 ## Sessão
 
-- **Última concluída:** S12 — instalador 0.3.0 e release
+- **Última concluída:** S12b — ciclos fechados de volta ao roadmap
 - **Próxima:** S13 — plugins: contrato e extração segura
 - **Ciclo:** 0008 — Plugins
 - **Decisões:** `flet pack` + Inno Setup, por usuário, desinstalação destrutiva
   com cache Flet por fingerprint (ADR 0021); comparação bruta; CNJ máscara ou 20
   dígitos; `MIGRAÇÃO` é sentinela; config empacotada; ADRs 0014–0019; Drive:
   PKCE/`state`, `drive.file`, DPAPI, Picker desktop, pasta concedida e `_001`;
-  histórico em texto (ADR 0020).
+  ciclos fechados no `roadmap/` (ADR 0022, substitui a 0020).
 
 ## Pronto
 
+- S12b: `docs/history/` removida; os ciclos 0001–0007 voltaram para
+  `docs/roadmap/`; o índice é `roadmap/README.md`; ADR 0022 substitui a 0020 e o
+  check de docs volta a validar os links das páginas de ciclo.
 - S12: `v0.3.0` publicada — instalador 85,1 MB, SHA-256 `7c8dcb95…`, menu
   Iniciar, atalho opcional, ícone 2b (arte dupla 16–32/48–256 px), desinstalação
   que apaga `%LOCALAPPDATA%\xl_utils` e o cache do cliente em
@@ -22,8 +25,6 @@
   `docs/guide/release-windows.md`; decisão no ADR 0021.
 - S11: 0.2.0 no pyproject, lock, `__version__` e diagnóstico; cartões do Início e
   e-mail do menu de perfis sem estouro, com tooltip de 3 s.
-- S10: ciclo 0006 arquivado; ciclo 0007 aberto. S9c: “Salvar no Drive” na pasta
-  de origem, concessão por conta e nomes `_001`.
 
 ## Próximo passo
 
@@ -33,6 +34,7 @@ instalação segura do `.7z` em `%LOCALAPPDATA%/xl_utils/plugins/`.
 ## Arquivos-chave
 
 - `docs/sessions/S13-plugins-contrato.md`, `docs/roadmap/main.md`
+- `docs/roadmap/README.md`, `docs/adr/0022-ciclos-no-roadmap.md`
 - `scripts/build_windows.ps1`, `installer/xl_utils.iss`, `scripts/make_icons.py`
 - `scripts/pack_entry.py`, `assets/icon.*`, `docs/guide/release-windows.md`
 - `pyproject.toml`, `src/xl_utils/shared/`
@@ -51,6 +53,7 @@ instalação segura do `.7z` em `%LOCALAPPDATA%/xl_utils/plugins/`.
 - Fechar o app não fecha o `flet.exe` do cliente; ele segura o cache.
 - Sandbox: pasta mapeada é somente leitura e o build apaga `artifacts/installer`;
   compartilhar por `artifacts/share`.
+- Ciclos fechados ficam em `docs/roadmap/`; não recriar `docs/history/`.
 
 ## Como rodar
 

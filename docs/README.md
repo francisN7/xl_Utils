@@ -14,7 +14,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | saber onde paramos | [`state/CURRENT.md`](state/CURRENT.md) |
 | saber o que vem agora | [`roadmap/main.md`](roadmap/main.md) |
 | entender o processo do roadmap | [`roadmap/README.md`](roadmap/README.md) |
-| ver o que já foi entregue | [`history/README.md`](history/README.md) |
+| ver o que já foi entregue | [`roadmap/README.md`](roadmap/README.md) |
 | entender as regras do agente | [`../AGENTS.md`](../AGENTS.md) |
 | relatar uma falha de segurança | [`../SECURITY.md`](../SECURITY.md) |
 | rodar o projeto | [`guide/setup.md`](guide/setup.md) |
@@ -64,6 +64,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o site só publica quando o HTML muda | `adr/0019-publicacao-do-site.md` | 45 |
 | por que o histórico é uma página por ciclo | `adr/0020-arquivo-do-historico.md` | 35 |
 | por que o instalador usa PyInstaller e Inno Setup | `adr/0021-instalador-windows.md` | 70 |
+| por que os ciclos fechados ficam no roadmap | `adr/0022-ciclos-no-roadmap.md` | 35 |
 
 ## Regras do mapa
 
@@ -71,15 +72,16 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 - **ADR** guarda o **por quê** e não muda depois de aceito.
 - **Spec de sessão** é escopo fechado e temporário; todas as specs do ciclo saem
   quando ele fecha.
-- **Histórico** é a página `NNNN-titulo.md` em `history/`, uma por ciclo. O
-  passado fica em texto no Git; não existe arquivo comprimido no repositório.
+- **Histórico** é a página `NNNN-titulo.md` em `roadmap/`, uma por ciclo, ao
+  lado do `main.md`. O passado fica em texto no Git; não existe arquivo
+  comprimido no repositório.
 - **CURRENT** é estado, não narrativa: sem medições, diffs ou tabelas antigas.
 - Referência não conta em que sessão a coisa foi feita; isso é histórico.
 - Documento novo só entra se responder uma pergunta que nenhum outro responde.
 
 ## O que é histórico
 
-`CHANGELOG.md`, os ADRs e os ciclos fechados em `history/NNNN-*.md` registram o
+`CHANGELOG.md`, os ADRs e os ciclos fechados em `roadmap/NNNN-*.md` registram o
 passado: nomes de documentos e sessões citados neles podem não existir mais. O
 check de docs valida os documentos vivos, ignora o corpo do CHANGELOG, das specs
 de sessão e dos ADRs, e confere os índices, inclusive `adr/README.md`.
