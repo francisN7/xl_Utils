@@ -16,6 +16,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from xl_utils import __version__
 from xl_utils.core.plugins import PluginError
 from xl_utils.core.plugins.package import build_package, inspect_package, verify_sidecar
 from xl_utils.shared.plugins.install import (
@@ -108,7 +109,7 @@ def _pack(source: Path, output: Path) -> None:
 
 
 def _check(archive: Path) -> None:
-    info = inspect_package(archive)
+    info = inspect_package(archive, app_version=__version__)
     digest = verify_sidecar(archive)
     manifest = info.manifest
     print(f"ID: {manifest.id}")
