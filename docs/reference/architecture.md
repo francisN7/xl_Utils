@@ -33,6 +33,7 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 | `core/tools/link.py` | regra da vinculação | `LinkConfig`, `SheetSpec`, `link_agenda`, `find_target_sheet` |
 | `core/plugins/manifest.py` | manifesto de plugin | `parse_manifest`, `PluginManifest`, `OptionSpec` |
 | `core/plugins/package.py` | pacote `.tar.xz` | `inspect_package`, `extract_package`, `build_package`, `verify_sidecar` |
+| `core/plugins/page.py` | página declarativa | `PageSpec`, `validate`, `coerce`, `describe_permissions` |
 
 Erros tipados: `WorkbookReadError` (leitura), `SaveError` (gravação),
 `ConfigError`, `InvalidCnjError`, `MissingColumnsError` e
@@ -42,10 +43,15 @@ regra inválida. O contrato de plugins usa `PluginError`, `ManifestError`,
 
 ## Plugins
 
-O contrato de plugins vive em duas camadas: `core/plugins/` valida o manifesto
-e o pacote sem executar código; `shared/plugins/` instala em
-`%LOCALAPPDATA%/xl_utils/plugins/`, descobre manifestos e desinstala. A UI e o
-carregamento ficam na S14. Guia do autor: [`../plugins/README.md`](../plugins/README.md).
+O contrato vive em duas camadas: `core/plugins/` valida o manifesto, o pacote e
+as opções sem executar código; `shared/plugins/` instala, descobre, desinstala e
+importa o `lib/` sob demanda. `controllers/plugins.py` monta o `PluginRequest`,
+chama `run(request)` e valida o `PluginResult`; `ui/pages/plugins.py` lista e
+administra, `ui/pages/plugin_tool.py` monta a página declarativa.
+
+A descoberta lê só `plugin.toml`. O import acontece na primeira execução, em
+pacote sintético (fora do `sys.path`), e fica em cache por `id`, versão e pasta.
+Guia do autor: [`../plugins/README.md`](../plugins/README.md).
 
 ## Fluxo de dados
 

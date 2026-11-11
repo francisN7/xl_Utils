@@ -1,0 +1,53 @@
+[plugin]
+id = "exemplo.com-opcoes"
+name = "Resumo com Opções"
+version = "1.0.0"
+api_version = 1
+entrypoint = "main:run"
+description = "Usa os quatro tipos de opção e dois slots nomeados de arquivo."
+authors = ["xl_Utils"]
+
+[ui]
+default_all_sheets = true
+note = "Escolha a origem; o apoio é opcional e só entra se a opção estiver marcada."
+
+[[ui.inputs]]
+key = "origem"
+label = "Planilha de origem"
+
+[[ui.inputs]]
+key = "apoio"
+label = "Planilha de apoio"
+required = false
+
+[[options]]
+key = "titulo"
+label = "Título do resumo"
+type = "text"
+default = "Resumo"
+help = "Aparece no nome da tabela e na mensagem final."
+
+[[options]]
+key = "limite"
+label = "Máximo de linhas por aba"
+type = "int"
+default = 100
+min = 1
+max = 10000
+
+[[options]]
+key = "incluir_apoio"
+label = "Incluir a planilha de apoio"
+type = "bool"
+default = false
+
+[[options]]
+key = "modo"
+label = "Modo"
+type = "choice"
+default = "contagem"
+choices = ["contagem", "colunas"]
+help = "Contagem devolve linhas; colunas devolve os nomes das colunas."
+
+[permissions]
+filesystem = "read"

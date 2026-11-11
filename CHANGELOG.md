@@ -16,8 +16,27 @@ decisões nos ADRs.
   limites contra zip bomb, descoberta sem importar código e desinstalação.
 - CLI `scripts/plugin_cli.py` com `pack`, `check`, `install`, `list` e
   `uninstall`, sem executar código do plugin.
+- Área **Plugins** na navegação: lista válidos e inválidos, instala pelo
+  seletor com confirmação de permissões, remove com aviso sobre `data/` e abre a
+  ferramenta.
+- Carregamento sob demanda: `shared/plugins/loader.py` importa `lib/` só no
+  primeiro Executar, em pacote sintético, e reusa o módulo até instalar ou
+  remover (ADR 0024). Abrir o app, listar ou montar a página não importa código.
+- Página declarativa a partir de `[ui]`/`[[options]]`, com `text`, `int`, `bool`
+  e `choice`, slots nomeados, log, progresso e cancelamento; o resultado vira
+  prévia e `SaveItem`.
+- CLI instalado como `xl-utils-plugin`; `scripts/plugin_cli.py` continua como
+  atalho no repositório.
+- Guia do autor: `docs/plugins/primeiro-plugin.md`, `empacotar-testar.md` e
+  `exemplos/hello` + `exemplos/com-opcoes`, empacotados e executados no pytest.
 
 ### Changed
+
+- `InstalledPlugin` carrega o manifesto já lido na descoberta, sem reler
+  `plugin.toml` ao montar a página.
+- `ToolLayout` carrega abas também nas entradas rotuladas e reavalia o botão
+  Executar com `ready` ao terminar a leitura.
+- O build falha se `_lzma.pyd` não entrar no bundle do app.
 
 - A spec da S13 e o roadmap trocaram `.7z`/`py7zr` por `.tar.xz` com
   `tarfile`/`lzma` da stdlib; não há dependência nova nem custo no instalador.

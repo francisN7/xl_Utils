@@ -19,7 +19,7 @@ SemVer `MAJOR.MINOR.PATCH`, sem pré-release nem build nesta versão:
 
 O host exibe a versão e o `install.json` a registra. Duas versões do mesmo `id`
 não convivem: instalar de novo é recusado; desinstale antes de trocar (a área
-“Plugins” da S14 vai oferecer o fluxo).
+“Plugins” faz instalar e remover).
 
 ## `api_version`
 
@@ -51,8 +51,8 @@ como uma correção de leitura ou uma tela nova. É um SemVer comparado com
 `app_too_old`.
 
 Na dúvida, prefira `api_version`: ela descreve o contrato, enquanto
-`min_app_version` engessa a versão do produto. A versão que introduzir a área
-“Plugins” (S14) é o marco inicial; use-a só quando necessário.
+`min_app_version` engessa a versão do produto. A primeira versão com a área
+“Plugins” é o marco inicial; use-a só quando necessário.
 
 ## `dependencies`
 

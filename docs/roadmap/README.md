@@ -23,6 +23,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | [`0005-polimento.md`](0005-polimento.md) | fechado | polimento |
 | [`0006-backlog.md`](0006-backlog.md) | fechado | vinculação, tela cheia e Drive |
 | [`0007-versoes-e-distribuicao.md`](0007-versoes-e-distribuicao.md) | fechado | versão e distribuição |
+| [`0008-plugins.md`](0008-plugins.md) | fechado | plugins |
 
 ## Ciclos fechados
 
@@ -35,6 +36,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | [`0005-polimento.md`](0005-polimento.md) | Polimento | 2026-11-06 |
 | [`0006-backlog.md`](0006-backlog.md) | Backlog | 2026-11-08 |
 | [`0007-versoes-e-distribuicao.md`](0007-versoes-e-distribuicao.md) | Versão e distribuição | 2026-11-09 |
+| [`0008-plugins.md`](0008-plugins.md) | Plugins | 2026-11-11 |
 
 ## Convenção de nomes
 

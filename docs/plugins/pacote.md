@@ -22,6 +22,10 @@ no pacote:
 - `data/` guarda os dados do plugin e é apagado na desinstalação.
 - `install.json` é o registro do host (hash, tamanho, data, origem).
 
+O código de `lib/` vira um pacote sintético em memória na primeira execução:
+imports entre arquivos do plugin são relativos (`from .helper import x`) e
+`lib/` não entra no `sys.path` do app.
+
 ## Regras de caminho
 
 O validador recusa, antes de escrever qualquer byte:

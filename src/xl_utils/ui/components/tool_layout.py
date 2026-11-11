@@ -361,6 +361,7 @@ class ToolLayout:
         self._run_button.disabled = not self._ready()
         self._refresh_options()
         self._refresh()
+        self._start_sheet_load()
 
     def _ready(self) -> bool:
         """Diz se as entradas exigidas pelo fluxo atual estão prontas."""
@@ -455,14 +456,13 @@ class ToolLayout:
         self.sheet_selector.set_failures(failures)
         self._sheet_loading = False
         self.sheet_selector.set_loading(False)
-        self._run_button.disabled = not self.state.files
+        self._run_button.disabled = not self._ready()
         self._selection_changed(self.state.selected_sheets)
 
     def _selection_changed(self, selection: dict[Path, set[str]]) -> None:
         if not self.state.files:
             return
-        total = sum(len(names) for names in selection.values())
-        self._summary.value = f"{len(self.state.files)} arquivo(s), {total} aba(s)."
+        self._update_summary()
         self._refresh_options()
         self._refresh()
 

@@ -5,10 +5,9 @@ xl_Utils. Ele não é baixado sozinho: você escolhe o arquivo, o app valida,
 instala em `%LOCALAPPDATA%/xl_utils/plugins/` e só executa o código quando a
 ferramenta é aberta.
 
-> **Estado:** a S13 entrega o contrato, o validador, a instalação atômica e o
-> CLI de desenvolvimento. A área “Plugins” na UI, o carregamento e o guia
-> prático com exemplos chegam na S14. Até lá, este diretório é a referência do
-> contrato.
+> **Estado:** a área “Plugins” lista, instala e remove pacotes; a ferramenta é
+> montada a partir do manifesto e o `lib/` só é importado no primeiro
+> Executar. Comece por [`primeiro-plugin.md`](primeiro-plugin.md).
 
 ## O que um plugin pode fazer
 
@@ -44,6 +43,9 @@ interface.
 
 | Tema | Leia |
 |---|---|
+| criar o primeiro plugin, do zero ao Executar | [`primeiro-plugin.md`](primeiro-plugin.md) |
+| empacotar, conferir, instalar e testar com CI | [`empacotar-testar.md`](empacotar-testar.md) |
+| exemplos que rodam: mínimo e com opções | [`exemplos/`](exemplos) |
 | formato, layout, limites e o que é recusado | [`pacote.md`](pacote.md) |
 | todos os campos do `plugin.toml` | [`manifesto.md`](manifesto.md) |
 | `run(request)`, entrada, saída, log, progresso e erros | [`api.md`](api.md) |
@@ -52,11 +54,10 @@ interface.
 | SemVer, `api_version` e compatibilidade | [`versionamento.md`](versionamento.md) |
 | por que `.tar.xz`, mesmo processo e UI declarativa | [`../adr/0023-contrato-de-plugins.md`](../adr/0023-contrato-de-plugins.md) |
 
-O CLI já existe em `scripts/plugin_cli.py` (`pack`, `check`, `install`, `list`,
-`uninstall`). O guia de “primeiro plugin”, os comandos passo a passo e os
-exemplos copiáveis entram na S14, quando o fluxo rodar de ponta a ponta. O
-roteiro da sessão está em
-[`../sessions/S14-plugins-ui.md`](../sessions/S14-plugins-ui.md).
+O CLI está instalado como `xl-utils-plugin` (`pack`, `check`, `install`,
+`list`, `uninstall`) e também roda como `uv run python scripts/plugin_cli.py`
+dentro do repositório do app. O fluxo completo, incluindo o repositório
+privado e o CI, está em [`empacotar-testar.md`](empacotar-testar.md).
 
 ## Antes de começar
 
@@ -64,6 +65,7 @@ roteiro da sessão está em
 - O repositório do app para usar o validador e o CLI; o plugin em si pode viver
   em outro repositório.
 - Um pacote `.tar.xz` e o sidecar `.sha256`. O empacotador oficial gera os dois.
+- Para instalar pela tela: abra **Plugins** na barra lateral e escolha o pacote.
 
 ## Segurança em uma linha
 

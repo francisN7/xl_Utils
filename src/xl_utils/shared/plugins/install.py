@@ -60,6 +60,7 @@ class InstalledPlugin:
     api_version: int
     path: Path
     data_dir: Path
+    manifest: PluginManifest | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -167,6 +168,7 @@ def install_package(
         api_version=info.manifest.api_version,
         path=target,
         data_dir=target / "data",
+        manifest=info.manifest,
     )
 
 
@@ -311,6 +313,7 @@ def _installed(path: Path, manifest: PluginManifest) -> InstalledPlugin:
         api_version=manifest.api_version,
         path=path,
         data_dir=path / "data",
+        manifest=manifest,
     )
 
 

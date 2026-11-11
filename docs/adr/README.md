@@ -28,6 +28,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0021](0021-instalador-windows.md) | Instalador Windows com PyInstaller e Inno Setup | Aceita |
 | [0022](0022-ciclos-no-roadmap.md) | Ciclos fechados no roadmap, sem pasta `history` | Aceita |
 | [0023](0023-contrato-de-plugins.md) | Contrato de plugins e pacote `.tar.xz` | Aceita |
+| [0024](0024-carregamento-sob-demanda.md) | Plugin importado só na primeira execução | Aceita |
 
 ## Como ler
 

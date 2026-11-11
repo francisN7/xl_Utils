@@ -1,0 +1,18 @@
+[plugin]
+id = "exemplo.hello"
+name = "Hello Planilha"
+version = "1.0.0"
+api_version = 1
+entrypoint = "main:run"
+description = "Conta as linhas de cada aba escolhida e devolve um resumo."
+authors = ["xl_Utils"]
+
+[ui]
+multiple_files = true
+default_all_sheets = true
+note = "Marca as abas que quer contar; o resultado tem uma linha por aba."
+
+[permissions]
+network = false
+filesystem = "read"
+subprocess = false

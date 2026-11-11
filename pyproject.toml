@@ -24,6 +24,9 @@ dependencies = [
 [project.gui-scripts]
 xl-utils = "xl_utils.app:run"
 
+[project.scripts]
+xl-utils-plugin = "xl_utils.plugin_cli:main"
+
 [build-system]
 requires = ["uv_build>=0.12.9,<0.13.0"]
 build-backend = "uv_build"

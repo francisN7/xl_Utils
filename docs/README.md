@@ -24,11 +24,13 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler o código em ordem guiada | [`guide/code-tour.md`](guide/code-tour.md) |
 | entender a UI e o tema | [`reference/ui.md`](reference/ui.md) |
 | criar um plugin | [`plugins/README.md`](plugins/README.md) |
+| criar o primeiro plugin, passo a passo | [`plugins/primeiro-plugin.md`](plugins/primeiro-plugin.md) |
+| empacotar e testar um plugin | [`plugins/empacotar-testar.md`](plugins/empacotar-testar.md) |
 | ver o site público | [`index.html`](index.html) |
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S14-plugins-ui.md`](sessions/S14-plugins-ui.md) |
+| ler a spec da próxima sessão | [`sessions/S15-seletor-de-arquivos.md`](sessions/S15-seletor-de-arquivos.md) |
 
 ## Por seção (atalho)
 
@@ -43,6 +45,8 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | saída e gravação | `reference/architecture.md` → **Saída** | 12 |
 | layout, navegação e tema | `reference/ui.md` → **Layout** | 30 |
 | contrato de plugins | `plugins/README.md` → **Mapa do contrato** | 20 |
+| criar, empacotar e testar um plugin | `plugins/primeiro-plugin.md` → **Empacotar** | 40 |
+| carregamento e ciclo de vida do plugin | `reference/architecture.md` → **Plugins** | 15 |
 | comandos do dia a dia | `guide/setup.md` → **Rodando** | 15 |
 | como escrever teste | `guide/testing.md` → **Testes** | 20 |
 | por que Flet, uv e Python 3.15 | `adr/0001-stack-ui-e-ambiente.md` | 35 |
@@ -68,6 +72,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o instalador usa PyInstaller e Inno Setup | `adr/0021-instalador-windows.md` | 70 |
 | por que os ciclos fechados ficam no roadmap | `adr/0022-ciclos-no-roadmap.md` | 35 |
 | por que plugins usam `.tar.xz` e mesmo processo | `adr/0023-contrato-de-plugins.md` | 120 |
+| por que o plugin só é importado ao executar | `adr/0024-carregamento-sob-demanda.md` | 45 |
 
 ## Regras do mapa
 

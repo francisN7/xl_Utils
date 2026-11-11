@@ -19,6 +19,7 @@ from xl_utils.ui.pages.link import DESCRIPTION as LINK_DESCRIPTION
 from xl_utils.ui.pages.link import build as build_link
 from xl_utils.ui.pages.merge import options as merge_options
 from xl_utils.ui.pages.merge import run as run_merge
+from xl_utils.ui.pages.plugins import build as build_plugins
 
 
 @dataclass(frozen=True, slots=True)
@@ -112,5 +113,12 @@ TOOLS: tuple[ToolPage, ...] = (
         icon=ft.Icons.LINK,
         description=LINK_DESCRIPTION,
         build=build_link,
+    ),
+    ToolPage(
+        id="plugins",
+        label="Plugins",
+        icon=ft.Icons.EXTENSION,
+        description="Instale ferramentas locais, veja as permissões e execute.",
+        build=build_plugins,
     ),
 )

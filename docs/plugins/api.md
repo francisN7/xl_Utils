@@ -121,8 +121,9 @@ def run(request: PluginRequest) -> PluginResult:
 ```
 
 A função só existe de verdade quando o plugin é carregado; instalar e listar
-**não** importam `lib/`. Na S14 o host confere a função, a assinatura e o
-retorno, isola a falha e monta a página.
+**não** importam `lib/`. O host importa na primeira execução, confere ali a
+função e a assinatura, valida o retorno e isola a falha; a página é montada a
+partir do manifesto.
 
 ## Compatibilidade
 

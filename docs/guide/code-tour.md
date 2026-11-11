@@ -36,6 +36,10 @@ app.py                          monta a janela e a navegação
 
 core/plugins/                   manifesto e pacote .tar.xz, sem Flet
 shared/plugins/install.py       instala, descobre e remove plugins
+shared/plugins/loader.py        importa lib/ na primeira execução
+controllers/plugins.py          monta o request e valida o resultado
+ui/pages/plugins.py             área: lista, instala e remove
+ui/pages/plugin_tool.py         página declarativa montada do manifesto
 ```
 
 ## As paradas
@@ -135,7 +139,24 @@ livre na pasta remota com a mesma convenção.
 
 **Observe:** `SaveError` embrulha qualquer falha; a prévia não é apagada.
 
-### 9. Drive — `shared/` e `ui/drive.py`
+### 9. Plugins — `shared/plugins/` e `ui/pages/plugins.py`
+
+`install.py` valida, promove e apaga pacotes sem importar código. `loader.py` é
+o único ponto que importa `lib/`: cria um pacote sintético em `sys.modules`
+(imports relativos funcionam; `sys.path` não muda), confere a assinatura de
+`run` e guarda o módulo em cache até instalar ou remover. `controllers/plugins.py`
+monta o `PluginRequest`, chama `run` e valida o `PluginResult`.
+
+Na UI, `PluginsPage` lista manifestos e pastas inválidas, instala pelo seletor
+(confirma permissões antes) e remove com aviso sobre `data/`. `plugin_tool.py`
+monta o `ToolLayout` a partir de `[ui]`/`[[options]]` e converte os controles
+com `core/plugins/page.py`.
+
+**Observe:** abrir a área, listar e montar a página não importam `lib/`; só o
+primeiro Executar importa. Falha de import vira erro na página, não derruba o
+app — plugin é código confiável, sem sandbox.
+
+### 10. Drive — `shared/` e `ui/drive.py`
 
 `drive_auth.py` e `accounts.py` cuidam do OAuth e das contas; `drive_pick.py`
 faz o Picker de arquivo e de pasta; `drive.py` é o cliente REST (leitura,
@@ -148,7 +169,7 @@ autorizadas por conta. `ui/drive.py` é o estado compartilhado e o
 **Observe:** nada de token em log ou mensagem; a pasta só é concedida uma vez e
 nada é sobrescrito.
 
-### 10. Testes — `tests/`
+### 11. Testes — `tests/`
 
 | Arquivo | Prova que… |
 |---|---|
@@ -173,6 +194,10 @@ nada é sobrescrito.
 | `test_drive_pick.py` | Picker de arquivo e pasta, PKCE/`state` e cancelamento |
 | `test_drive_session.py` | login, contas, leitura e cópia no cache |
 | `test_drive_write.py` | gravação, sufixo `_001`, pasta e diálogo de concessão |
+| `test_plugin_loader.py` | import sob demanda, pacote sintético e erros isolados |
+| `test_plugin_page.py` | tipos de opção, defaults, validação e permissões |
+| `test_plugins_ui.py` | lista, instalar/remover, execução e falha de import |
+| `test_plugin_examples.py` | os exemplos dos docs empacotam e executam |
 
 ## Onde mexer para…
 
@@ -180,7 +205,9 @@ nada é sobrescrito.
 |---|---|
 | suportar um formato novo | `core/mime.py` + `core/io.py` + teste em `test_formats.py` |
 | criar uma ferramenta | `core/tools/<nova>.py` + controller + página + `ui/pages/registry.py` |
-| criar ou validar um plugin | `docs/plugins/README.md` + `core/plugins/` + `shared/plugins/` |
+| criar ou validar um plugin | `docs/plugins/` + `core/plugins/` + `shared/plugins/` |
+| mudar a área Plugins ou a página declarativa | `ui/pages/plugins.py` + `plugin_tool.py` + `controllers/plugins.py` |
+| mudar o carregamento de plugin | `shared/plugins/loader.py` + teste em `test_plugin_loader.py` |
 | mudar a leitura de texto/emojis | `core/tools/all_str.py` + `core/text.py` |
 | mudar nome de arquivo de saída | `controllers/cut.py` ou `core/paths.py` |
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |

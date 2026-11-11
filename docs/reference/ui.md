@@ -8,7 +8,8 @@ responde:** regras de negócio (ver `architecture.md`) nem o porquê (ver
 
 Sidebar fixa de 260 px + área de conteúdo. A sidebar é um `Column` próprio, não
 um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
-forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas. No
+forma consistente. Ela tem o logo, o item **Início** e as seis ferramentas
+(cinco nativas e **Plugins**). No
 canto superior direito da área de conteúdo fica o menu hamburger dos perfis do
 Google Drive — fora da sidebar, para não competir com a navegação.
 O conteúdo abre em uma das duas formas:
@@ -27,6 +28,7 @@ O conteúdo abre em uma das duas formas:
 │ Recortar │    dropzone       │    status + caminho    │
 │ Mesclar  │ 2. Opções         │    log + prévia        │
 │ Vínculos │                   │                        │
+│ Plugins  │                   │                        │
 │          ├───────────────────┴────────────────────────┤
 │          │ [resumo]                    [Executar]     │
 └──────────┴────────────────────────────────────────────┘
@@ -41,11 +43,22 @@ O conteúdo abre em uma das duas formas:
   entrar, marcar a ativa, adicionar outra conta e sair. Ele não interfere na
   navegação das ferramentas.
 
+## Plugins
+
+A área **Plugins** lista os manifestos válidos e as pastas inválidas, instala um
+`.tar.xz` pelo seletor nativo (com o sidecar ao lado) e remove com confirmação,
+avisando que `data/` também é apagado. “Abrir” monta uma página com o mesmo
+`ToolLayout` das ferramentas nativas, a partir de `[ui]` e `[[options]]`.
+
+O `lib/` do plugin **não** é importado ao abrir o app, listar, navegar ou montar
+a página: o import acontece no primeiro Executar e fica em cache até instalar ou
+remover. Abrir a ferramenta também não lê planilha; a leitura começa no clique.
+
 ## Componentes
 
 | Componente | Responsabilidade |
 |---|---|
-| `sidebar` | Logo, Início e as cinco ferramentas, com item ativo destacado. |
+| `sidebar` | Logo, Início e as seis ferramentas, com item ativo destacado. |
 | `top_menu` | Menu hamburger no canto superior direito com os perfis do Drive. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |

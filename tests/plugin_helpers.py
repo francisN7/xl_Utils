@@ -9,6 +9,8 @@ from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 
+from xl_utils.shared.plugins.install import InstalledPlugin, scan_installed
+
 VALID_MANIFEST = """\
 [plugin]
 id = "autor.teste"
@@ -122,3 +124,25 @@ def write_sidecar(
     target = package.with_name(f"{package.name}.sha256")
     target.write_text(f"{value}  {name}\n", encoding="utf-8")
     return target
+
+
+def installed_plugin(
+    root: Path,
+    *,
+    plugin_id: str = "autor.teste",
+    manifest: str = VALID_MANIFEST,
+    files: dict[str, str] | None = None,
+) -> InstalledPlugin:
+    """Cria a pasta instalada sem empacotar, como a descoberta a encontraria."""
+    path = root / plugin_id
+    (path / "lib").mkdir(parents=True)
+    (path / "data").mkdir()
+    text = manifest.replace('id = "autor.teste"', f'id = "{plugin_id}"')
+    (path / "plugin.toml").write_text(text, encoding="utf-8")
+    sources = files or {"main.py": "def run(request):\n    return None\n"}
+    for name, source in sources.items():
+        target = path / "lib" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(source, encoding="utf-8")
+    valid = scan_installed(root=root).valid
+    return next(item for item in valid if item.id == plugin_id)

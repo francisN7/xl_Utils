@@ -143,8 +143,8 @@ pacote usa `pkg.mod:run`, que procura `lib/pkg/mod.py` ou
 `lib/pkg/mod/__init__.py`.
 
 A instalação confere se o arquivo do módulo existe, mas **não importa** o
-código. A existência da função e a assinatura correta são conferidas no
-carregamento, na S14; um erro ali isola o plugin e aparece no log.
+código. A existência da função e a assinatura correta são conferidas na primeira
+execução; um erro ali isola o plugin e aparece na página e no diagnóstico.
 
 ## Validação e erros
 

@@ -1,37 +1,44 @@
 # Roadmap atual
 
-Ciclo ativo: **0008 — Plugins**. Os ciclos fechados estão em
+Ciclo ativo: **0009 — Investigações de UI**. Os ciclos fechados estão em
 [`README.md`](README.md), nesta mesma pasta.
 
 ## Sessões
 
 | Sessão | Entrega | Estado |
 |---|---|---|
-| S13 | Plugins I — contrato e extração segura | [x] |
-| S14 | Plugins II — área, carregamento e guia | [ ] |
-| — | Seletor de arquivos integrado à UI | sem sessão |
-| — | Drive sem consentimento repetido | sem sessão |
+| S15 | Seletor de arquivos integrado à UI — investigação | [ ] |
+| S16 | Drive sem consentimento repetido — investigação | [ ] |
+| — | Release 0.4.0 (plugins + guia do autor) | no backlog; o dono decide |
+| — | Ícone do cabeçalho | sem sessão |
 
 Ordem definida pelo dono: **primeira release → plugins → investigações
-pesadas**.
+pesadas**. Plugins foram entregues no ciclo 0008; a 0.4.0 está pronta para
+empacotar quando o dono decidir.
 
-## S13 — concluída
+## S15 — próxima
 
-Contrato no ADR 0023, pacote `.tar.xz` com `tarfile`/`lzma`, validação pura,
-instalação atômica em `%LOCALAPPDATA%/xl_utils/plugins/`, sidecar SHA-256 e
-limites contra zip bomb. O CLI `scripts/plugin_cli.py` empacota, confere,
-instala, lista e remove sem executar código. O contrato do autor está em
-`docs/plugins/`. Ver a [spec](../sessions/S13-plugins-contrato.md).
+Medir um seletor de arquivos próprio, dentro do tema e do fluxo da janela, e
+decidir com evidências se o Flet 1.1 permite ou se a migração para
+webview/PySide6 é necessária. A decisão vira ADR 0025; o seletor nativo e o
+Picker continuam como fallback obrigatório. Ver a
+[spec](../sessions/S15-seletor-de-arquivos.md).
 
-## S14 — próxima
+## S16 — esboço
 
-Área “Plugins” na navegação com lista, instalar e remover pela tela, carregar
-`run(request)` isolado e o primeiro exemplo público. Completar o guia do autor
-com `primeiro-plugin.md`, `empacotar-testar.md` e `exemplos/`, incluindo o fluxo
-do repo privado/CI. O plugin continua no mesmo processo, com permissões
-declarativas e sem sandbox. Ver a [spec](../sessions/S14-plugins-ui.md).
+Investigar um pipeline de Drive que use o token do login para listar e escolher
+arquivos e pastas dentro do app, comparando consentimento único, verificação do
+Google, acesso mínimo, esforço e risco com o desenho atual (`drive.file` +
+Picker + concessão de pasta). Não trocar o escopo sem ADR.
 
 ## Backlog
+
+### Release 0.4.0
+
+O código dos plugins e o guia do autor estão no repositório; falta decidir a
+versão, regerar o instalador e publicar. Segue o roteiro de
+[`../guide/release-windows.md`](../guide/release-windows.md), incluindo o teste
+do exe com um plugin real instalado.
 
 ### Ícone do aplicativo
 
@@ -47,7 +54,7 @@ do navegador; os dois saem do visual e do fluxo da janela. Estudar um seletor
 próprio (pastas e arquivos, filtros por formato, recentes e, no Drive, as pastas
 já concedidas) que siga o tema e caiba no app, mantendo o seletor nativo e o
 Picker como fallback. A decisão depende de o Flet suportar ou de migrar para
-webview/PySide6; medir antes.
+webview/PySide6; medir antes — é o escopo da S15.
 
 ### Drive sem consentimento repetido
 
@@ -69,7 +76,6 @@ esforço e risco. Não trocar o escopo sem ADR.
   mudar; o roteiro está em [`../guide/release-windows.md`](../guide/release-windows.md).
 - Fechar o ciclo transformando esta página em `docs/roadmap/NNNN-titulo.md` e
   limpando as specs do working tree.
-- [x] S12b — devolver os ciclos fechados a `docs/roadmap/` (ADR 0022).
 
 ## Gatilhos (não são backlog)
 
@@ -79,6 +85,7 @@ esforço e risco. Não trocar o escopo sem ADR.
   Windows-only.
 - Auto-update e assinatura de código — só entram se o SmartScreen incomodar
   usuários de verdade.
+- Sandbox/subprocesso de plugin — só entra com uma API nova e um motivo real.
 
 ## Descartados (não voltam sem decisão nova)
 
@@ -95,3 +102,4 @@ esforço e risco. Não trocar o escopo sem ADR.
 - Arquivar documentação em `.7z`/`.zip` — o Git é o arquivo; ver ADR 0020.
 - Nuitka no empacotamento — sem integração com o cliente desktop do Flet; ver
   ADR 0021.
+- Importar todos os plugins na abertura do app — ver ADR 0024.

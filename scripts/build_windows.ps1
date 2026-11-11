@@ -94,6 +94,15 @@ if (-not (Test-Path $exe)) {
     throw "O executável não foi gerado em $exe."
 }
 
+# A área de plugins usa tarfile + lzma no mesmo processo. O PyInstaller precisa
+# embutir o módulo compilado _lzma; sem ele, instalar/ler pacote quebra no exe.
+$lzma = Get-ChildItem (Join-Path $app "xl_Utils") -Recurse -Filter "_lzma*.pyd" |
+    Select-Object -First 1
+if (-not $lzma) {
+    throw "Módulo _lzma não foi embutido no bundle do app."
+}
+Write-Host "Módulo lzma: $($lzma.FullName)"
+
 if ($SkipInstaller) {
     Write-Host "Build pronto: $exe"
     exit 0
