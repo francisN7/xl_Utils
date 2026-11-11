@@ -12,9 +12,9 @@
 
 ## Pronto
 
-- S15: spike em Flet puro com 25.000 arquivos, filtro por formato, busca,
-  recentes, subpasta e seleção; nenhum fluxo padrão mudou. ADR 0025 com as
-  medições e a spec de implementação em `docs/sessions/S24-seletor-em-flet.md`.
+- S15: spike em Flet puro com 25.000 arquivos; provou a viabilidade da UI. O
+  adendo do ADR 0025 restringe o seletor interno à rota do Drive — arquivo local
+  continua no nativo. Spec em `docs/sessions/S24-seletor-do-drive.md`.
 - S14: área Plugins (válidos/inválidos, instalar, remover, abrir pasta),
   carregamento sob demanda, página declarativa, CLI e guia do autor. 595 testes.
 - S13: ADR 0023; `core/plugins/` e `shared/plugins/`; instalação atômica e CLI.
@@ -24,8 +24,8 @@
 
 Ler `docs/sessions/S16-drive-sem-consentimento.md`: inventariar o fluxo atual
 (`drive.file` + Picker + concessão de pasta) e medir um spike de listagem com o
-token do login, sem trocar escopo. A decisão vira ADR 0026. O seletor próprio
-(S24) fica para depois da 0.4.0; a release é a S23.
+token do login, sem trocar escopo. A decisão vira ADR 0026. O seletor do Drive
+(S24) fica para depois da 0.4.0 e depende dessa decisão; a release é a S23.
 
 ## Arquivos-chave
 

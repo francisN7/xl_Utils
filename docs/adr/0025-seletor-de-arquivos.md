@@ -1,6 +1,6 @@
 # ADR 0025 — Seletor de arquivos próprio em Flet
 
-**Status:** aceita · **Data:** 2026-11-11 · **Contexto:** ciclo 0009, S15
+**Status:** aceita, com adendo · **Data:** 2026-11-11 · **Contexto:** ciclo 0009, S15
 
 ## Contexto
 
@@ -96,3 +96,21 @@ Git; contém caminho pessoal e não é publicada).
    de rede/OneDrive, tema claro/escuro, 100%/125%/150%.
 5. Só então avaliar tornar o seletor o padrão; o nativo e o Picker continuam
    como fallback em qualquer caso.
+
+## Adendo — 2026-11-11
+
+O dono restringiu o escopo: **o seletor interno é exclusivo da rota do Drive**.
+Arquivo local continua sempre no seletor nativo do sistema operacional; não há
+plano de substituí-lo. Isso corrige a leitura das seções acima:
+
+- O spike com `os.scandir` provou a **viabilidade da UI em Flet** e o custo de
+  paginação; ele não define a fonte de dados do seletor definitivo. A lista do
+  Drive virá da Drive API, com o pipeline decidido na S16/ADR 0026.
+- `core/files.py` e o store de recentes locais saem do escopo. Entram a
+  listagem de pastas/arquivos do Drive, a paginação por `nextPageToken`, o
+  cache local da ADR 0018 e os erros de token/permissão.
+- O seletor só entra na rota do Drive; o `FileInput` local permanece intocado.
+  A implementação foi reescopada na spec `docs/sessions/S24-seletor-do-drive.md`.
+- A decisão de viabilidade da UI (Flet puro, paginação, tema) continua válida;
+  o que muda é o dado que alimenta a lista.
+

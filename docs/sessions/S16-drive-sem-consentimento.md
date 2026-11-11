@@ -10,8 +10,8 @@ fallback.
 ## Fora de escopo
 
 - Trocar o escopo OAuth ou publicar uma versão com o novo pipeline nesta sessão.
-- Implementar o seletor próprio (ADR 0025), a release 0.4.0 ou a API 2 dos
-  plugins.
+- Implementar o seletor do Drive (ADR 0025/S24), a release 0.4.0 ou a API 2
+  dos plugins.
 - Mexer na conta ativa, no menu de perfis (S21) ou na gravação de resultados.
 
 ## Tarefas
@@ -32,8 +32,8 @@ fallback.
 5. Escrever o ADR 0026 com a tabela (consentimento, escopo, verificação,
    listagem, esforço, risco) e a recomendação; atualizar `docs/reference/ui.md`,
    `architecture.md` e o backlog do roadmap.
-6. Se a decisão for “sim”, escrever a spec da implementação; se for “não”,
-   registrar o motivo e descartar o spike.
+6. Se a decisão for “sim”, atualizar a spec `S24-seletor-do-drive.md` com o
+   pipeline escolhido; se for “não”, registrar o motivo e descartar o spike.
 
 ## Aceite
 

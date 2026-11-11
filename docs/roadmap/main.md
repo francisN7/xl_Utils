@@ -23,11 +23,12 @@ Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 
 ## S15 — concluída
 
-O spike em Flet puro listou 25.000 arquivos, filtrou por formato, mostrou
-recentes e implementou a seleção dentro do tema. A decisão está no
-[ADR 0025](../adr/0025-seletor-de-arquivos.md): seletor próprio com paginação
-de 300 itens, listagem fora da UI thread e seletor nativo/Picker como fallback.
-A implementação fica para depois da 0.4.0; nenhum fluxo padrão mudou.
+O spike em Flet puro provou a viabilidade da UI: 25.000 itens, filtro por
+formato, recentes, navegação e seleção no tema. O adendo do
+[ADR 0025](../adr/0025-seletor-de-arquivos.md) restringe o seletor interno à
+**rota do Drive**; arquivo local continua sempre no seletor nativo do sistema
+operacional. A listagem definitiva virá da Drive API, a ser medida na S16. A
+implementação fica para depois da 0.4.0; nenhum fluxo padrão mudou.
 
 ## S16 — próxima
 
@@ -35,7 +36,8 @@ Investigar um pipeline de Drive que use o token do login para listar e escolher
 arquivos e pastas dentro do app, comparando consentimento único, verificação do
 Google, acesso mínimo, esforço e risco com o desenho atual (`drive.file` +
 Picker + concessão de pasta). Não trocar o escopo sem ADR. Ver a
-[spec](../sessions/S16-drive-sem-consentimento.md).
+[spec](../sessions/S16-drive-sem-consentimento.md). A implementação do seletor
+do Drive (S24) depende desta decisão.
 
 ## S17–S23 — próximas
 
@@ -58,12 +60,11 @@ Picker + concessão de pasta). Não trocar o escopo sem ADR. Ver a
 
 ## Backlog
 
-### Seletor próprio (implementação)
+### Seletor do Drive (implementação)
 
-O ADR 0025 decidiu o caminho em Flet puro, com paginação, busca, filtro e
-recentes, mantendo o nativo e o Picker como fallback. A implementação fica para
-depois da 0.4.0; o escopo técnico está no próprio ADR e a
-[spec de backlog](../sessions/S24-seletor-em-flet.md).
+O adendo do ADR 0025 restringe o seletor interno à rota do Drive; arquivo local
+continua no seletor nativo. A implementação depende do ADR 0026 (S16), fica para
+depois da 0.4.0 e está na [spec de backlog](../sessions/S24-seletor-do-drive.md).
 
 ## Manutenção
 

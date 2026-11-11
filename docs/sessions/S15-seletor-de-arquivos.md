@@ -1,5 +1,9 @@
 # S15 — Seletor de arquivos integrado à UI (investigação)
 
+> **Resultado:** o seletor interno é só para a rota do Drive; arquivo local
+> continua no seletor nativo. O adendo do ADR 0025 corrige o escopo e a
+> implementação foi reescopada para a S24.
+
 ## Objetivo
 
 Medir, com protótipo descartável, se o app consegue ter um seletor de arquivos

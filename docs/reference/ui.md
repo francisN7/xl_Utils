@@ -83,11 +83,11 @@ direto; duas ou mais abrem um diálogo para escolher qual. O arquivo escolhido �
 baixado para o cache local com o nome real e entra na lista como qualquer
 arquivo do computador.
 
-O seletor nativo continua sendo o padrão. O ADR 0025 decidiu que o próximo passo
-é um seletor próprio em Flet puro, dentro do tema, com navegação de pastas,
-busca, filtro por formato e recentes locais; a lista é paginada (300 itens por
-página) e a leitura do diretório sai da UI thread. O seletor nativo e o Picker
-do Drive continuam como fallback. A implementação ainda não está no app.
+Arquivo local continua sempre no seletor nativo do sistema operacional. O adendo
+do ADR 0025 restringe o seletor interno à rota do Drive: um seletor em Flet puro,
+dentro do tema, com navegação de pastas, busca, filtro e paginação, que substitui
+o Picker que abre o navegador. A listagem virá da Drive API, com o pipeline do
+ADR 0026; a implementação ainda não está no app e o Picker continua como fallback.
 
 Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
 extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:

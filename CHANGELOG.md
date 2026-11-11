@@ -32,10 +32,10 @@ decisões nos ADRs.
 
 ### Changed
 
-- S15: investigação do seletor próprio; o ADR 0025 decidiu Flet puro com
-  paginação de 300 itens, listagem fora da UI thread e o seletor nativo/Picker
-  como fallback. Nenhum fluxo padrão mudou; a implementação fica para depois da
-  0.4.0.
+- S15: investigação do seletor interno; o adendo do ADR 0025 restringe o
+  seletor à rota do Drive (Flet puro, paginado), enquanto arquivo local continua
+  no seletor nativo. Nenhum fluxo padrão mudou; a implementação fica para depois
+  da 0.4.0.
 - `InstalledPlugin` carrega o manifesto já lido na descoberta, sem reler
   `plugin.toml` ao montar a página.
 - `ToolLayout` carrega abas também nas entradas rotuladas e reavalia o botão
