@@ -33,6 +33,9 @@ app.py                          monta a janela e a navegação
                ├─ core/tools/sheets.py  filtra as abas escolhidas
                └─ core/tools/<regra>.py regra pura da ferramenta
                   └─ core/save.py          grava só depois da escolha
+
+core/plugins/                   manifesto e pacote .tar.xz, sem Flet
+shared/plugins/install.py       instala, descobre e remove plugins
 ```
 
 ## As paradas
@@ -177,6 +180,7 @@ nada é sobrescrito.
 |---|---|
 | suportar um formato novo | `core/mime.py` + `core/io.py` + teste em `test_formats.py` |
 | criar uma ferramenta | `core/tools/<nova>.py` + controller + página + `ui/pages/registry.py` |
+| criar ou validar um plugin | `docs/plugins/README.md` + `core/plugins/` + `shared/plugins/` |
 | mudar a leitura de texto/emojis | `core/tools/all_str.py` + `core/text.py` |
 | mudar nome de arquivo de saída | `controllers/cut.py` ou `core/paths.py` |
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |

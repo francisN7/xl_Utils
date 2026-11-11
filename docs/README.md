@@ -23,11 +23,12 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | entender como o código é organizado | [`reference/architecture.md`](reference/architecture.md) |
 | ler o código em ordem guiada | [`guide/code-tour.md`](guide/code-tour.md) |
 | entender a UI e o tema | [`reference/ui.md`](reference/ui.md) |
+| criar um plugin | [`plugins/README.md`](plugins/README.md) |
 | ver o site público | [`index.html`](index.html) |
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S13-plugins-contrato.md`](sessions/S13-plugins-contrato.md) |
+| ler a spec da próxima sessão | [`sessions/S14-plugins-ui.md`](sessions/S14-plugins-ui.md) |
 
 ## Por seção (atalho)
 
@@ -41,6 +42,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | detecção de formato e MIME | `reference/architecture.md` → **Detecção de formato** | 15 |
 | saída e gravação | `reference/architecture.md` → **Saída** | 12 |
 | layout, navegação e tema | `reference/ui.md` → **Layout** | 30 |
+| contrato de plugins | `plugins/README.md` → **Mapa do contrato** | 20 |
 | comandos do dia a dia | `guide/setup.md` → **Rodando** | 15 |
 | como escrever teste | `guide/testing.md` → **Testes** | 20 |
 | por que Flet, uv e Python 3.15 | `adr/0001-stack-ui-e-ambiente.md` | 35 |
@@ -65,6 +67,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o histórico é uma página por ciclo | `adr/0020-arquivo-do-historico.md` | 35 |
 | por que o instalador usa PyInstaller e Inno Setup | `adr/0021-instalador-windows.md` | 70 |
 | por que os ciclos fechados ficam no roadmap | `adr/0022-ciclos-no-roadmap.md` | 35 |
+| por que plugins usam `.tar.xz` e mesmo processo | `adr/0023-contrato-de-plugins.md` | 120 |
 
 ## Regras do mapa
 

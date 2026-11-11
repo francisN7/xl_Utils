@@ -47,13 +47,13 @@ Estado: `docs/state/CURRENT.md` · futuro: `docs/roadmap/main.md` · decisões:
 ```text
 src/xl_utils/
   app.py            shell Flet e navegação
-  core/             regras puras: io, mime, paths, text, tools/
+  core/             regras puras: io, mime, paths, text, tools/, plugins/
   controllers/      ponte entre UI e core
   ui/pages/         Início + uma página por ferramenta
   ui/components/    entrada, resultado, prévia, layout e menu do Drive
   ui/theme.py       tokens e temas (Dracula/Alucard)
   configs/          headers.json empacotado (padrão, não estado)
-  shared/           log, config, contas e Drive
+  shared/           log, config, contas, Drive e plugins/
 tests/              testes do core e da UI (headless)
 scripts/            automação de docs
 docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
@@ -64,8 +64,8 @@ docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
 - Identificadores e código em inglês; comentários, docstrings, UI e docs em
   PT-BR. Core, controllers, `ui/`, `shared/` e o shell já estão traduzidos.
 - `core/` não importa Flet, não abre diálogos e não imprime no terminal.
-- Páginas Flet só coletam entrada, chamam controller e exibem resultado.
-- Regra de negócio fica em função pura testável, não na página.
+- Página Flet coleta entrada, chama controller e exibe; regra fica em função pura.
+- Decisão em aberto vira questionário; não espalhar perguntas no texto.
 - Toda ferramenta lê pelo pipeline do `all_str` (texto + emojis), antes da
   regra específica; quebras de linha são preservadas.
 - Nunca renomear o arquivo original do usuário; detectar o tipo real e ler.

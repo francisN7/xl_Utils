@@ -6,8 +6,21 @@ decisões nos ADRs.
 
 ## Não lançado
 
+### Added
+
+- Contrato de plugins no ADR 0023: manifesto `plugin.toml`, API
+  `run(request)`, UI declarativa, permissões declarativas, versionamento e
+  documentação do autor em `docs/plugins/`.
+- Instalação segura de pacote `.tar.xz` em
+  `%LOCALAPPDATA%\xl_utils\plugins\`: staging atômico, sidecar SHA-256,
+  limites contra zip bomb, descoberta sem importar código e desinstalação.
+- CLI `scripts/plugin_cli.py` com `pack`, `check`, `install`, `list` e
+  `uninstall`, sem executar código do plugin.
+
 ### Changed
 
+- A spec da S13 e o roadmap trocaram `.7z`/`py7zr` por `.tar.xz` com
+  `tarfile`/`lzma` da stdlib; não há dependência nova nem custo no instalador.
 - Documentação: `docs/history/` foi removida e os ciclos fechados 0001–0007
   voltaram para `docs/roadmap/`; o índice fica em `roadmap/README.md` e o ADR
   0022 substitui o 0020. O check de docs volta a validar os links das páginas de

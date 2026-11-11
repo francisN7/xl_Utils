@@ -27,6 +27,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0020](0020-arquivo-do-historico.md) | Histórico em texto, uma página por ciclo | Substituída pela 0022 |
 | [0021](0021-instalador-windows.md) | Instalador Windows com PyInstaller e Inno Setup | Aceita |
 | [0022](0022-ciclos-no-roadmap.md) | Ciclos fechados no roadmap, sem pasta `history` | Aceita |
+| [0023](0023-contrato-de-plugins.md) | Contrato de plugins e pacote `.tar.xz` | Aceita |
 
 ## Como ler
 

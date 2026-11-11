@@ -12,7 +12,7 @@ guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 | Core | `src/xl_utils/core/` | Regra pura, sem Flet, sem diálogo, sem `print`. |
 | Controllers | `src/xl_utils/controllers/` | Orquestra o core e devolve dados em memória. |
 | UI | `src/xl_utils/ui/` | Coleta entrada, executa em segundo plano e exibe resultado; não contém regra. |
-| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso, abertura de pasta, contas e pastas do Drive. |
+| Shared | `src/xl_utils/shared/` | Log, diagnóstico, progresso, abertura de pasta, contas, pastas do Drive e plugins. |
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 
@@ -31,11 +31,21 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 | `core/tools/cut.py` | regra do recorte | `split_frame`, `split_workbook` |
 | `core/tools/merge.py` | regra do merge | `ColumnRef`, `ColumnGroup`, `merge_sheets`, `move_column` |
 | `core/tools/link.py` | regra da vinculação | `LinkConfig`, `SheetSpec`, `link_agenda`, `find_target_sheet` |
+| `core/plugins/manifest.py` | manifesto de plugin | `parse_manifest`, `PluginManifest`, `OptionSpec` |
+| `core/plugins/package.py` | pacote `.tar.xz` | `inspect_package`, `extract_package`, `build_package`, `verify_sidecar` |
 
 Erros tipados: `WorkbookReadError` (leitura), `SaveError` (gravação),
 `ConfigError`, `InvalidCnjError`, `MissingColumnsError` e
 `AlreadyProcessedError` (vinculação), além de `ValueError` para seleção ou
-regra inválida.
+regra inválida. O contrato de plugins usa `PluginError`, `ManifestError`,
+`PackageError` e `InstallError`, com códigos estáveis.
+
+## Plugins
+
+O contrato de plugins vive em duas camadas: `core/plugins/` valida o manifesto
+e o pacote sem executar código; `shared/plugins/` instala em
+`%LOCALAPPDATA%/xl_utils/plugins/`, descobre manifestos e desinstala. A UI e o
+carregamento ficam na S14. Guia do autor: [`../plugins/README.md`](../plugins/README.md).
 
 ## Fluxo de dados
 

@@ -7,38 +7,31 @@ Ciclo ativo: **0008 — Plugins**. Os ciclos fechados estão em
 
 | Sessão | Entrega | Estado |
 |---|---|---|
-| S13 | Plugins I — contrato e extração segura | [ ] |
-| — | Plugins II — área de Plugins na UI | sem sessão |
+| S13 | Plugins I — contrato e extração segura | [x] |
+| S14 | Plugins II — área, carregamento e guia | [ ] |
 | — | Seletor de arquivos integrado à UI | sem sessão |
 | — | Drive sem consentimento repetido | sem sessão |
 
 Ordem definida pelo dono: **primeira release → plugins → investigações
 pesadas**.
 
-## S13 — próxima
+## S13 — concluída
 
-Sistema de plugins começa pelo contrato, não pela tela: ADR com manifesto,
-API de UI, ciclo de vida, permissões e versionamento; extração segura do pacote
-`.7z` em `%LOCALAPPDATA%/xl_utils/plugins/`, com recusa de caminho absoluto,
-`..`, symlink e zip bomb, hash/tamanho conferidos e nada executado durante a
-extração. A área “Plugins” na navegação e o primeiro plugin de exemplo ficam na
-sessão seguinte. Ver a [spec](../sessions/S13-plugins-contrato.md).
+Contrato no ADR 0023, pacote `.tar.xz` com `tarfile`/`lzma`, validação pura,
+instalação atômica em `%LOCALAPPDATA%/xl_utils/plugins/`, sidecar SHA-256 e
+limites contra zip bomb. O CLI `scripts/plugin_cli.py` empacota, confere,
+instala, lista e remove sem executar código. O contrato do autor está em
+`docs/plugins/`. Ver a [spec](../sessions/S13-plugins-contrato.md).
+
+## S14 — próxima
+
+Área “Plugins” na navegação com lista, instalar e remover pela tela, carregar
+`run(request)` isolado e o primeiro exemplo público. Completar o guia do autor
+com `primeiro-plugin.md`, `empacotar-testar.md` e `exemplos/`, incluindo o fluxo
+do repo privado/CI. O plugin continua no mesmo processo, com permissões
+declarativas e sem sandbox. Ver a [spec](../sessions/S14-plugins-ui.md).
 
 ## Backlog
-
-### Plugins II — área de Plugins na UI
-
-Área “Plugins” na navegação com lista, instalar, remover e um botão de
-informação que abre a documentação pública: estrutura do `.7z`, manifesto, API,
-exemplo mínimo e checklist de segurança. Ferramentas opcionais deixam de vir no
-app e passam a ser instaladas por um `.7z`; o que é seguro pode virar padrão, o
-que é arriscado fica num repositório privado do dono. Nada é baixado sozinho:
-instalar é ato explícito.
-
-- **Pacote:** `.7z` com manifesto, código e assets, validado antes de instalar
-  em `%LOCALAPPDATA%/xl_utils/plugins/` — nunca no repositório.
-- **Pendências:** dependências declaradas pelo plugin, assinatura/hash e modo
-  seguro para iniciar sem plugins.
 
 ### Ícone do aplicativo
 

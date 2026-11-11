@@ -4,57 +4,51 @@
 
 ## Sessão
 
-- **Última concluída:** S12b — ciclos fechados de volta ao roadmap
-- **Próxima:** S13 — plugins: contrato e extração segura
+- **Última concluída:** S13 — contrato de plugins e instalação `.tar.xz`
+- **Próxima:** S14 — área Plugins, carregamento e guia prático
 - **Ciclo:** 0008 — Plugins
-- **Decisões:** `flet pack` + Inno Setup, por usuário, desinstalação destrutiva
-  com cache Flet por fingerprint (ADR 0021); comparação bruta; CNJ máscara ou 20
-  dígitos; `MIGRAÇÃO` é sentinela; config empacotada; ADRs 0014–0019; Drive:
-  PKCE/`state`, `drive.file`, DPAPI, Picker desktop, pasta concedida e `_001`;
-  ciclos fechados no `roadmap/` (ADR 0022, substitui a 0020).
+- **Decisões:** plugins em `.tar.xz` com stdlib, `plugin.toml`, `run(request)`,
+  mesmo processo, permissões declarativas e sidecar SHA-256 (ADR 0023);
+  `flet pack` + Inno Setup (ADR 0021); demais regras nos ADRs 0014–0022.
 
 ## Pronto
 
-- S12b: `docs/history/` removida; os ciclos 0001–0007 voltaram para
-  `docs/roadmap/`; o índice é `roadmap/README.md`; ADR 0022 substitui a 0020 e o
-  check de docs volta a validar os links das páginas de ciclo.
-- S12: `v0.3.0` publicada — instalador 85,1 MB, SHA-256 `7c8dcb95…`, menu
-  Iniciar, atalho opcional, ícone 2b (arte dupla 16–32/48–256 px), desinstalação
-  que apaga `%LOCALAPPDATA%\xl_utils` e o cache do cliente em
-  `%USERPROFILE%\.flet`. Build em `scripts/build_windows.ps1`; guia em
-  `docs/guide/release-windows.md`; decisão no ADR 0021.
-- S11: 0.2.0 no pyproject, lock, `__version__` e diagnóstico; cartões do Início e
-  e-mail do menu de perfis sem estouro, com tooltip de 3 s.
+- S13: ADR 0023; `core/plugins/` (manifesto e pacote); `shared/plugins/`
+  (instalação atômica, descoberta e desinstalação); CLI
+  `pack/check/install/list/uninstall`; contrato em `docs/plugins/`; 92 testes
+  de plugins. Build 85,1 MB e app abriu.
+- S12b: ciclos 0001–0007 em `docs/roadmap/`; ADR 0022 substitui a 0020.
+- S12: `v0.3.0` publicada; build em `scripts/build_windows.ps1` e guia em
+  `docs/guide/release-windows.md`.
 
 ## Próximo passo
 
-Ler `docs/sessions/S13-plugins-contrato.md`: ADR do contrato de plugins e
-instalação segura do `.7z` em `%LOCALAPPDATA%/xl_utils/plugins/`.
+Ler `docs/sessions/S14-plugins-ui.md`: área “Plugins”, instalar/remover pela
+tela, carregamento isolado e guia prático com exemplos. Não há mudança no
+formato `.tar.xz` nem no contrato da API 1.
 
 ## Arquivos-chave
 
-- `docs/sessions/S13-plugins-contrato.md`, `docs/roadmap/main.md`
-- `docs/roadmap/README.md`, `docs/adr/0022-ciclos-no-roadmap.md`
-- `scripts/build_windows.ps1`, `installer/xl_utils.iss`, `scripts/make_icons.py`
-- `scripts/pack_entry.py`, `assets/icon.*`, `docs/guide/release-windows.md`
-- `pyproject.toml`, `src/xl_utils/shared/`
+- `src/xl_utils/core/plugins/`, `src/xl_utils/shared/plugins/api.py`
+- `src/xl_utils/shared/plugins/install.py`, `scripts/plugin_cli.py`
+- `docs/plugins/`, `docs/adr/0023-contrato-de-plugins.md`
+- `docs/sessions/S14-plugins-ui.md`, `tests/test_plugin_*.py`
 
 ## Armadilhas
 
-- `flet pack` apaga `build/` e o `--distpath`: artefatos sempre em `artifacts/`.
+- Sidecar SHA-256 é obrigatório; hash é integridade, não autoria.
+- `.tar.xz` é tar + xz; não usar `extractall` nem confiar no cabeçalho.
+- Plugin em processo não tem sandbox; permissões são avisos.
+- A promoção é atômica; staging fica no mesmo volume e id duplicado não
+  sobrescreve.
+- O PyInstaller só embute `shared/plugins` quando a S14 ligar a UI; validar
+  `_lzma` no bundle daquela sessão.
+- `flet pack` apaga `build/` e `--distpath`: artefatos em `artifacts/`.
 - Sem `python3t.dll` de `abi3t-compat/`, o google-auth quebra no exe.
-- `flet-cli` 1.1.2: o build aplica o patch `open(..., "ab")`.
-- `.iss` é UTF-8 **com BOM**; `Set-Content` do PowerShell corrompe acentos.
-- Desinstalador acha o cache Flet pelo fingerprint do zip; não apagar `.flet`
-  inteiro (outros apps Flet usam o mesmo `client`).
-- `gh` fica em `C:\Program Files\GitHub CLI\gh.exe`, fora do PATH do shell.
-- Flet não é thread-safe: login, Picker, gravação e execução fora da UI thread.
-- `drive.file` só vê arquivo criado/escolhido; a pasta precisa ser concedida.
-- Fechar o app não fecha o `flet.exe` do cliente; ele segura o cache.
-- Sandbox: pasta mapeada é somente leitura e o build apaga `artifacts/installer`;
-  compartilhar por `artifacts/share`.
+- `.iss` é UTF-8 com BOM; `Set-Content` do PowerShell corrompe acentos.
+- Flet não é thread-safe: carregar/executar fora da UI thread.
 - Ciclos fechados ficam em `docs/roadmap/`; não recriar `docs/history/`.
 
 ## Como rodar
 
-`uv run xl-utils` · `uv run ruff check src tests` · `uv run ruff format --check src tests` · `uv run pytest` · `node scripts/check-docs.mjs` · `powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1`
+`uv run xl-utils` · `uv run ruff check src tests` · `uv run ruff format --check src tests` · `uv run pytest` · `node scripts/check-docs.mjs` · `uv run python scripts/plugin_cli.py --help` · `powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1`
