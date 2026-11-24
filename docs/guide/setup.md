@@ -7,7 +7,6 @@ código é organizado (ver `reference/architecture.md`).
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) instalado.
-- Node.js apenas para `node scripts/check-docs.mjs`.
 - Nenhum Python global necessário: o uv baixa o 3.15 definido em
   `.python-version`.
 
@@ -136,7 +135,7 @@ republica a cada push na `main` e o filtro de caminho não vale.
 uv run ruff check src tests
 uv run ruff format --check src tests
 uv run pytest
-node scripts/check-docs.mjs
+uv run python scripts/check_docs.py
 ```
 
 ## Problemas comuns

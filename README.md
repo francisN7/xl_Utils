@@ -68,7 +68,7 @@ xl-utils
 - **A janela não abre:** confirme `flet[desktop]` no `pyproject.toml` e rode
   `uv sync`.
 - **Python errado:** `uv python pin 3.15` e `uv sync` recriam o `.venv`.
-- **Link quebrado nas docs:** `node scripts/check-docs.mjs` mostra o arquivo e a
+- **Link quebrado nas docs:** `uv run python scripts/check_docs.py` mostra o arquivo e a
   linha; corrija o caminho relativo.
 
 Mais detalhes em [setup e execução](docs/guide/setup.md#problemas-comuns).
@@ -78,7 +78,7 @@ Mais detalhes em [setup e execução](docs/guide/setup.md#problemas-comuns).
 ```bash
 uv run ruff check src tests
 uv run pytest
-node scripts/check-docs.mjs
+uv run python scripts/check_docs.py
 ```
 
 ## Estrutura

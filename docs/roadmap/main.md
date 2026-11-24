@@ -5,30 +5,24 @@ Ciclo ativo: **0009 — Investigações de UI**. Os ciclos fechados estão em
 
 ## Sessões
 
-| Sessão | Entrega | Estado |
-|---|---|---|
-| S15 | Seletor de arquivos integrado à UI — investigação | [x] |
-| S16 | Drive sem consentimento repetido — investigação | [ ] |
-| S17 | Ícone da sidebar e da janela | [ ] |
-| S18 | Plugins no rodapé da sidebar, fora do Início | [ ] |
-| S19 | Remover Verificar Vínculos e preparar o repo de plugins | [ ] |
-| S20 | Leitura de planilhas pelo host e API 2 dos plugins | [ ] |
-| S21 | Menu de perfis do Drive sem troca de conta | [ ] |
-| S22 | Auditoria dos docs e README com badges e screenshots | [ ] |
-| S23 | Release 0.4.0 e fechamento do ciclo | [ ] |
+Estado: `[ ]` pendente · `[~]` em andamento · `[x]` concluída. Ao concluir,
+a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
+
+| Sessão | Entrega | Aceite | Estado |
+|---|---|---|---|
+| S15 | Spike em Flet puro com 25.000 itens; seletor interno restrito à rota do Drive (adendo do ADR 0025) | ADR 0025 aceito com medições; fluxo padrão intacto; ruff, pytest e docs verdes | [x] |
+| S16 | Drive sem consentimento repetido — investigação | — | [ ] |
+| S17 | Ícone da sidebar e da janela | — | [ ] |
+| S18 | Plugins no rodapé da sidebar, fora do Início | — | [ ] |
+| S19 | Remover Verificar Vínculos e preparar o repo de plugins | — | [ ] |
+| S20 | Leitura de planilhas pelo host e API 2 dos plugins | — | [ ] |
+| S21 | Menu de perfis do Drive sem troca de conta | — | [ ] |
+| S22 | Auditoria dos docs e README com badges e screenshots | — | [ ] |
+| S23 | Release 0.4.0 e fechamento do ciclo | — | [ ] |
 
 Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21 → S22 →
 S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
 Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
-
-## S15 — concluída
-
-O spike em Flet puro provou a viabilidade da UI: 25.000 itens, filtro por
-formato, recentes, navegação e seleção no tema. O adendo do
-[ADR 0025](../adr/0025-seletor-de-arquivos.md) restringe o seletor interno à
-**rota do Drive**; arquivo local continua sempre no seletor nativo do sistema
-operacional. A listagem definitiva virá da Drive API, a ser medida na S16. A
-implementação fica para depois da 0.4.0; nenhum fluxo padrão mudou.
 
 ## S16 — próxima
 
@@ -74,8 +68,8 @@ depois da 0.4.0 e está na [spec de backlog](../sessions/S24-seletor-do-drive.md
 - Atualizar o code tour quando um módulo do core mudar de papel.
 - Refazer o instalador e a validação no Sandbox quando a versão ou o ícone
   mudar; o roteiro está em [`../guide/release-windows.md`](../guide/release-windows.md).
-- Fechar o ciclo transformando esta página em `docs/roadmap/NNNN-titulo.md` e
-  limpando as specs do working tree.
+- Fechar o ciclo transformando esta página em `docs/roadmap/NNNN-titulo.md`; as
+  specs já saíram a cada encerramento.
 
 ## Gatilhos (não são backlog)
 

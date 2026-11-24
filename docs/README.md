@@ -79,8 +79,8 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 
 - **Guide** responde "como eu faço"; **reference**, "como X é".
 - **ADR** guarda o **por quê** e não muda depois de aceito.
-- **Spec de sessão** é escopo fechado e temporário; todas as specs do ciclo saem
-  quando ele fecha.
+- **Spec de sessão** é escopo fechado e temporário: no encerramento, entrega e
+  aceite viram linha em `roadmap/main.md` e a spec sai (`git rm`).
 - **Histórico** é a página `NNNN-titulo.md` em `roadmap/`, uma por ciclo, ao
   lado do `main.md`. O passado fica em texto no Git; não existe arquivo
   comprimido no repositório.

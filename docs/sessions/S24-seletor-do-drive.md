@@ -44,7 +44,7 @@ download continua no cache local e entrega o caminho ao `FileInput`.
 - [ ] O arquivo escolhido vira o mesmo caminho de cache que o Picker entrega.
 - [ ] Seletor nativo local e Picker continuam disponíveis como fallback.
 - [ ] Erros de token/permissão têm mensagem clara, sem traceback.
-- [ ] `ruff`, `pytest` e `node scripts/check-docs.mjs` verdes.
+- [ ] `ruff`, `pytest` e `uv run python scripts/check_docs.py` verdes.
 
 ## Orçamento de contexto (≤90 linhas)
 

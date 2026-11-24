@@ -59,7 +59,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 - lint, testes e docs verdes;
 - funciona no ambiente alvo;
 - docs, `CURRENT.md`, roadmap e `CHANGELOG.md` atualizados;
-- spec da sessão fora do working tree no fim do ciclo;
+- entrega e aceite na linha da sessão em `main.md` e spec fora do working tree;
 - commit `SXX: resumo curto`.
 
 ## Numeração

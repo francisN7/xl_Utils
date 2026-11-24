@@ -14,13 +14,13 @@ mesclagem e vinculação entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES.
    ela. Nunca despeje um arquivo grande no contexto.
 3. Prefira `grep`/`glob` e leituras parciais (`offset`/`limit`).
 4. No fim da sessão, obrigatoriamente:
-   - rodar `uv run ruff check src tests`, `uv run pytest` e
-     `node scripts/check-docs.mjs`;
-   - atualizar `CURRENT.md`, o roadmap e o `CHANGELOG.md`; no fechamento do
-     ciclo, virar `main.md` em `docs/roadmap/NNNN-titulo.md` e tirar as specs;
+   - rodar `uv run ruff check src tests`, `uv run pytest` e o check de docs;
+   - atualizar `CURRENT.md`; no roadmap, preencher entrega e aceite da sessão
+     e tirar a spec (`git rm`); `CHANGELOG.md` só com mudança visível;
+   - no fechamento do ciclo, virar `main.md` em `docs/roadmap/NNNN-titulo.md`;
    - criar/atualizar um ADR se a decisão for relevante;
    - escrever a spec da próxima sessão;
-   - commitar com `SXX: resumo curto`.
+   - commitar com `SNN: resumo curto`.
 5. Se o contexto encher no meio, salve o estado em `CURRENT.md` e recomece.
 6. Revisão profunda de todos os `.md` é a skill `docs-review`: só sob pedido
    explícito, nunca no fim da sessão.
@@ -80,7 +80,7 @@ docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
 | lint | `uv run ruff check src tests` |
 | format | `uv run ruff format src tests` |
 | test | `uv run pytest` |
-| docs | `node scripts/check-docs.mjs` |
+| docs | `uv run python scripts/check_docs.py` |
 | sync | `uv sync` |
 | nova dependência | `uv add <pacote>` |
 

@@ -40,7 +40,7 @@ fallback.
 - [ ] ADR 0026 aceito, com tabela comparativa e evidências das medições.
 - [ ] Fluxo atual intacto: Picker, `drive.file`, cache e gravação continuam.
 - [ ] Spike removido ou atrás de flag desligada; nada muda por padrão.
-- [ ] `ruff`, `pytest` e `node scripts/check-docs.mjs` verdes.
+- [ ] `ruff`, `pytest` e `uv run python scripts/check_docs.py` verdes.
 - [ ] Backlog, `reference/ui.md` e `architecture.md` refletem a decisão.
 
 ## Orçamento de contexto (≤90 linhas)

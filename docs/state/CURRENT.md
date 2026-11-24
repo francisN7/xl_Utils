@@ -7,6 +7,7 @@
 - **Última concluída:** S15 — seletor de arquivos (investigação)
 - **Próxima:** S16 — Drive sem consentimento repetido (investigação)
 - **Ciclo:** 0009 — Investigações de UI
+- **Retorno:** `a17bdf1` — S15: restringe seletor interno a rota do Drive
 - **Decisões:** ADR 0025 — seletor em Flet puro, paginado (300), listagem fora
   da UI thread, nativo/Picker como fallback; demais nos ADRs 0014–0024.
 
@@ -55,4 +56,4 @@ token do login, sem trocar escopo. A decisão vira ADR 0026. O seletor do Drive
 
 ## Como rodar
 
-`uv run xl-utils` · `uv run ruff check src tests` · `uv run ruff format --check src tests` · `uv run pytest` · `node scripts/check-docs.mjs` · `uv run xl-utils-plugin --help` · `powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1`
+`uv run xl-utils` · `uv run ruff check src tests` · `uv run ruff format --check src tests` · `uv run pytest` · `uv run python scripts/check_docs.py` · `uv run xl-utils-plugin --help` · `powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1`

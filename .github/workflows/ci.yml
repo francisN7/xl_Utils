@@ -30,4 +30,4 @@ jobs:
         run: uv run pytest
 
       - name: Docs
-        run: node scripts/check-docs.mjs
+        run: uv run python scripts/check_docs.py

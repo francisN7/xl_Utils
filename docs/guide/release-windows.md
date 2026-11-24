@@ -16,7 +16,7 @@ Windows x64, e não depende de Flutter nem de certificado de assinatura.
 ```powershell
 uv run ruff check src tests
 uv run pytest
-node scripts/check-docs.mjs
+uv run python scripts/check_docs.py
 powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1
 ```
 
