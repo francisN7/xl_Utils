@@ -26,19 +26,9 @@
         color: var(--text);
         font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
       }
-      main { width: min(720px, 100%); }
-      .logo {
-        display: inline-grid;
-        place-items: center;
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--purple);
-        color: var(--bg);
-        font-weight: 800;
-        font-size: 22px;
-      }
-      h1 { margin: 18px 0 4px; font-size: 34px; letter-spacing: -0.02em; }
+      main { width: min(880px, 100%); }
+      h1 { margin: 0 0 14px; line-height: 0; }
+      .banner { display: block; width: 100%; height: auto; }
       .tagline { margin: 0 0 26px; color: var(--muted); }
       .card {
         background: var(--surface);
@@ -55,12 +45,38 @@
       li { margin: 4px 0; }
       footer { margin-top: 24px; color: var(--muted); font-size: 13px; }
       .dot { color: var(--green); }
+      h3 { margin: 0 0 8px; font-size: 15px; }
+      .shots {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin: 0 0 18px;
+      }
+      figure { margin: 0; }
+      figure img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      figcaption { margin-top: 6px; color: var(--muted); font-size: 13px; }
+      @media (max-width: 640px) {
+        .shots { grid-template-columns: 1fr; }
+      }
     </style>
   </head>
   <body>
     <main>
-      <div class="logo">x</div>
-      <h1>xl_Utils</h1>
+      <h1>
+        <img
+          class="banner"
+          src="assets/banner-dark.svg"
+          width="1280"
+          height="320"
+          alt="xl_Utils — utilitários de planilha, no seu computador"
+        />
+      </h1>
       <p class="tagline">Quatro utilitários de planilha em um app desktop local, com plugins locais.</p>
 
       <div class="card">
@@ -71,6 +87,41 @@
           <li>Recorte de planilhas por quantidade de linhas.</li>
           <li>Mesclagem de abas de vários arquivos.</li>
         </ul>
+      </div>
+
+      <div class="card">
+        <h2>Como ele é</h2>
+        <h3>Início</h3>
+        <div class="shots">
+          <figure>
+            <a href="assets/screenshots/home-dark.png">
+              <img src="assets/screenshots/home-dark.png" width="1440" height="900" loading="lazy" alt="Tela Início no tema Dracula, com as quatro ferramentas" />
+            </a>
+            <figcaption>Dracula (escuro)</figcaption>
+          </figure>
+          <figure>
+            <a href="assets/screenshots/home-light.png">
+              <img src="assets/screenshots/home-light.png" width="1440" height="900" loading="lazy" alt="Tela Início no tema Alucard, com as quatro ferramentas" />
+            </a>
+            <figcaption>Alucard (claro)</figcaption>
+          </figure>
+        </div>
+        <h3>Extrair CNJs, com prévia do resultado</h3>
+        <div class="shots">
+          <figure>
+            <a href="assets/screenshots/cnj-dark.png">
+              <img src="assets/screenshots/cnj-dark.png" width="1440" height="900" loading="lazy" alt="Extrair CNJs no tema Dracula, com log e prévia" />
+            </a>
+            <figcaption>Dracula (escuro)</figcaption>
+          </figure>
+          <figure>
+            <a href="assets/screenshots/cnj-light.png">
+              <img src="assets/screenshots/cnj-light.png" width="1440" height="900" loading="lazy" alt="Extrair CNJs no tema Alucard, com log e prévia" />
+            </a>
+            <figcaption>Alucard (claro)</figcaption>
+          </figure>
+        </div>
+        <p>Capturas com uma planilha fictícia e sem conta conectada.</p>
       </div>
 
       <div class="card">

@@ -1,12 +1,14 @@
 name: Pages
 
-# Publica apenas o site (home e privacidade). Código, testes e docs internos
-# não disparam deployment: o filtro de caminho evita a republicação a cada push.
+# Publica apenas o site (home e privacidade) e as imagens dele (docs/assets/,
+# as mesmas do README). Código, testes e docs internos não disparam
+# deployment: o filtro de caminho evita a republicação a cada push.
 on:
   push:
     branches: [main]
     paths:
       - docs/*.html
+      - docs/assets/**
   workflow_dispatch:
 
 permissions:
@@ -31,6 +33,7 @@ jobs:
         run: |
           mkdir -p _site
           cp docs/*.html _site/
+          cp -r docs/assets _site/assets
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
 

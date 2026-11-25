@@ -23,7 +23,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0016](0016-fluxos-e-opcoes-da-vinculacao.md) | Fluxos independentes e opções da vinculação | Substituída pela 0027 |
 | [0017](0017-tela-cheia-do-quadro.md) | Tela cheia por overlay no conteúdo do merge | Aceita |
 | [0018](0018-drive-autenticacao.md) | OAuth do Drive, contas e tokens | Aceita |
-| [0019](0019-publicacao-do-site.md) | Publicação do site por workflow com filtro | Aceita |
+| [0019](0019-publicacao-do-site.md) | Publicação do site por workflow com filtro | Aceita, com adendo |
 | [0020](0020-arquivo-do-historico.md) | Histórico em texto, uma página por ciclo | Substituída pela 0022 |
 | [0021](0021-instalador-windows.md) | Instalador Windows com PyInstaller e Inno Setup | Aceita |
 | [0022](0022-ciclos-no-roadmap.md) | Ciclos fechados no roadmap, sem pasta `history` | Aceita |

@@ -1,6 +1,6 @@
 # ADR 0019 — Publicação do site por workflow com filtro de caminho
 
-- **Status:** aceita
+- **Status:** aceita, com adendo (S22b)
 - **Data:** 2026-11-08
 
 ## Contexto
@@ -44,3 +44,13 @@ fixada por SHA completo.
   manter uma cópia do site fora de `docs/`; pior de manter.
 - **Só deploy manual:** elimina o ruído, mas o site envelhece até alguém lembrar
   de rodar; o filtro mantém a atualização automática no caso que importa.
+
+## Adendo — S22b (2026-11-25)
+
+O site passou a ter imagens (banner e capturas dos dois temas), as mesmas do
+README. Elas vivem numa pasta só, `docs/assets/`, e o workflow publica essa
+pasta junto com os HTML: o filtro ganha `docs/assets/**` e “Preparar o site”
+copia `docs/assets/` para `_site/assets/`. Trocar uma imagem do README também
+republica o site; é raro e muda o que o site mostra, então o deployment é
+legítimo. Apontar o site para `raw.githubusercontent.com` evitaria a mudança no
+workflow, mas deixaria o site dependente de URL externa e do estado da `main`.

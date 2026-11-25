@@ -126,8 +126,9 @@ uv run python scripts/check-drive-picker.py
 ## Site público
 
 `docs/index.html` e `docs/privacy.html` são publicados por
-`.github/workflows/pages.yml`, que só roda quando um desses HTML muda — ou pelo
-botão **Run workflow** em Actions → Pages. Em **Settings → Pages → Source**, a
+`.github/workflows/pages.yml`, junto com as imagens de `docs/assets/` (banner e
+capturas, as mesmas do README). O workflow só roda quando um desses HTML ou algo
+em `docs/assets/` muda — ou pelo botão **Run workflow** em Actions → Pages. Em **Settings → Pages → Source**, a
 origem precisa ser **GitHub Actions**; em “Deploy from a branch”, o GitHub
 republica a cada push na `main` e o filtro de caminho não vale.
 
