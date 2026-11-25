@@ -20,13 +20,15 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 | S21c | Login do Drive no Linux: fora do Windows o `refresh_token` vai para o chaveiro do sistema (`keyring`, Secret Service/KWallet), Windows segue no DPAPI; Sair apaga o segredo; versão Linux sai dos gatilhos para o backlog; ADR 0030. Feita antes da S21b, a pedido do dono | Gravar, ler e apagar um token falso no chaveiro real do KDE; testes do cofre em memória (o `conftest` isola o chaveiro real); login com conta real do Google no Linux fica com o dono; ruff, pytest e docs verdes | [x] |
 | S21b | Engrenagem da conta: foto e apelido. Engrenagem (`MenuItemButton`) no cabeçalho do painel abre o diálogo “Configurar conta” (`ui/components/account_settings.py`) com prévia, Escolher/Remover foto e apelido (≤16); `shared/profiles.py` recorta no centro, reduz a PNG 256 px (Pillow) e grava em `drive/profiles/` pelo hash da conta (`accounts.account_key`), de forma atômica; apelido no topo, no painel e no tooltip de “Abrir do Drive”; foto no avatar com as iniciais de reserva; Sair apaga o perfil da conta; ADR 0031 | Questionário: diálogo, Pillow 256 px, centro automático; spike no `--web` com contas falsas em raiz temporária nos dois temas (engrenagem fecha o painel e abre o diálogo, apelido no topo e no painel, foto no avatar, Remover + Cancelar não grava); testes de perfil, menu, diálogo e tooltip; escolher foto real no desktop e build Windows com Pillow ficam com o dono; ruff, pytest e docs verdes | [x] |
 | S21d | Correção urgente: resultado acima do limite do Excel. `core/save.py` ganha `ROW_LIMIT = 1_000_000` e `split_item`; `save_item`, `save_to_output`, `save_chosen` e `DriveSession._save_sync` gravam um arquivo por parte (`_parte1`, `_parte2`…), com cabeçalho; limite redondo por escolha do dono, para margem | Merge fictício de 1.240.948 × 12 salvo em `Merge_parte1.xlsx` (33 MB) e `Merge_parte2.xlsx` (8 MB) em cerca de 5 min; testes de divisão em `output/`, arquivo escolhido e Drive; a planilha real fica com o dono; ruff, pytest e docs verdes | [x] |
-| S22 | Auditoria dos docs, documentação completa para quem chega e README com badges e screenshots | — | [ ] |
+| S22a | Auditoria dos docs (`docs-review`), trilha de onboarding, glossário, `CONTRIBUTING.md`, diagramas em `architecture.md` e check de cobertura de módulos | — | [ ] |
+| S22b | README e site com banner, tagline animada, badges e screenshots dos dois temas | — | [ ] |
 | S23 | Release 0.4.0 e fechamento do ciclo | — | [ ] |
 
 Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21a → S21c →
-S21b → S21d → S22 → S23** (a S21c entrou antes da S21b e a S21d antes da S22,
-por urgência). A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
-Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
+S21b → S21d → S22a → S22b → S23** (a S21c entrou antes da S21b e a S21d antes
+da S22a, por urgência; a S22 foi dividida em texto e visual). A release 0.4.0
+entra depois dos ajustes de UI, da limpeza do Verificar Vínculos e da API 2
+dos plugins. Plugins foram entregues no ciclo 0008.
 
 ## S18–S23 — próximas
 
@@ -44,14 +46,15 @@ Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 - **S21b:** engrenagem no painel abre a configuração da conta: foto escolhida
   do disco (sem foto, a inicial) e apelido no lugar do e-mail; os dois somem
   no “Sair”.
-- **S22:** auditar todos os `.md` contra o código e deixar a documentação
+- **S22a:** auditar todos os `.md` contra o código e deixar a documentação
   completa e intuitiva para quem nunca viu o projeto: trilha de onboarding
   (o que é → rodar → arquitetura → tour do código → primeira contribuição),
   glossário dos termos do domínio (CNJ, AGENDA, FINANCEIRO, `all_str`…),
   diagramas do fluxo de dados e das camadas, guia de contribuição e de
   "onde mexer para…", e conferência de que todo módulo atual aparece em
-  `architecture.md`/`code-tour.md`. Atualizar README/site com banner, badges,
-  tagline animada e screenshots.
+  `architecture.md`/`code-tour.md`, cobrada pelo check de docs.
+- **S22b:** README e site com banner, badges, tagline animada e screenshots
+  dos dois temas, com dados fictícios.
 - **S23:** versão 0.4.0, notas, build, Sandbox, publicação e fechamento do
   ciclo 0009; o 0010 nasce limpo.
 

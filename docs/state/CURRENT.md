@@ -5,8 +5,8 @@
 ## Sessão
 
 - **Última concluída:** S21d — Merge acima do limite em vários arquivos
-- **Próxima:** S22 — Auditoria dos docs e documentação para quem chega
-  (`docs/sessions/S22-docs-para-quem-chega.md`)
+- **Próxima:** S22a — Auditoria dos docs e documentação para quem chega
+  (`docs/sessions/S22a-docs-para-quem-chega.md`)
 - **Ciclo:** 0009 — Investigações de UI
 - **Retorno:** `f1f79e5` — S21b: foto e apelido da conta
 - **Decisões:** ADR 0031 (perfil local), 0030 (chaveiro), 0029 (painel de
@@ -22,10 +22,10 @@
 
 ## Próximo passo
 
-Executar a S22 (auditoria com `docs-review`, onboarding, glossário, README).
-O dono confere no desktop: escolher foto real, login real e painel no Linux.
-Depois S23 (0.4.0, build Windows com Pillow); S24 (Picker JS) e versão Linux
-no backlog; o próximo ciclo planeja Windows e Linux.
+Executar a S22a (auditoria, onboarding, glossário, contribuição); depois S22b
+(README e site com banner, badges e screenshots). O dono confere no desktop:
+foto real, login real e painel no Linux. Depois S23 (0.4.0, build Windows com
+Pillow); S24 (Picker JS) e versão Linux no backlog.
 
 ## Arquivos-chave
 

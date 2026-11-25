@@ -30,7 +30,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S22-docs-para-quem-chega.md`](sessions/S22-docs-para-quem-chega.md) |
+| ler a spec da próxima sessão | [`sessions/S22a-docs-para-quem-chega.md`](sessions/S22a-docs-para-quem-chega.md) |
 
 ## Por seção (atalho)
 
