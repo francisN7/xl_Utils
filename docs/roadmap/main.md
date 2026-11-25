@@ -17,7 +17,7 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 | S19 | Remover Verificar Vínculos e preparar o repo de plugins | — | [ ] |
 | S20 | Leitura de planilhas pelo host e API 2 dos plugins | — | [ ] |
 | S21 | Menu de perfis do Drive sem troca de conta | — | [ ] |
-| S22 | Auditoria dos docs e README com badges e screenshots | — | [ ] |
+| S22 | Auditoria dos docs, documentação completa para quem chega e README com badges e screenshots | — | [ ] |
 | S23 | Release 0.4.0 e fechamento do ciclo | — | [ ] |
 
 Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21 → S22 →
@@ -36,8 +36,14 @@ Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 - **S21:** menu de perfis nativo, sem `checked` e sem troca de conta; o “Sair
   desta conta” aparece no submenu do e-mail. O salvamento do Drive continua
   usando a conta de origem do arquivo.
-- **S22:** auditar todos os `.md`, atualizar README/site e adicionar banner,
-  badges, tagline animada e screenshots.
+- **S22:** auditar todos os `.md` contra o código e deixar a documentação
+  completa e intuitiva para quem nunca viu o projeto: trilha de onboarding
+  (o que é → rodar → arquitetura → tour do código → primeira contribuição),
+  glossário dos termos do domínio (CNJ, AGENDA, FINANCEIRO, `all_str`…),
+  diagramas do fluxo de dados e das camadas, guia de contribuição e de
+  "onde mexer para…", e conferência de que todo módulo atual aparece em
+  `architecture.md`/`code-tour.md`. Atualizar README/site com banner, badges,
+  tagline animada e screenshots.
 - **S23:** versão 0.4.0, notas, build, Sandbox, publicação e fechamento do
   ciclo 0009; o 0010 nasce limpo.
 
