@@ -1,9 +1,9 @@
 ﻿; Instalador por usuário do xl_Utils (Windows x64).
 ; Compilar com scripts/build_windows.ps1 (iscc) ou:
-;   iscc /DAppVersion=0.3.0 /DSourceDir=build\app\xl_Utils /DOutputDir=build\installer installer\xl_utils.iss
+;   iscc /DAppVersion=0.4.0 /DSourceDir=build\app\xl_Utils /DOutputDir=build\installer installer\xl_utils.iss
 
 #ifndef AppVersion
-  #define AppVersion "0.3.0"
+  #define AppVersion "0.4.0"
 #endif
 #ifndef SourceDir
   #define SourceDir "..\build\app\xl_Utils"

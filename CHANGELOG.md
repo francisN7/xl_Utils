@@ -6,6 +6,8 @@ decisões nos ADRs.
 
 ## Não lançado
 
+## v0.4.0 — 2026-11-25
+
 ### Added
 
 - Contrato de plugins no ADR 0023: manifesto `plugin.toml`, API

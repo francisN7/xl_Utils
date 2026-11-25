@@ -1,6 +1,6 @@
 [project]
 name = "xl-utils"
-version = "0.3.0"
+version = "0.4.0"
 description = "A collection of spreadsheet utilities with a unified desktop interface."
 readme = "README.md"
 authors = [
