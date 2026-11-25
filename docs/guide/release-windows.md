@@ -33,6 +33,22 @@ gravar a versão do `flet.exe`) e copia `python3t.dll` de `abi3t-compat/` para
 `_internal/`; sem esse shim o app empacotado falha no import do google-auth.
 Remover o patch quando o Flet corrigir.
 
+## Build no CI
+
+`.github/workflows/release.yml` gera o mesmo instalador num runner
+`windows-2025`, junto com o AppImage Linux. Ele só roda por disparo manual:
+**Actions → Release → Run workflow**, com o campo `confirmar` igual a `build`.
+Com qualquer outro texto, o job `guarda` falha e nada é compilado. Push, tag e
+PR não disparam o workflow.
+
+O job instala o Inno Setup 6 (`choco`) se ele não estiver no runner e roda
+`scripts/build_windows.ps1`. No smoke test, instala em silêncio
+(`/VERYSILENT /CURRENTUSER`), abre `xl_Utils.exe` e exige que o app e o cliente
+Flet (`~/.flet/client`) fiquem vivos por 10 s, sem `Traceback`. O artefato
+`xl_Utils-<versão>-windows` traz o instalador e o `SHA256SUMS.txt` e fica 7
+dias no run. O workflow não publica release: a publicação segue abaixo, com o
+arquivo baixado do run. O CI não substitui a validação no Windows Sandbox.
+
 ## Validação (Windows Sandbox)
 
 O Windows Sandbox é uma máquina limpa, sem Python nem `uv`. Habilitar uma vez:

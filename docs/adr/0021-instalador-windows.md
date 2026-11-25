@@ -79,3 +79,24 @@ OAuth do Google. Não há certificado de assinatura e o build é local.
   recebe só o instalador.
 - Trocar de empacotador exige ADR novo; o patch do Flet é dívida técnica
   rastreada até o upstream corrigir.
+
+## Adendo S23b — build no CI
+
+O item 4 da decisão muda: o build deixa de ser só local. O
+`.github/workflows/release.yml` gera o instalador Windows (`windows-2025`) e o
+AppImage Linux (`ubuntu-24.04`, ADR 0032) com os mesmos scripts. Regras:
+
+- **Gatilho único:** `workflow_dispatch` com o input `confirmar` igual a
+  `build`. O job `guarda` falha com outro texto, e os builds dependem dele.
+  Sem `push`, `tag`, `schedule`, `workflow_run` ou `release`.
+- **Sem publicação:** `permissions: contents: read`, sem `gh release`. O
+  workflow sobe artefatos com retenção de 7 dias, e a release segue manual com
+  os arquivos baixados.
+- **Smoke test:** instalação silenciosa (Windows) ou AppImage no `Xvfb`
+  (Linux). O app e o cliente Flet precisam ficar vivos por 10 s, sem
+  `Traceback`.
+- Actions fixadas por SHA completo, runners com versão fixa e `concurrency:
+  release` sem cancelar.
+
+O CI não substitui a validação humana no Windows Sandbox nem a assinatura de
+código, que continua fora.

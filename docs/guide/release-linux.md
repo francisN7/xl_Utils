@@ -42,6 +42,21 @@ Depois monta o AppDir com os arquivos de `packaging/linux/` (`AppRun` e
 `--skip-appimage` para no bundle. O build não usa `.venv`, `output/` nem o
 cache do Drive.
 
+## Build no CI
+
+`.github/workflows/release.yml` gera o mesmo AppImage num runner
+`ubuntu-24.04`, que define o piso de glibc 2.39, junto com o instalador
+Windows. Ele só roda por disparo manual: **Actions → Release → Run workflow**,
+com o campo `confirmar` igual a `build`. Com qualquer outro texto, o job
+`guarda` falha e nada é compilado. Push, tag e PR não disparam o workflow.
+
+O job roda `scripts/build_linux.sh` e, para o smoke test, instala `xvfb` e as
+bibliotecas da seção abaixo. Depois abre o AppImage num `Xvfb` com
+`APPIMAGE_EXTRACT_AND_RUN=1` (o runner não tem FUSE) e GL por software. O app e
+o cliente Flet (processo `flet`) precisam ficar vivos por 10 s, sem `Traceback`
+no log. O artefato `xl_Utils-<versão>-linux` traz o AppImage e o
+`SHA256SUMS.txt` e fica 7 dias no run. O workflow não publica release.
+
 ## Requisitos do sistema
 
 - **glibc ≥ 2.39**: Ubuntu 24.04, Fedora 40, Debian 13 ou mais novos. O
@@ -92,8 +107,9 @@ cp /w/*.AppImage /tmp/a && /tmp/a --appimage-extract-and-run
 ## Publicação
 
 O AppImage entra na mesma release do instalador Windows. Publique os dois
-`SHA256SUMS.txt` ou junte os dois num só. O workflow do Actions (S23b) e a
-release 0.4.0 (S23c) seguem este guia.
+`SHA256SUMS.txt` ou junte os dois num só. Os arquivos podem vir do build local
+ou do artefato do workflow (**Build no CI**). A release 0.4.0 (S23c) segue
+este guia.
 
 ```bash
 gh release upload v<versão> \

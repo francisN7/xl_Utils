@@ -1,0 +1,181 @@
+name: Release
+
+# Gera o instalador Windows e o AppImage Linux só quando o dono pede: o único
+# gatilho é o disparo manual, com a confirmação digitada. Nada de push, tag,
+# PR ou agenda. O workflow não publica release (isso é manual, ver os guias
+# docs/guide/release-{windows,linux}.md); só sobe os artefatos para baixar.
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: "Digite build para gerar os instaladores"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  guarda:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Conferir a confirmação
+        env:
+          CONFIRMAR: ${{ inputs.confirmar }}
+        run: |
+          if [ "$CONFIRMAR" != "build" ]; then
+            echo "::error::Confirmação inválida: digite exatamente build."
+            exit 1
+          fi
+          echo "Confirmação aceita."
+
+  windows:
+    needs: guarda
+    runs-on: windows-2025
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+
+      - name: Inno Setup
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue) -and -not (Test-Path $iscc)) {
+            choco install innosetup --no-progress -y
+          }
+          if (-not (Test-Path $iscc)) { throw "Inno Setup 6 não encontrado em $iscc." }
+          (Get-Item $iscc).VersionInfo.ProductVersion
+
+      - name: Build
+        run: powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1
+
+      - name: Smoke test
+        run: |
+          $setup = Get-ChildItem artifacts/installer -Filter "*-setup.exe" | Select-Object -First 1
+          if (-not $setup) { throw "Instalador não encontrado." }
+          $installLog = Join-Path $env:RUNNER_TEMP "install.log"
+          $install = Start-Process $setup.FullName -Wait -PassThru -ArgumentList `
+            "/VERYSILENT", "/CURRENTUSER", "/SUPPRESSMSGBOXES", "/NORESTART", "/LOG=$installLog"
+          if ($install.ExitCode -ne 0) {
+            Get-Content $installLog
+            throw "Instalação falhou (código $($install.ExitCode))."
+          }
+          $exe = Join-Path $env:LOCALAPPDATA "Programs\xl_Utils\xl_Utils.exe"
+          if (-not (Test-Path $exe)) { throw "Executável não instalado em $exe." }
+
+          $out = Join-Path $env:RUNNER_TEMP "app.out.log"
+          $err = Join-Path $env:RUNNER_TEMP "app.err.log"
+          $app = Start-Process $exe -PassThru -RedirectStandardOutput $out -RedirectStandardError $err
+          # O app só está de pé quando o cliente Flet (extraído na primeira
+          # execução em ~/.flet/client) sobe; import quebrado nunca chega lá.
+          $client = $null
+          foreach ($i in 1..90) {
+            if ($app.HasExited) { break }
+            $client = Get-Process flet -ErrorAction SilentlyContinue |
+              Where-Object { $_.Path -like "*\.flet\client\*" } | Select-Object -First 1
+            if ($client) { break }
+            Start-Sleep -Seconds 1
+          }
+          if ($client) { Start-Sleep -Seconds 10 }
+          $alive = -not $app.HasExited -and $client -and -not $client.HasExited
+          Write-Host "== stdout =="; if (Test-Path $out) { Get-Content $out }
+          Write-Host "== stderr =="; if (Test-Path $err) { Get-Content $err }
+          $traceback = (Test-Path $err) -and (Select-String -Path $err -Pattern "Traceback" -Quiet)
+          Get-Process flet -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+          if (-not $app.HasExited) { Stop-Process -Id $app.Id -Force -ErrorAction SilentlyContinue }
+          if (-not $alive) { throw "O app não ficou de pé (cliente Flet: $([bool]$client))." }
+          if ($traceback) { throw "O app registrou Traceback." }
+          Write-Host "Smoke test ok: app e cliente Flet vivos."
+
+      - name: Versão
+        id: versao
+        run: '"v=$((uv version --short).Trim())" >> $env:GITHUB_OUTPUT'
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: xl_Utils-${{ steps.versao.outputs.v }}-windows
+          path: |
+            artifacts/installer/*-setup.exe
+            artifacts/installer/SHA256SUMS.txt
+          retention-days: 7
+          if-no-files-found: error
+
+  linux:
+    needs: guarda
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+
+      - name: Build
+        run: bash scripts/build_linux.sh
+
+      - name: Dependências do smoke test
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            xvfb libgtk-3-0t64 libepoxy0 libsecret-1-0 \
+            libgl1 libegl1 libgles2 libgl1-mesa-dri
+
+      - name: Smoke test
+        env:
+          # Runner sem FUSE nem GPU: extrai o AppImage e usa GL por software.
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+          LIBGL_ALWAYS_SOFTWARE: "1"
+        run: |
+          image="$(find artifacts/linux/dist -name '*.AppImage' | head -n 1)"
+          [ -n "$image" ] || { echo "::error::AppImage não encontrado."; exit 1; }
+          chmod +x "$image"
+          log="$RUNNER_TEMP/app.log"
+
+          Xvfb :99 -screen 0 1280x800x24 >/dev/null 2>&1 &
+          xvfb=$!
+          export DISPLAY=:99
+          sleep 2
+
+          "$image" >"$log" 2>&1 &
+          app=$!
+          # O app só está de pé quando o cliente Flet (extraído na primeira
+          # execução em ~/.flet/client) sobe; import quebrado nunca chega lá.
+          client=0
+          for _ in $(seq 1 90); do
+            kill -0 "$app" 2>/dev/null || break
+            if pgrep -x flet >/dev/null; then client=1; break; fi
+            sleep 1
+          done
+          [ "$client" = 1 ] && sleep 10
+          alive=0
+          if kill -0 "$app" 2>/dev/null && pgrep -x flet >/dev/null; then alive=1; fi
+
+          echo "== log =="; cat "$log"
+          pkill -x flet || true
+          kill "$app" 2>/dev/null || true
+          kill "$xvfb" 2>/dev/null || true
+
+          [ "$alive" = 1 ] || { echo "::error::O app não ficou de pé (cliente Flet: $client)."; exit 1; }
+          if grep -q Traceback "$log"; then echo "::error::O app registrou Traceback."; exit 1; fi
+          echo "Smoke test ok: app e cliente Flet vivos."
+
+      - name: Versão
+        id: versao
+        run: echo "v=$(uv version --short | tr -d '[:space:]')" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: xl_Utils-${{ steps.versao.outputs.v }}-linux
+          path: |
+            artifacts/linux/dist/*.AppImage
+            artifacts/linux/dist/SHA256SUMS.txt
+          retention-days: 7
+          if-no-files-found: error
