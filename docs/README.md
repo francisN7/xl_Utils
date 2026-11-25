@@ -30,7 +30,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S19-remover-vinculos.md`](sessions/S19-remover-vinculos.md) |
+| ler a spec da próxima sessão | [`sessions/S20-api-2-leitor.md`](sessions/S20-api-2-leitor.md) |
 
 ## Por seção (atalho)
 
@@ -62,9 +62,9 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que a execução sai da UI thread | `adr/0011-execucao-fora-da-ui.md` | 35 |
 | por que CNJ sujo é extraído sem validar o dígito | `adr/0012-cnj-texto-sujo.md` | 35 |
 | por que existe tema claro e preferência salva | `adr/0013-tema-claro-e-preferencia.md` | 40 |
-| por que a vinculação compara valor bruto | `adr/0014-regra-de-vinculacao.md` | 45 |
+| por que a vinculação comparava valor bruto (substituída) | `adr/0014-regra-de-vinculacao.md` | 45 |
 | por que a config viaja no pacote | `adr/0015-config-empacotada.md` | 40 |
-| por que os fluxos da vinculação vêm dos anexos | `adr/0016-fluxos-e-opcoes-da-vinculacao.md` | 45 |
+| por que os fluxos da vinculação vinham dos anexos (substituída) | `adr/0016-fluxos-e-opcoes-da-vinculacao.md` | 45 |
 | por que a tela cheia é overlay no conteúdo | `adr/0017-tela-cheia-do-quadro.md` | 35 |
 | por que o Drive usa OAuth, DPAPI e contas separadas | `adr/0018-drive-autenticacao.md` | 55 |
 | por que o site só publica quando o HTML muda | `adr/0019-publicacao-do-site.md` | 45 |
@@ -74,6 +74,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que plugins usam `.tar.xz` e mesmo processo | `adr/0023-contrato-de-plugins.md` | 120 |
 | por que o plugin só é importado ao executar | `adr/0024-carregamento-sob-demanda.md` | 45 |
 | por que o seletor do Drive é Flet puro e paginado | `adr/0025-seletor-de-arquivos.md` | 115 |
+| por que a vinculação saiu do app | `adr/0027-vinculacao-vira-plugin.md` | 45 |
 
 ## Regras do mapa
 

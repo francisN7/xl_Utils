@@ -13,12 +13,6 @@ from xl_utils.core.io import list_sheets
 from xl_utils.core.mime import FormatCheck, check_format
 from xl_utils.core.save import SaveError, SaveItem, save_chosen, save_to_output
 from xl_utils.core.tools.all_str import WorkbookReadError
-from xl_utils.core.tools.link import (
-    AlreadyProcessedError,
-    ConfigError,
-    InvalidCnjError,
-    MissingColumnsError,
-)
 from xl_utils.shared import drive_auth, drive_cache
 from xl_utils.shared.accounts import Account
 from xl_utils.shared.drive import FolderPermissionError
@@ -41,8 +35,6 @@ RunHandler = Callable[
     [ToolState, ResultPanel, ProgressReporter | NullReporter, CancelToken],
     None,
 ]
-
-PreRun = Callable[[ToolState], str | None]
 
 ReadyCheck = Callable[[ToolState, Mapping[str, Path | None]], bool]
 
@@ -107,20 +99,17 @@ class ToolLayout:
         inputs: Sequence[str] | None = None,
         ready: ReadyCheck | None = None,
         hint: Hint | None = None,
-        pre_run: PreRun | None = None,
         run_handler: RunHandler | None = None,
         drive: DriveSession | None = None,
     ) -> None:
         self.state = ToolState()
         self._title = title
         self._run_handler = run_handler
-        self._pre_run = pre_run
         self._ready_check = ready
         self._hint = hint
         self._drive = drive
         self._default_all_sheets = default_all_sheets
         self._input_labels = tuple(inputs or ())
-        self._pre_checking = False
         self._input_files: dict[str, Path | None] = {
             label: None for label in self._input_labels
         }
@@ -353,7 +342,6 @@ class ToolLayout:
         self.state.inputs = {
             name: path for name, path in self._input_files.items() if path is not None
         }
-        self.state.options.pop("reprocess", None)
         self._check_formats()
         self.result.set_idle()
         self._update_summary()
@@ -471,7 +459,7 @@ class ToolLayout:
             self._options_refresh()
 
     def _run(self, _event=None) -> None:
-        if self._running or self._pre_checking:
+        if self._running:
             return
         if self._sheet_loading:
             self.result.set_info(
@@ -490,11 +478,6 @@ class ToolLayout:
                 "A lógica será conectada na sessão desta ferramenta.",
             )
             return
-        if self._pre_run is not None and not self.state.options.get("reprocess"):
-            page = self._page()
-            if page is not None and hasattr(page, "run_task"):
-                self._start_preflight(checks)
-                return
         self._start_run(checks)
 
     def _start_run(self, checks: list[FormatCheck]) -> None:
@@ -506,79 +489,6 @@ class ToolLayout:
             self._execute_sync()
         else:
             page.run_task(self._execute_async)
-
-    def _start_preflight(self, checks: list[FormatCheck]) -> None:
-        """Confere a planilha fora do loop antes de perguntar qualquer coisa."""
-        files = tuple(self.state.files)
-        self._pre_checking = True
-        self._run_button.disabled = True
-        self._summary.value = "Conferindo a planilha..."
-        self._refresh()
-        page = self._page()
-        if page is None:
-            self._pre_checking = False
-            self._start_run(checks)
-            return
-        page.run_task(self._preflight_async, checks, files)
-
-    async def _preflight_async(
-        self,
-        checks: list[FormatCheck],
-        files: tuple[Path, ...],
-    ) -> None:
-        try:
-            warning = await asyncio.to_thread(self._pre_run, self.state)
-        except Exception:  # noqa: BLE001 - a execução real mostra o erro
-            warning = None
-        self._pre_checking = False
-        if tuple(self.state.files) != files:
-            self._update_summary()
-            self._run_button.disabled = not self._ready()
-            self._refresh()
-            return
-        if warning:
-            self._ask_confirmation(warning, checks)
-        else:
-            self._start_run(checks)
-
-    def _ask_confirmation(self, message: str, checks: list[FormatCheck]) -> None:
-        """Mostra o aviso de reexecução e só continua depois do aceite."""
-        page = self._page()
-        if page is None:
-            self._start_run(checks)
-            return
-
-        def close(_event=None) -> None:
-            page.pop_dialog()
-            self._update_summary()
-            self._run_button.disabled = not self._ready()
-            self._refresh()
-
-        def confirm(_event=None) -> None:
-            page.pop_dialog()
-            self.state.options["reprocess"] = True
-            self._start_run(checks)
-
-        def dismissed(_event=None) -> None:
-            if self.state.running:
-                return
-            self._update_summary()
-            self._run_button.disabled = not self._ready()
-            self._refresh()
-
-        page.show_dialog(
-            ft.AlertDialog(
-                modal=True,
-                title=ft.Text("Planilha já processada"),
-                content=ft.Text(message),
-                actions=[
-                    ft.TextButton("Cancelar", on_click=close),
-                    ft.FilledButton("Continuar mesmo assim", on_click=confirm),
-                ],
-                actions_alignment=ft.MainAxisAlignment.END,
-                on_dismiss=dismissed,
-            )
-        )
 
     def _begin(self, checks: list[FormatCheck]) -> None:
         """Prepara o estado e o painel antes de entregar o trabalho à thread."""
@@ -679,18 +589,6 @@ class ToolLayout:
         except WorkbookReadError as error:
             failure = error
             self._fail(error, "Não foi possível ler a planilha")
-        except AlreadyProcessedError as error:
-            failure = error
-            self._fail(error, "Planilha já processada")
-        except ConfigError as error:
-            failure = error
-            self._fail(error, "Configuração de cabeçalhos inválida")
-        except InvalidCnjError as error:
-            failure = error
-            self._fail(error, "CNJ fora do padrão")
-        except MissingColumnsError as error:
-            failure = error
-            self._fail(error, "Colunas padrão ausentes")
         except ValueError as error:
             failure = error
             self._fail(error, "Confira a seleção")

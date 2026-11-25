@@ -61,10 +61,6 @@ formatos. Para criar uma amostra local em `samples/` (fora do Git):
 uv run python scripts/make_fixture.py
 ```
 
-`tests/test_link.py` usa cabeçalhos fictícios e não depende dos rótulos reais;
-`tests/test_configs.py` é quem confere o `headers.json` empacotado e o override
-temporário em `%LOCALAPPDATA%`.
-
 ## Drive sem credenciais
 
 `tests/test_drive_flow.py` roda o fluxo de navegador de ponta a ponta contra um

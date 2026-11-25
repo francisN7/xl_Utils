@@ -1,6 +1,6 @@
 # ADR 0015 — Config empacotada e estado por máquina
 
-- **Status:** aceita
+- **Status:** aceita, com adendo (S19)
 - **Data:** 2026-11-06
 
 ## Contexto
@@ -53,3 +53,9 @@ Git nem para o instalador.
 - **Variável de ambiente por máquina:** mais uma coisa para configurar e
   documentar; o override em `%LOCALAPPDATA%` já resolve.
 - **Guardar token no repositório:** proibido por segurança; o repo é público.
+
+## Adendo — S19 (2026-11-25)
+
+O `headers.json` e o override por máquina saíram com a vinculação (ADR 0027).
+O padrão segue valendo para `configs/drive_client.json`: o modelo público viaja
+no pacote e o cliente real fica por máquina.

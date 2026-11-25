@@ -8,7 +8,7 @@ responde:** regras de negócio (ver `architecture.md`) nem o porquê (ver
 
 Sidebar fixa de 260 px + área de conteúdo. A sidebar é um `Column` próprio, não
 um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
-forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas
+forma consistente. Ela tem o logo, o item **Início** e as quatro ferramentas
 nativas; **Plugins** fica fixo no rodapé, acima de `uv · Python 3.15` e do
 botão de tema, com o mesmo realce de selecionado. Os itens são identificados
 pelo `id` da página (`registry.TOOLS` e `registry.FOOTER_PAGES`), não pela
@@ -36,7 +36,7 @@ O conteúdo abre em uma das duas formas:
 │ CNJ      │ 1. Entrada        │ 3. Resultado           │
 │ Recortar │    dropzone       │    status + caminho    │
 │ Mesclar  │ 2. Opções         │    log + prévia        │
-│ Vínculos │                   │                        │
+│          │                   │                        │
 │          │                   │                        │
 │          ├───────────────────┴────────────────────────┤
 │ Plugins  │ [resumo]                    [Executar]     │
@@ -82,9 +82,8 @@ O Flet 1.0 não expõe arrastar e soltar arquivos do sistema operacional. O
 dropzone é uma área clicável que abre o `FilePicker` nativo; o texto "clique
 para selecionar" substitui a promessa de drop. As ferramentas em lote aceitam
 vários arquivos: depois do primeiro, o dropzone vira “Adicionar outro arquivo” e
-a lista permite remover cada um. A vinculação é a exceção: tem quatro entradas
-rotuladas (AGENDA, PROCESSOS, FINANCEIRO e CLIENTES), uma planilha em cada, sem
-lista acumulada e sem seletor de abas — a aba é achada pelo bloco padrão.
+a lista permite remover cada um. Um plugin pode declarar entradas rotuladas
+(`[ui].inputs` no manifesto): uma planilha em cada rótulo, sem lista acumulada.
 
 Com uma conta do Drive conectada, um botão quadrado com o ícone do Drive aparece
 à direita da dropzone, na mesma linha e sem texto. Uma conta abre o Picker
@@ -149,28 +148,6 @@ A saída `Merge.xlsx` mostra `ORIGEM` (arquivo sem extensão e aba) e
 `LINHA_ORIGEM` (posição da linha no resultado, com zeros à esquerda) como
 primeiras colunas.
 
-### Vinculação
-
-A ferramenta **Verificar Vínculos** usa quatro entradas rotuladas — AGENDA,
-PROCESSOS, FINANCEIRO e CLIENTES — e não mostra o seletor de abas: cada arquivo
-pode ter várias abas e a ferramenta escolhe a primeira que contém o bloco
-padrão. Não há checkbox de fluxo: a presença do arquivo define o que roda.
-AGENDA exige PROCESSOS; FINANCEIRO exige PROCESSOS ou CLIENTES; pelo menos um
-dos dois fluxos precisa estar anexado. Com AGENDA sem PROCESSOS, o botão fica
-bloqueado. O resumo diz o que falta.
-
-O card “2. Opções” tem três caixas, todas desligadas e habilitadas conforme os
-arquivos: “Nome sem vínculo na descrição” (FINANCEIRO), “Manter apenas um campo
-vinculante — AGENDA” e “Manter apenas um campo vinculante — FINANCEIRO” (esta
-só com PROCESSOS). A prévia combina as abas transformadas dos fluxos
-presentes; as demais abas continuam no arquivo salvo.
-
-Se a coluna de protocolo da AGENDA já contém `MIGRAÇÃO`, antes de executar
-aparece um `AlertDialog` com “Cancelar” e “Continuar mesmo assim”. Continuar
-recalcula `VINCULA?`, limpa a sentinela nas linhas que vinculam e não
-acrescenta o protocolo de novo à descrição. O aviso só volta se o arquivo for
-trocado.
-
 ## Início
 
 O hub mostra um cartão por ferramenta nativa (Plugins fica só no rodapé da
@@ -181,8 +158,7 @@ reticências quando falta espaço — nunca quebra no meio da palavra; a descri�
 fica em até duas linhas, também com `…`, e mostra o texto completo no tooltip.
 O cartão recorta o conteúdo, então o atalho permanece dentro da área mesmo em
 largura estreita. Novas ferramentas entram da esquerda para a direita; a próxima
-linha também começa à esquerda. O cartão de Verificar Vínculos lista as quatro
-planilhas e avisa que a presença do arquivo define o fluxo.
+linha também começa à esquerda. As quatro nativas cabem numa linha no desktop.
 
 ## Drive
 

@@ -105,7 +105,7 @@ def test_labeled_inputs_require_all_entries(
     agenda.write_bytes(xlsx_file.read_bytes())
     processos.write_bytes(xlsx_file.read_bytes())
 
-    layout = ToolLayout("Vinculação", "Teste", inputs=("AGENDA", "PROCESSOS"))
+    layout = ToolLayout("Entradas nomeadas", "Teste", inputs=("AGENDA", "PROCESSOS"))
     layout._file_inputs["AGENDA"].set_files([agenda])
 
     assert layout._run_button.disabled

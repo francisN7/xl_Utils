@@ -20,13 +20,10 @@ são necessários na máquina de destino.
 | Extrair CNJs | Encontra e padroniza numerações CNJ em uma ou mais planilhas | pronta |
 | Recortar Planilha | Divide planilhas em arquivos por quantidade de linhas | pronta |
 | Mesclar Planilhas | Concatena as abas selecionadas com a origem de cada linha | pronta |
-| Verificar Vínculos | Confere os vínculos entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES | pronta |
 
-> **Escopo pessoal:** algumas ferramentas nasceram de fluxos de trabalho
-> específicos e não fazem sentido para qualquer usuário. Verificar Vínculos é o
-> exemplo mais claro: ele espera planilhas AGENDA, PROCESSOS, FINANCEIRO e
-> CLIENTES com cabeçalhos próprios. O app é um kit pessoal, não um produto
-> genérico.
+> **Plugins:** ferramentas de fluxo específico, que não servem a qualquer
+> usuário, ficam fora do app e entram como plugins locais pela área **Plugins**
+> (rodapé da barra lateral). O contrato está em [`docs/plugins/`](docs/plugins/README.md).
 
 ## Requisitos
 
@@ -59,9 +56,6 @@ xl-utils
 1. Abra o app, escolha uma ferramenta e anexe uma planilha pelo seletor nativo.
 2. Confira as abas marcadas e ajuste as opções, quando existirem.
 3. Execute, veja a prévia e só então salve em `output/` ou na pasta escolhida.
-4. Em **Verificar Vínculos**, anexe AGENDA e PROCESSOS (ou FINANCEIRO com
-   PROCESSOS/CLIENTES); a ferramenta escolhe a aba pelo bloco de cabeçalhos
-   padrão e gera uma saída por fluxo.
 
 ## Problemas comuns
 
@@ -89,7 +83,7 @@ src/xl_utils/
   core/        regras puras (io, mime, paths, text, tools)
   controllers/ orquestração entre UI e core
   ui/          páginas, componentes e tema
-  configs/     headers.json empacotado (padrão)
+  configs/     modelo do cliente OAuth do Drive (padrão)
   shared/      log, config, progresso e abertura de pasta
 tests/         testes do core e da UI (headless)
 docs/          documentação e memória entre sessões

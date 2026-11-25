@@ -1,8 +1,8 @@
 # AGENTS.md — xl_Utils
 
-Aplicativo desktop em Flet que reúne cinco utilitários de planilha:
-tratamento de texto (inclui remoção de emojis), extração de CNJ, recorte,
-mesclagem e vinculação entre AGENDA, FINANCEIRO, PROCESSOS e CLIENTES.
+Aplicativo desktop em Flet que reúne quatro utilitários de planilha:
+tratamento de texto (inclui remoção de emojis), extração de CNJ, recorte e
+mesclagem; ferramentas específicas entram como plugins (`xl_U-Plugins`).
 
 **Stack:** Python 3.15 · uv · Flet 1.x · pandas 3.x · pytest · ruff
 
@@ -52,7 +52,7 @@ src/xl_utils/
   ui/pages/         Início + uma página por ferramenta
   ui/components/    entrada, resultado, prévia, layout e menu do Drive
   ui/theme.py       tokens e temas (Dracula/Alucard)
-  configs/          headers.json empacotado (padrão, não estado)
+  configs/          drive_client.json modelo (padrão, não estado)
   shared/           log, config, contas, Drive e plugins/
 tests/              testes do core e da UI (headless)
 scripts/            automação de docs

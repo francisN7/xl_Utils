@@ -30,15 +30,12 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 | `core/tools/cnj.py` | regra do CNJ | `extract_cnjs`, `normalize_cnj`, `summarize_cnjs` |
 | `core/tools/cut.py` | regra do recorte | `split_frame`, `split_workbook` |
 | `core/tools/merge.py` | regra do merge | `ColumnRef`, `ColumnGroup`, `merge_sheets`, `move_column` |
-| `core/tools/link.py` | regra da vinculação | `LinkConfig`, `SheetSpec`, `link_agenda`, `find_target_sheet` |
 | `core/plugins/manifest.py` | manifesto de plugin | `parse_manifest`, `PluginManifest`, `OptionSpec` |
 | `core/plugins/package.py` | pacote `.tar.xz` | `inspect_package`, `extract_package`, `build_package`, `verify_sidecar` |
 | `core/plugins/page.py` | página declarativa | `PageSpec`, `validate`, `coerce`, `describe_permissions` |
 
-Erros tipados: `WorkbookReadError` (leitura), `SaveError` (gravação),
-`ConfigError`, `InvalidCnjError`, `MissingColumnsError` e
-`AlreadyProcessedError` (vinculação), além de `ValueError` para seleção ou
-regra inválida. O contrato de plugins usa `PluginError`, `ManifestError`,
+Erros tipados: `WorkbookReadError` (leitura) e `SaveError` (gravação), além
+de `ValueError` para seleção ou regra inválida. O contrato de plugins usa `PluginError`, `ManifestError`,
 `PackageError` e `InstallError`, com códigos estáveis.
 
 ## Plugins
@@ -232,7 +229,6 @@ os chips de abas e “Executar” ficam desabilitados até `_finish`. Ver ADR 00
 | Extrair CNJs | `core/tools/cnj.py` | pronta |
 | Recortar planilha | `core/tools/cut.py` | pronta |
 | Mesclar planilhas | `core/tools/merge.py` | pronta |
-| Verificar vínculos | `core/tools/link.py` | pronta: quatro planilhas em dois fluxos |
 
 ## Extração de CNJ
 
@@ -246,40 +242,6 @@ padronizado mesmo inválido. `normalize_cnj` devolve sempre o formato pontuado;
 `(achados, únicos ordenados)`. `collect_cnjs` e `count_cnjs` continuam como
 atalhos. `controllers/cnj.py` prepara `SaveItem` com `<nome> lista cnj.xlsx` na
 coluna `PROCESSOS` e registra encontrados, duplicados e únicos no log.
-
-## Vinculação
-
-`core/tools/link.py` recebe as abas das planilhas e o `LinkConfig` carregado de
-`headers.json`. `column_map` casa o cabeçalho com `header_key`, que dobra caixa
-e acento e remove todos os espaços; os valores das células continuam brutos.
-`find_target_sheet` escolhe a primeira aba que tem todos os campos exigidos e,
-se nenhuma tiver, lista o que faltou por aba.
-
-A AGENDA usa `link_agenda`: valida o CNJ, compara CNJ → PASTA → PROTOCOLO e
-grava `VINCULA?`. Sem vínculo, o protocolo vira `<cabeçalho real>: <valor>` no
-fim da descrição e o campo recebe `MIGRAÇÃO`. A sentinela nunca entra na
-comparação; em linha vinculada ela é limpa. A reexecução exige
-`allow_migrated` e não repete a linha.
-
-O FINANCEIRO usa `link_financeiro`: com PROCESSOS, grava `VINCULA?` na mesma
-prioridade e `VINCULA (POR NOME)?` (SIM/NÃO) com a união dos nomes de
-PROCESSOS (split cru por `;`) e de CLIENTES. Só com CLIENTES, grava apenas a
-coluna de nome e não toca em `VINCULA?`. As duas colunas entram depois do bloco
-padrão e antes das extras, na ordem `VINCULA?` e `VINCULA (POR NOME)?`; uma
-coluna existente, mesmo com grafia sem espaço, é sobrescrita no lugar.
-
-As opções `single_field` (AGENDA e/ou FINANCEIRO) mantêm o campo vencedor e
-movem os outros dois para o fim da descrição como `<cabeçalho real>: <valor>`,
-esvaziando as colunas; `MIGRAÇÃO` não é movida. `name_in_description` prefixa
-`NOME DO CLIENTE: <valor>` no FINANCEIRO quando o nome não vincula. Os fluxos
-são independentes: AGENDA exige PROCESSOS; FINANCEIRO exige PROCESSOS ou
-CLIENTES; cada um gera um `SaveItem`. As demais abas são preservadas.
-
-`shared/configs.py` lê `src/xl_utils/configs/headers.json` por
-`importlib.resources` e, se existir, o override em
-`%LOCALAPPDATA%/xl_utils/headers.json` (ADR 0015). O JSON traz as quatro
-planilhas padrão, os campos usados, o bloco padrão na ordem e o separador de
-descrição (quebra de linha na AGENDA, `" | "` no FINANCEIRO).
 
 ## Drive
 
@@ -378,11 +340,6 @@ livre, cancelamento, `SaveError` e recusa de arquivo no lote. O `.xls` é uma
 fixture binária mínima em `tests/fixtures/minimo.xls`, gerada uma vez com `xlwt`
 e **sem** adicionar a dependência ao projeto.
 
-`tests/test_link.py` cobre prioridade, comparação bruta, CNJ inválido,
-`MIGRAÇÃO`, reexecução, colunas e abas preservadas, com cabeçalhos fictícios.
-`tests/test_configs.py` carrega o JSON empacotado e um override temporário. O
-end-to-end com arquivo real continua no smoke manual.
-
 ## Limites conhecidos
 
 - Datas do Excel chegam como texto ISO (`2024-01-02 00:00:00`), não no formato
@@ -403,7 +360,7 @@ end-to-end com arquivo real continua no smoke manual.
   texto.
 - [ADR 0011](../adr/0011-execucao-fora-da-ui.md) — execução fora da UI thread e
   progresso por arquivo.
-- [ADR 0014](../adr/0014-regra-de-vinculacao.md) — vinculação por valor bruto e
-  `MIGRAÇÃO`.
 - [ADR 0015](../adr/0015-config-empacotada.md) — config empacotada e estado por
   máquina.
+- [ADR 0027](../adr/0027-vinculacao-vira-plugin.md) — Verificar Vínculos sai do
+  app e vira plugin privado.

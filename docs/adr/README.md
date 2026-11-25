@@ -18,9 +18,9 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0011](0011-execucao-fora-da-ui.md) | Execução fora da UI thread e progresso por arquivo | Aceita |
 | [0012](0012-cnj-texto-sujo.md) | CNJ em texto sujo sem validar o dígito verificador | Aceita |
 | [0013](0013-tema-claro-e-preferencia.md) | Tema claro opcional e preferência salva | Aceita |
-| [0014](0014-regra-de-vinculacao.md) | Vinculação por valor bruto e `MIGRAÇÃO` | Aceita |
-| [0015](0015-config-empacotada.md) | Config empacotada e estado por máquina | Aceita |
-| [0016](0016-fluxos-e-opcoes-da-vinculacao.md) | Fluxos independentes e opções da vinculação | Aceita |
+| [0014](0014-regra-de-vinculacao.md) | Vinculação por valor bruto e `MIGRAÇÃO` | Substituída pela 0027 |
+| [0015](0015-config-empacotada.md) | Config empacotada e estado por máquina | Aceita, com adendo |
+| [0016](0016-fluxos-e-opcoes-da-vinculacao.md) | Fluxos independentes e opções da vinculação | Substituída pela 0027 |
 | [0017](0017-tela-cheia-do-quadro.md) | Tela cheia por overlay no conteúdo do merge | Aceita |
 | [0018](0018-drive-autenticacao.md) | OAuth do Drive, contas e tokens | Aceita |
 | [0019](0019-publicacao-do-site.md) | Publicação do site por workflow com filtro | Aceita |
@@ -31,6 +31,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0024](0024-carregamento-sob-demanda.md) | Plugin importado só na primeira execução | Aceita |
 | [0025](0025-seletor-de-arquivos.md) | Seletor do Drive em Flet; local no nativo | Aceita; seletor do Drive substituído pela 0026 |
 | [0026](0026-drive-sem-consentimento.md) | Picker JS no navegador com o token do login | Aceita |
+| [0027](0027-vinculacao-vira-plugin.md) | Verificar Vínculos sai do app e vira plugin privado | Aceita |
 
 ## Como ler
 

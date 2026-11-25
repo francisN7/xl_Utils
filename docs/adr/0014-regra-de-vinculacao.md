@@ -1,6 +1,6 @@
 # ADR 0014 — Vinculação por valor bruto
 
-- **Status:** aceita
+- **Status:** substituída pela [ADR 0027](0027-vinculacao-vira-plugin.md) — ferramenta removida do app na S19
 - **Data:** 2026-11-06
 
 ## Contexto

@@ -56,10 +56,8 @@ entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 ### 2. Ciclo de uma ferramenta — `ui/components/tool_layout.py`
 
 `_run` é o coração: valida o `ToolState`, chama `_check_formats`, bloqueia
-formato não identificado e entrega o handler a `_execute_async`. Quando a página
-define `pre_run` (vinculação), ele roda antes e pode abrir o diálogo de
-reexecução. Com página, o trabalho vai para `asyncio.to_thread`; sem página,
-roda no próprio loop. Os
+formato não identificado e entrega o handler a `_execute_async`. Com página, o
+trabalho vai para `asyncio.to_thread`; sem página, roda no próprio loop. Os
 marcos de `shared/progress.py` e as etapas dos controllers voltam por uma fila
 e atualizam barra, texto e log no loop. Enquanto um arquivo roda, a barra fica
 indeterminada; entre arquivos, ela avança. O botão vira “Cancelar” durante a
@@ -120,11 +118,6 @@ célula vazia vira `""`. `read_headers` lê só o necessário para a UI.
 - `merge.py`: `ColumnRef`/`ColumnGroup`, `move_column` e `merge_sheets`; o
   resultado abre com `ORIGEM` (`stem - aba`) e `LINHA_ORIGEM` (linha de dados
   numerada no total, com zeros à esquerda).
-- `link.py`: `LinkConfig`/`SheetSpec`, `find_target_sheet`, `link_agenda` e
-  `link_financeiro`; compara CNJ/PASTA/PROTOCOLO/nome brutos, grava `VINCULA?`
-  e `VINCULA (POR NOME)?`, trata `MIGRAÇÃO` como sentinela e aplica as opções
-  de nome na descrição e campo único. `shared/configs.py` carrega o
-  `headers.json` empacotado ou o override local.
 
 **Observe:** nenhum módulo daqui importa Flet ou abre diálogo.
 
@@ -181,14 +174,11 @@ nada é sobrescrito.
 | `test_save.py` | nada é gravado antes da escolha e o lote usa pasta |
 | `test_format_check.py` | conteúdo vence o nome e `.xlsm` não é divergência |
 | `test_progress.py` | contagem, log ao vivo, token e cancelamento entre arquivos |
-| `test_link.py` | prioridade, valor bruto, CNJ, FINANCEIRO, opções, `MIGRAÇÃO` e log por etapa |
-| `test_link_page.py` | fluxos exigidos e opções habilitadas por arquivo |
 | `test_layout.py` | o layout alterna cartões e preserva o estado do quadro |
 | `test_merge_page.py` | a tela cheia preserva grupos, seleção e ordem |
 | `test_theme.py` | contraste e troca de tema sem perder a estrutura |
 | `test_settings.py` | a preferência de tema persiste e cai no escuro |
 | `test_ui_state.py` | trocar o arquivo reseta o resultado sem perder opções |
-| `test_configs.py` | JSON empacotado e override por `%LOCALAPPDATA%` |
 | `test_integration.py` | as ferramentas de lote rodam nos quatro formatos |
 | `test_drive_api.py` | metadados, download, export, multipart e erro de pasta |
 | `test_drive_pick.py` | Picker de arquivo e pasta, PKCE/`state` e cancelamento |
@@ -213,8 +203,6 @@ nada é sobrescrito.
 | mudar a tela de salvar | `ui/components/result_panel.py` + `core/save.py` |
 | mudar a gravação no Drive | `shared/drive.py` + `drive_pick.py` + `drive_store.py` + `ui/drive.py` + `tool_layout.py` |
 | mudar a regra do merge | `core/tools/merge.py` |
-| mudar a regra da vinculação | `core/tools/link.py` + `controllers/link.py` + `ui/pages/link.py` |
-| mudar um cabeçalho padrão | `src/xl_utils/configs/headers.json` (ou override local) |
 | mudar a regra do recorte | `core/tools/cut.py` + `controllers/cut.py` + `ui/pages/cut.py` |
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
 | mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |

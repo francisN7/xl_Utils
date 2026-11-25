@@ -8,7 +8,7 @@ from xl_utils.ui.components.account_label import (
     short_email,
 )
 from xl_utils.ui.pages.home import build_home
-from xl_utils.ui.pages.registry import TOOLS
+from xl_utils.ui.pages.registry import FOOTER_PAGES, TOOLS
 
 LONG_EMAIL = "francisco.almeida@escritorio-advocacia.com.br"
 
@@ -24,6 +24,12 @@ def _cards(control: ft.Control) -> list[ft.Container]:
     if content is not None:
         found.extend(_cards(content))
     return found
+
+
+def test_home_has_four_native_tools_and_plugins_only_in_footer() -> None:
+    assert [tool.id for tool in TOOLS] == ["all_str", "cnj", "cut", "merge"]
+    assert [page.id for page in FOOTER_PAGES] == ["plugins"]
+    assert len(_cards(build_home(lambda _tool_id: None))) == 4
 
 
 def test_home_cards_keep_title_description_and_shortcut_inside_narrow_width() -> None:

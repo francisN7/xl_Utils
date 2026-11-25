@@ -54,6 +54,14 @@ decisões nos ADRs.
   0022 substitui o 0020. O check de docs volta a validar os links das páginas de
   ciclo.
 
+### Removed
+
+- **Verificar Vínculos** saiu do app (ADR 0027): o Início e a sidebar ficam
+  com quatro ferramentas. A vinculação volta como plugin privado depois da
+  API 2 dos plugins.
+- O `headers.json` empacotado e o override em
+  `%LOCALAPPDATA%\xl_utils\headers.json`, que só serviam à vinculação.
+
 ## v0.3.0 — 2026-11-09
 
 ### Added
