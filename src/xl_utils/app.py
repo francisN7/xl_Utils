@@ -1,6 +1,8 @@
 """Shell do aplicativo: barra lateral, hub inicial e páginas de ferramenta."""
 
+import argparse
 import contextlib
+from collections.abc import Sequence
 
 import flet as ft
 
@@ -100,6 +102,26 @@ def main(page: ft.Page) -> None:
     show(HOME_ID)
 
 
-def run() -> None:
-    """Inicia o aplicativo desktop."""
-    ft.run(main)
+WEB_HOST = "127.0.0.1"
+WEB_PORT = 8550
+
+
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    """Lê as opções de linha de comando do app."""
+    parser = argparse.ArgumentParser(prog="xl-utils")
+    parser.add_argument(
+        "--web",
+        action="store_true",
+        help="Serve a interface no navegador (só para conferência visual).",
+    )
+    parser.add_argument("--port", type=int, default=WEB_PORT, help="Porta do modo web.")
+    return parser.parse_args(argv)
+
+
+def run(argv: Sequence[str] | None = None) -> None:
+    """Inicia o app desktop ou, com ``--web``, serve a mesma UI no navegador."""
+    args = parse_args(argv)
+    if args.web:
+        ft.run(main, view=ft.AppView.WEB_BROWSER, host=WEB_HOST, port=args.port)
+    else:
+        ft.run(main)

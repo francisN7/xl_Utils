@@ -76,7 +76,7 @@ docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
 
 | Ação | Comando |
 |---|---|
-| dev | `uv run xl-utils` |
+| dev | `uv run xl-utils` (`--web`: mesma UI no navegador, porta 8550) |
 | lint | `uv run ruff check src tests` |
 | format | `uv run ruff format src tests` |
 | test | `uv run pytest` |

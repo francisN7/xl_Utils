@@ -61,6 +61,16 @@ formatos. Para criar uma amostra local em `samples/` (fora do Git):
 uv run python scripts/make_fixture.py
 ```
 
+## Conferência visual pelo navegador
+
+`uv run xl-utils --web` serve a mesma interface em `http://127.0.0.1:8550`
+(`--port` troca a porta; `flet-web` é dependência de dev e não entra no exe).
+No Claude Code, a entrada `xl-utils-web` do `.claude/launch.json` abre essa
+rota no navegador do app, para capturar a tela sem a janela desktop. O Flet
+desenha num canvas: confira por captura, não pelo texto da página. Seletor
+nativo de arquivos, ícone da janela e login do Drive só existem no desktop.
+Trocar o tema por ali grava a preferência de verdade.
+
 ## Drive sem credenciais
 
 `tests/test_drive_flow.py` roda o fluxo de navegador de ponta a ponta contra um
