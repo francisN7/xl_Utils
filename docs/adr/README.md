@@ -29,7 +29,8 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0022](0022-ciclos-no-roadmap.md) | Ciclos fechados no roadmap, sem pasta `history` | Aceita |
 | [0023](0023-contrato-de-plugins.md) | Contrato de plugins e pacote `.tar.xz` | Aceita |
 | [0024](0024-carregamento-sob-demanda.md) | Plugin importado só na primeira execução | Aceita |
-| [0025](0025-seletor-de-arquivos.md) | Seletor do Drive em Flet; local no nativo | Aceita, com adendo |
+| [0025](0025-seletor-de-arquivos.md) | Seletor do Drive em Flet; local no nativo | Aceita; seletor do Drive substituído pela 0026 |
+| [0026](0026-drive-sem-consentimento.md) | Picker JS no navegador com o token do login | Aceita |
 
 ## Como ler
 

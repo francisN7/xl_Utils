@@ -11,7 +11,7 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 | Sessão | Entrega | Aceite | Estado |
 |---|---|---|---|
 | S15 | Spike em Flet puro com 25.000 itens; seletor interno restrito à rota do Drive (adendo do ADR 0025) | ADR 0025 aceito com medições; fluxo padrão intacto; ruff, pytest e docs verdes | [x] |
-| S16 | Drive sem consentimento repetido — investigação | — | [ ] |
+| S16 | Spike do Picker JS em `127.0.0.1` com o token do login; ADR 0026 escolhe esse caminho e descarta o seletor do Drive em Flet | ADR 0026 aceito com medições; fluxo atual intacto; spike fora do Git; ruff, pytest e docs verdes | [x] |
 | S17 | Ícone da sidebar e da janela | — | [ ] |
 | S18 | Plugins no rodapé da sidebar, fora do Início | — | [ ] |
 | S19 | Remover Verificar Vínculos e preparar o repo de plugins | — | [ ] |
@@ -23,15 +23,6 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21 → S22 →
 S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
 Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
-
-## S16 — próxima
-
-Investigar um pipeline de Drive que use o token do login para listar e escolher
-arquivos e pastas dentro do app, comparando consentimento único, verificação do
-Google, acesso mínimo, esforço e risco com o desenho atual (`drive.file` +
-Picker + concessão de pasta). Não trocar o escopo sem ADR. Ver a
-[spec](../sessions/S16-drive-sem-consentimento.md). A implementação do seletor
-do Drive (S24) depende desta decisão.
 
 ## S17–S23 — próximas
 
@@ -54,11 +45,17 @@ do Drive (S24) depende desta decisão.
 
 ## Backlog
 
-### Seletor do Drive (implementação)
+### Picker JS do Drive (implementação)
 
-O adendo do ADR 0025 restringe o seletor interno à rota do Drive; arquivo local
-continua no seletor nativo. A implementação depende do ADR 0026 (S16), fica para
-depois da 0.4.0 e está na [spec de backlog](../sessions/S24-seletor-do-drive.md).
+O ADR 0026 troca o Picker de desktop pelo Picker JavaScript no navegador, com o
+token do login: consentimento só no login, sem mudar `drive.file`. Fica para
+depois da 0.4.0, na [spec de backlog](../sessions/S24-seletor-do-drive.md).
+
+### Credenciais do Google no build
+
+O build não embute o cliente OAuth: quem recebe o instalador teria de importar
+o JSON. Embutir cliente, API key e número do projeto no build, sem commitar
+nada, antes de distribuir para terceiros (ADR 0026).
 
 ## Manutenção
 
@@ -99,3 +96,5 @@ depois da 0.4.0 e está na [spec de backlog](../sessions/S24-seletor-do-drive.md
 - Importar todos os plugins na abertura do app — ver ADR 0024.
 - Migrar a stack para PySide6 ou embutir webview só para ter seletor de arquivos
   — preterido no ADR 0025.
+- Seletor do Drive em Flet e escopo `drive`/`drive.readonly` — exigiriam escopo
+  restrito e verificação anual; ver ADR 0026.

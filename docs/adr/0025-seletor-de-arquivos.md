@@ -114,3 +114,10 @@ plano de substituí-lo. Isso corrige a leitura das seções acima:
 - A decisão de viabilidade da UI (Flet puro, paginação, tema) continua válida;
   o que muda é o dado que alimenta a lista.
 
+## Adendo — 2026-11-24 (S16)
+
+O ADR 0026 descarta o seletor do Drive em Flet: com `drive.file`, a Drive API
+lista 0 itens com o token do login, e listar o Drive exigiria escopo restrito.
+A escolha no Drive passa a ser o Picker JavaScript no navegador padrão. O que
+este ADR mediu sobre UI em Flet (paginação, tema, `asyncio.to_thread`) continua
+válido como referência, sem uso previsto.

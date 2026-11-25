@@ -83,11 +83,11 @@ direto; duas ou mais abrem um diálogo para escolher qual. O arquivo escolhido �
 baixado para o cache local com o nome real e entra na lista como qualquer
 arquivo do computador.
 
-Arquivo local continua sempre no seletor nativo do sistema operacional. O adendo
-do ADR 0025 restringe o seletor interno à rota do Drive: um seletor em Flet puro,
-dentro do tema, com navegação de pastas, busca, filtro e paginação, que substitui
-o Picker que abre o navegador. A listagem virá da Drive API, com o pipeline do
-ADR 0026; a implementação ainda não está no app e o Picker continua como fallback.
+Arquivo local continua sempre no seletor nativo do sistema operacional. No
+Drive, o ADR 0026 troca o Picker de desktop, que pede consentimento a cada
+escolha, pelo Picker JavaScript aberto no navegador com o token do login:
+consentimento só no login, abrindo no Meu Drive com pastas e filtro de
+planilhas. A troca é a S24; até lá o app usa o Picker de desktop.
 
 Cada arquivo da lista mostra o tamanho e, quando o conteúdo diverge da
 extensão, uma linha discreta com o tipo real (ex.: `conteúdo: .xlsx · nome:

@@ -316,6 +316,13 @@ da UI thread; `ToolLayout` mostra o diálogo de concessão quando a pasta ainda
 não foi autorizada e cai na raiz se o usuário recusar. Ver o adendo da S9c ao
 ADR 0018.
 
+Com `drive.file`, a Drive API só enxerga o que o app criou ou o usuário
+escolheu; listar o Drive com o token do login devolve 0 itens. Por isso não há
+seletor próprio: o ADR 0026 decide trocar `drive_pick.py` pelo Picker
+JavaScript, servido em `127.0.0.1` com nonce e aberto no navegador padrão com o
+token da conta (`setOAuthToken`), mais API key e número do projeto. Isso tira o
+`prompt=consent` de cada escolha sem mudar escopo. A troca é a S24.
+
 ## Recorte
 
 `core/tools/cut.py` divide cada aba de dois modos: blocos de N linhas

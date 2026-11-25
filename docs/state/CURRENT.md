@@ -4,47 +4,47 @@
 
 ## Sessão
 
-- **Última concluída:** S15 — seletor de arquivos (investigação)
-- **Próxima:** S16 — Drive sem consentimento repetido (investigação)
+- **Última concluída:** S16 — Drive sem consentimento repetido (investigação)
+- **Próxima:** S17 — ícone da sidebar e da janela
+  (`docs/sessions/S17-icone-da-sidebar.md`)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `a17bdf1` — S15: restringe seletor interno a rota do Drive
-- **Decisões:** ADR 0025 — seletor em Flet puro, paginado (300), listagem fora
-  da UI thread, nativo/Picker como fallback; demais nos ADRs 0014–0024.
+- **Retorno:** `e7fa4ad` — docs: adapta ao padrao novo das skills de sessao
+- **Decisões:** ADR 0026 — Picker JS no navegador com o token do login,
+  `drive.file`, seletor do Drive em Flet descartado; demais nos ADRs 0014–0025.
 
 ## Pronto
 
-- S15: spike em Flet puro com 25.000 arquivos; provou a viabilidade da UI. O
-  adendo do ADR 0025 restringe o seletor interno à rota do Drive — arquivo local
-  continua no nativo. Spec em `docs/sessions/S24-seletor-do-drive.md`.
-- S14: área Plugins (válidos/inválidos, instalar, remover, abrir pasta),
-  carregamento sob demanda, página declarativa, CLI e guia do autor. 595 testes.
-- S13: ADR 0023; `core/plugins/` e `shared/plugins/`; instalação atômica e CLI.
+- S16: spike do Picker JS em `127.0.0.1` com `setOAuthToken`; consentimento só
+  no login, arquivo escolhido acessível ao token do login, `drive.file` lista 0
+  itens sem Picker. ADR 0026; S24 reescrita para o Picker JS.
+- S15: spike em Flet puro com 25.000 arquivos; ADR 0025 (com adendos).
+- S14: área Plugins, carregamento sob demanda, CLI e guia do autor.
 - S12: `v0.3.0`, build Windows e instalador.
 
 ## Próximo passo
 
-Ler `docs/sessions/S16-drive-sem-consentimento.md`: inventariar o fluxo atual
-(`drive.file` + Picker + concessão de pasta) e medir um spike de listagem com o
-token do login, sem trocar escopo. A decisão vira ADR 0026. O seletor do Drive
-(S24) fica para depois da 0.4.0 e depende dessa decisão; a release é a S23.
+Ler `docs/sessions/S17-icone-da-sidebar.md`: trocar o “x” de `Sidebar._logo`
+por `assets/icon.png`, ícone da janela com `assets/icon.ico` e `assets/` no
+build. Depois S18–S23 até a release 0.4.0; a S24 (Picker JS) fica no backlog.
 
 ## Arquivos-chave
 
-- `docs/adr/0025-seletor-de-arquivos.md`, `docs/sessions/S16-*.md`
-- `docs/reference/ui.md` → Entrada de arquivos
-- `src/xl_utils/shared/drive.py`, `drive_auth.py`, `drive_pick.py`,
-  `drive_store.py`, `ui/drive.py`, `ui/components/file_input.py`
-- `artifacts/spike_selector/` (ignorado; spike descartável e captura local)
+- `src/xl_utils/ui/components/sidebar.py`, `src/xl_utils/app.py`, `assets/`
+- `scripts/build_windows.ps1`, `docs/reference/ui.md` → Layout
+- `docs/adr/0026-drive-sem-consentimento.md`, `docs/sessions/S24-*.md`
+- `artifacts/spike_drive/` (ignorado; spike do Picker JS)
 
 ## Armadilhas
 
-- Flet não virtualiza a lista no processo Python: 5.000 `ListTile` custam
-  ~10 MB e ~500 ms; paginar em 300 e listar em `asyncio.to_thread`.
-- `os.scandir` é ~2,7× mais rápido que `Path.iterdir` + `is_dir` (46 ms vs
-  125 ms em 10.000 itens); usar `DirEntry.is_dir`.
+- `drive.file` só enxerga o que o app criou ou o Picker concedeu; listar o
+  Drive com o token do login devolve 0 itens.
+- Picker JS com token inválido mostra 403 e não chama o callback: precisa de
+  tempo-limite.
+- O build não embute o cliente OAuth nem a API key (backlog); no Linux o
+  `drive_client.json` fica em `~/.xl_utils/` e o DPAPI não existe.
 - Largura fixa de diálogo corta em 125% de escala; calcular a partir de
   `page.width` e testar 100/125/150%.
-- O spike tem caminho pessoal na captura; não commitar `artifacts/`.
+- Spikes e capturas ficam em `artifacts/`; nunca commitar.
 - Abrir a área de plugins não importa `lib/`; só o primeiro Executar importa.
 - Plugin em processo não tem sandbox; permissões são avisos.
 - `.tar.xz` é tar + xz; sidecar SHA-256 obrigatório; nada de `extractall`.
