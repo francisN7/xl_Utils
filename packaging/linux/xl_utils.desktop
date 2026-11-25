@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=xl_Utils
+Comment=Utilitários de planilha
+Exec=xl_Utils
+Icon=xl_utils
+Terminal=false
+Categories=Office;Spreadsheet;
+# O cliente Flet 1.1.x fixa a própria identidade (WM_CLASS/app_id) e ignora o
+# FLET_APP_ID do flet pack; trocar quando o Flet respeitar a identidade.
+StartupWMClass=com.appveyor.flet

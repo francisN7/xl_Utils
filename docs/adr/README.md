@@ -36,6 +36,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0029](0029-painel-de-perfis-do-drive.md) | Painel de perfis do Drive com conta selecionada | Aceita |
 | [0030](0030-token-no-chaveiro-fora-do-windows.md) | Token do Drive no chaveiro do sistema fora do Windows | Aceita |
 | [0031](0031-perfil-local-da-conta.md) | Perfil local da conta: foto e apelido | Aceita |
+| [0032](0032-appimage-linux.md) | AppImage como formato da versão Linux | Aceita |
 
 ## Como ler
 

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Ponto de entrada do AppImage: executa o bundle do flet pack dentro do AppDir.
+HERE="$(dirname "$(readlink -f "$0")")"
+exec "$HERE/usr/lib/xl_Utils/xl_Utils" "$@"

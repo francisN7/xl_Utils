@@ -30,6 +30,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | relatar uma falha de segurança | [`../SECURITY.md`](../SECURITY.md) |
 | rodar o projeto | [`guide/setup.md`](guide/setup.md) |
 | gerar e publicar o instalador | [`guide/release-windows.md`](guide/release-windows.md) |
+| gerar e publicar o AppImage Linux | [`guide/release-linux.md`](guide/release-linux.md) |
 | testar | [`guide/testing.md`](guide/testing.md) |
 | entender como o código é organizado | [`reference/architecture.md`](reference/architecture.md) |
 | ler o código em ordem guiada | [`guide/code-tour.md`](guide/code-tour.md) |
@@ -93,6 +94,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o Drive tem painel de perfil e conta selecionada | `adr/0029-painel-de-perfis-do-drive.md` | 68 |
 | por que o token do Drive vai para o chaveiro fora do Windows | `adr/0030-token-no-chaveiro-fora-do-windows.md` | 53 |
 | por que a foto e o apelido da conta ficam em `drive/profiles/` | `adr/0031-perfil-local-da-conta.md` | 60 |
+| por que o Linux sai em AppImage | `adr/0032-appimage-linux.md` | 43 |
 
 ## Regras do mapa
 

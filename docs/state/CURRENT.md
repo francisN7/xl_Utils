@@ -8,7 +8,7 @@
 - **Próxima:** S23a — Versão Linux em AppImage
   (`docs/sessions/S23a-appimage-linux.md`); depois S23b (workflow) e S23c (0.4.0)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `800b326` — S22a: encerra a sessão (roadmap, CURRENT e spec)
+- **Retorno:** `0a7eefd` — S23: replaneja em S23a–c (0.4.0 com Windows e Linux)
 - **Decisões:** ADRs 0015–0031 (0019 com adendo S22b: imagens no Pages).
 
 ## Pronto
