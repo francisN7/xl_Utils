@@ -5,8 +5,8 @@
 ## Sessão
 
 - **Última concluída:** S22b — README e site com banner, badges e screenshots
-- **Próxima:** S23 — Release 0.4.0 e fechamento do ciclo
-  (`docs/sessions/S23-release-0-4-0.md`)
+- **Próxima:** S23a — Versão Linux em AppImage
+  (`docs/sessions/S23a-appimage-linux.md`); depois S23b (workflow) e S23c (0.4.0)
 - **Ciclo:** 0009 — Investigações de UI
 - **Retorno:** `800b326` — S22a: encerra a sessão (roadmap, CURRENT e spec)
 - **Decisões:** ADRs 0015–0031 (0019 com adendo S22b: imagens no Pages).
@@ -19,9 +19,9 @@
 
 ## Próximo passo
 
-Executar a S23 (0.4.0, build Windows com Pillow, Sandbox, release, fechar o
-ciclo 0009). Com o dono: push, conferir README/site no GitHub (temas, badges,
-deploy do Pages), foto e login reais. S24 e versão Linux no backlog.
+Executar a S23a (AppImage). A 0.4.0 sai com Windows e Linux: build no Actions
+só por disparo manual (S23b), Windows validado só por CI. Com o dono: push e
+conferir README/site no GitHub, foto e login reais. S24 no backlog.
 
 ## Arquivos-chave
 

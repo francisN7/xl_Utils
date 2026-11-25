@@ -42,7 +42,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S23-release-0-4-0.md`](sessions/S23-release-0-4-0.md) |
+| ler a spec da próxima sessão | [`sessions/S23a-appimage-linux.md`](sessions/S23a-appimage-linux.md) |
 
 ## Por seção (atalho)
 

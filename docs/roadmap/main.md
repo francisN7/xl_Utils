@@ -22,15 +22,19 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 | S21d | Correção urgente: resultado acima do limite do Excel. `core/save.py` ganha `ROW_LIMIT = 1_000_000` e `split_item`; `save_item`, `save_to_output`, `save_chosen` e `DriveSession._save_sync` gravam um arquivo por parte (`_parte1`, `_parte2`…), com cabeçalho; limite redondo por escolha do dono, para margem | Merge fictício de 1.240.948 × 12 salvo em `Merge_parte1.xlsx` (33 MB) e `Merge_parte2.xlsx` (8 MB) em cerca de 5 min; testes de divisão em `output/`, arquivo escolhido e Drive; a planilha real fica com o dono; ruff, pytest e docs verdes | [x] |
 | S22a | Auditoria completa dos 66 `.md` com `docs-review` (24 achados, 0 P0, todos aplicados em quatro lotes, menos o DOC-21, justificado: o exemplo `min_app_version = "0.4.0"` está certo); trilha `guide/onboarding.md`, `reference/glossary.md` e `CONTRIBUTING.md` (dev convidado, licença intacta) ligados no README e no mapa; diagramas Mermaid de camadas e fluxo e **Mapa dos módulos** em `architecture.md`; `check_docs.py` exige todo módulo de `src/xl_utils/` citado; SECURITY, README, `ui.md`, code tour e plugins atualizados com o código | Relatório entregue antes de editar e lotes aprovados pelo dono; check de docs vermelho com 16 módulos sem citação antes do mapa e verde depois; diagramas renderizados com mermaid 10.9.1 no navegador do app; ruff, format, pytest (651) e docs verdes | [x] |
 | S22b | README com banner SVG animado (quatro frases em CSS, `<picture>` por tema), badges shields.io (CI, Pages, release, Python 3.15, direitos reservados) e seção “Como ele é” com Início e Extrair CNJs em Dracula/Alucard; site com banner e os dois temas lado a lado; imagens em `docs/assets/` (160 KB), publicadas pelo `pages.yml` (filtro `docs/assets/**`); adendo S22b na ADR 0019 | Capturas pelo spike `ft.Screenshot` no `--web` com `LOCALAPPDATA` temporário, sem conta e com a fixture fictícia; banner animando nos dois temas e site em 1280 px e 375 px (sem rolagem horizontal, cinco imagens carregadas) no navegador do app; empacotamento do Pages simulado com `_site/assets/`; renderização no GitHub e deploy ficam com o dono após o push; ruff, format, pytest (651) e docs verdes | [x] |
-| S23 | Release 0.4.0 e fechamento do ciclo | — | [ ] |
+| S23a | Versão Linux em AppImage, com build local e guia | — | [ ] |
+| S23b | Workflow de release no GitHub Actions (Windows e Linux), só por disparo manual | — | [ ] |
+| S23c | Release 0.4.0 para Windows e Linux e fechamento do ciclo | — | [ ] |
 
 Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21a → S21c →
-S21b → S21d → S22a → S22b → S23** (a S21c entrou antes da S21b e a S21d antes
-da S22a, por urgência; a S22 foi dividida em texto e visual). A release 0.4.0
+S21b → S21d → S22a → S22b → S23a → S23b → S23c** (a S21c entrou antes da S21b
+e a S21d antes da S22a, por urgência; a S22 foi dividida em texto e visual; a
+S23 virou três para a 0.4.0 sair já com Windows e Linux, porque o dono passou
+a usar só Linux). A release 0.4.0
 entra depois dos ajustes de UI, da limpeza do Verificar Vínculos e da API 2
 dos plugins. Plugins foram entregues no ciclo 0008.
 
-## S18–S23 — próximas
+## S18–S23c — próximas
 
 - **S18:** tirar **Plugins** do Início e fixar o item no rodapé da sidebar,
   acima de `uv · Python 3.15`, sem quebrar o índice de navegação.
@@ -55,8 +59,14 @@ dos plugins. Plugins foram entregues no ciclo 0008.
   `architecture.md`/`code-tour.md`, cobrada pelo check de docs.
 - **S22b:** README e site com banner, badges, tagline animada e screenshots
   dos dois temas, com dados fictícios.
-- **S23:** versão 0.4.0, notas, build, Sandbox, publicação e fechamento do
-  ciclo 0009; o 0010 nasce limpo.
+- **S23a:** AppImage a partir do mesmo `flet pack` do Windows, com `.desktop`,
+  ícone, `configs/` e backends do `keyring` no bundle; guia de release Linux e
+  ADR do formato. Testado no CachyOS e numa distro limpa.
+- **S23b:** `release.yml` só com `workflow_dispatch` e confirmação obrigatória;
+  jobs Windows e Ubuntu com smoke test e artefatos + SHA-256; não publica.
+- **S23c:** versão 0.4.0, CHANGELOG, build pelo workflow, notas (Windows
+  validado só por CI), publicação pelo dono e fechamento do ciclo 0009; o 0010
+  nasce limpo.
 
 ## Backlog
 
@@ -96,16 +106,6 @@ evidências; depois, sessões de correção.
 Mostrar o número da versão, os créditos, a licença e o link para o repositório
 no GitHub. O menu hambúrguer saiu na S21a; o lugar (painel de perfil ou rodapé
 da sidebar) se decide na sessão.
-
-### Versão Linux
-
-O dono passou a usar só Linux. O app já roda no Linux pelo `uv run xl-utils`, e
-o login do Drive guarda o token no chaveiro (ADR 0030). Falta a distribuição:
-build e pacote para Linux (formato a decidir: AppImage, `.deb`, Flatpak ou
-`flet build linux`), ícone e atalho, cliente OAuth no build e um roteiro de
-release como o do Windows. O planejamento do próximo ciclo já considera as
-versões Windows e Linux; o Windows só pode ser validado por quem tiver a
-máquina.
 
 ### Ajuda ( i ) em cada ferramenta
 
