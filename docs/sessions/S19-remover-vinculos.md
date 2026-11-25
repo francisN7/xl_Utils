@@ -23,8 +23,9 @@ atual da vinculação como referência e o guia reutilizável de criação.
 4. Docs: `docs/reference/ui.md` (Layout, Início, **Vinculação**),
    `docs/reference/architecture.md`, `docs/index.html`, AGENTS.md (“cinco
    utilitários”); ADRs 0014/0016 ganham nota “superado — removido na S19”.
-5. Esqueleto `xl_U-Plugins` (fora deste repo; local, sem push sem OK): README,
-   `link/` com o código atual como referência e guia de criação reaproveitando
+5. Esqueleto em `/home/francis/Apps/Codes/xl_U-Plugins` (repo próprio, remoto
+   `francisN7/xl_U-Plugins`; commit lá, push só com OK): README, `link/` com o
+   código atual como referência e guia de criação reaproveitando
    `docs/plugins/`.
 6. CHANGELOG (Removed).
 
@@ -52,7 +53,8 @@ só nos trechos achados; `docs/reference/ui.md` → **Layout**, **Início**,
 
 - `headers.json` e `shared/configs.py` podem servir a outras ferramentas:
   remover só as chaves da vinculação.
-- Onde criar o repo `xl_U-Plugins` e se ele recebe push: perguntar ao dono.
+- O repo de plugins tem só `README.md` (1 commit) e esse README estava com
+  mudança não commitada em 2026-11-25: conferir com o dono antes de mexer.
 
 ## Próximo depois desta
 
