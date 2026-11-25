@@ -60,22 +60,8 @@ decisões nos ADRs.
 - A sidebar mostra o ícone real do app (`assets/icon.png`) no lugar do
   quadrado “x”, e a janela usa o ícone do app (`.ico` no Windows, `.png` no
   Linux). O build leva `assets/` para o bundle e falha se o ícone faltar.
-- S15: investigação do seletor interno; o adendo do ADR 0025 restringe o
-  seletor à rota do Drive (Flet puro, paginado), enquanto arquivo local continua
-  no seletor nativo. Nenhum fluxo padrão mudou; a implementação fica para depois
-  da 0.4.0.
-- `InstalledPlugin` carrega o manifesto já lido na descoberta, sem reler
-  `plugin.toml` ao montar a página.
 - `ToolLayout` carrega abas também nas entradas rotuladas e reavalia o botão
   Executar com `ready` ao terminar a leitura.
-- O build falha se `_lzma.pyd` não entrar no bundle do app.
-
-- A spec da S13 e o roadmap trocaram `.7z`/`py7zr` por `.tar.xz` com
-  `tarfile`/`lzma` da stdlib; não há dependência nova nem custo no instalador.
-- Documentação: `docs/history/` foi removida e os ciclos fechados 0001–0007
-  voltaram para `docs/roadmap/`; o índice fica em `roadmap/README.md` e o ADR
-  0022 substitui o 0020. O check de docs volta a validar os links das páginas de
-  ciclo.
 
 ### Removed
 

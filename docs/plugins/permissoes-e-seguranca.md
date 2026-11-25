@@ -55,19 +55,9 @@ confere tipo e valor; o comportamento real do código não é verificado.
 
 ## Limites do pacote
 
-| Item | Limite |
-|---|---:|
-| Arquivo `.tar.xz` | 100 MB |
-| Conteúdo extraído | 500 MB |
-| Entradas no tar | 10.000 |
-| Arquivo individual | 200 MB |
-| Razão extraído/pacote | 500:1 |
-| Nome de entrada | 180 caracteres |
-| Caminho final | 250 caracteres |
-| `plugin.toml` | 256 KB |
-| Memória do xz | 256 MB |
-
-Os números são generosos, mas o limite de conteúdo extraído e a razão barram
+A tabela completa (tamanho do pacote, conteúdo extraído, entradas, razão,
+nomes, caminho e memória do xz) está em [`pacote.md`](pacote.md#limites). Os
+números são generosos, mas o limite de conteúdo extraído e a razão barram
 um zip bomb antes de encher o disco. O host também confere o espaço livre e
 aborta a extração ao passar do teto, mesmo que o cabeçalho do tar minta.
 

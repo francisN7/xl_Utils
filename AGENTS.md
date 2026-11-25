@@ -95,6 +95,6 @@ docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
 ## Segurança (repo público)
 
 - Nunca commitar `.env`, credenciais, chaves, backups ou dados reais.
-- Configuração pública em `configs/`; segredos em `%LOCALAPPDATA%/xl_utils/`.
-- Planilhas de teste usam dados fictícios.
-- `output/` e artefatos locais ficam fora do Git.
+- Configuração pública em `configs/`; segredos em `%LOCALAPPDATA%/xl_utils/`
+  (Linux: `~/.xl_utils/` e o token no chaveiro).
+- Planilhas de teste usam dados fictícios; `output/` e artefatos ficam fora do Git.
