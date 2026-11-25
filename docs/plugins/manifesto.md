@@ -78,7 +78,7 @@ Tabela opcional. Os padrões são conservadores:
 | `subprocess` | booleano | `false` | o plugin pode iniciar processos |
 
 São **declarações**, não bloqueios. O plugin roda no mesmo processo e tem os
-direitos do usuário; a UI da S14 mostra o aviso. O install não tenta impedir
+direitos do usuário; a área Plugins mostra o aviso antes de instalar. O install não tenta impedir
 rede, leitura ou subprocesso em tempo de execução. Veja
 [`permissoes-e-seguranca.md`](permissoes-e-seguranca.md).
 

@@ -48,8 +48,9 @@ ui/pages/plugin_tool.py         página declarativa montada do manifesto
 ### 1. Shell e navegação — `src/xl_utils/app.py`
 
 `main` monta a sidebar, o hub e o conteúdo. Antes de qualquer controle, lê o
-tema de `shared/settings.py` e chama `theme.apply(mode)`; `show(index)` troca a
-página e `TOOLS`, em `ui/pages/registry.py`, é a única lista de ferramentas. Para
+tema de `shared/settings.py` e chama `theme.apply(mode)`; `show(page_id)` troca
+a página pelo `id` e `TOOLS`, em `ui/pages/registry.py`, é a única lista de
+ferramentas. Para
 entender por que a sidebar não é `NavigationRail`, leia o ADR 0003.
 
 **Observe:** o estado de cada ferramenta vive em `ui/state.py`, não na página.
@@ -86,7 +87,7 @@ de leitura e cálculo.
 `prepare_workbook`, filtra com `filter_sheets` e devolve `AllStrOutcome` com
 `SaveItem` e `RunLog`. As etapas são registradas com `reporter.note(...)`: vão
 para o log final e aparecem durante a execução. Os demais controllers seguem o
-mesmo desenho: `CnjOutcome`, `CutOutcome`, `MergeOutcome` e `LinkOutcome`.
+mesmo desenho: `CnjOutcome`, `CutOutcome` e `MergeOutcome`.
 
 **Observe:** nada é gravado; o controller devolve dados em memória.
 

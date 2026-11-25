@@ -28,7 +28,6 @@ são necessários na máquina de destino.
 ## Requisitos
 
 - [uv](https://docs.astral.sh/uv/) — o Python 3.15 é baixado e gerenciado por ele.
-- Node.js apenas para o check de documentação.
 
 ## Como rodar
 

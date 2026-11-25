@@ -67,7 +67,7 @@ remover. Abrir a ferramenta também não lê planilha; a leitura começa no cliq
 
 | Componente | Responsabilidade |
 |---|---|
-| `sidebar` | Logo, Início e as seis ferramentas, com item ativo destacado. |
+| `sidebar` | Logo, Início, as quatro ferramentas nativas e Plugins no rodapé, com item ativo destacado. |
 | `top_menu` | Painel de perfil no canto superior direito: conta selecionada, outras contas, adicionar e sair. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
@@ -228,6 +228,9 @@ painel entra em **“Pronto para salvar”**: a prévia aparece, mas nenhum arqu
   `Salvo: <caminho>`.
 - Após salvar, o caminho real aparece, “Abrir pasta” é liberado e os botões de
   salvar somem. Falha de escrita mostra o erro e mantém a prévia.
+
+A prévia mostra:
+
 - primeiras 100 linhas e todas as colunas;
 - rolagem vertical com barra oculta e horizontal com barra só quando precisa;
 - vista fixa de 240 px, com o log limitado a 160 px para não espremer a prévia;

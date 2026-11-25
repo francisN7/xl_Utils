@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Confere a saúde da documentação, sem dependências (Python >= 3.10).
 
-Gêmeo de ``scripts/check-docs.mjs``: mesmas regras, mesma saída.
+Nasceu do modelo da skill ``project-context-init``; aqui não há gêmeo ``.mjs``.
 
 1. links relativos e ``<img src>`` entre ``.md`` (ignora http(s), mailto,
    #âncora e blocos de código);

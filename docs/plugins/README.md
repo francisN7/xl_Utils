@@ -35,8 +35,8 @@ assets/          imagens e dados opcionais
 data/            criado pelo host; dados do plugin, apagados na desinstalação
 ```
 
-O host lê o manifesto, valida o pacote, instala e — na S14 — importa
-`run(request)` e exibe o resultado. O plugin devolve dados, não controles de
+O host lê o manifesto, valida o pacote, instala e, no primeiro Executar,
+importa `run(request)` e exibe o resultado. O plugin devolve dados, não controles de
 interface.
 
 ## Mapa do contrato
