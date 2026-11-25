@@ -12,6 +12,12 @@ forma consistente. Ela tem o logo, o item **Início** e as seis ferramentas
 (cinco nativas e **Plugins**). No
 canto superior direito da área de conteúdo fica o menu hamburger dos perfis do
 Google Drive — fora da sidebar, para não competir com a navegação.
+
+O logo da sidebar é `assets/icon.png` (36 px, cantos de 9 px), lido em bytes
+para não depender do `assets_dir` do Flet; sem o arquivo, volta o quadrado roxo
+com “x”. O ícone da janela (`page.window.icon`) é `assets/icon.ico` no Windows e
+`assets/icon.png` nos demais. `ui/assets.py` resolve a pasta: raiz do repo no
+dev e `sys._MEIPASS/assets` no exe (o build leva `assets/` com `--add-data`).
 O conteúdo abre em uma das duas formas:
 
 - **Início:** hub com cartões das ferramentas.

@@ -67,6 +67,9 @@ if ($content.Contains('open(exe_path, "ab", encoding="utf-8")')) {
 
 Write-Host "== Empacotando com flet pack (onedir) =="
 $configs = Join-Path $venv "Lib/site-packages/xl_utils/configs"
+# Os ícones da sidebar e da janela são lidos de assets/ ao lado do bundle
+# (sys._MEIPASS/assets); o --icon só vale para o .exe.
+$assets = Join-Path $root "assets"
 # O _rust.pyd do cryptography importa python3t.dll, que o Python 3.15 instala
 # em abi3t-compat/ e só adiciona ao path no interpretador normal. Sem copiar
 # esse shim, o app empacotado morre no import do google-auth.
@@ -80,6 +83,7 @@ if (-not (Test-Path $python3t)) {
     --distpath $app `
     --icon "assets/icon.ico" `
     --add-data "$configs;xl_utils/configs" `
+    --add-data "$assets;assets" `
     --add-binary "$python3t;." `
     --product-name "xl_Utils" `
     --file-description "Utilitários de planilha" `
@@ -102,6 +106,14 @@ if (-not $lzma) {
     throw "Módulo _lzma não foi embutido no bundle do app."
 }
 Write-Host "Módulo lzma: $($lzma.FullName)"
+
+$bundledIcon = Get-ChildItem (Join-Path $app "xl_Utils") -Recurse -Filter "icon.png" |
+    Where-Object { $_.Directory.Name -eq "assets" } |
+    Select-Object -First 1
+if (-not $bundledIcon) {
+    throw "assets/icon.png não foi embutido no bundle do app."
+}
+Write-Host "Ícone da sidebar: $($bundledIcon.FullName)"
 
 if ($SkipInstaller) {
     Write-Host "Build pronto: $exe"

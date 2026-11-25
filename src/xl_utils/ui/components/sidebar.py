@@ -6,7 +6,36 @@ from collections.abc import Callable, Sequence
 import flet as ft
 
 from xl_utils.ui import theme
+from xl_utils.ui.assets import asset_path
 from xl_utils.ui.pages.registry import ToolPage
+
+LOGO_SIZE = 36
+
+
+def _logo_mark() -> ft.Control:
+    """Ícone do app em `assets/icon.png`; sem o arquivo, o quadrado com “x”."""
+    icon = asset_path("icon.png")
+    if icon is not None:
+        return ft.Image(
+            src=icon.read_bytes(),
+            width=LOGO_SIZE,
+            height=LOGO_SIZE,
+            fit=ft.BoxFit.CONTAIN,
+            border_radius=9,
+        )
+    return ft.Container(
+        content=ft.Text(
+            "x",
+            size=19,
+            weight=ft.FontWeight.BOLD,
+            color=theme.BACKGROUND_DEEP,
+        ),
+        width=LOGO_SIZE,
+        height=LOGO_SIZE,
+        bgcolor=theme.PURPLE,
+        border_radius=9,
+        alignment=ft.Alignment.CENTER,
+    )
 
 
 class Sidebar:
@@ -119,22 +148,7 @@ class Sidebar:
             spacing=0,
             expand=True,
         )
-        controls = [
-            ft.Container(
-                content=ft.Text(
-                    "x",
-                    size=19,
-                    weight=ft.FontWeight.BOLD,
-                    color=theme.BACKGROUND_DEEP,
-                ),
-                width=36,
-                height=36,
-                bgcolor=theme.PURPLE,
-                border_radius=9,
-                alignment=ft.Alignment.CENTER,
-            ),
-            title,
-        ]
+        controls = [_logo_mark(), title]
         return ft.Container(
             content=ft.Row(
                 controls=controls,

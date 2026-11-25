@@ -32,6 +32,9 @@ decisões nos ADRs.
 
 ### Changed
 
+- A sidebar mostra o ícone real do app (`assets/icon.png`) no lugar do
+  quadrado “x”, e a janela usa o ícone do app (`.ico` no Windows, `.png` no
+  Linux). O build leva `assets/` para o bundle e falha se o ícone faltar.
 - S15: investigação do seletor interno; o adendo do ADR 0025 restringe o
   seletor à rota do Drive (Flet puro, paginado), enquanto arquivo local continua
   no seletor nativo. Nenhum fluxo padrão mudou; a implementação fica para depois

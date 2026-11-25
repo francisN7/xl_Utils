@@ -12,7 +12,7 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 |---|---|---|---|
 | S15 | Spike em Flet puro com 25.000 itens; seletor interno restrito à rota do Drive (adendo do ADR 0025) | ADR 0025 aceito com medições; fluxo padrão intacto; ruff, pytest e docs verdes | [x] |
 | S16 | Spike do Picker JS em `127.0.0.1` com o token do login; ADR 0026 escolhe esse caminho e descarta o seletor do Drive em Flet | ADR 0026 aceito com medições; fluxo atual intacto; spike fora do Git; ruff, pytest e docs verdes | [x] |
-| S17 | Ícone da sidebar e da janela | — | [ ] |
+| S17 | Ícone real na sidebar (`assets/icon.png`, fallback “x”) e na janela (`.ico` no Windows, `.png` no Linux); `ui/assets.py` resolve dev e `_MEIPASS`; build leva `assets/` e checa o ícone | Sidebar e janela conferidas no Linux (tema escuro); build Windows pendente de validação no Windows; ruff, pytest e docs verdes | [x] |
 | S18 | Plugins no rodapé da sidebar, fora do Início | — | [ ] |
 | S19 | Remover Verificar Vínculos e preparar o repo de plugins | — | [ ] |
 | S20 | Leitura de planilhas pelo host e API 2 dos plugins | — | [ ] |
@@ -24,10 +24,8 @@ Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21 
 S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
 Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 
-## S17–S23 — próximas
+## S18–S23 — próximas
 
-- **S17:** trocar o quadrado “x” da sidebar pelo ícone real e usar o `.ico` no
-  cabeçalho da janela; o build precisa levar `assets/` para o lado do exe.
 - **S18:** tirar **Plugins** do Início e fixar o item no rodapé da sidebar,
   acima de `uv · Python 3.15`, sem quebrar o índice de navegação.
 - **S19:** remover Verificar Vínculos (código, config, testes, docs e site) e

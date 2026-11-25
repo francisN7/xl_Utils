@@ -6,6 +6,7 @@ import flet as ft
 
 from xl_utils.shared import drive_cache, settings
 from xl_utils.ui import theme
+from xl_utils.ui.assets import window_icon
 from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.components.sidebar import Sidebar
 from xl_utils.ui.components.top_menu import TopMenu
@@ -32,6 +33,9 @@ def main(page: ft.Page) -> None:
     page.window.height = 800
     page.window.min_width = 980
     page.window.min_height = 640
+    icon = window_icon()
+    if icon is not None:
+        page.window.icon = str(icon)
 
     content = ft.Container(expand=True)
     pages: dict[str, ft.Control] = {}

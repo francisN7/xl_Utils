@@ -4,35 +4,35 @@
 
 ## Sessão
 
-- **Última concluída:** S16 — Drive sem consentimento repetido (investigação)
-- **Próxima:** S17 — ícone da sidebar e da janela
-  (`docs/sessions/S17-icone-da-sidebar.md`)
+- **Última concluída:** S17 — ícone da sidebar e da janela
+- **Próxima:** S18 — Plugins no rodapé da sidebar, fora do Início
+  (`docs/sessions/S18-plugins-no-rodape.md`)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `e7fa4ad` — docs: adapta ao padrao novo das skills de sessao
+- **Retorno:** `3720860` — S16: Picker JS com token do login evita consentimento repetido
 - **Decisões:** ADR 0026 — Picker JS no navegador com o token do login,
   `drive.file`, seletor do Drive em Flet descartado; demais nos ADRs 0014–0025.
 
 ## Pronto
 
-- S16: spike do Picker JS em `127.0.0.1` com `setOAuthToken`; consentimento só
-  no login, arquivo escolhido acessível ao token do login, `drive.file` lista 0
-  itens sem Picker. ADR 0026; S24 reescrita para o Picker JS.
+- S17: logo da sidebar é `assets/icon.png` (fallback “x”); ícone da janela
+  `.ico` no Windows e `.png` no Linux via `ui/assets.py`; build leva
+  `assets/`. Validação no Windows pendente (exe e instalador).
+- S16: spike do Picker JS com `setOAuthToken` (ADR 0026); S24 no backlog.
 - S15: spike em Flet puro com 25.000 arquivos; ADR 0025 (com adendos).
-- S14: área Plugins, carregamento sob demanda, CLI e guia do autor.
-- S12: `v0.3.0`, build Windows e instalador.
 
 ## Próximo passo
 
-Ler `docs/sessions/S17-icone-da-sidebar.md`: trocar o “x” de `Sidebar._logo`
-por `assets/icon.png`, ícone da janela com `assets/icon.ico` e `assets/` no
-build. Depois S18–S23 até a release 0.4.0; a S24 (Picker JS) fica no backlog.
+Ler `docs/sessions/S18-plugins-no-rodape.md`: tirar Plugins do Início e fixar
+o item no rodapé da sidebar sem quebrar a navegação por índice. Depois S19–S23
+até a release 0.4.0; a S24 (Picker JS) fica no backlog. Conferir o ícone no
+build Windows na próxima vez que rodar `build_windows.ps1`.
 
 ## Arquivos-chave
 
-- `src/xl_utils/ui/components/sidebar.py`, `src/xl_utils/app.py`, `assets/`
-- `scripts/build_windows.ps1`, `docs/reference/ui.md` → Layout
+- `src/xl_utils/ui/components/sidebar.py`, `src/xl_utils/app.py`
+- `src/xl_utils/ui/pages/registry.py`, `src/xl_utils/ui/pages/home.py`
+- `src/xl_utils/ui/assets.py`, `docs/reference/ui.md` → Layout/Início
 - `docs/adr/0026-drive-sem-consentimento.md`, `docs/sessions/S24-*.md`
-- `artifacts/spike_drive/` (ignorado; spike do Picker JS)
 
 ## Armadilhas
 
@@ -45,6 +45,8 @@ build. Depois S18–S23 até a release 0.4.0; a S24 (Picker JS) fica no backlog.
 - Largura fixa de diálogo corta em 125% de escala; calcular a partir de
   `page.width` e testar 100/125/150%.
 - Spikes e capturas ficam em `artifacts/`; nunca commitar.
+- `assets/` fica na raiz, fora do wheel: no exe só existe via `--add-data`.
+  `ft.Image` recebe bytes para não depender do `assets_dir` do Flet.
 - Abrir a área de plugins não importa `lib/`; só o primeiro Executar importa.
 - Plugin em processo não tem sandbox; permissões são avisos.
 - `.tar.xz` é tar + xz; sidecar SHA-256 obrigatório; nada de `extractall`.
@@ -52,7 +54,6 @@ build. Depois S18–S23 até a release 0.4.0; a S24 (Picker JS) fica no backlog.
   `_lzma.pyd` e `python3t.dll` no bundle.
 - `.iss` é UTF-8 com BOM; `Set-Content` corrompe acentos.
 - Flet não é thread-safe: carregar e executar fora da UI thread.
-- Ciclos fechados ficam em `docs/roadmap/`; não recriar `docs/history/`.
 
 ## Como rodar
 
