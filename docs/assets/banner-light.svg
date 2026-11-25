@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-labelledby="t d">
+<title id="t">xl_Utils</title>
+<desc id="d">Utilitários de planilha, no seu computador: tratamento de texto, extração de CNJs, recorte e mesclagem.</desc>
+<style>
+  text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif; }
+  .title { font-size: 64px; font-weight: 800; letter-spacing: -1.5px; }
+  .sub { font-size: 24px; }
+  .p { font-size: 30px; font-weight: 600; opacity: 0; animation: rotate 12s ease-in-out infinite both; }
+  .c { opacity: 0; animation: cell 12s ease-in-out infinite both; }
+  .p2, .c2 { animation-delay: 3s; }
+  .p3, .c3 { animation-delay: 6s; }
+  .p4, .c4 { animation-delay: 9s; }
+  @keyframes rotate {
+    0% { opacity: 0; transform: translateY(14px); }
+    4%, 21% { opacity: 1; transform: translateY(0); }
+    25%, 100% { opacity: 0; transform: translateY(-14px); }
+  }
+  @keyframes cell {
+    0% { opacity: 0; }
+    4%, 21% { opacity: 0.35; }
+    25%, 100% { opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .p, .c { animation: none; opacity: 0; transform: none; }
+    .p1 { opacity: 1; }
+    .c1 { opacity: 0.35; }
+  }
+</style>
+<defs>
+  <linearGradient id="fade" x1="0" x2="1" y1="0" y2="0">
+    <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+    <stop offset="0.45" stop-color="#fff" stop-opacity="0.9"/>
+    <stop offset="1" stop-color="#fff" stop-opacity="0.5"/>
+  </linearGradient>
+  <mask id="grid-mask"><rect x="760" y="0" width="520" height="320" fill="url(#fade)"/></mask>
+  <clipPath id="frame"><rect width="1280" height="320" rx="24"/></clipPath>
+</defs>
+<g clip-path="url(#frame)">
+  <rect width="1280" height="320" fill="#F2EEE1"/>
+  <g mask="url(#grid-mask)">
+    <rect x="800" y="48" width="420" height="44" fill="#E9E4D4"/>
+    <rect class="c c1" x="884" y="92" width="84" height="44" fill="#644AC9"/>
+    <rect class="c c2" x="1052" y="136" width="84" height="44" fill="#14710A"/>
+    <rect class="c c3" x="968" y="224" width="84" height="44" fill="#036A96"/>
+    <rect class="c c4" x="1136" y="180" width="84" height="44" fill="#A34D14"/>
+    <path d="M800 48V268M884 48V268M968 48V268M1052 48V268M1136 48V268M1220 48V268M800 48H1220M800 92H1220M800 136H1220M800 180H1220M800 224H1220M800 268H1220" stroke="#D7D0BC" stroke-width="1.5" fill="none"/>
+  </g>
+</g>
+<rect x="0.75" y="0.75" width="1278.5" height="318.5" rx="23.5" fill="none" stroke="#D7D0BC" stroke-width="1.5"/>
+<g transform="translate(64 96)">
+  <rect width="128" height="128" rx="30" fill="#282A36"/>
+  <path d="M38 38L90 90" stroke="#BD93F9" stroke-width="20" stroke-linecap="round"/>
+  <path d="M90 38L38 90" stroke="#FF79C6" stroke-width="20" stroke-linecap="round"/>
+</g>
+<text class="title" x="230" y="160" fill="#1F1F1F">xl_Utils</text>
+<text class="sub" x="232" y="200" fill="#4B4636">Utilitários de planilha, no seu computador</text>
+  <text class="p p1" x="232" y="262" fill="#644AC9"><tspan fill="#6C664B">›</tspan> Trate texto e remova emojis</text>
+  <text class="p p2" x="232" y="262" fill="#14710A"><tspan fill="#6C664B">›</tspan> Extraia e padronize CNJs</text>
+  <text class="p p3" x="232" y="262" fill="#036A96"><tspan fill="#6C664B">›</tspan> Recorte planilhas por linhas</text>
+  <text class="p p4" x="232" y="262" fill="#A34D14"><tspan fill="#6C664B">›</tspan> Mescle abas de vários arquivos</text>
+</svg>

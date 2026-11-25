@@ -1,8 +1,39 @@
-# xl_Utils
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/banner-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset="docs/assets/banner-light.svg">
+    <img alt="xl_Utils — utilitários de planilha, no seu computador" src="docs/assets/banner-dark.svg" width="100%">
+  </picture>
+</p>
+
+<p align="center">
+  <a href="https://github.com/francisN7/xl_Utils/actions/workflows/ci.yml"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/francisN7/xl_Utils/ci.yml?branch=main&label=CI"></a>
+  <a href="https://francisn7.github.io/xl_Utils/"><img alt="Pages" src="https://img.shields.io/github/actions/workflow/status/francisN7/xl_Utils/pages.yml?branch=main&label=Pages"></a>
+  <a href="https://github.com/francisN7/xl_Utils/releases/latest"><img alt="Última release" src="https://img.shields.io/github/v/release/francisN7/xl_Utils?label=release"></a>
+  <img alt="Python 3.15" src="https://img.shields.io/badge/python-3.15-3776AB">
+  <a href="#licença"><img alt="Todos os direitos reservados" src="https://img.shields.io/badge/licen%C3%A7a-todos%20os%20direitos%20reservados-6272A4"></a>
+</p>
 
 Aplicativo desktop que reúne pequenos utilitários de planilha em uma única
 interface. O núcleo é compartilhado: toda leitura passa por um pipeline de
 texto seguro antes de chegar à ferramenta.
+
+## Como ele é
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/home-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/screenshots/home-light.png">
+  <img alt="Tela Início do xl_Utils com as quatro ferramentas" src="docs/assets/screenshots/home-dark.png" width="100%">
+</picture>
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/screenshots/cnj-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/assets/screenshots/cnj-light.png">
+  <img alt="Extrair CNJs com uma planilha fictícia carregada, o log e a prévia do resultado" src="docs/assets/screenshots/cnj-dark.png" width="100%">
+</picture>
+
+O tema segue o seu GitHub: Dracula no escuro, Alucard no claro. As capturas usam
+dados fictícios.
 
 ## Instalação (Windows)
 
