@@ -32,6 +32,8 @@ decisões nos ADRs.
 
 ### Changed
 
+- **Plugins** saiu do Início e da lista principal da sidebar: virou item fixo
+  no rodapé, acima de `uv · Python 3.15`, e abre a mesma página.
 - A sidebar mostra o ícone real do app (`assets/icon.png`) no lugar do
   quadrado “x”, e a janela usa o ícone do app (`.ico` no Windows, `.png` no
   Linux). O build leva `assets/` para o bundle e falha se o ícone faltar.

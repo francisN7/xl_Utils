@@ -109,7 +109,7 @@ def test_sidebar_button_toggles_without_a_restart_prompt() -> None:
     changes: list[str] = []
     sidebar = Sidebar(
         [],
-        lambda _index: None,
+        lambda _page_id: None,
         theme_mode="dark",
         on_theme_change=changes.append,
     )

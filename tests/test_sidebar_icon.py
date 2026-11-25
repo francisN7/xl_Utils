@@ -21,7 +21,7 @@ def test_dev_assets_point_to_the_repo_icons() -> None:
 
 
 def test_sidebar_shows_the_real_icon() -> None:
-    sidebar = Sidebar([], lambda _index: None)
+    sidebar = Sidebar([], lambda _page_id: None)
 
     mark = _logo_mark(sidebar)
 
@@ -35,7 +35,7 @@ def test_sidebar_falls_back_to_the_x_without_the_png(
 ) -> None:
     monkeypatch.setattr(sidebar_module, "asset_path", lambda _name: None)
 
-    sidebar = Sidebar([], lambda _index: None)
+    sidebar = Sidebar([], lambda _page_id: None)
 
     mark = _logo_mark(sidebar)
     assert isinstance(mark, ft.Container)

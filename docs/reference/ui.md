@@ -8,8 +8,11 @@ responde:** regras de negócio (ver `architecture.md`) nem o porquê (ver
 
 Sidebar fixa de 260 px + área de conteúdo. A sidebar é um `Column` próprio, não
 um `NavigationRail`: assim ícones, rótulos e o item ativo ficam alinhados de
-forma consistente. Ela tem o logo, o item **Início** e as seis ferramentas
-(cinco nativas e **Plugins**). No
+forma consistente. Ela tem o logo, o item **Início** e as cinco ferramentas
+nativas; **Plugins** fica fixo no rodapé, acima de `uv · Python 3.15` e do
+botão de tema, com o mesmo realce de selecionado. Os itens são identificados
+pelo `id` da página (`registry.TOOLS` e `registry.FOOTER_PAGES`), não pela
+posição. No
 canto superior direito da área de conteúdo fica o menu hamburger dos perfis do
 Google Drive — fora da sidebar, para não competir com a navegação.
 
@@ -20,7 +23,7 @@ com “x”. O ícone da janela (`page.window.icon`) é `assets/icon.ico` no Win
 dev e `sys._MEIPASS/assets` no exe (o build leva `assets/` com `--add-data`).
 O conteúdo abre em uma das duas formas:
 
-- **Início:** hub com cartões das ferramentas.
+- **Início:** hub com cartões das ferramentas nativas.
 - **Ferramenta:** cabeçalho + duas colunas (entrada/opções e resultado) + barra
   de ação fixa, separada do corpo por 16 px. As duas colunas rolam na vertical
   sem barra visível; os cartões recortam o conteúdo e nunca invadem a barra de
@@ -34,9 +37,9 @@ O conteúdo abre em uma das duas formas:
 │ Recortar │    dropzone       │    status + caminho    │
 │ Mesclar  │ 2. Opções         │    log + prévia        │
 │ Vínculos │                   │                        │
-│ Plugins  │                   │                        │
+│          │                   │                        │
 │          ├───────────────────┴────────────────────────┤
-│          │ [resumo]                    [Executar]     │
+│ Plugins  │ [resumo]                    [Executar]     │
 └──────────┴────────────────────────────────────────────┘
 ```
 
@@ -170,7 +173,8 @@ trocado.
 
 ## Início
 
-O hub mostra um cartão por ferramenta, com 200 px de altura: até quatro por
+O hub mostra um cartão por ferramenta nativa (Plugins fica só no rodapé da
+sidebar), com 200 px de altura: até quatro por
 linha no desktop, dois no médio e um no mobile. Cada cartão tem ícone, nome,
 descrição e o atalho “Abrir ferramenta”. O nome ocupa uma única linha e ganha
 reticências quando falta espaço — nunca quebra no meio da palavra; a descrição

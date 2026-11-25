@@ -349,12 +349,14 @@ def test_remove_drops_the_loaded_module(tmp_path: Path) -> None:
 
 
 def test_registry_has_a_single_plugins_entrance() -> None:
-    from xl_utils.ui.pages.registry import TOOLS
+    from xl_utils.ui.pages.registry import FOOTER_PAGES, PAGES, TOOLS
 
-    entries = [tool for tool in TOOLS if tool.id == "plugins"]
+    entries = [tool for tool in PAGES if tool.id == "plugins"]
 
     assert len(entries) == 1
     assert entries[0].label == "Plugins"
+    assert entries[0] in FOOTER_PAGES
+    assert all(tool.id != "plugins" for tool in TOOLS)
 
 
 def test_scan_does_not_run_plugin_code(tmp_path: Path) -> None:

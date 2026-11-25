@@ -8,10 +8,10 @@ from xl_utils.shared import drive_cache, settings
 from xl_utils.ui import theme
 from xl_utils.ui.assets import window_icon
 from xl_utils.ui.components.client_import import ClientImport
-from xl_utils.ui.components.sidebar import Sidebar
+from xl_utils.ui.components.sidebar import HOME_ID, Sidebar
 from xl_utils.ui.components.top_menu import TopMenu
 from xl_utils.ui.drive import DriveSession
-from xl_utils.ui.pages import TOOLS
+from xl_utils.ui.pages import FOOTER_PAGES, PAGES, TOOLS
 from xl_utils.ui.pages.home import build_home
 from xl_utils.ui.theme import build_theme
 
@@ -39,26 +39,23 @@ def main(page: ft.Page) -> None:
 
     content = ft.Container(expand=True)
     pages: dict[str, ft.Control] = {}
+    pages_by_id = {tool.id: tool for tool in PAGES}
 
-    def show(index: int) -> None:
-        if index == 0:
+    def show(page_id: str) -> None:
+        if page_id == HOME_ID:
             content.content = home
         else:
-            tool = TOOLS[index - 1]
-            if tool.id not in pages:
-                pages[tool.id] = tool.build(drive)
-            content.content = pages[tool.id]
+            if page_id not in pages:
+                pages[page_id] = pages_by_id[page_id].build(drive)
+            content.content = pages[page_id]
         content.update()
 
     def open_tool(tool_id: str) -> None:
-        index = next(
-            position + 1 for position, tool in enumerate(TOOLS) if tool.id == tool_id
-        )
-        sidebar.select(index)
-        show(index)
+        sidebar.select(tool_id)
+        show(tool_id)
 
-    def handle_select(index: int) -> None:
-        show(index)
+    def handle_select(page_id: str) -> None:
+        show(page_id)
 
     def change_theme(next_mode: str) -> None:
         nonlocal mode
@@ -81,6 +78,7 @@ def main(page: ft.Page) -> None:
     sidebar = Sidebar(
         TOOLS,
         handle_select,
+        footer=FOOTER_PAGES,
         theme_mode=mode,
         on_theme_change=change_theme,
     )
@@ -99,7 +97,7 @@ def main(page: ft.Page) -> None:
         vertical_alignment=ft.CrossAxisAlignment.STRETCH,
     )
     page.add(shell)
-    show(0)
+    show(HOME_ID)
 
 
 def run() -> None:

@@ -31,6 +31,7 @@ def test_home_cards_keep_title_description_and_shortcut_inside_narrow_width() ->
     cards = _cards(home)
 
     assert len(cards) == len(TOOLS)
+    assert "plugins" not in {tool.id for tool in TOOLS}
     for card in cards:
         assert card.height == 200
         assert card.clip_behavior == ft.ClipBehavior.HARD_EDGE
@@ -80,3 +81,14 @@ def test_email_text_without_truncation_has_no_tooltip() -> None:
 
     assert text.value == "ana@example.com"
     assert text.tooltip is None
+
+
+def test_home_has_no_plugins_card() -> None:
+    opened: list[str] = []
+    home = build_home(opened.append)
+
+    for card in _cards(home):
+        card.on_click(None)
+
+    assert opened == [tool.id for tool in TOOLS]
+    assert "plugins" not in opened

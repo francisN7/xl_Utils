@@ -10,6 +10,7 @@ from xl_utils.ui.assets import asset_path
 from xl_utils.ui.pages.registry import ToolPage
 
 LOGO_SIZE = 36
+HOME_ID = "home"
 
 
 def _logo_mark() -> ft.Control:
@@ -39,29 +40,32 @@ def _logo_mark() -> ft.Control:
 
 
 class Sidebar:
-    """Barra lateral de largura fixa com Início e um item por ferramenta."""
+    """Barra lateral de largura fixa: Início, ferramentas e páginas de rodapé.
+
+    Os itens são identificados pelo `id` da página (`HOME_ID` para o Início),
+    nunca pela posição, para que a ordem da lista não afete a navegação.
+    """
 
     def __init__(
         self,
         tools: Sequence[ToolPage],
-        on_select: Callable[[int], None],
+        on_select: Callable[[str], None],
         *,
-        selected: int = 0,
+        footer: Sequence[ToolPage] = (),
+        selected: str = HOME_ID,
         theme_mode: str = "dark",
         on_theme_change: Callable[[str], None] | None = None,
     ) -> None:
         self._on_select = on_select
         self._theme_mode = theme_mode
         self._on_theme_change = on_theme_change
-        self._items: list[tuple[ft.Container, ft.Icon, ft.Text]] = []
+        self._footer_pages = tuple(footer)
+        self._items: dict[str, tuple[ft.Container, ft.Icon, ft.Text]] = {}
 
         navigation = ft.Column(
             controls=[
-                self._item(0, ft.Icons.HOME, "Início"),
-                *[
-                    self._item(index + 1, tool.icon, tool.label)
-                    for index, tool in enumerate(tools)
-                ],
+                self._item(HOME_ID, ft.Icons.HOME, "Início"),
+                *[self._item(tool.id, tool.icon, tool.label) for tool in tools],
             ],
             spacing=2,
         )
@@ -91,10 +95,10 @@ class Sidebar:
         )
         self.select(selected)
 
-    def select(self, index: int) -> None:
-        """Destaca um item e devolve o anterior ao estado neutro."""
-        for position, (container, icon, label) in enumerate(self._items):
-            active = position == index
+    def select(self, page_id: str) -> None:
+        """Destaca um item (lista ou rodapé) e devolve os demais ao neutro."""
+        for item_id, (container, icon, label) in self._items.items():
+            active = item_id == page_id
             container.bgcolor = theme.SURFACE if active else None
             icon.color = theme.PURPLE if active else theme.MUTED
             label.color = theme.TEXT if active else theme.SUBTLE_TEXT
@@ -102,7 +106,7 @@ class Sidebar:
 
     def _item(
         self,
-        index: int,
+        page_id: str,
         icon: ft.IconData,
         label: str,
     ) -> ft.Container:
@@ -121,15 +125,15 @@ class Sidebar:
             ),
             padding=ft.Padding.symmetric(vertical=10, horizontal=10),
             border_radius=8,
-            on_click=lambda _event, position=index: self._click(position),
+            on_click=lambda _event, item_id=page_id: self._click(item_id),
             ink=True,
         )
-        self._items.append((container, icon_control, label_control))
+        self._items[page_id] = (container, icon_control, label_control)
         return container
 
-    def _click(self, index: int) -> None:
-        self.select(index)
-        self._on_select(index)
+    def _click(self, page_id: str) -> None:
+        self.select(page_id)
+        self._on_select(page_id)
 
     def _logo(self) -> ft.Control:
         title = ft.Column(
@@ -170,7 +174,10 @@ class Sidebar:
                 icon_color=theme.MUTED,
             ),
         )
-        return ft.Container(
+        footer_items = [
+            self._item(page.id, page.icon, page.label) for page in self._footer_pages
+        ]
+        status = ft.Container(
             content=ft.Column(
                 controls=[
                     ft.Row(
@@ -195,6 +202,7 @@ class Sidebar:
             ),
             padding=ft.Padding.only(left=10, top=10),
         )
+        return ft.Column(controls=[*footer_items, status], spacing=2)
 
     def _theme_action_label(self) -> str:
         return "Tema claro" if self._theme_mode == "dark" else "Tema escuro"

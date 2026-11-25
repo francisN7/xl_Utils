@@ -1,4 +1,4 @@
-"""Registro das páginas de ferramenta mostradas na navegação."""
+"""Registro das páginas mostradas na navegação: hub e rodapé da sidebar."""
 
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -114,11 +114,19 @@ TOOLS: tuple[ToolPage, ...] = (
         description=LINK_DESCRIPTION,
         build=build_link,
     ),
-    ToolPage(
-        id="plugins",
-        label="Plugins",
-        icon=ft.Icons.EXTENSION,
-        description="Instale ferramentas locais, veja as permissões e execute.",
-        build=build_plugins,
-    ),
 )
+"""Ferramentas nativas: viram cartões no Início e itens da lista principal."""
+
+PLUGINS = ToolPage(
+    id="plugins",
+    label="Plugins",
+    icon=ft.Icons.EXTENSION,
+    description="Instale ferramentas locais, veja as permissões e execute.",
+    build=build_plugins,
+)
+
+FOOTER_PAGES: tuple[ToolPage, ...] = (PLUGINS,)
+"""Páginas fixas no rodapé da sidebar, fora do hub."""
+
+PAGES: tuple[ToolPage, ...] = TOOLS + FOOTER_PAGES
+"""Todas as páginas navegáveis, cada uma uma única vez."""

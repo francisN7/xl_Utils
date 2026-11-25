@@ -215,8 +215,8 @@ def test_progress_bar_is_indeterminate_while_a_file_runs() -> None:
 
 
 def test_every_tool_page_can_be_built() -> None:
-    from xl_utils.ui.pages import TOOLS
+    from xl_utils.ui.pages import PAGES
 
-    for tool in TOOLS:
+    for tool in PAGES:
         control = tool.build(None)
         assert control is not None, tool.id
