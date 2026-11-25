@@ -29,6 +29,8 @@ decisões nos ADRs.
   atalho no repositório.
 - Guia do autor: `docs/plugins/primeiro-plugin.md`, `empacotar-testar.md` e
   `exemplos/hello` + `exemplos/com-opcoes`, empacotados e executados no pytest.
+- Versão Linux em AppImage x86_64 (glibc 2.39+, como Ubuntu 24.04), gerada por
+  `scripts/build_linux.sh` com SHA-256; guia em `docs/guide/release-linux.md`.
 
 ### Changed
 

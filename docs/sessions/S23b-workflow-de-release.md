@@ -59,6 +59,11 @@ dono pedir, com smoke test e artefatos prontos para baixar.
 - O runner não tem GPU nem sessão gráfica: o smoke test do Flet pode precisar
   de `xvfb` (Linux) ou falhar sem tela (Windows). Plano B: smoke test só com
   `--help`/import do bundle, registrado nas notas.
+- Lições da S23a: sem FUSE no runner o script já usa
+  `APPIMAGE_EXTRACT_AND_RUN=1`; o smoke test Linux precisa de
+  `libgtk-3-0t64 libepoxy0 libsecret-1-0 libgl1 libegl1 libgles2
+  libgl1-mesa-dri` e `xvfb`; o `--web` não existe no executável, então o
+  smoke test é abrir a janela; o piso glibc segue o runner `ubuntu-24.04` (2.39).
 
 ## Próximo depois desta
 
