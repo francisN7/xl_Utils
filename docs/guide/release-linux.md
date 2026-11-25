@@ -22,8 +22,8 @@ bash scripts/build_linux.sh
 ```
 
 O script limpa `artifacts/linux/` e gera o wheel. Em seguida cria
-`artifacts/linux/venv`, instala o wheel com o PyInstaller e o `flet[cli]`, e
-empacota com `flet pack` em modo onedir. Antes de montar o AppDir, confere no
+`artifacts/linux/venv`, instala o wheel com o PyInstaller e o `flet-cli` nas
+versões do `uv.lock` e empacota com `flet pack` em modo onedir. Antes de montar o AppDir, confere no
 bundle:
 
 - `_lzma`, que no Python do uv é built-in;

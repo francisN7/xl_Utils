@@ -1,4 +1,4 @@
-# Gera o instalador Windows a partir do wheel da versão corrente.
+﻿# Gera o instalador Windows a partir do wheel da versão corrente.
 #
 # Uso:
 #   powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1
@@ -47,7 +47,18 @@ if (-not $wheel) {
 
 Write-Host "== Criando venv limpo e instalando o wheel =="
 & uv venv --python 3.15 $venv
-& uv pip install --python (Join-Path $venv "Scripts/python.exe") $wheel.FullName pyinstaller "flet[cli]>=1.0.5"
+# Versões travadas no uv.lock: sem isso o venv pega o Flet/PyInstaller mais
+# novo do PyPI (o flet-cli 1.1.3 quebrou o patch abaixo no CI). O flet-cli não
+# está no lock; segue a versão do flet.
+$constraints = Join-Path $wheelDir "constraints.txt"
+& uv export --frozen --no-hashes --no-emit-project --all-groups --output-file $constraints | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "uv export falhou." }
+$fletMatch = Select-String -Path $constraints -Pattern '^flet==([^\s;]+)' | Select-Object -First 1
+if (-not $fletMatch) { throw "flet não está no uv.lock." }
+$fletVersion = $fletMatch.Matches[0].Groups[1].Value
+& uv pip install --python (Join-Path $venv "Scripts/python.exe") -c $constraints $wheel.FullName pyinstaller "flet-cli==$fletVersion"
+if ($LASTEXITCODE -ne 0) { throw "uv pip install falhou." }
+Write-Host "Flet $fletVersion (uv.lock)"
 
 # flet-cli 1.1.2 quebra no Windows ao reanexar o overlay do flet.exe:
 # open(exe_path, "ab", encoding="utf-8") é inválido em modo binário. O patch é

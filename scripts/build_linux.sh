@@ -58,7 +58,14 @@ wheel="$(find "$wheel_dir" -maxdepth 1 -name '*.whl' | head -n 1)"
 
 echo "== Criando venv limpo e instalando o wheel =="
 uv venv --python 3.15 "$venv"
-uv pip install --python "$venv/bin/python" "$wheel" pyinstaller "flet[cli]>=1.0.5"
+# Versões travadas no uv.lock: sem isso o venv pega o Flet/PyInstaller mais
+# novo do PyPI. O flet-cli não está no lock; segue a versão do flet.
+constraints="$wheel_dir/constraints.txt"
+uv export --frozen --no-hashes --no-emit-project --all-groups --output-file "$constraints" >/dev/null
+flet_version="$(sed -nE 's/^flet==([^[:space:];]+).*/\1/p' "$constraints" | head -n 1)"
+[ -n "$flet_version" ] || die "flet não está no uv.lock."
+uv pip install --python "$venv/bin/python" -c "$constraints" "$wheel" pyinstaller "flet-cli==$flet_version"
+echo "Flet $flet_version (uv.lock)"
 
 echo "== Empacotando com flet pack (onedir) =="
 configs="$("$venv/bin/python" -c 'import pathlib, xl_utils; print(pathlib.Path(xl_utils.__file__).parent / "configs")')"

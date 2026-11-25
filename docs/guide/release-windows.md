@@ -21,7 +21,8 @@ powershell -ExecutionPolicy Bypass -File scripts/build_windows.ps1
 ```
 
 O script limpa `artifacts/`, gera o wheel, cria `artifacts/venv`, instala o wheel
-e o PyInstaller, empacota com `flet pack` (onedir) e compila o Inno Setup.
+e o PyInstaller (nas versões do `uv.lock`), empacota com `flet pack` (onedir) e
+compila o Inno Setup.
 Saídas:
 
 - `artifacts/app/xl_Utils/xl_Utils.exe` — executável empacotado;
