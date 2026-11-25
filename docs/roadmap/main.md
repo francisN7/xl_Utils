@@ -61,6 +61,25 @@ O build não embute o cliente OAuth: quem recebe o instalador teria de importar
 o JSON. Embutir cliente, API key e número do projeto no build, sem commitar
 nada, antes de distribuir para terceiros (ADR 0026).
 
+### Revisão completa do código
+
+Revisar o repo inteiro atrás de bugs de lógica e execução, decisões ruins ou
+contraditórias, código mal otimizado, funções que deveriam ser separadas e
+reaproveitadas, nomes pouco intuitivos, código não idiomático ou fora de clean
+code e trechos sem comentário ou explicação. Primeiro sai um relatório com
+evidências; depois, sessões de correção.
+
+### Sobre o app no menu hambúrguer
+
+Adicionar ao menu hambúrguer o número da versão, os créditos, a licença e o
+link para o repositório no GitHub.
+
+### Ajuda ( i ) em cada ferramenta
+
+Botão ( i ) em cada ferramenta que abre uma página web local explicando o uso
+(a UI) e a lógica aplicada por trás. Tema Dracula e Alucard, acompanhando o
+escuro e o claro do app, com animação de cara tecnológica e transições.
+
 ## Manutenção
 
 - Rodar `uv lock --upgrade` no início do ciclo e validar pandas/Flet — critério:
@@ -81,6 +100,8 @@ nada, antes de distribuir para terceiros (ADR 0026).
 - Auto-update e assinatura de código — só entram se o SmartScreen incomodar
   usuários de verdade.
 - Sandbox/subprocesso de plugin — só entra com uma API nova e um motivo real.
+- Verificação do sistema de plugins com o plugin de Vínculo — só vira sessão
+  quando o dono avisar que terminou o plugin no `xl_U-Plugins`.
 
 ## Descartados (não voltam sem decisão nova)
 

@@ -25,8 +25,8 @@
 ## Próximo passo
 
 Executar a S21 (abre com questionário: conta do "Abrir do Drive"). Depois
-S22–S23 até a 0.4.0; S24 (Picker JS) no backlog. Dono: rodar um plugin com
-arquivo real no app e conferir o ícone no build Windows.
+S22–S23 até a 0.4.0; S24 (Picker JS) no backlog. Teste real de plugin é
+gatilho (plugin de Vínculo). Conferir o ícone no build Windows.
 
 ## Arquivos-chave
 
