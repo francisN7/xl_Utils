@@ -32,6 +32,10 @@ decisões nos ADRs.
 
 ### Changed
 
+- **Login do Drive no Linux** (ADR 0030): fora do Windows o token da conta vai
+  para o chaveiro do sistema (KWallet ou GNOME Keyring), em vez de o login
+  falhar com “A proteção de tokens do Drive só existe no Windows.” O Windows
+  continua com DPAPI e o build Windows não ganha dependência.
 - **Painel de perfis do Drive** (ADR 0029): o hambúrguer do canto superior
   direito deu lugar ao avatar e ao nome da conta selecionada. O painel mostra a
   conta, as outras contas numa lista retrátil e, fixos embaixo, “Adicionar

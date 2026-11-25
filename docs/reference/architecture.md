@@ -254,7 +254,8 @@ recusa arquivo acima de 64 KB, exige HTTPS em `google.com`/`googleapis.com` e
 grava só os campos usados, de forma atômica; `is_configured` diz se há cliente
 válido. `shared/accounts.py` grava uma conta por e-mail em
 `%LOCALAPPDATA%/xl_utils/drive/accounts/`, com o `refresh_token` cifrado por
-DPAPI e escrita atômica; o e-mail ativo fica em `drive/active.json`. `ui/drive.py`
+DPAPI (fora do Windows, no chaveiro do sistema via `KeyringVault`, ADR 0030) e
+escrita atômica; o e-mail selecionado fica em `drive/active.json`. `ui/drive.py`
 é o estado compartilhado pelo menu de perfis no canto superior direito, e o
 login roda fora da thread da UI (ADR 0018).
 

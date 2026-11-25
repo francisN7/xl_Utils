@@ -92,7 +92,9 @@ campos que usa em `%LOCALAPPDATA%/xl_utils/drive_client.json` e não move nem
 altera o original. No Windows, o `client_secret` é gravado cifrado por DPAPI
 (campo `client_secret_dpapi`); em texto ele só existe em memória durante o
 login. As contas ficam em `%LOCALAPPDATA%/xl_utils/drive/`, com o
-`refresh_token` também protegido por DPAPI. Depois de importar, apague o JSON
+`refresh_token` também protegido por DPAPI. No Linux, a pasta é
+`~/.xl_utils/drive/` e o `refresh_token` vai para o chaveiro do sistema (KWallet
+ou GNOME Keyring, via Secret Service), que precisa estar ativo (ADR 0030). Depois de importar, apague o JSON
 baixado. O repositório é público: nunca faça commit do JSON do cliente — o
 `.gitignore` cobre os nomes usuais, mas o caminho certo é o `%LOCALAPPDATA%`.
 

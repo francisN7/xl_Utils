@@ -114,6 +114,28 @@ def test_last_logout_leaves_no_selection(store: accounts.AccountStore) -> None:
     assert session.accounts == []
 
 
+def test_logout_reports_a_keyring_failure_and_keeps_going(
+    store: accounts.AccountStore,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    asyncio.run(_session(store, "ana@example.com").connect())
+    session = _session(store, "zeca@example.com")
+    asyncio.run(session.connect())
+    original = store.remove
+
+    def remove(email: str) -> None:
+        original(email)
+        raise accounts.AccountsError("Chaveiro trancado.")
+
+    monkeypatch.setattr(store, "remove", remove)
+
+    session.logout()
+
+    assert session.error == "Chaveiro trancado."
+    assert session.active == "ana@example.com"
+    assert [account.email for account in session.accounts] == ["ana@example.com"]
+
+
 def test_logout_waits_while_busy(store: accounts.AccountStore) -> None:
     session = _session(store, "ana@example.com")
     asyncio.run(session.connect())

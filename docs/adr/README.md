@@ -34,6 +34,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0027](0027-vinculacao-vira-plugin.md) | Verificar Vínculos sai do app e vira plugin privado | Aceita |
 | [0028](0028-api-2-reader.md) | API 2 dos plugins: `request.reader` e fim da API 1 | Aceita |
 | [0029](0029-painel-de-perfis-do-drive.md) | Painel de perfis do Drive com conta selecionada | Aceita |
+| [0030](0030-token-no-chaveiro-fora-do-windows.md) | Token do Drive no chaveiro do sistema fora do Windows | Aceita |
 
 ## Como ler
 

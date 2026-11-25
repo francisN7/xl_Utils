@@ -68,3 +68,26 @@ def xls_file(tmp_path: Path) -> Path:
     source = tmp_path / "entrada.xls"
     source.write_bytes((FIXTURES / "minimo.xls").read_bytes())
     return source
+
+
+class _MemoryVault:
+    """Chaveiro em memória: nenhum teste toca o chaveiro real do usuário."""
+
+    def __init__(self, *_args: object) -> None:
+        self.tokens: dict[str, str] = {}
+
+    def put(self, key: str, token: str) -> None:
+        self.tokens[key] = token
+
+    def get(self, key: str) -> str | None:
+        return self.tokens.get(key)
+
+    def delete(self, key: str) -> None:
+        self.tokens.pop(key, None)
+
+
+@pytest.fixture(autouse=True)
+def _no_real_keyring(monkeypatch: pytest.MonkeyPatch) -> None:
+    from xl_utils.shared import accounts
+
+    monkeypatch.setattr(accounts, "KeyringVault", _MemoryVault)

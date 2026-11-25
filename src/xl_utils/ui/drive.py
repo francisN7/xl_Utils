@@ -344,13 +344,16 @@ class DriveSession:
         """
         if self.active is None or self.busy:
             return
-        self._store.remove(self.active)
+        self.error = None
+        try:
+            self._store.remove(self.active)
+        except accounts.AccountsError as error:
+            self.error = str(error)
         remaining = self._store.list()
         if remaining:
             self._store.set_active(remaining[0].email)
         else:
             self._store.clear_active()
-        self.error = None
         self.reload()
         self.notify()
 

@@ -181,3 +181,102 @@ def test_dpapi_round_trip() -> None:
 def test_dpapi_is_rejected_outside_windows() -> None:
     with pytest.raises(accounts.AccountsError):
         accounts.protect(b"x")
+
+
+class _Vault:
+    def __init__(self, *, fail_delete: bool = False) -> None:
+        self.tokens: dict[str, str] = {}
+        self.fail_delete = fail_delete
+
+    def put(self, key: str, token: str) -> None:
+        self.tokens[key] = token
+
+    def get(self, key: str) -> str | None:
+        return self.tokens.get(key)
+
+    def delete(self, key: str) -> None:
+        if self.fail_delete:
+            raise accounts.AccountsError("chaveiro trancado")
+        self.tokens.pop(key, None)
+
+
+def test_vault_keeps_the_token_out_of_the_file(tmp_path) -> None:
+    vault = _Vault()
+    store = accounts.AccountStore(tmp_path, vault=vault)
+
+    store.save(_account(token="refresh-secreto"))
+
+    raw = store.path_for("ana@example.com").read_text(encoding="utf-8")
+    assert "refresh-secreto" not in raw
+    assert '"vault": "keyring"' in raw
+    assert '"token"' not in raw
+    assert list(vault.tokens.values()) == ["refresh-secreto"]
+    assert store.get("ana@example.com") == _account(token="refresh-secreto")
+
+
+def test_vault_key_is_the_file_hash_not_the_email(tmp_path) -> None:
+    vault = _Vault()
+    store = accounts.AccountStore(tmp_path, vault=vault)
+
+    store.save(_account())
+
+    assert list(vault.tokens) == [store.path_for("ana@example.com").stem]
+
+
+def test_remove_deletes_the_token_from_the_vault(tmp_path) -> None:
+    vault = _Vault()
+    store = accounts.AccountStore(tmp_path, vault=vault)
+    store.save(_account("ana@example.com"))
+    store.save(_account("zeca@example.com"))
+
+    store.remove("ana@example.com")
+
+    assert [account.email for account in store.list()] == ["zeca@example.com"]
+    assert list(vault.tokens) == [store.path_for("zeca@example.com").stem]
+
+
+def test_missing_vault_token_skips_the_account(tmp_path) -> None:
+    vault = _Vault()
+    store = accounts.AccountStore(tmp_path, vault=vault)
+    store.save(_account())
+    vault.tokens.clear()
+
+    assert store.list() == []
+
+
+def test_failed_vault_delete_still_removes_the_file(tmp_path) -> None:
+    store = accounts.AccountStore(tmp_path, vault=_Vault(fail_delete=True))
+    store.save(_account())
+
+    with pytest.raises(accounts.AccountsError):
+        store.remove("ana@example.com")
+
+    assert store.list() == []
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="Windows usa DPAPI")
+def test_default_store_uses_the_keyring_outside_windows(tmp_path) -> None:
+    store = accounts.AccountStore(tmp_path)
+
+    store.save(_account())
+
+    assert store.get("ana@example.com") == _account()
+
+
+def test_keyring_errors_hide_the_backend_message(monkeypatch) -> None:
+    keyring = pytest.importorskip("keyring")
+    errors = pytest.importorskip("keyring.errors")
+
+    # O conftest troca o chaveiro por um em memória; aqui vale a classe real.
+    monkeypatch.undo()
+
+    def boom(*_args: str) -> None:
+        raise errors.KeyringLocked("refresh-secreto")
+
+    monkeypatch.setattr(keyring, "set_password", boom)
+
+    with pytest.raises(accounts.AccountsError) as caught:
+        accounts.KeyringVault().put("chave", "refresh-secreto")
+
+    assert "refresh-secreto" not in str(caught.value)
+    assert "KeyringLocked" in str(caught.value)

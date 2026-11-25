@@ -17,12 +17,13 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 | S19 | Verificar Vínculos saiu do app (core, controller, página, `shared/configs.py`, `headers.json`, testes) junto com o `pre_run` e as exceções da vinculação no `ToolLayout`; ADR 0027 (0014/0016 substituídas, adendo no 0015); repo privado `xl_U-Plugins` com `uv init`, estrutura de contexto, `_molde/`, guia e `link/referencia/` | grep sem `link`/Vínculos em `src/` e `tests/`; teste headless de quatro cartões e Plugins só no rodapé; `_molde` passa no `check`; ruff, pytest e docs verdes; app aberto no Linux | [x] |
 | S20 | API 2 dos plugins: `request.reader` (`shared/plugins/reader.py`) lê pelo `prepare_workbook` só as abas marcadas (`all_sheets=True` traz todas), com cache por execução, `ReadError` e etapa/log por arquivo; API 1 aposentada com motivo; exemplos 2.0.0 e docs `docs/plugins/`; ADR 0028; `_molde` do `xl_U-Plugins` na API 2 | Reader igual às nativas em xlsx/xls/csv/html e no cache do Drive; API 1 inválida com motivo na área Plugins (conferida no `--web`), no `list` e no `check`; `_molde` passa no `check`; execução no app com arquivo real fica com o dono; ruff, pytest e docs verdes | [x] |
 | S21a | Avatar + nome da conta selecionada no lugar do hambúrguer; painel (`MenuBar` + `SubmenuButton`) com cabeçalho, “Outras contas” retrátil, “Adicionar conta” e “Sair” fixos; Sair seleciona a próxima; “Abrir do Drive” abre direto na selecionada; “Salvar no Drive” só na conta de origem, com tooltip e aviso; ADR 0029 | Spike no `--web` com contas falsas nos dois temas (abrir, expandir, trocar, sair, adicionar, cabeçalhos sem sobreposição); `tests/test_top_menu.py` novo e testes de sessão, entrada e gravação; conferência no desktop e com conta real do Google fica com o dono; ruff, pytest e docs verdes | [x] |
+| S21c | Login do Drive no Linux: fora do Windows o `refresh_token` vai para o chaveiro do sistema (`keyring`, Secret Service/KWallet), Windows segue no DPAPI; Sair apaga o segredo; versão Linux sai dos gatilhos para o backlog; ADR 0030. Feita antes da S21b, a pedido do dono | Gravar, ler e apagar um token falso no chaveiro real do KDE; testes do cofre em memória (o `conftest` isola o chaveiro real); login com conta real do Google no Linux fica com o dono; ruff, pytest e docs verdes | [x] |
 | S21b | Engrenagem da conta: foto e apelido | — | [ ] |
 | S22 | Auditoria dos docs, documentação completa para quem chega e README com badges e screenshots | — | [ ] |
 | S23 | Release 0.4.0 e fechamento do ciclo | — | [ ] |
 
-Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21a → S21b →
-S22 → S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
+Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21a → S21c →
+S21b → S22 → S23** (a S21c entrou antes da S21b por urgência). A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
 Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 
 ## S18–S23 — próximas
@@ -80,6 +81,16 @@ Mostrar o número da versão, os créditos, a licença e o link para o repositó
 no GitHub. O menu hambúrguer saiu na S21a; o lugar (painel de perfil ou rodapé
 da sidebar) se decide na sessão.
 
+### Versão Linux
+
+O dono passou a usar só Linux. O app já roda no Linux pelo `uv run xl-utils`, e
+o login do Drive guarda o token no chaveiro (ADR 0030). Falta a distribuição:
+build e pacote para Linux (formato a decidir: AppImage, `.deb`, Flatpak ou
+`flet build linux`), ícone e atalho, cliente OAuth no build e um roteiro de
+release como o do Windows. O planejamento do próximo ciclo já considera as
+versões Windows e Linux; o Windows só pode ser validado por quem tiver a
+máquina.
+
 ### Ajuda ( i ) em cada ferramenta
 
 Botão ( i ) em cada ferramenta que abre uma página web local explicando o uso
@@ -99,7 +110,7 @@ escuro e o claro do app, com animação de cara tecnológica e transições.
 
 ## Gatilhos (não são backlog)
 
-- Suporte a macOS/Linux — só entra quando houver máquina para testar.
+- Suporte a macOS — só entra quando houver máquina para testar.
 - Internacionalização — só entra se aparecer usuário fora do PT-BR.
 - Drag & drop real de arquivos — só entra se migrar para PySide6 ou houver hook
   Windows-only.

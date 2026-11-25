@@ -4,28 +4,28 @@
 
 ## Sessão
 
-- **Última concluída:** S21a — Painel de perfis do Drive
+- **Última concluída:** S21c — Login do Drive no Linux (chaveiro); antes, S21a
 - **Próxima:** S21b — Engrenagem da conta: foto e apelido
   (`docs/sessions/S21b-config-da-conta.md`)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `e76283b` — docs: backlog de revisao, sobre, ajuda e gatilho
-- **Decisões:** ADR 0029 (painel de perfis, conta selecionada), 0028 (API 2),
-  0027 (vinculação vira plugin), 0026 (Picker JS) e 0015–0025.
+- **Retorno:** `d0982d5` — S21a: painel de perfis do Drive
+- **Decisões:** ADR 0030 (token no chaveiro), 0029 (painel de perfis), 0028
+  (API 2), 0027 (vinculação vira plugin), 0026 (Picker JS) e 0015–0025.
 
 ## Pronto
 
+- S21c: fora do Windows o token vai para o chaveiro (`KeyringVault`).
 - S21a: avatar + nome da conta selecionada no topo; painel `MenuBar` +
   `SubmenuButton` com “Outras contas” retrátil, “Adicionar conta” e “Sair”;
   “Abrir do Drive” sem diálogo; salvar só na conta de origem, com aviso.
 - S20: `request.reader.read(path)` lê pelo `prepare_workbook` só as abas
   marcadas; API 1 inválida com motivo; `_molde` do `xl_U-Plugins` na API 2.
-- Pós-S19: `uv run xl-utils --web` abre a mesma UI na porta 8550.
 
 ## Próximo passo
 
 Executar a S21b (abre com questionário: diálogo ou página, foto). O dono
-confere o painel no desktop e com conta real do Google. Depois S22–S23 até a
-0.4.0; S24 (Picker JS) no backlog. Conferir o ícone no build Windows.
+confere login real e painel no Linux. Depois S22–S23 até a 0.4.0; S24 (Picker
+JS) e versão Linux no backlog; o próximo ciclo planeja Windows e Linux.
 
 ## Arquivos-chave
 
@@ -43,8 +43,8 @@ confere o painel no desktop e com conta real do Google. Depois S22–S23 até a
 - `configs/` só tem o modelo `drive_client.json`; o build leva a pasta.
 - `drive.file` só vê o que o app criou ou o Picker concedeu (listar dá 0).
 - Picker JS com token inválido dá 403 sem callback: precisa de tempo-limite.
-- O build não embute cliente OAuth nem API key (backlog); no Linux o
-  `drive_client.json` fica em `~/.xl_utils/` e o DPAPI não existe.
+- No Linux tudo fica em `~/.xl_utils/`; o token vai para o chaveiro e os
+  testes nunca o tocam (`conftest` troca `KeyringVault` por um em memória).
 - Spikes em `artifacts/`, nunca commitados; `spike_s21a/panel.py` roda o app
   com contas falsas na 8551, mas trocar o tema lá grava a preferência real.
 - Diálogo de largura fixa corta em 125%: calcular por `page.width`.

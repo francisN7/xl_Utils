@@ -1,8 +1,10 @@
 """Contas do Google Drive: identidade, token protegido e conta selecionada.
 
-O ``refresh_token`` nunca é gravado em texto: no Windows ele passa por DPAPI
-(``CryptProtectData``) e o arquivo da conta só guarda o blob em base64. O
-e-mail selecionado fica em ``drive/active.json``; as demais contas continuam lá.
+O ``refresh_token`` nunca é gravado em texto. No Windows ele passa por DPAPI
+(``CryptProtectData``) e o arquivo da conta só guarda o blob em base64; nos
+demais sistemas ele vai para o chaveiro do usuário (Secret Service/KWallet, via
+``keyring``) e o arquivo só diz onde está. O e-mail selecionado fica em
+``drive/active.json``; as demais contas continuam lá.
 """
 
 from __future__ import annotations
@@ -16,7 +18,7 @@ import sys
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 from xl_utils.shared.settings import APP_DIR
 
@@ -24,6 +26,8 @@ DRIVE_DIR = "drive"
 ACCOUNTS_DIR = "accounts"
 ACTIVE_FILE = "active.json"
 ENTROPY = b"xl_utils/drive/v1"
+KEYRING_SERVICE = "xl_utils/drive"
+VAULT_KEYRING = "keyring"
 _CRYPTPROTECT_UI_FORBIDDEN = 0x1
 
 Protector = Callable[[bytes], bytes]
@@ -31,6 +35,56 @@ Protector = Callable[[bytes], bytes]
 
 class AccountsError(Exception):
     """Falha ao ler, gravar ou proteger uma conta do Drive."""
+
+
+class TokenVault(Protocol):
+    """Guarda o token fora do arquivo da conta, por uma chave estável."""
+
+    def put(self, key: str, token: str) -> None: ...
+
+    def get(self, key: str) -> str | None: ...
+
+    def delete(self, key: str) -> None: ...
+
+
+class KeyringVault:
+    """Chaveiro do usuário (Secret Service, KWallet ou macOS Keychain)."""
+
+    def __init__(self, service: str = KEYRING_SERVICE) -> None:
+        self._service = service
+
+    def put(self, key: str, token: str) -> None:
+        self._call("gravar", "set_password", key, token)
+
+    def get(self, key: str) -> str | None:
+        return self._call("ler", "get_password", key)
+
+    def delete(self, key: str) -> None:
+        import keyring.errors
+
+        try:
+            self._call("apagar", "delete_password", key)
+        except AccountsError as error:
+            if not isinstance(error.__cause__, keyring.errors.PasswordDeleteError):
+                raise
+
+    def _call(self, verb: str, name: str, *args: str) -> Any:
+        try:
+            import keyring
+            import keyring.errors
+        except ImportError as error:
+            raise AccountsError(
+                "O chaveiro do sistema não está disponível (pacote keyring)."
+            ) from error
+        try:
+            return getattr(keyring, name)(self._service, *args)
+        except keyring.errors.KeyringError as error:
+            # Só o tipo do erro: a mensagem do backend pode citar o segredo.
+            raise AccountsError(
+                f"Não foi possível {verb} o token no chaveiro do sistema "
+                f"({type(error).__name__}). Confira se o KWallet ou o "
+                "GNOME Keyring está ativo e desbloqueado."
+            ) from error
 
 
 @dataclass(frozen=True, slots=True)
@@ -130,10 +184,15 @@ class AccountStore:
         *,
         protector: Protector | None = None,
         unprotector: Protector | None = None,
+        vault: TokenVault | None = None,
     ) -> None:
         self.root = root or default_root()
         self._protector = protector or protect
         self._unprotector = unprotector or unprotect
+        # Sem protetor injetado e fora do Windows, o token vai para o chaveiro.
+        if vault is None and protector is None and sys.platform != "win32":
+            vault = KeyringVault()
+        self._vault = vault
 
     @property
     def accounts_dir(self) -> Path:
@@ -171,20 +230,35 @@ class AccountStore:
 
     def save(self, account: Account) -> None:
         """Grava a conta de forma atômica, com o token protegido."""
-        token = self._protector(account.refresh_token.encode("utf-8"))
-        payload = {
-            "email": account.email,
-            "name": account.name,
-            "token": base64.b64encode(token).decode("ascii"),
-            "scopes": list(account.scopes),
-            "token_uri": account.token_uri,
-            "client_id": account.client_id,
-        }
+        payload: dict[str, Any] = {"email": account.email, "name": account.name}
+        if self._vault is not None:
+            self._vault.put(self._key(account.email), account.refresh_token)
+            payload["vault"] = VAULT_KEYRING
+        else:
+            token = self._protector(account.refresh_token.encode("utf-8"))
+            payload["token"] = base64.b64encode(token).decode("ascii")
+        payload.update(
+            {
+                "scopes": list(account.scopes),
+                "token_uri": account.token_uri,
+                "client_id": account.client_id,
+            }
+        )
         _write_atomic(self.path_for(account.email), payload)
 
     def remove(self, email: str) -> None:
-        """Apaga só a conta indicada."""
+        """Apaga só a conta indicada e, depois, o token dela no chaveiro.
+
+        O arquivo sai primeiro: se o chaveiro falhar, a conta já não aparece e
+        o erro chega ao usuário para ele limpar o segredo à mão.
+        """
         self.path_for(email).unlink(missing_ok=True)
+        if self._vault is not None:
+            self._vault.delete(self._key(email))
+
+    def _key(self, email: str) -> str:
+        """Chave do token no chaveiro: o mesmo hash do nome do arquivo."""
+        return self.path_for(email).stem
 
     def active(self) -> str | None:
         """Devolve o e-mail selecionado, ou ``None`` se ele não existe mais."""
@@ -211,20 +285,32 @@ class AccountStore:
         data = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
             raise AccountsError(f"{path.name}: conta inválida.")
-        token = data.get("token")
-        if not isinstance(token, str) or not token:
-            raise AccountsError(f"{path.name}: token ausente.")
+        refresh_token = self._token(path, data)
         scopes = data.get("scopes")
         return Account(
             email=data.get("email", ""),
             name=data.get("name", ""),
-            refresh_token=self._unprotector(base64.b64decode(token)).decode("utf-8"),
+            refresh_token=refresh_token,
             scopes=tuple(str(item) for item in scopes)
             if isinstance(scopes, list)
             else (),
             token_uri=_text(data.get("token_uri")),
             client_id=_text(data.get("client_id")),
         )
+
+    def _token(self, path: Path, data: dict[str, Any]) -> str:
+        """Lê o token do chaveiro ou desfaz a proteção do blob do arquivo."""
+        if data.get("vault") == VAULT_KEYRING:
+            if self._vault is None:
+                raise AccountsError(f"{path.name}: token em chaveiro indisponível.")
+            token = self._vault.get(path.stem)
+            if not token:
+                raise AccountsError(f"{path.name}: token ausente no chaveiro.")
+            return token
+        blob = data.get("token")
+        if not isinstance(blob, str) or not blob:
+            raise AccountsError(f"{path.name}: token ausente.")
+        return self._unprotector(base64.b64decode(blob)).decode("utf-8")
 
 
 def _text(value: Any) -> str:

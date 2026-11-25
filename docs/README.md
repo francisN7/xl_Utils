@@ -76,6 +76,8 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o seletor do Drive é Flet puro e paginado | `adr/0025-seletor-de-arquivos.md` | 115 |
 | por que a vinculação saiu do app | `adr/0027-vinculacao-vira-plugin.md` | 45 |
 | por que o plugin lê por `request.reader` e a API 1 saiu | `adr/0028-api-2-reader.md` | 70 |
+| por que o Drive tem painel de perfil e conta selecionada | `adr/0029-painel-de-perfis-do-drive.md` | 68 |
+| por que o token do Drive vai para o chaveiro fora do Windows | `adr/0030-token-no-chaveiro-fora-do-windows.md` | 53 |
 
 ## Regras do mapa
 
