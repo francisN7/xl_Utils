@@ -90,7 +90,7 @@ docs/               mapa, estado, roadmap (ativo e ciclos), guias, ADRs
 - [ ] ferramenta funciona com arquivo real
 - [ ] docs afetados atualizados
 - [ ] `CURRENT.md`, roadmap e `CHANGELOG.md` atualizados
-- [ ] commit feito e enviado
+- [ ] commit local feito (push fica com o dono)
 
 ## Segurança (repo público)
 

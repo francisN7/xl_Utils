@@ -24,7 +24,7 @@ atual da vinculação como referência e o guia reutilizável de criação.
    `docs/reference/architecture.md`, `docs/index.html`, AGENTS.md (“cinco
    utilitários”); ADRs 0014/0016 ganham nota “superado — removido na S19”.
 5. Esqueleto em `/home/francis/Apps/Codes/xl_U-Plugins` (repo próprio, remoto
-   `francisN7/xl_U-Plugins`; commit lá, push só com OK): README, `link/` com o
+   `francisN7/xl_U-Plugins`; só commit local, sem push): README, `link/` com o
    código atual como referência e guia de criação reaproveitando
    `docs/plugins/`.
 6. CHANGELOG (Removed).
