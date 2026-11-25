@@ -235,6 +235,11 @@ nada é sobrescrito.
 | mudar o log ao vivo ou o cancelamento | `shared/progress.py` + `ui/components/tool_layout.py` + páginas |
 | mudar o painel de perfis, a foto ou o apelido | `ui/components/top_menu.py` + `account_settings.py` + `account_label.py` + `shared/profiles.py` |
 | mudar tema ou preferência salva | `ui/theme.py` + `shared/settings.py` + `ui/components/sidebar.py` |
+| mudar o Início ou a navegação | `ui/pages/home.py` + `ui/pages/registry.py` + `app.py` |
+| mudar o login ou as contas do Drive | `shared/drive_auth.py` + `shared/accounts.py` + `ui/drive.py` + teste em `test_drive_flow.py` |
+| mudar o limite de linhas por arquivo | `core/save.py` (`ROW_LIMIT`, `split_item`) + teste em `test_save_split.py` |
+| mudar o CLI de plugins | `plugin_cli.py` + teste em `test_plugin_cli.py` |
+| acrescentar um módulo | o módulo + uma linha em `architecture.md` → **Mapa dos módulos** (o check cobra) |
 
 ## Invariantes
 

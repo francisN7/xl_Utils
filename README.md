@@ -93,9 +93,10 @@ docs/            documentação e memória entre sessões
 
 ## Documentação
 
-O mapa completo está em [`docs/README.md`](docs/README.md). Para entender o
-código em ordem guiada, comece pelo
-[code tour](docs/guide/code-tour.md). Para retomar o projeto, leia
+Primeira vez aqui? A [trilha de onboarding](docs/guide/onboarding.md) leva do
+“o que é” à primeira contribuição em seis passos, com o
+[glossário](docs/reference/glossary.md) ao lado. O mapa completo está em
+[`docs/README.md`](docs/README.md); para retomar o projeto, leia
 [`AGENTS.md`](AGENTS.md) e [`docs/state/CURRENT.md`](docs/state/CURRENT.md).
 
 ## Branch `legacy`
@@ -118,8 +119,9 @@ terceiros.
 
 ## Contribuindo
 
-Este é um projeto pessoal e não há processo formal de contribuição. Sugestões e
-relatos podem ser abertos como issue no repositório.
+É um projeto pessoal: contribuições de código são por convite e seguem o
+[`CONTRIBUTING.md`](CONTRIBUTING.md). Sugestões e relatos podem ser abertos
+como issue; antes de mandar um pull request sem convite, fale com o dono.
 
 ## Licença
 

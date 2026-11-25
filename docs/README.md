@@ -12,12 +12,15 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 |---|---|
 | 🤖 agente | `AGENTS.md`, `state/CURRENT.md`, `sessions/` (spec da vez) |
 | 🤝 ambos | este mapa, `guide/`, `reference/`, `plugins/`, `roadmap/`, `adr/` |
-| 👤 pessoas | `README.md`, `CHANGELOG.md`, `SECURITY.md`, o site (`index.html`) |
+| 👤 pessoas | `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `SECURITY.md`, o site (`index.html`) |
 
 ## Por pergunta
 
 | Você quer… | Leia |
 |---|---|
+| chegar do zero à primeira contribuição | [`guide/onboarding.md`](guide/onboarding.md) |
+| saber o que um termo quer dizer | [`reference/glossary.md`](reference/glossary.md) |
+| contribuir (fluxo, regras e validação) | [`../CONTRIBUTING.md`](../CONTRIBUTING.md) |
 | entender o projeto e ver as ferramentas | [`../README.md`](../README.md) |
 | saber onde paramos | [`state/CURRENT.md`](state/CURRENT.md) |
 | saber o que vem agora | [`roadmap/main.md`](roadmap/main.md) |
