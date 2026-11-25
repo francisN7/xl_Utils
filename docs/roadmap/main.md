@@ -61,6 +61,17 @@ O ADR 0026 troca o Picker de desktop pelo Picker JavaScript no navegador, com o
 token do login: consentimento só no login, sem mudar `drive.file`. Fica para
 depois da 0.4.0, na [spec de backlog](../sessions/S24-seletor-do-drive.md).
 
+### Picker do Drive só com planilhas
+
+Hoje o Picker de abrir aceita qualquer arquivo (vídeo, `.rar`, `.zip`…). Ele
+deve mostrar e deixar escolher só planilhas (`.xlsx`, `.xls`, `.csv` e Planilha
+Google), com as pastas visíveis para navegar. O Picker de desktop
+(`shared/drive_pick.py`) já usa o parâmetro `mimetypes` na escolha de pasta;
+falta passar a lista de MIME de planilha na escolha de arquivo e conferir que
+as pastas continuam navegáveis. No Picker JS (S24) o equivalente é
+`DocsView.setMimeTypes`. Rede de segurança: rejeitar com aviso o arquivo
+escolhido que não for planilha, antes de baixar.
+
 ### Credenciais do Google no build
 
 O build não embute o cliente OAuth: quem recebe o instalador teria de importar
