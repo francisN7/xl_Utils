@@ -72,3 +72,6 @@ PJE.py
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Configuração local do Claude Code
+.claude/
