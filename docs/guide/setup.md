@@ -73,11 +73,11 @@ arquivo uma única vez:
    No consentimento, os escopos são `openid`,
    `https://www.googleapis.com/auth/userinfo.email` e
    `https://www.googleapis.com/auth/drive.file`.
-3. No app, clique no menu hamburger do canto superior direito → **Entrar com
-   Google** e selecione o JSON baixado.
+3. No app, clique em **Entrar com Google** no canto superior direito e
+   selecione o JSON baixado.
 
-Depois disso o fluxo é sempre o mesmo: menu → **Entrar com Google** → navegador
-→ pronto. Não há cartão nem item de configuração na tela; o pedido do arquivo
+Depois disso o fluxo é sempre o mesmo: canto superior direito → **Entrar com
+Google** → navegador → pronto. Não há cartão nem item de configuração na tela; o pedido do arquivo
 só aparece se ainda não houver cliente.
 
 Ao abrir uma planilha do Drive, o app usa o **Picker de apps desktop**: uma

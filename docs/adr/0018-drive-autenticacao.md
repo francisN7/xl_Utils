@@ -1,6 +1,6 @@
 # ADR 0018 — Autenticação no Google Drive
 
-- **Status:** aceita
+- **Status:** aceita; conta ativa e “Sair” detalhados no ADR 0029
 - **Data:** 2026-11-08
 
 ## Contexto

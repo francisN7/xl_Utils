@@ -212,7 +212,7 @@ class ToolLayout:
                 ],
                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
             ),
-            padding=ft.Padding.only(bottom=16, right=64),
+            padding=ft.Padding.only(bottom=16, right=theme.TOP_MENU_RESERVE),
         )
 
         if self._input_labels:
@@ -710,10 +710,23 @@ class ToolLayout:
         self._refresh()
 
     def _update_drive_mode(self) -> None:
-        """Mostra “Salvar no Drive” só quando a entrada veio do Drive."""
+        """Mostra “Salvar no Drive” só quando a entrada veio do Drive.
+
+        O botão grava na conta de origem; sem ela, fica desabilitado e o
+        tooltip diz por quê.
+        """
         has_origin = any(drive_cache.is_cached(path) for path in self.state.files)
-        available = self._drive is not None and bool(self._drive.accounts)
-        self.result.set_drive_mode(has_origin, available)
+        account = None
+        hint = None
+        if has_origin and self._drive is not None:
+            origins = drive_cache.origins(self.state.files)
+            account = self._drive.account_for(origins)
+            hint = (
+                f"Grava no Drive de {account.email}"
+                if account is not None
+                else _missing_origin_account(origins)
+            )
+        self.result.set_drive_mode(has_origin, account is not None, hint)
 
     def _save_drive_clicked(self, _event=None) -> None:
         """Leva o resultado para a pasta do Drive, pedindo a pasta se preciso."""
@@ -729,9 +742,7 @@ class ToolLayout:
         origins = drive_cache.origins(self.state.files)
         account = self._drive.account_for(origins)
         if account is None:
-            self._save_failed(
-                SaveError("Entre no Google Drive para salvar o resultado lá.")
-            )
+            self._save_failed(SaveError(_missing_origin_account(origins)))
             return
         folders = drive_cache.parents(self.state.files)
         if not folders:
@@ -1026,3 +1037,11 @@ def _build_options(
     if isinstance(panel, ft.Control):
         return panel, None
     return panel.control, panel.refresh
+
+
+def _missing_origin_account(origins: Sequence[drive_cache.DriveOrigin]) -> str:
+    """Explica por que não dá para salvar: a conta que abriu o arquivo saiu."""
+    email = next((item.account for item in origins if item.account), "")
+    if email:
+        return f"Entre de novo com {email} para salvar no Drive."
+    return "Abra o arquivo de novo pelo Drive para salvar lá."

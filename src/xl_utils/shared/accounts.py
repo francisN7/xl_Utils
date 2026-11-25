@@ -1,8 +1,8 @@
-"""Contas do Google Drive: identidade, token protegido e conta ativa.
+"""Contas do Google Drive: identidade, token protegido e conta selecionada.
 
 O ``refresh_token`` nunca é gravado em texto: no Windows ele passa por DPAPI
 (``CryptProtectData``) e o arquivo da conta só guarda o blob em base64. O
-e-mail ativo fica em ``drive/active.json``; as demais contas continuam lá.
+e-mail selecionado fica em ``drive/active.json``; as demais contas continuam lá.
 """
 
 from __future__ import annotations
@@ -142,7 +142,7 @@ class AccountStore:
 
     @property
     def active_path(self) -> Path:
-        """Arquivo que guarda o e-mail ativo."""
+        """Arquivo que guarda o e-mail selecionado."""
         return self.root / ACTIVE_FILE
 
     def path_for(self, email: str) -> Path:
@@ -187,7 +187,7 @@ class AccountStore:
         self.path_for(email).unlink(missing_ok=True)
 
     def active(self) -> str | None:
-        """Devolve o e-mail ativo, ou ``None`` se ele não existe mais."""
+        """Devolve o e-mail selecionado, ou ``None`` se ele não existe mais."""
         try:
             data = json.loads(self.active_path.read_text(encoding="utf-8"))
         except OSError, ValueError:
@@ -198,13 +198,13 @@ class AccountStore:
         return email if self.path_for(email).exists() else None
 
     def set_active(self, email: str) -> None:
-        """Marca a conta ativa; a conta precisa existir."""
+        """Marca a conta selecionada; a conta precisa existir."""
         if not self.path_for(email).exists():
             raise AccountsError(f"Conta desconhecida: {email}")
         _write_atomic(self.active_path, {"email": email})
 
     def clear_active(self) -> None:
-        """Remove a marca de conta ativa, preservando as contas."""
+        """Remove a marca de conta selecionada, preservando as contas."""
         self.active_path.unlink(missing_ok=True)
 
     def _read(self, path: Path) -> Account:

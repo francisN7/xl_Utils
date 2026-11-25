@@ -9,7 +9,7 @@ import flet as ft
 from xl_utils.core.mime import FormatCheck
 from xl_utils.shared.accounts import Account
 from xl_utils.ui import theme
-from xl_utils.ui.components.account_label import email_text
+from xl_utils.ui.components.account_label import display_name
 from xl_utils.ui.drive import DriveSession
 
 ALLOWED_EXTENSIONS = ["xlsx", "xlsm", "xls", "csv", "html", "htm"]
@@ -82,7 +82,7 @@ class FileInput:
             bgcolor=theme.BACKGROUND_DEEP,
             alignment=ft.Alignment.CENTER,
             ink=True,
-            tooltip="Abrir do Drive",
+            tooltip=_drive_tooltip(drive),
             on_click=self._open_drive,
             visible=bool(drive and drive.accounts),
         )
@@ -132,52 +132,14 @@ class FileInput:
         return page
 
     def _open_drive(self, _event=None) -> None:
-        """Abre o seletor do Drive; com mais de uma conta, pergunta qual."""
+        """Abre o seletor do Drive direto na conta selecionada no painel."""
         page = self._page()
         if page is None or self._drive is None or self._busy:
             return
-        accounts = self._drive.accounts
-        if not accounts:
+        account = self._drive.active_account
+        if account is None:
             return
-        if len(accounts) == 1:
-            page.run_task(self._drive_open, accounts[0])
-            return
-        self._choose_account(page, accounts)
-
-    def _choose_account(self, page: ft.Page, accounts: Sequence[Account]) -> None:
-        def choose(account: Account) -> None:
-            page.pop_dialog()
-            page.run_task(self._drive_open, account)
-
-        dialog = ft.AlertDialog(
-            modal=True,
-            title=ft.Text("Abrir do Drive"),
-            content=ft.Column(
-                controls=[
-                    ft.ListTile(
-                        leading=ft.CircleAvatar(
-                            content=ft.Text(_initials(account), size=13),
-                        ),
-                        title=email_text(account.email),
-                        subtitle=ft.Text(
-                            account.name or "Conta do Google",
-                            size=theme.FONT_XS,
-                        ),
-                        on_click=lambda _event, item=account: choose(item),
-                    )
-                    for account in accounts
-                ],
-                tight=True,
-                spacing=2,
-            ),
-            actions=[
-                ft.TextButton(
-                    "Cancelar",
-                    on_click=lambda _event: page.pop_dialog(),
-                )
-            ],
-        )
-        page.show_dialog(dialog)
+        page.run_task(self._drive_open, account)
 
     async def _drive_open(self, account: Account) -> None:
         """Baixa as planilhas escolhidas e entrega ao mesmo fluxo do local."""
@@ -204,6 +166,7 @@ class FileInput:
             return
         self._drive_button.visible = bool(self._drive.accounts)
         self._drive_button.disabled = self._busy or self._drive.busy
+        self._drive_button.tooltip = _drive_tooltip(self._drive)
         self._render_drive()
 
     def _render_drive(self) -> None:
@@ -336,10 +299,12 @@ class FileInput:
             self.control.update()
 
 
-def _initials(account: Account) -> str:
-    source = account.name or account.email
-    parts = [part for part in source.replace("@", " ").split() if part]
-    return "".join(part[0].upper() for part in parts[:2]) or "G"
+def _drive_tooltip(drive: DriveSession | None) -> str:
+    """Diz em qual conta o “Abrir do Drive” vai abrir."""
+    account = drive.active_account if drive is not None else None
+    if account is None:
+        return "Abrir do Drive"
+    return f"Abrir do Drive — {display_name(account)}"
 
 
 def _format_size(size: int) -> str:

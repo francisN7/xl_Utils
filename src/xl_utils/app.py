@@ -72,6 +72,7 @@ def main(page: ft.Page) -> None:
         page.theme_mode = ft.ThemeMode.LIGHT if mode == "light" else ft.ThemeMode.DARK
         theme.restyle(sidebar.control, mapping)
         theme.restyle(menu_overlay, mapping)
+        top_menu.refresh()
         theme.restyle(home, mapping)
         for view in pages.values():
             theme.restyle(view, mapping)

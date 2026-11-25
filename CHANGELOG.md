@@ -32,6 +32,13 @@ decisões nos ADRs.
 
 ### Changed
 
+- **Painel de perfis do Drive** (ADR 0029): o hambúrguer do canto superior
+  direito deu lugar ao avatar e ao nome da conta selecionada. O painel mostra a
+  conta, as outras contas numa lista retrátil e, fixos embaixo, “Adicionar
+  conta” e “Sair”. Sair remove só a selecionada e seleciona a próxima.
+  “Abrir do Drive” abre direto na conta selecionada, sem perguntar.
+  “Salvar no Drive” grava sempre na conta que abriu o arquivo e diz qual no
+  tooltip; se ela saiu, o botão pede para entrar de novo com aquele e-mail.
 - **API 2 dos plugins** (ADR 0028): `request.reader.read(path)` lê `.xlsx`,
   `.xls`, `.csv`, `.html` e arquivos abertos do Drive pelo mesmo pipeline das
   ferramentas nativas, só com as abas marcadas (`all_sheets=True` traz todas).

@@ -5,7 +5,7 @@ from types import SimpleNamespace
 import flet as ft
 import pytest
 
-from xl_utils.shared import accounts, drive_pick
+from xl_utils.shared import accounts, drive_cache, drive_pick
 from xl_utils.shared.drive import DriveApiError, DriveFile
 from xl_utils.ui.components.top_menu import TopMenu
 from xl_utils.ui.drive import DriveSession
@@ -84,36 +84,91 @@ def test_switch_changes_the_active_account(store: accounts.AccountStore) -> None
     assert len(session.accounts) == 2
 
 
-def test_logout_removes_only_the_active_account(
+def test_logout_removes_only_the_selected_and_selects_the_first_left(
     store: accounts.AccountStore,
 ) -> None:
-    asyncio.run(_session(store, "ana@example.com").connect())
+    for email in ("bia@example.com", "ana@example.com"):
+        asyncio.run(_session(store, email).connect())
     session = _session(store, "zeca@example.com")
     asyncio.run(session.connect())
 
     session.logout()
 
+    assert session.active == "ana@example.com"
+    assert store.active() == "ana@example.com"
+    assert [account.email for account in session.accounts] == [
+        "ana@example.com",
+        "bia@example.com",
+    ]
+
+
+def test_last_logout_leaves_no_selection(store: accounts.AccountStore) -> None:
+    session = _session(store, "ana@example.com")
+    asyncio.run(session.connect())
+
+    session.logout()
+
     assert session.active is None
-    assert [account.email for account in session.accounts] == ["ana@example.com"]
+    assert session.active_account is None
+    assert store.active() is None
+    assert session.accounts == []
 
 
-def test_next_account_cycles_between_two(store: accounts.AccountStore) -> None:
+def test_logout_waits_while_busy(store: accounts.AccountStore) -> None:
+    session = _session(store, "ana@example.com")
+    asyncio.run(session.connect())
+    session.busy = True
+
+    session.logout()
+
+    assert session.active == "ana@example.com"
+    assert len(session.accounts) == 1
+
+
+def test_reload_selects_the_first_account_when_the_mark_is_orphan(
+    store: accounts.AccountStore,
+) -> None:
+    for email in ("zeca@example.com", "ana@example.com"):
+        asyncio.run(_session(store, email).connect())
+    store.active_path.write_text('{"email": "sumiu@example.com"}', encoding="utf-8")
+
+    session = DriveSession(store=store, configured=True)
+
+    assert session.active == "ana@example.com"
+    assert session.active_account is not None
+
+
+def _origin(account: str) -> drive_cache.DriveOrigin:
+    return drive_cache.DriveOrigin(
+        file_id="id",
+        name="planilha.xlsx",
+        parent="pasta",
+        account=account,
+    )
+
+
+def test_account_for_returns_the_origin_even_with_another_selected(
+    store: accounts.AccountStore,
+) -> None:
     asyncio.run(_session(store, "ana@example.com").connect())
     session = _session(store, "zeca@example.com")
     asyncio.run(session.connect())
 
-    assert session.next_account() == "ana@example.com"
-    session.switch("ana@example.com")
-    assert session.next_account() == "zeca@example.com"
+    account = session.account_for([_origin("ana@example.com")])
+
+    assert session.active == "zeca@example.com"
+    assert account is not None
+    assert account.email == "ana@example.com"
 
 
-def test_next_account_is_none_with_a_single_account(
+def test_account_for_never_falls_back_to_the_selected(
     store: accounts.AccountStore,
 ) -> None:
-    session = _session(store, "ana@example.com")
+    session = _session(store, "zeca@example.com")
     asyncio.run(session.connect())
 
-    assert session.next_account() is None
+    assert session.account_for([_origin("ana@example.com")]) is None
+    assert session.account_for([_origin("")]) is None
 
 
 def test_failure_keeps_the_previous_accounts(store: accounts.AccountStore) -> None:
@@ -154,68 +209,6 @@ def test_listeners_are_notified_on_change(store: accounts.AccountStore) -> None:
     session.logout()
 
     assert len(calls) == 3
-
-
-def test_menu_offers_login_when_there_is_no_account(
-    store: accounts.AccountStore,
-) -> None:
-    session = DriveSession(
-        store=store,
-        authorize=lambda: _account("ana@example.com"),
-        configured=True,
-    )
-    menu = TopMenu(session)
-
-    items = menu.control.items
-
-    assert [item.content for item in items] == ["Entrar com Google"]
-
-
-def test_menu_lists_accounts_and_checks_the_active_one(
-    store: accounts.AccountStore,
-) -> None:
-    asyncio.run(_session(store, "ana@example.com").connect())
-    session = _session(store, "zeca@example.com")
-    asyncio.run(session.connect())
-    menu = TopMenu(session)
-
-    checked = [item for item in menu.control.items if item.checked]
-
-    assert [_texts(item.content) for item in checked] == [["zeca@example.com"]]
-
-
-def test_menu_switches_the_account(store: accounts.AccountStore) -> None:
-    asyncio.run(_session(store, "ana@example.com").connect())
-    session = _session(store, "zeca@example.com")
-    asyncio.run(session.connect())
-    menu = TopMenu(session)
-    target = next(
-        item
-        for item in menu.control.items
-        if _texts(item.content) == ["ana@example.com"]
-    )
-
-    target.on_click(None)
-
-    assert session.active == "ana@example.com"
-
-
-def test_menu_truncates_a_long_email_and_keeps_the_full_value_in_tooltip(
-    store: accounts.AccountStore,
-) -> None:
-    long_email = "francisco.almeida@escritorio-advocacia.com.br"
-    session = _session(store, long_email)
-    asyncio.run(session.connect())
-    menu = TopMenu(session)
-
-    item = next(item for item in menu.control.items if item.checked)
-    text = item.content
-
-    assert isinstance(text, ft.Text)
-    assert text.value.endswith("…")
-    assert long_email.startswith(text.value[:-1])
-    assert isinstance(text.tooltip, ft.Tooltip)
-    assert text.tooltip.message == long_email
 
 
 def _texts(control: object) -> list[str]:
@@ -274,11 +267,9 @@ def test_app_shell_puts_the_drive_menu_at_the_top_right(
     assert isinstance(body, ft.Stack)
     assert menu.right == 16
     assert menu.top == 18
-    assert isinstance(menu.content, ft.PopupMenuButton)
+    assert isinstance(menu.content, ft.MenuBar)
     logo = sidebar.content.controls[0]
-    assert not any(
-        isinstance(control, ft.PopupMenuButton) for control in logo.content.controls
-    )
+    assert not any(isinstance(control, ft.MenuBar) for control in logo.content.controls)
     assert not any("Drive:" in text for text in _texts(home))
 
 
@@ -403,38 +394,6 @@ def test_first_login_stops_when_the_picker_is_cancelled(
     assert session.active is None
     assert session.accounts == []
     assert session.error is None
-
-
-def test_menu_offers_only_login_when_unconfigured(
-    store: accounts.AccountStore,
-) -> None:
-    session = DriveSession(
-        store=store,
-        authorize=lambda: _account("ana@example.com"),
-        configured=False,
-    )
-    menu = TopMenu(session, importer=_FakeImporter())
-
-    assert [item.content for item in menu.control.items] == ["Entrar com Google"]
-
-
-def test_menu_lists_profiles_and_actions(store: accounts.AccountStore) -> None:
-    asyncio.run(_session(store, "ana@example.com").connect())
-    session = _session(store, "zeca@example.com")
-    asyncio.run(session.connect())
-    menu = TopMenu(session, importer=_FakeImporter())
-
-    contents = [" ".join(_texts(item.content)) for item in menu.control.items]
-
-    assert "ana@example.com" in contents
-    assert "zeca@example.com" in contents
-    assert "Adicionar conta" in contents
-    assert "Sair desta conta" in contents
-    assert all("Configurar" not in content for content in contents)
-    checked = [
-        " ".join(_texts(item.content)) for item in menu.control.items if item.checked
-    ]
-    assert checked == ["zeca@example.com"]
 
 
 class _FakeClient:

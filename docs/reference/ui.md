@@ -13,8 +13,8 @@ nativas; **Plugins** fica fixo no rodapé, acima de `uv · Python 3.15` e do
 botão de tema, com o mesmo realce de selecionado. Os itens são identificados
 pelo `id` da página (`registry.TOOLS` e `registry.FOOTER_PAGES`), não pela
 posição. No
-canto superior direito da área de conteúdo fica o menu hamburger dos perfis do
-Google Drive — fora da sidebar, para não competir com a navegação.
+canto superior direito da área de conteúdo fica o painel de perfil do Google
+Drive (avatar + nome) — fora da sidebar, para não competir com a navegação.
 
 O logo da sidebar é `assets/icon.png` (36 px, cantos de 9 px), lido em bytes
 para não depender do `assets_dir` do Flet; sem o arquivo, volta o quadrado roxo
@@ -48,9 +48,9 @@ O conteúdo abre em uma das duas formas:
 - Trocar de ferramenta **mantém** o estado dela (arquivo, opções e resultado).
 - Trocar o arquivo **reseta o resultado**; o valor das opções permanece.
 - A página inicial é o hub; o item “Início” volta para ele.
-- O menu hamburger no canto superior direito abre os perfis do Google Drive:
-  entrar, marcar a ativa, adicionar outra conta e sair. Ele não interfere na
-  navegação das ferramentas.
+- O avatar com o nome no canto superior direito abre o painel de perfis do
+  Google Drive: entrar, selecionar outra conta, adicionar conta e sair. Ele não
+  interfere na navegação das ferramentas.
 
 ## Plugins
 
@@ -68,7 +68,7 @@ remover. Abrir a ferramenta também não lê planilha; a leitura começa no cliq
 | Componente | Responsabilidade |
 |---|---|
 | `sidebar` | Logo, Início e as seis ferramentas, com item ativo destacado. |
-| `top_menu` | Menu hamburger no canto superior direito com os perfis do Drive. |
+| `top_menu` | Painel de perfil no canto superior direito: conta selecionada, outras contas, adicionar e sair. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
 | `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
@@ -162,29 +162,37 @@ linha também começa à esquerda. As quatro nativas cabem numa linha no desktop
 
 ## Drive
 
-O hamburger no canto superior direito abre o menu de perfis (`ui/drive.py`).
-Não existe cartão do Drive no hub: entrar é uma ação do menu, como em qualquer
-app com “Entrar com Google”.
+O canto superior direito mostra a conta selecionada: avatar com as iniciais e
+o nome (sem nome, o e-mail curto). O clique abre o painel de perfis
+(`ui/components/top_menu.py`, estado em `ui/drive.py`). Não existe cartão do
+Drive no hub: entrar é uma ação do painel, como em qualquer app com “Entrar com
+Google”.
 
-- **Sem conta:** o menu mostra **Entrar com Google** com ícone de perfil. Se o
-  cliente OAuth ainda não estiver configurado, o primeiro clique pede o JSON
-  baixado do Google Cloud Console, uma única vez; feito isso, o navegador abre.
-- **Com uma ou mais contas:** o menu lista os e-mails com ícone de perfil e
-  marca a ativa. E-mails longos aparecem truncados com `…`; o valor completo fica
-  no tooltip, que surge depois de 3 s de hover. Clicar em outro e-mail troca a
-  conta ativa; **Adicionar conta** abre o navegador para outro perfil; **Sair
-  desta conta** remove só a ativa. O seletor de conta do Drive usa o mesmo
-  rótulo curto.
-- **Durante o login:** o menu mostra “Conectando ao Google…”. Se o usuário
-  negar o acesso ou o navegador não responder em três minutos, a mensagem
-  aparece no próprio menu e nada fica travado.
+- **Sem conta:** o topo e o painel mostram **Entrar com Google**. Se o cliente
+  OAuth ainda não estiver configurado, o primeiro clique pede o JSON baixado do
+  Google Cloud Console, uma única vez; feito isso, o navegador abre.
+- **Com uma ou mais contas:** o painel abre com a conta selecionada (avatar,
+  nome e e-mail). As demais ficam em **Outras contas**, uma lista retrátil que
+  começa fechada; clicar numa delas a seleciona. **Adicionar conta** e **Sair**
+  ficam fixos embaixo. Sair remove só a selecionada e seleciona a primeira que
+  sobrar (ordem de e-mail); as outras contas e os arquivos já abertos ficam.
+  E-mails longos aparecem truncados com `…`; o valor completo fica no tooltip,
+  que surge depois de 3 s de hover.
+- **Abrir do Drive:** o botão ao lado da dropzone abre direto na conta
+  selecionada, sem perguntar; o tooltip diz qual é.
+- **Durante o login:** o topo e o painel mostram “Conectando ao Google…”. Se o
+  usuário negar o acesso ou o navegador não responder em três minutos, a
+  mensagem aparece no topo do painel e nada fica travado.
 
 O token nunca aparece na tela, no log ou no diagnóstico; os detalhes ficam no
 ADR 0018.
 
 Com uma planilha aberta do Drive, o painel de resultado troca **Salvar em
-output/** por **Salvar no Drive**. A primeira gravação pede a pasta no Picker e
-lembra a concessão por conta; as seguintes gravam direto. Recusar a pasta manda
+output/** por **Salvar no Drive**. A gravação usa sempre a conta que abriu o
+arquivo, mesmo com outra selecionada; o tooltip do botão diz qual. Se essa conta
+saiu do app, o botão fica desabilitado e pede para entrar de novo com ela. A
+primeira gravação pede a pasta no Picker e lembra a concessão por conta; as
+seguintes gravam direto. Recusar a pasta manda
 o resultado para a raiz do Meu Drive, com aviso. O sucesso mostra o nome, a
 pasta e o botão **Abrir no Drive**.
 

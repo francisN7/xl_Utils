@@ -165,7 +165,7 @@ class PluginsPage:
                 spacing=10,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            padding=ft.Padding.only(bottom=16, right=56),
+            padding=ft.Padding.only(bottom=16, right=theme.TOP_MENU_RESERVE),
         )
         return ft.Container(
             content=ft.Column(

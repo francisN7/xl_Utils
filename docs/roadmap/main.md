@@ -16,12 +16,13 @@ a linha recebe entrega e aceite e a spec sai de `docs/sessions/`.
 | S18 | Plugins saiu do Início e da lista da sidebar e virou item fixo no rodapé, acima de `uv · Python 3.15`; sidebar e app navegam por `id` da página (`TOOLS`, `FOOTER_PAGES`, `PAGES`) | Testes headless do rodapé, do realce único e da abertura por `tool_id`; app conferido pelo dono nos dois temas; ruff, pytest e docs verdes | [x] |
 | S19 | Verificar Vínculos saiu do app (core, controller, página, `shared/configs.py`, `headers.json`, testes) junto com o `pre_run` e as exceções da vinculação no `ToolLayout`; ADR 0027 (0014/0016 substituídas, adendo no 0015); repo privado `xl_U-Plugins` com `uv init`, estrutura de contexto, `_molde/`, guia e `link/referencia/` | grep sem `link`/Vínculos em `src/` e `tests/`; teste headless de quatro cartões e Plugins só no rodapé; `_molde` passa no `check`; ruff, pytest e docs verdes; app aberto no Linux | [x] |
 | S20 | API 2 dos plugins: `request.reader` (`shared/plugins/reader.py`) lê pelo `prepare_workbook` só as abas marcadas (`all_sheets=True` traz todas), com cache por execução, `ReadError` e etapa/log por arquivo; API 1 aposentada com motivo; exemplos 2.0.0 e docs `docs/plugins/`; ADR 0028; `_molde` do `xl_U-Plugins` na API 2 | Reader igual às nativas em xlsx/xls/csv/html e no cache do Drive; API 1 inválida com motivo na área Plugins (conferida no `--web`), no `list` e no `check`; `_molde` passa no `check`; execução no app com arquivo real fica com o dono; ruff, pytest e docs verdes | [x] |
-| S21 | Menu de perfis do Drive sem troca de conta | — | [ ] |
+| S21a | Avatar + nome da conta selecionada no lugar do hambúrguer; painel (`MenuBar` + `SubmenuButton`) com cabeçalho, “Outras contas” retrátil, “Adicionar conta” e “Sair” fixos; Sair seleciona a próxima; “Abrir do Drive” abre direto na selecionada; “Salvar no Drive” só na conta de origem, com tooltip e aviso; ADR 0029 | Spike no `--web` com contas falsas nos dois temas (abrir, expandir, trocar, sair, adicionar, cabeçalhos sem sobreposição); `tests/test_top_menu.py` novo e testes de sessão, entrada e gravação; conferência no desktop e com conta real do Google fica com o dono; ruff, pytest e docs verdes | [x] |
+| S21b | Engrenagem da conta: foto e apelido | — | [ ] |
 | S22 | Auditoria dos docs, documentação completa para quem chega e README com badges e screenshots | — | [ ] |
 | S23 | Release 0.4.0 e fechamento do ciclo | — | [ ] |
 
-Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21 → S22 →
-S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
+Ordem definida pelo dono: **S15 → S16 → S17 → S18 → S19 → S20 → S21a → S21b →
+S22 → S23**. A release 0.4.0 entra depois dos ajustes de UI, da limpeza do Verificar
 Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
 
 ## S18–S23 — próximas
@@ -33,9 +34,13 @@ Vínculos e da API 2 dos plugins. Plugins foram entregues no ciclo 0008.
   referência e o guia reutilizável de criação de plugins.
 - **S20:** `PluginRequest.reader` para ler com o pipeline do host, incluindo
   arquivos do cache do Drive; API 2 sem compatibilidade com a 1.
-- **S21:** menu de perfis nativo, sem `checked` e sem troca de conta; o “Sair
-  desta conta” aparece no submenu do e-mail. O salvamento do Drive continua
-  usando a conta de origem do arquivo.
+- **S21a:** painel de perfil no topo (avatar + nome), outras contas numa
+  lista retrátil, “Adicionar conta” e “Sair” fixos; “Abrir do Drive” abre
+  direto na conta selecionada. Salvar no Drive continua na conta de origem e
+  avisa quando ela saiu.
+- **S21b:** engrenagem no painel abre a configuração da conta: foto escolhida
+  do disco (sem foto, a inicial) e apelido no lugar do e-mail; os dois somem
+  no “Sair”.
 - **S22:** auditar todos os `.md` contra o código e deixar a documentação
   completa e intuitiva para quem nunca viu o projeto: trilha de onboarding
   (o que é → rodar → arquitetura → tour do código → primeira contribuição),
@@ -69,10 +74,11 @@ reaproveitadas, nomes pouco intuitivos, código não idiomático ou fora de clea
 code e trechos sem comentário ou explicação. Primeiro sai um relatório com
 evidências; depois, sessões de correção.
 
-### Sobre o app no menu hambúrguer
+### Sobre o app
 
-Adicionar ao menu hambúrguer o número da versão, os créditos, a licença e o
-link para o repositório no GitHub.
+Mostrar o número da versão, os créditos, a licença e o link para o repositório
+no GitHub. O menu hambúrguer saiu na S21a; o lugar (painel de perfil ou rodapé
+da sidebar) se decide na sessão.
 
 ### Ajuda ( i ) em cada ferramenta
 

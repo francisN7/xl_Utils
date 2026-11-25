@@ -67,6 +67,10 @@ FONT_MD = 15
 FONT_TITLE = 24
 FONT_HERO = 26
 
+# Faixa que os cabeçalhos das páginas deixam livre à direita para o painel de
+# perfil do Drive (avatar + nome de até 16 caracteres + seta).
+TOP_MENU_RESERVE = 220
+
 
 def apply(mode: str) -> str:
     """Ativa a paleta de ``mode`` e devolve o modo efetivo (escuro no fallback)."""

@@ -335,14 +335,21 @@ class ResultPanel:
         self.preview.set_frames(frames)
         self._refresh()
 
-    def set_drive_mode(self, enabled: bool, available: bool = True) -> None:
+    def set_drive_mode(
+        self,
+        enabled: bool,
+        available: bool = True,
+        hint: str | None = None,
+    ) -> None:
         """Troca “Salvar em output/” por “Salvar no Drive” para origens do Drive.
 
-        ``available`` diz se há conta conectada; sem ela o botão do Drive fica
-        visível, mas desabilitado, em vez de voltar ao atalho de ``output/``.
+        ``available`` diz se a conta de origem está conectada; sem ela o botão
+        do Drive fica visível, mas desabilitado, em vez de voltar ao atalho de
+        ``output/``. ``hint`` vira o tooltip (conta de destino ou o motivo).
         """
         self._save_drive_button.visible = enabled
         self._save_drive_button.disabled = enabled and not available
+        self._save_drive_button.tooltip = hint
         self._save_output_button.visible = not enabled
         self._refresh()
 

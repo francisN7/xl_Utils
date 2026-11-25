@@ -69,7 +69,7 @@ class DriveSession:
 
     @property
     def active_account(self) -> Account | None:
-        """Devolve o registro da conta ativa, se houver."""
+        """Devolve o registro da conta selecionada, se houver."""
         for account in self.accounts:
             if account.email == self.active:
                 return account
@@ -80,9 +80,11 @@ class DriveSession:
         self._listeners.append(listener)
 
     def reload(self) -> None:
-        """Relê as contas e a conta ativa do disco."""
+        """Relê as contas e a selecionada; sem marca válida, vale a primeira."""
         self.accounts = self._store.list()
-        self.active = self._store.active()
+        emails = [account.email for account in self.accounts]
+        active = self._store.active()
+        self.active = active if active in emails else (emails[0] if emails else None)
 
     def notify(self) -> None:
         """Avisa todos os controles inscritos."""
@@ -184,12 +186,16 @@ class DriveSession:
         self,
         origins: Sequence[drive_cache.DriveOrigin],
     ) -> Account | None:
-        """Escolhe a conta que abriu as planilhas; senão, a conta ativa."""
+        """Devolve a conta que abriu as planilhas; nunca troca por outra.
+
+        Se ela saiu do app (ou a cópia não guardou o e-mail), devolve ``None``:
+        a pasta de origem só é visível para a conta que a abriu (``drive.file``).
+        """
         wanted = {item.account for item in origins if item.account}
         for account in self.accounts:
             if account.email in wanted:
                 return account
-        return self.active_account
+        return None
 
     def folder_grant(self, account: Account, folder_id: str) -> FolderGrant | None:
         """Devolve a concessão já guardada para a pasta, se existir."""
@@ -322,7 +328,7 @@ class DriveSession:
         self.notify()
 
     def switch(self, email: str) -> None:
-        """Troca a conta ativa sem apagar nenhuma outra."""
+        """Seleciona outra conta sem apagar nenhuma."""
         try:
             self._store.set_active(email)
             self.error = None
@@ -331,21 +337,19 @@ class DriveSession:
         self.reload()
         self.notify()
 
-    def next_account(self) -> str | None:
-        """Devolve o próximo e-mail da lista, para o botão “Trocar”."""
-        if len(self.accounts) < 2:
-            return None
-        emails = [account.email for account in self.accounts]
-        if self.active not in emails:
-            return emails[0]
-        return emails[(emails.index(self.active) + 1) % len(emails)]
-
     def logout(self) -> None:
-        """Remove só a conta ativa; as demais continuam guardadas."""
-        if self.active is None:
+        """Remove só a conta selecionada e seleciona a primeira que sobrar.
+
+        As demais contas e as cópias já abertas do Drive continuam intactas.
+        """
+        if self.active is None or self.busy:
             return
         self._store.remove(self.active)
-        self._store.clear_active()
+        remaining = self._store.list()
+        if remaining:
+            self._store.set_active(remaining[0].email)
+        else:
+            self._store.clear_active()
         self.error = None
         self.reload()
         self.notify()

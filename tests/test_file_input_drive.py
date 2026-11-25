@@ -18,13 +18,19 @@ class _FakeSession:
         *,
         paths: list[Path] | None = None,
         error: str | None = None,
+        active: str | None = None,
     ) -> None:
         self.accounts = accounts
+        self.active = active or (accounts[0].email if accounts else None)
         self.busy = False
         self.error = error
         self.paths = paths or []
         self.calls: list[tuple[str, bool]] = []
         self._listeners: list[object] = []
+
+    @property
+    def active_account(self) -> Account | None:
+        return next((item for item in self.accounts if item.email == self.active), None)
 
     def subscribe(self, listener: object) -> None:
         self._listeners.append(listener)
@@ -123,28 +129,38 @@ def test_single_account_opens_the_picker_without_asking(tmp_path: Path) -> None:
     assert control._files == [source]
 
 
-def test_two_accounts_ask_which_one_first(tmp_path: Path) -> None:
+def test_two_accounts_open_with_the_selected_one_without_a_dialog(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "AGENDA.xlsx"
     source.write_bytes(b"x")
     session = _FakeSession(
         [_account("ana@example.com", "Ana"), _account("zeca@example.com", "Zeca")],
         paths=[source],
+        active="zeca@example.com",
     )
     control, page = _input(session)
 
     control._open_drive()
 
-    assert page.dialog is not None
-    tiles = page.dialog.content.controls
-    assert [tile.title.value for tile in tiles] == [  # type: ignore[union-attr]
-        "ana@example.com",
-        "zeca@example.com",
-    ]
-    tiles[1].on_click(None)  # type: ignore[union-attr]
-    assert page.popped == 1
+    assert page.dialog is None
     handler, args = page.tasks[0]
     asyncio.run(handler(*args))  # type: ignore[operator]
     assert session.calls == [("zeca@example.com", False)]
+
+
+def test_tooltip_names_the_selected_account() -> None:
+    session = _FakeSession(
+        [_account("ana@example.com", "Ana"), _account("zeca@example.com", "Zeca")],
+        active="ana@example.com",
+    )
+    control, _ = _input(session)
+    assert control._drive_button.tooltip == "Abrir do Drive — Ana"
+
+    session.active = "zeca@example.com"
+    session.notify()
+
+    assert control._drive_button.tooltip == "Abrir do Drive — Zeca"
 
 
 def test_drive_error_lands_in_the_hint() -> None:

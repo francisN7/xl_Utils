@@ -363,6 +363,10 @@ class _FakeDrive:
         self.authorized = 0
         self._listeners: list[object] = []
 
+    @property
+    def active_account(self) -> accounts.Account | None:
+        return next((item for item in self.accounts if item.email == self.active), None)
+
     def subscribe(self, listener: object) -> None:
         self._listeners.append(listener)
 
@@ -370,8 +374,12 @@ class _FakeDrive:
         for listener in self._listeners:
             listener()  # type: ignore[operator]
 
-    def account_for(self, origins: object) -> accounts.Account:
-        return self.accounts[0]
+    def account_for(self, origins: object) -> accounts.Account | None:
+        wanted = {item.account for item in origins}  # type: ignore[attr-defined]
+        return next(
+            (item for item in self.accounts if item.email in wanted),
+            self.accounts[0] if not wanted else None,
+        )
 
     def folder_grant(self, account: accounts.Account, folder_id: str):
         return self.grant
@@ -437,6 +445,63 @@ def test_drive_mode_without_account_keeps_the_button_disabled() -> None:
     assert panel._save_drive_button.visible is True
     assert panel._save_drive_button.disabled is True
     assert panel._save_output_button.visible is False
+
+
+def test_drive_mode_names_the_origin_account_in_the_tooltip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    layout, _ = _cached_layout(tmp_path, _FakeDrive(), monkeypatch)
+    layout.state.files = [tmp_path / NOME]
+
+    layout._update_drive_mode()
+
+    button = layout.result._save_drive_button
+    assert button.disabled is False
+    assert button.tooltip == "Grava no Drive de ana@example.com"
+
+
+def test_save_is_blocked_when_the_origin_account_left(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    drive = _FakeDrive(grant=FolderGrant("pasta", "Teste"))
+    drive.accounts = [_account("zeca@example.com")]
+    layout, page = _cached_layout(tmp_path, drive, monkeypatch)
+    layout.state.files = [tmp_path / NOME]
+
+    layout._update_drive_mode()
+    layout._save_drive_clicked()
+
+    message = "Entre de novo com ana@example.com para salvar no Drive."
+    assert layout.result._save_drive_button.disabled is True
+    assert layout.result._save_drive_button.tooltip == message
+    assert page.tasks == []
+    assert layout.result.status == "Não foi possível salvar"
+    assert layout.result._detail.value == message
+
+
+def test_save_without_origin_email_asks_to_open_again(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    drive = _FakeDrive()
+    layout, page = _cached_layout(tmp_path, drive, monkeypatch)
+    monkeypatch.setattr(
+        drive_cache,
+        "origins",
+        lambda paths: [
+            drive_cache.DriveOrigin(file_id="id", name=NOME, parent="pasta")
+        ],
+    )
+    drive.account_for = lambda origins: None  # type: ignore[method-assign]
+
+    layout._save_drive_clicked()
+
+    assert page.tasks == []
+    assert layout.result._detail.value == (
+        "Abra o arquivo de novo pelo Drive para salvar lá."
+    )
 
 
 def test_drive_mode_shows_the_drive_button_instead_of_output(
