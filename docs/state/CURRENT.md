@@ -4,28 +4,26 @@
 
 ## Sessão
 
-- **Última concluída:** S23a — Versão Linux em AppImage
-- **Próxima:** S23b — Workflow de release no Actions
-  (`docs/sessions/S23b-workflow-de-release.md`); depois S23c (0.4.0)
+- **Última concluída:** S23b — Workflow de release no Actions
+- **Próxima:** S23c — Release 0.4.0 (`docs/sessions/S23c-release-0-4-0.md`)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `0a7eefd` — S23: replaneja em S23a–c (0.4.0 com Windows e Linux)
-- **Decisões:** ADRs 0015–0032 (0019 com adendo S22b; 0032: AppImage).
+- **Retorno:** `ea233c2` — S23a: encerra a sessão (roadmap, CURRENT e spec)
+- **Decisões:** ADRs 0015–0032 (adendos: 0019 S22b, 0021 S23b; 0032: AppImage).
 
 ## Pronto
 
+- S23b: `release.yml` manual (`confirmar=build`) gera instalador e AppImage com smoke test.
 - S23a: AppImage por `scripts/build_linux.sh`; validado no CachyOS e no Ubuntu limpo.
-- S22b: banner animado, badges e capturas dos dois temas no README e no site.
 
 ## Próximo passo
 
-Executar a S23b (workflow manual de release, Windows e Linux). A 0.4.0 sai
-com os dois (S23c); Windows validado só por CI. Com o dono: push e
-conferir README/site no GitHub, foto e login reais. S24 no backlog.
+Executar a S23c: 0.4.0, CHANGELOG, disparo do `release.yml`, release Windows e
+Linux e fechar o ciclo 0009 (push, disparo e `gh release` com o dono).
 
 ## Arquivos-chave
 
 - Versão: `pyproject.toml`, `src/xl_utils/__init__.py`, `installer/xl_utils.iss`
-- Release: `scripts/build_{windows.ps1,linux.sh}`, `packaging/linux/`, `docs/guide/release-{windows,linux}.md`
+- Release: `.github/workflows/release.yml`, `scripts/build_{windows.ps1,linux.sh}`, `packaging/linux/`, `docs/guide/release-{windows,linux}.md`
 - Contas: `shared/{accounts,profiles}.py`, `ui/components/{top_menu,account_settings}.py`
 
 ## Armadilhas
@@ -54,6 +52,8 @@ conferir README/site no GitHub, foto e login reais. S24 no backlog.
 - AppImage: piso glibc 2.39; janela é `com.appveyor.flet` (Flet ignora
   `FLET_APP_ID`); sem `--web` no executável; teste limpo via Podman + X11
   (`--ipc=host`, `XAUTHORITY`). Print do desktop só da janela do app.
+- Build usa as versões do `uv.lock` (subir o Flet: conferir o patch do
+  `flet-cli`); `.ps1` com BOM, senão o PowerShell 5.1 lê como ANSI.
 
 ## Como rodar
 

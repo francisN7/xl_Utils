@@ -25,7 +25,7 @@ consequências; ele não muda depois de aceito (adendos entram no próprio ADR).
 | [0018](0018-drive-autenticacao.md) | OAuth do Drive, contas e tokens | Aceita |
 | [0019](0019-publicacao-do-site.md) | Publicação do site por workflow com filtro | Aceita, com adendo |
 | [0020](0020-arquivo-do-historico.md) | Histórico em texto, uma página por ciclo | Substituída pela 0022 |
-| [0021](0021-instalador-windows.md) | Instalador Windows com PyInstaller e Inno Setup | Aceita |
+| [0021](0021-instalador-windows.md) | Instalador Windows com PyInstaller e Inno Setup (adendo S23b: build no CI) | Aceita |
 | [0022](0022-ciclos-no-roadmap.md) | Ciclos fechados no roadmap, sem pasta `history` | Aceita |
 | [0023](0023-contrato-de-plugins.md) | Contrato de plugins e pacote `.tar.xz` | Aceita; API 1 substituída pela 0028 |
 | [0024](0024-carregamento-sob-demanda.md) | Plugin importado só na primeira execução | Aceita |

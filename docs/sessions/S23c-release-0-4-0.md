@@ -60,7 +60,9 @@ lançado”), `pyproject.toml`, topo de `installer/xl_utils.iss`,
 
 - Sem conferência humana no Windows: login do Drive e foto podem falhar só lá.
   As notas avisam; o primeiro problema real vira 0.4.1.
-- Artefato do Actions expira: baixar logo depois do disparo.
+- Artefato do Actions expira em 7 dias: baixar logo depois do disparo.
+- O build instala as versões do `uv.lock` (S23b): o `uv lock` da tarefa 1 não
+  pode subir o Flet sem conferir o patch do `flet-cli` no `build_windows.ps1`.
 - Publicar exige push: nunca empurrar sem o OK do dono.
 
 ## Próximo depois desta

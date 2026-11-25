@@ -43,7 +43,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S23b-workflow-de-release.md`](sessions/S23b-workflow-de-release.md) |
+| ler a spec da próxima sessão | [`sessions/S23c-release-0-4-0.md`](sessions/S23c-release-0-4-0.md) |
 
 ## Por seção (atalho)
 
