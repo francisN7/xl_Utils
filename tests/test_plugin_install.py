@@ -69,7 +69,7 @@ def test_install_list_and_uninstall(tmp_path: Path) -> None:
     record = json.loads((plugin.path / "install.json").read_text(encoding="utf-8"))
     assert record["id"] == "autor.teste"
     assert record["version"] == "1.0.0"
-    assert record["api_version"] == 1
+    assert record["api_version"] == 2
     assert record["source"] == package.name
     assert len(record["sha256"]) == 64
 
@@ -251,6 +251,22 @@ def test_scan_reports_invalid(tmp_path: Path) -> None:
     assert result.valid == ()
     assert len(result.invalid) == 1
     assert result.invalid[0].code == "manifest_invalid"
+
+
+def test_scan_lists_api_1_plugin_with_the_reason(tmp_path: Path) -> None:
+    root = tmp_path / "plugins"
+    folder = root / "autor.teste"
+    (folder / "lib").mkdir(parents=True)
+    (folder / "lib" / "main.py").write_text(MAIN_PY, encoding="utf-8")
+    manifest = VALID_MANIFEST.replace("api_version = 2", "api_version = 1")
+    (folder / "plugin.toml").write_text(manifest, encoding="utf-8")
+
+    result = scan_installed(root=root)
+
+    assert result.valid == ()
+    assert [item.path.name for item in result.invalid] == ["autor.teste"]
+    assert result.invalid[0].code == "unsupported_api"
+    assert "aposentada" in result.invalid[0].message
 
 
 def test_scan_reports_missing_entrypoint(tmp_path: Path) -> None:

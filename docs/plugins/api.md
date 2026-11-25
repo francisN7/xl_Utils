@@ -20,6 +20,7 @@ Importe de `xl_utils.shared.plugins.api`:
 | `files` | `tuple[Path, ...]` | arquivos do seletor genérico, na ordem da tela |
 | `inputs` | `Mapping[str, Path]` | slots nomeados de `[[ui.inputs]]`, por `key` |
 | `sheets` | `Mapping[Path, tuple[str, ...]]` | abas marcadas para cada arquivo |
+| `reader` | `WorkbookReader` | lê planilhas pelo pipeline das nativas; veja abaixo |
 | `options` | `Mapping[str, object]` | opções já convertidas para `str`, `int` ou `bool` |
 | `log` | `RunLog` | log canônico da execução |
 | `progress` | `ProgressReporter` | marcos ao vivo da barra |
@@ -31,6 +32,37 @@ Importe de `xl_utils.shared.plugins.api`:
 `files` e `inputs` são alternativas: com `[[ui.inputs]]`, o seletor genérico não
 aparece. `sheets` cobre os arquivos escolhidos nos dois modos; abas não se
 aplicam a formatos que não são planilha.
+
+## Ler planilhas: `request.reader`
+
+Leia planilhas sempre pelo `reader`, não com `pd.read_excel`. Ele usa o mesmo
+pipeline das quatro ferramentas nativas: tudo como texto (zeros à esquerda e
+quebras de linha preservados), sem emojis, com reparo de arquivo e tipo real
+detectado. Lê `.xlsx`, `.xlsm`, `.xls`, `.csv` e `.html`, inclusive a cópia
+local de uma planilha aberta do Drive, que chega como `Path` igual à do
+computador.
+
+```python
+frames = request.reader.read(path)                   # só as abas marcadas
+livro = request.reader.read(path, all_sheets=True)   # todas as abas
+```
+
+- Volta `dict[str, DataFrame]` na ordem do livro. CSV vira a aba `Planilha1`;
+  cada tabela HTML vira `PáginaN`.
+- Sem `all_sheets`, valem as abas de `request.sheets[path]`. Um arquivo que
+  não veio da tela (por exemplo, uma tabela em `data_dir`) volta inteiro.
+- Cada arquivo é lido uma vez por execução; as chamadas seguintes saem do
+  cache. Cada chamada devolve um dicionário novo: alterar os DataFrames não
+  muda a próxima leitura.
+- Na primeira leitura de cada arquivo, o `reader` mostra "Lendo
+  <arquivo>" na barra e registra "<arquivo>: N aba(s)" no log.
+- Arquivo ilegível, mesmo após o reparo, levanta `ReadError` (importe de
+  `xl_utils.shared.plugins.api`). Sem tratar, o host mostra "Não foi possível
+  ler a planilha"; um plugin de lote pode capturar e seguir para o próximo.
+- Seleção vazia ou aba inexistente levanta `ValueError` e o host mostra
+  "Confira a seleção".
+- A leitura não é interrompível e o `reader` não olha `request.cancel`:
+  confira o cancelamento entre arquivos. Use o `reader` de uma thread só.
 
 ## `PluginResult`
 
@@ -45,7 +77,7 @@ aplicam a formatos que não são planilha.
 e a gravação como faz nas ferramentas nativas.
 
 Recomendação: devolva células como texto, preservando quebras de linha, para
-ficar igual ao pipeline das cinco ferramentas. A prévia aceita outros tipos,
+ficar igual ao pipeline das quatro ferramentas. A prévia aceita outros tipos,
 mas texto é o mais previsível.
 
 ## Log, progresso e cancelamento
@@ -94,7 +126,7 @@ traceback no diagnóstico e mostra o erro sem derrubar o app. Um erro dentro do
 plugin não deve virar `print`, `os._exit` ou alteração global do processo.
 
 Falhas duras (segfault, `os._exit`, consumo total de memória) não são
-recuperáveis no mesmo processo; por isso a v1 trata plugin como código
+recuperáveis no mesmo processo; por isso a API trata plugin como código
 confiável. Sandbox/subprocesso é decisão futura, não promessa desta API.
 
 ## Esqueleto
@@ -111,9 +143,9 @@ def run(request: PluginRequest) -> PluginResult:
         if request.cancel.cancelled:
             break
         request.progress.file_started(path.name)
-        request.log.info(f"Processando {path.name}")
-        # leia com pandas/openpyxl e monte um DataFrame
-        frames[path.stem] = ...
+        for name, frame in request.reader.read(path).items():
+            # trabalhe sobre o DataFrame já tratado
+            frames[f"{path.stem} · {name}"] = frame
         request.progress.file_done(path.name)
 
     request.progress.finish()
@@ -127,6 +159,7 @@ partir do manifesto.
 
 ## Compatibilidade
 
-A API é versionada por `api_version` no manifesto. Esta versão aceita `1`.
-Mudança de campo, de tipo, de semântica ou de schema de UI exige uma versão
-nova; veja [`versionamento.md`](versionamento.md).
+A API é versionada por `api_version` no manifesto. Esta versão aceita só `2`;
+a API 1 (sem `reader`) foi aposentada e aparece como inválida com o motivo
+(ADR 0028). Mudança de campo, de tipo, de semântica ou de schema de UI exige
+uma versão nova; veja [`versionamento.md`](versionamento.md).

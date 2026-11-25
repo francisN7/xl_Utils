@@ -22,15 +22,10 @@ def run(request: PluginRequest) -> PluginResult:
         if request.cancel.cancelled:
             break
         request.progress.file_started(path.name)
-        for name in request.sheets.get(path, ()):
+        for name, sheet in request.reader.read(path).items():
             if request.cancel.cancelled:
                 break
-            frame = pd.read_excel(
-                path,
-                sheet_name=name,
-                nrows=limite,
-                engine="openpyxl",
-            )
+            frame = sheet.head(limite)
             rows.append(
                 {
                     "titulo": titulo,

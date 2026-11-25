@@ -14,6 +14,7 @@ from xl_utils.shared.log import RunLog
 from xl_utils.shared.plugins.api import PluginRequest, PluginResult
 from xl_utils.shared.plugins.install import InstalledPlugin
 from xl_utils.shared.plugins.loader import PluginLoader
+from xl_utils.shared.plugins.reader import WorkbookReader
 from xl_utils.shared.progress import CancelToken, NullReporter, ProgressReporter
 
 
@@ -41,10 +42,12 @@ def execute_plugin(
 ) -> PluginOutcome:
     """Importa o plugin (uma vez) e chama ``run`` fora da UI thread."""
     loaded = loader.load(plugin)
+    selection = {path: tuple(names) for path, names in sheets.items()}
     request = PluginRequest(
         files=tuple(files),
         inputs=dict(inputs),
-        sheets={path: tuple(names) for path, names in sheets.items()},
+        sheets=selection,
+        reader=WorkbookReader(selection, log=log, progress=progress),
         options=dict(options),
         log=log,
         progress=progress,

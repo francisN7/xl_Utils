@@ -32,6 +32,12 @@ decisões nos ADRs.
 
 ### Changed
 
+- **API 2 dos plugins** (ADR 0028): `request.reader.read(path)` lê `.xlsx`,
+  `.xls`, `.csv`, `.html` e arquivos abertos do Drive pelo mesmo pipeline das
+  ferramentas nativas, só com as abas marcadas (`all_sheets=True` traz todas).
+  Plugins com `api_version = 1` deixam de ser aceitos e aparecem como
+  inválidos, com o motivo, na área Plugins e no `check`. Os exemplos foram para
+  a versão 2.0.0.
 - **Plugins** saiu do Início e da lista principal da sidebar: virou item fixo
   no rodapé, acima de `uv · Python 3.15`, e abre a mesma página.
 - A sidebar mostra o ícone real do app (`assets/icon.png`) no lugar do

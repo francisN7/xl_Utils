@@ -11,7 +11,7 @@ saber para validar, instalar e montar a página está aqui.
 id = "autor.ferramenta"
 name = "Minha Ferramenta"
 version = "1.0.0"
-api_version = 1
+api_version = 2
 entrypoint = "main:run"
 description = "Converte a aba escolhida em uma tabela de resumo."
 authors = ["Autor"]
@@ -51,7 +51,7 @@ help = "Detalhado mantém uma linha por registro."
 | `id` | string | sim | `autor.ferramenta`, 3–64, minúsculas, `[a-z0-9._-]`, sem `..`, sem nome reservado do Windows |
 | `name` | string | sim | 1–80 caracteres, sem controle |
 | `version` | string | sim | SemVer `X.Y.Z` |
-| `api_version` | inteiro | sim | versão da API do host; esta versão aceita `1` |
+| `api_version` | inteiro | sim | versão da API do host; esta versão aceita `2` |
 | `entrypoint` | string | sim | `modulo:funcao`, resolvido dentro de `lib/` |
 | `description` | string | sim | 1–500 caracteres |
 | `authors` | lista de strings | não | até 10 nomes, 1–80 cada |
@@ -159,7 +159,7 @@ desconhecidas são recusadas para pegar erro de digitação; um campo novo exige
 | `manifest_invalid` | TOML quebrado, campo faltando, tipo ou valor inválido |
 | `invalid_id` | `id` fora da regra ou nome reservado |
 | `duplicate_option` | `key` repetido em opções ou entradas |
-| `unsupported_api` | `api_version` não suportado pelo host |
+| `unsupported_api` | `api_version` não suportado pelo host ou aposentado (a `1`) |
 | `app_too_old` | `min_app_version` maior que a versão do app |
 | `missing_dependency` | distribuição declarada não está instalada |
 | `entrypoint_missing` | arquivo do entrypoint não existe em `lib/` |

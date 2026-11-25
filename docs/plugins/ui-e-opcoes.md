@@ -2,7 +2,7 @@
 
 O plugin não desenha a tela. O manifesto declara **quais arquivos** e **quais
 opções** a ferramenta aceita, e o host monta a página com o mesmo `ToolLayout`
-das cinco ferramentas nativas. Isso mantém tema, espaçamento, prévia, log e
+das quatro ferramentas nativas. Isso mantém tema, espaçamento, prévia, log e
 salvamento consistentes, e evita acoplar o plugin à versão do Flet.
 
 ## O que o host monta
@@ -14,7 +14,7 @@ salvamento consistentes, e evita acoplar o plugin à versão do Flet.
 5. O botão de executar, o painel de resultado e o log.
 
 A ordem dos controles é a ordem das tabelas no TOML. Não existe layout livre,
-abas internas, gráficos ou botões extras na API 1.
+abas internas, gráficos ou botões extras na API 2.
 
 ## Arquivos: genérico ou nomeado
 
@@ -30,6 +30,7 @@ default_all_sheets = true
 - `default_all_sheets = true` marca todas as abas dos livros selecionados.
 - Se o plugin não declarar `[[ui.inputs]]`, o seletor genérico aparece.
 - Os arquivos chegam em `request.files`; as abas, em `request.sheets`.
+  `request.reader.read(path)` já devolve só as abas marcadas.
 
 ### Slots nomeados
 
@@ -58,7 +59,7 @@ required = true
 - Com slots nomeados, o seletor genérico não aparece e `multiple_files` deve ser
   `false`.
 - As abas escolhidas para cada slot continuam em `request.sheets`, pela chave
-  `Path`.
+  `Path`, e `request.reader.read(path)` respeita essa seleção.
 
 ## Opções
 
@@ -90,7 +91,7 @@ help = "Detalhado mantém uma linha por registro."
 - `choices` só vale em `choice`; `min`/`max` só em `int`.
 - `default` de `int` precisa caber em `min`/`max`.
 - `choices` não aceita itens vazios, repetidos ou com mais de 60 caracteres.
-- `text` não tem `choices`; o limite de 500 é fixo na API 1.
+- `text` não tem `choices`; o limite de 500 é fixo na API 2.
 
 ## Exemplo de página completa
 
@@ -99,7 +100,7 @@ help = "Detalhado mantém uma linha por registro."
 id = "autor.resumo"
 name = "Resumo"
 version = "1.0.0"
-api_version = 1
+api_version = 2
 entrypoint = "main:run"
 description = "Gera um resumo a partir de uma planilha."
 
@@ -133,7 +134,7 @@ Nesse exemplo, `request.inputs["origem"]` é a planilha, `request.sheets` traz a
 abas marcadas e `request.options` chega como
 `{"modo": "resumo", "limite": 100}`.
 
-## O que não existe na API 1
+## O que não existe na API 2
 
 - Controles Flet personalizados.
 - Opções condicionais, visibilidade dinâmica ou dependência entre campos.

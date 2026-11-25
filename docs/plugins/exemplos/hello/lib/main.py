@@ -7,17 +7,17 @@ from xl_utils.shared.plugins.api import PluginRequest, PluginResult
 
 def run(request: PluginRequest) -> PluginResult:
     """Conta as linhas de cada aba marcada e devolve a tabela."""
-    pairs = [(path, name) for path, names in request.sheets.items() for name in names]
-    request.progress.start(len(pairs))
+    request.progress.start(len(request.files))
     rows: list[dict[str, object]] = []
-    for path, name in pairs:
+    for path in request.files:
         if request.cancel.cancelled:
             break
-        request.progress.file_started(f"{path.name} · {name}")
-        frame = pd.read_excel(path, sheet_name=name, engine="openpyxl")
-        rows.append({"arquivo": path.name, "aba": name, "linhas": len(frame)})
-        request.log.info(f"{path.name} · {name}: {len(frame)} linha(s)")
-        request.progress.file_done(f"{path.name} · {name}")
+        request.progress.file_started(path.name)
+        # O reader devolve só as abas marcadas, já como texto e sem emojis.
+        for name, frame in request.reader.read(path).items():
+            rows.append({"arquivo": path.name, "aba": name, "linhas": len(frame)})
+            request.log.info(f"{path.name} · {name}: {len(frame)} linha(s)")
+        request.progress.file_done(path.name)
     request.progress.finish()
     if not rows:
         return PluginResult(message="Nenhuma aba selecionada.")

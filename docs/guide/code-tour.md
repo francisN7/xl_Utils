@@ -37,6 +37,7 @@ app.py                          monta a janela e a navegação
 core/plugins/                   manifesto e pacote .tar.xz, sem Flet
 shared/plugins/install.py       instala, descobre e remove plugins
 shared/plugins/loader.py        importa lib/ na primeira execução
+shared/plugins/reader.py        request.reader: lê pelo pipeline all_str
 controllers/plugins.py          monta o request e valida o resultado
 ui/pages/plugins.py             área: lista, instala e remove
 ui/pages/plugin_tool.py         página declarativa montada do manifesto
@@ -138,7 +139,8 @@ livre na pasta remota com a mesma convenção.
 o único ponto que importa `lib/`: cria um pacote sintético em `sys.modules`
 (imports relativos funcionam; `sys.path` não muda), confere a assinatura de
 `run` e guarda o módulo em cache até instalar ou remover. `controllers/plugins.py`
-monta o `PluginRequest`, chama `run` e valida o `PluginResult`.
+monta o `PluginRequest` (com o `WorkbookReader` de `reader.py`, que lê cada
+livro uma vez por `prepare_workbook`), chama `run` e valida o `PluginResult`.
 
 Na UI, `PluginsPage` lista manifestos e pastas inválidas, instala pelo seletor
 (confirma permissões antes) e remove com aviso sobre `data/`. `plugin_tool.py`

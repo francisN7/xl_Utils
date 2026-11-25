@@ -22,8 +22,8 @@ hello/
 [plugin]
 id = "exemplo.hello"
 name = "Hello Planilha"
-version = "1.0.0"
-api_version = 1
+version = "2.0.0"
+api_version = 2
 entrypoint = "main:run"
 description = "Conta as linhas de cada aba escolhida e devolve um resumo."
 authors = ["xl_Utils"]
@@ -55,21 +55,17 @@ from xl_utils.shared.plugins.api import PluginRequest, PluginResult
 
 
 def run(request: PluginRequest) -> PluginResult:
-    pairs = [
-        (path, name)
-        for path, names in request.sheets.items()
-        for name in names
-    ]
-    request.progress.start(len(pairs))
+    request.progress.start(len(request.files))
     rows = []
-    for path, name in pairs:
+    for path in request.files:
         if request.cancel.cancelled:
             break
-        request.progress.file_started(f"{path.name} · {name}")
-        frame = pd.read_excel(path, sheet_name=name, engine="openpyxl")
-        rows.append({"arquivo": path.name, "aba": name, "linhas": len(frame)})
-        request.log.info(f"{path.name} · {name}: {len(frame)} linha(s)")
-        request.progress.file_done(f"{path.name} · {name}")
+        request.progress.file_started(path.name)
+        # O reader devolve só as abas marcadas, já como texto e sem emojis.
+        for name, frame in request.reader.read(path).items():
+            rows.append({"arquivo": path.name, "aba": name, "linhas": len(frame)})
+            request.log.info(f"{path.name} · {name}: {len(frame)} linha(s)")
+        request.progress.file_done(path.name)
     request.progress.finish()
     if not rows:
         return PluginResult(message="Nenhuma aba selecionada.")
@@ -78,6 +74,9 @@ def run(request: PluginRequest) -> PluginResult:
         message=f"{len(rows)} aba(s) lida(s)",
     )
 ```
+
+Leia planilhas sempre por `request.reader`: ele usa o pipeline das ferramentas
+nativas e aceita `.xlsx`, `.xls`, `.csv`, `.html` e arquivos abertos do Drive.
 
 Regras da função: um parâmetro posicional, nada de Flet, `print`, diálogo ou
 `sys.exit`. Devolva `PluginResult`; exceções viram erro na tela e no

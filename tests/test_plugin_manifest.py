@@ -24,7 +24,7 @@ def test_valid_manifest_is_parsed() -> None:
     assert manifest.id == "autor.teste"
     assert manifest.name == "Plugin de Teste"
     assert manifest.version == "1.0.0"
-    assert manifest.api_version == 1
+    assert manifest.api_version == 2
     assert manifest.entrypoint == "main:run"
     assert manifest.permissions.filesystem == "read"
     assert manifest.ui.multiple_files is True
@@ -82,8 +82,17 @@ def test_invalid_version_fails() -> None:
 
 def test_unsupported_api_fails() -> None:
     with pytest.raises(ManifestError) as error:
-        parse_manifest(manifest_with(**{"api_version = 1": "api_version = 2"}))
+        parse_manifest(manifest_with(**{"api_version = 2": "api_version = 3"}))
     assert error.value.code == "unsupported_api"
+    assert "aceito: [2]" in str(error.value)
+
+
+def test_retired_api_1_explains_the_migration() -> None:
+    with pytest.raises(ManifestError) as error:
+        parse_manifest(manifest_with(**{"api_version = 2": "api_version = 1"}))
+    assert error.value.code == "unsupported_api"
+    assert "aposentada" in str(error.value)
+    assert "request.reader" in str(error.value)
 
 
 def test_min_app_version_is_checked() -> None:

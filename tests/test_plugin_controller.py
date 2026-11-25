@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pandas as pd
 import pytest
 from plugin_helpers import installed_plugin
 
+from xl_utils.controllers.all_str import run_all_str
 from xl_utils.controllers.plugins import execute_plugin
 from xl_utils.core.plugins.errors import PluginError
 from xl_utils.shared.log import RunLog
@@ -199,3 +201,45 @@ def test_default_options_are_not_invented(tmp_path: Path) -> None:
     outcome = execute(plugin, tmp_path, options={})
 
     assert outcome.message == ""
+
+
+ECHO = """\
+from xl_utils.shared.plugins.api import PluginResult
+
+
+def run(request):
+    frames = {}
+    for path in request.files:
+        frames.update(request.reader.read(path))
+    return PluginResult(frames=frames, message="ok")
+"""
+
+
+@pytest.mark.parametrize("fixture", ["xlsx_file", "xls_file", "csv_file", "html_file"])
+def test_reader_gives_the_plugin_the_same_text_as_the_natives(
+    tmp_path: Path,
+    fixture: str,
+    request: pytest.FixtureRequest,
+) -> None:
+    source: Path = request.getfixturevalue(fixture)
+    native = run_all_str(source).sheets
+    plugin = installed_plugin(tmp_path / "plugins", files={"main.py": ECHO})
+    log = RunLog()
+
+    outcome = execute_plugin(
+        plugin,
+        loader=PluginLoader(),
+        files=(source,),
+        inputs={},
+        sheets={source: tuple(native)},
+        options={"modo": "a"},
+        log=log,
+        progress=NullReporter(),
+        token=CancelToken(),
+        app_version="0.3.0",
+    )
+
+    assert list(outcome.frames) == list(native)
+    for name, frame in native.items():
+        pd.testing.assert_frame_equal(outcome.frames[name], frame)
+    assert f"{source.name}: {len(native)} aba(s)" in log.to_text()

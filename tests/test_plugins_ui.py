@@ -8,7 +8,12 @@ from pathlib import Path
 
 import flet as ft
 import pytest
-from plugin_helpers import installed_plugin, valid_package, write_sidecar
+from plugin_helpers import (
+    VALID_MANIFEST,
+    installed_plugin,
+    valid_package,
+    write_sidecar,
+)
 
 from xl_utils.core.plugins.errors import InstallError
 from xl_utils.core.plugins.page import PageSpec
@@ -22,7 +27,7 @@ OPTIONS_MANIFEST = """\
 id = "autor.opcoes"
 name = "Opções"
 version = "1.0.0"
-api_version = 1
+api_version = 2
 entrypoint = "main:run"
 description = "Plugin com todos os tipos de opção."
 
@@ -167,6 +172,23 @@ def test_invalid_folder_is_listed_with_the_code(tmp_path: Path) -> None:
     assert [item.path.name for item in page.scan.invalid] == ["quebrado"]
     assert page.scan.invalid[0].code == "manifest_invalid"
     assert any("manifest_invalid" in text for text in _texts(page.control))
+
+
+def test_api_1_plugin_shows_the_retirement_reason(tmp_path: Path) -> None:
+    root = tmp_path / "plugins"
+    folder = root / "autor.antigo"
+    (folder / "lib").mkdir(parents=True)
+    (folder / "lib" / "main.py").write_text("def run(request): ...\n", "utf-8")
+    manifest = VALID_MANIFEST.replace('id = "autor.teste"', 'id = "autor.antigo"')
+    manifest = manifest.replace("api_version = 2", "api_version = 1")
+    (folder / "plugin.toml").write_text(manifest, encoding="utf-8")
+
+    page = PluginsPage(root=root)
+
+    assert page.scan.valid == ()
+    assert page.scan.invalid[0].code == "unsupported_api"
+    texts = _texts(page.control)
+    assert any("unsupported_api" in text and "aposentada" in text for text in texts)
 
 
 def test_open_builds_the_declarative_page_and_back_returns(tmp_path: Path) -> None:

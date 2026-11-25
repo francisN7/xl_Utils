@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from xl_utils import __version__
+from xl_utils.controllers.all_str import run_all_str
 from xl_utils.controllers.plugins import execute_plugin
 from xl_utils.core.plugins.manifest import PluginManifest, parse_manifest
 from xl_utils.core.plugins.package import build_package, inspect_package, verify_sidecar
@@ -73,6 +76,27 @@ def test_hello_counts_each_selected_sheet(tmp_path: Path, xlsx_file: Path) -> No
     assert frame.iloc[0]["aba"] == "Dados"
     assert frame.iloc[0]["linhas"] == 3
     assert outcome.message == "1 aba(s) lida(s)"
+
+
+@pytest.mark.parametrize("fixture", ["xlsx_file", "xls_file", "csv_file", "html_file"])
+def test_hello_reads_the_four_formats_like_the_natives(
+    tmp_path: Path,
+    fixture: str,
+    request: pytest.FixtureRequest,
+) -> None:
+    source: Path = request.getfixturevalue(fixture)
+    native = run_all_str(source).sheets
+    plugin = install_example("hello", tmp_path)
+
+    outcome = execute(
+        plugin,
+        files=(source,),
+        sheets={source: tuple(native)},
+    )
+
+    frame = outcome.frames["resumo"]
+    assert list(frame["aba"]) == list(native)
+    assert list(frame["linhas"]) == [len(sheet) for sheet in native.values()]
 
 
 def test_com_opcoes_uses_named_slots_and_typed_options(

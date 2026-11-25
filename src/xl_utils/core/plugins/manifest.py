@@ -14,8 +14,12 @@ from typing import Any, Literal
 
 from xl_utils.core.plugins.errors import ManifestError
 
-API_VERSION = 1
+API_VERSION = 2
 SUPPORTED_API_VERSIONS = frozenset({API_VERSION})
+# Versões que já existiram e saíram: o motivo aparece na listagem e no check.
+RETIRED_API_VERSIONS = {
+    1: "a API 1 foi aposentada; migre para a 2 (leitura por request.reader)",
+}
 MAX_MANIFEST_BYTES = 256 * 1024
 MAX_OPTIONS = 20
 MAX_INPUTS = 8
@@ -233,6 +237,12 @@ def _build(
         raise ManifestError(
             "manifest_invalid",
             f"{source}: 'api_version' deve ser inteiro.",
+        )
+    if api_raw in RETIRED_API_VERSIONS:
+        raise ManifestError(
+            "unsupported_api",
+            f"{source}: api_version {api_raw} não é mais aceito: "
+            f"{RETIRED_API_VERSIONS[api_raw]}.",
         )
     if api_raw not in SUPPORTED_API_VERSIONS:
         raise ManifestError(

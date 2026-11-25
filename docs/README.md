@@ -30,7 +30,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S20-api-2-leitor.md`](sessions/S20-api-2-leitor.md) |
+| ler a spec da próxima sessão | [`sessions/S21-perfis-do-drive.md`](sessions/S21-perfis-do-drive.md) |
 
 ## Por seção (atalho)
 
@@ -75,6 +75,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o plugin só é importado ao executar | `adr/0024-carregamento-sob-demanda.md` | 45 |
 | por que o seletor do Drive é Flet puro e paginado | `adr/0025-seletor-de-arquivos.md` | 115 |
 | por que a vinculação saiu do app | `adr/0027-vinculacao-vira-plugin.md` | 45 |
+| por que o plugin lê por `request.reader` e a API 1 saiu | `adr/0028-api-2-reader.md` | 70 |
 
 ## Regras do mapa
 

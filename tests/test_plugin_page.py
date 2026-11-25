@@ -19,7 +19,7 @@ ALL_OPTIONS = """\
 id = "autor.opcoes"
 name = "Opções de Teste"
 version = "1.0.0"
-api_version = 1
+api_version = 2
 entrypoint = "main:run"
 description = "Testa todos os tipos de opção."
 
@@ -60,7 +60,7 @@ NAMED_INPUTS = """\
 id = "autor.entradas"
 name = "Entradas"
 version = "1.0.0"
-api_version = 1
+api_version = 2
 entrypoint = "main:run"
 description = "Usa slots nomeados."
 

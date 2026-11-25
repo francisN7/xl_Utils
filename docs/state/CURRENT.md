@@ -4,36 +4,35 @@
 
 ## Sessão
 
-- **Última concluída:** S19 — Remover Verificar Vínculos e preparar o repo de
+- **Última concluída:** S20 — Leitura de planilhas pelo host e API 2 dos
   plugins
-- **Próxima:** S20 — Leitura de planilhas pelo host e API 2 dos plugins
-  (`docs/sessions/S20-api-2-leitor.md`)
+- **Próxima:** S21 — Menu de perfis do Drive sem troca de conta
+  (`docs/sessions/S21-perfis-do-drive.md`)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `4be82ef` — docs: commit so local, push fica com o dono
-- **Decisões:** ADR 0027 (vinculação vira plugin), 0026 (Picker JS) e 0015–0025.
+- **Retorno:** `7fd9cc8` — chore: tira .claude do repo
+- **Decisões:** ADR 0028 (API 2, `reader`), 0027 (vinculação vira plugin),
+  0026 (Picker JS) e 0015–0025.
 
 ## Pronto
 
-- S19: quatro ferramentas nativas; vinculação, `headers.json`,
-  `shared/configs.py` e o `pre_run` do `ToolLayout` removidos. Código guardado
-  em `../xl_U-Plugins/link/referencia/` (repo privado, S01 de lá fechada).
-- S18: Plugins é `FOOTER_PAGES` no rodapé; navegação por `id`.
-- S17: ícone real na sidebar e na janela; validação no Windows pendente.
+- S20: `request.reader.read(path)` lê pelo `prepare_workbook` só as abas
+  marcadas (`all_sheets=True` traz todas); API 1 inválida com motivo;
+  exemplos 2.0.0; `_molde` do `xl_U-Plugins` na API 2 (commit local lá).
+- Pós-S19: `uv run xl-utils --web` abre a mesma UI na porta 8550.
+- S19: quatro ferramentas nativas; vinculação guardada em
+  `../xl_U-Plugins/link/referencia/`, volta como plugin na S02 de lá.
 
 ## Próximo passo
 
-Executar a S20 (`reader` na API 2, sem compatibilidade com a 1) e depois
-atualizar o `_molde/` do `xl_U-Plugins`. Em seguida S21–S23 até a 0.4.0; S24
-(Picker JS) no backlog. Conferir o ícone no build Windows na próxima vez que
-rodar `build_windows.ps1`.
+Executar a S21 (abre com questionário: conta do "Abrir do Drive"). Depois
+S22–S23 até a 0.4.0; S24 (Picker JS) no backlog. Dono: rodar um plugin com
+arquivo real no app e conferir o ícone no build Windows.
 
 ## Arquivos-chave
 
-- `src/xl_utils/shared/plugins/api.py`, `controllers/plugins.py`
-- `src/xl_utils/core/plugins/manifest.py`, `core/tools/all_str.py`
-- `src/xl_utils/ui/components/tool_layout.py`, `ui/pages/registry.py`
-- `docs/plugins/api.md`, `docs/adr/0023-contrato-de-plugins.md`
-- `../xl_U-Plugins/AGENTS.md`, `../xl_U-Plugins/link/README.md`
+- `src/xl_utils/ui/components/top_menu.py`, `src/xl_utils/ui/drive.py`
+- `src/xl_utils/shared/accounts.py`, `docs/adr/0026-drive-sem-consentimento.md`
+- Plugins: `shared/plugins/{api,reader}.py`, `docs/plugins/api.md`
 
 ## Armadilhas
 
@@ -49,6 +48,7 @@ rodar `build_windows.ps1`.
 - Spikes e capturas ficam em `artifacts/`; nunca commitar.
 - `assets/` fica na raiz, fora do wheel; `ft.Image` recebe bytes.
 - Abrir a área de plugins não importa `lib/`; só o primeiro Executar importa.
+- `RunLog()` vazio é falsy: use `is None`, não `log or RunLog()`.
 - Plugin em processo não tem sandbox; permissões são avisos.
 - `.tar.xz` é tar + xz; sidecar SHA-256 obrigatório; nada de `extractall`.
 - `flet pack` apaga `build/`; o build exige `_lzma.pyd` e `python3t.dll`.

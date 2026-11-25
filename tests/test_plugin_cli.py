@@ -6,7 +6,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from plugin_helpers import MAIN_PY, VALID_MANIFEST
+from plugin_helpers import MAIN_PY, VALID_MANIFEST, valid_package, write_sidecar
 
 ROOT = Path(__file__).resolve().parents[1]
 CLI = ROOT / "scripts" / "plugin_cli.py"
@@ -65,3 +65,17 @@ def test_cli_check_reports_missing_sidecar(tmp_path: Path) -> None:
     checked = run_cli("check", str(package))
     assert checked.returncode == 1
     assert "digest_missing" in checked.stderr
+
+
+def test_cli_check_refuses_api_1_with_the_reason(tmp_path: Path) -> None:
+    package = valid_package(
+        tmp_path / "plugin.tar.xz",
+        manifest=VALID_MANIFEST.replace("api_version = 2", "api_version = 1"),
+    )
+    write_sidecar(package)
+
+    checked = run_cli("check", str(package))
+
+    assert checked.returncode == 1
+    assert "unsupported_api" in checked.stderr
+    assert "aposentada" in checked.stderr

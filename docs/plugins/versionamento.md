@@ -23,15 +23,17 @@ não convivem: instalar de novo é recusado; desinstale antes de trocar (a área
 
 ## `api_version`
 
-A API 1 cobre:
+A API 2 cobre:
 
 - os campos do `plugin.toml` e as regras de validação;
-- `PluginRequest` e `PluginResult`;
+- `PluginRequest` (com `reader`) e `PluginResult`;
 - o schema de `[ui]` e `[[options]]`;
 - o comportamento de instalação e descoberta.
 
-O host declara o conjunto suportado; esta versão aceita `1`. Um manifesto com
-outro valor é recusado com `unsupported_api`, sem tentativa de adaptação.
+O host declara o conjunto suportado; esta versão aceita só `2`. Um manifesto com
+outro valor é recusado com `unsupported_api`, sem tentativa de adaptação. A
+API 1 (sem `reader`) foi aposentada: o motivo aparece na área Plugins e no
+`check`.
 
 **Quebra de API** é qualquer mudança que faça um plugin válido na versão antiga
 deixar de funcionar ou mudar de significado: campo obrigatório novo, remoção,
@@ -68,8 +70,8 @@ declare `pip`, `requirements.txt` ou instalação em tempo de execução.
 
 | Situação | Resultado |
 |---|---|
-| Plugin API 1 em host API 1 | instala e carrega |
-| Plugin API 1 em host API 2 | carrega se o host ainda suportar 1 |
+| Plugin API 2 em host API 2 | instala e carrega |
+| Plugin API 1 em host API 2 | recusa com `unsupported_api` (API aposentada) |
 | Plugin API 2 em host API 1 | recusa com `unsupported_api` |
 | `min_app_version` maior que o app | recusa com `app_too_old` |
 | Dependência ausente | recusa com `missing_dependency` |
@@ -83,6 +85,9 @@ Quando uma versão de API sair de moda, o host deve:
 2. manter a versão antiga por pelo menos uma release de transição;
 3. avisar no carregamento qual versão ainda funciona;
 4. remover só depois que os plugins conhecidos migrarem.
+
+Exceção registrada: a API 1 saiu na 2 sem release de transição, porque só os
+exemplos e o molde a usavam (ADR 0028).
 
 O repo privado de plugins deve fixar a faixa de `api_version` que testa e rodar
 o validador do app no CI antes de publicar um pacote.
