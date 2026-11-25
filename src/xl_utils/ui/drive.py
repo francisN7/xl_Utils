@@ -10,7 +10,7 @@ from pathlib import Path
 
 from xl_utils.core.io import dump_workbook
 from xl_utils.core.paths import free_name
-from xl_utils.core.save import SaveError, SaveItem
+from xl_utils.core.save import SaveError, SaveItem, split_item
 from xl_utils.shared import accounts, drive_auth, drive_cache, drive_pick
 from xl_utils.shared.accounts import Account, AccountStore
 from xl_utils.shared.drive import (
@@ -302,7 +302,8 @@ class DriveSession:
                     ) from error
                 raise
         saved: list[DriveSaved] = []
-        for item in items:
+        parts = [part for item in items for part in split_item(item)]
+        for item in parts:
             try:
                 data = dump_workbook(item.sheets)
             except Exception as error:  # noqa: BLE001 - vira falha de gravação

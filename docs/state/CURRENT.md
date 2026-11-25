@@ -4,11 +4,11 @@
 
 ## Sessão
 
-- **Última concluída:** S21b — Engrenagem da conta: foto e apelido
+- **Última concluída:** S21d — Merge acima do limite em vários arquivos
 - **Próxima:** S22 — Auditoria dos docs e documentação para quem chega
   (`docs/sessions/S22-docs-para-quem-chega.md`)
 - **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `5668e89` — docs: backlog do Picker do Drive so com planilhas
+- **Retorno:** `f1f79e5` — S21b: foto e apelido da conta
 - **Decisões:** ADR 0031 (perfil local), 0030 (chaveiro), 0029 (painel de
   perfis), 0028 (API 2), 0027 (vinculação), 0026 (Picker JS) e 0015–0025.
 
@@ -16,7 +16,7 @@
 
 - S21b: engrenagem no painel abre “Configurar conta”; foto (Pillow, centro,
   PNG 256 px) e apelido (≤16) em `drive/profiles/`; Sair apaga os dois.
-- S21c: fora do Windows o token vai para o chaveiro (`KeyringVault`).
+- S21d: aba >1.000.000 linhas vira arquivos `_parte1`, `_parte2`… (`split_item`).
 - S21a: avatar + nome no topo; painel `MenuBar` + `SubmenuButton` com “Outras
   contas”, “Adicionar conta” e “Sair”; salvar só na conta de origem.
 

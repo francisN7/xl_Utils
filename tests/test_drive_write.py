@@ -9,6 +9,7 @@ from typing import Any
 import pandas as pd
 import pytest
 
+from xl_utils.core import save as save_module
 from xl_utils.core.io import dump_workbook, read_workbook
 from xl_utils.core.save import SaveItem
 from xl_utils.shared import accounts, drive_cache, drive_pick
@@ -195,6 +196,27 @@ def test_save_to_drive_never_overwrites_and_uses_the_origin_folder(
     assert all(data.startswith(b"PK") for _, data, _ in client.created)
     assert saved[0].folder_name == "Teste"
     assert saved[0].web_link.endswith("/id-1/view")
+
+
+def test_save_to_drive_splits_results_over_the_row_limit(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(save_module, "ROW_LIMIT", 1)
+    client = _SaveClient()
+    session = _save_session(tmp_path, client)
+    item = SaveItem(
+        "Merge.xlsx",
+        {"Mesclado": pd.DataFrame({"n": ["1", "2"]})},
+        tmp_path,
+    )
+
+    saved = asyncio.run(session.save_to_drive(_account(), [item], None))
+
+    assert [entry.name for entry in saved] == [
+        "Merge_parte1.xlsx",
+        "Merge_parte2.xlsx",
+    ]
 
 
 def test_save_to_drive_without_folder_goes_to_the_root(tmp_path: Path) -> None:

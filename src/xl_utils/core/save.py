@@ -4,8 +4,13 @@ Entrada: lista de ``SaveItem`` e o destino escolhido pelo usuário.
 Saída: lista de ``Path`` realmente gravados, ``None`` no cancelamento ou ``[]``
 quando não há item.
 Erros: ``SaveError`` quando o destino não pode receber o livro.
+
+Livro com aba acima de ``ROW_LIMIT`` linhas vira vários arquivos
+(``Merge_parte1.xlsx``, ``Merge_parte2.xlsx``…): o Excel não aceita aba com mais
+de 1.048.576 linhas e o limite redondo deixa margem.
 """
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,6 +18,8 @@ from pathlib import Path
 import pandas as pd
 
 from xl_utils.core.io import save_workbook
+
+ROW_LIMIT = 1_000_000
 
 
 class SaveError(Exception):
@@ -57,19 +64,73 @@ def save_chosen(
         targets = [destination / item.suggested_name for item in items]
 
     return [
-        save_item(item, target) for item, target in zip(items, targets, strict=True)
+        path
+        for item, target in zip(items, targets, strict=True)
+        for path in save_item(item, target)
     ]
 
 
 def save_to_output(items: Sequence[SaveItem]) -> list[Path]:
     """Grava cada item na pasta ``output/`` da própria origem."""
-    return [save_item(item, item.output_dir / item.suggested_name) for item in items]
+    return [
+        path
+        for item in items
+        for path in save_item(item, item.output_dir / item.suggested_name)
+    ]
 
 
-def save_item(item: SaveItem, destination: Path) -> Path:
-    """Grava um item e devolve o caminho real, sem sobrescrever."""
-    target = destination.with_suffix(".xlsx")
-    try:
-        return save_workbook(item.sheets, target)
-    except Exception as error:  # noqa: BLE001 - uma falha tipada para a UI
-        raise SaveError(f"Não foi possível salvar {target.name}: {error}") from error
+def save_item(item: SaveItem, destination: Path) -> list[Path]:
+    """Grava um item e devolve os caminhos reais, sem sobrescrever.
+
+    Acima de ``ROW_LIMIT`` linhas o item sai em partes, uma por arquivo.
+    """
+    parts = split_item(item)
+    stem = destination.with_suffix("").name
+    written: list[Path] = []
+    for index, part in enumerate(parts):
+        name = _part_stem(stem, index) if len(parts) > 1 else stem
+        target = destination.with_name(f"{name}.xlsx")
+        try:
+            written.append(save_workbook(part.sheets, target))
+        except Exception as error:  # noqa: BLE001 - uma falha tipada para a UI
+            raise SaveError(
+                f"Não foi possível salvar {target.name}: {error}"
+            ) from error
+    return written
+
+
+def split_item(item: SaveItem, limit: int | None = None) -> list[SaveItem]:
+    """Divide o item em partes de até ``limit`` linhas por aba.
+
+    Sem aba acima do limite, devolve o próprio item. Cada parte leva o
+    cabeçalho e o trecho correspondente de cada aba; aba que acaba antes fica
+    só nas primeiras partes. Os nomes ganham ``_parte1``, ``_parte2``…
+    """
+    limit = limit or ROW_LIMIT
+    longest = max((len(frame) for frame in item.sheets.values()), default=0)
+    if longest <= limit:
+        return [item]
+    name = Path(item.suggested_name)
+    total = math.ceil(longest / limit)
+    suffix = name.suffix or ".xlsx"
+    parts: list[SaveItem] = []
+    for index in range(total):
+        start = index * limit
+        sheets = {
+            sheet: frame.iloc[start : start + limit]
+            for sheet, frame in item.sheets.items()
+            if index == 0 or len(frame) > start
+        }
+        parts.append(
+            SaveItem(
+                suggested_name=_part_stem(name.stem, index) + suffix,
+                sheets=sheets,
+                output_dir=item.output_dir,
+            )
+        )
+    return parts
+
+
+def _part_stem(stem: str, index: int) -> str:
+    """Nome da parte ``index`` (base 0): ``Merge`` vira ``Merge_parte1``."""
+    return f"{stem}_parte{index + 1}"

@@ -219,6 +219,10 @@ painel entra em **“Pronto para salvar”**: a prévia aparece, mas nenhum arqu
   Drive**: a primeira gravação pede a pasta no Picker, a concessão fica
   lembrada por conta e recusar cai na raiz do Meu Drive. Nome ocupado ganha
   `_001`, `_002`... e o sucesso mostra “Abrir no Drive”.
+- Aba com mais de 1.000.000 de linhas (o Excel aceita até 1.048.576) faz o
+  resultado sair em vários arquivos, `_parte1`, `_parte2`…, cada um com o
+  cabeçalho e até 1.000.000 de linhas; vale para `output/`, Salvar e Drive
+  (`core/save.py`, `ROW_LIMIT`).
 - Cancelar o seletor mantém a prévia e os botões; nada é gravado.
 - Nomes existentes ganham sufixo; o log registra o caminho real como
   `Salvo: <caminho>`.

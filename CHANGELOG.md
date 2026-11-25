@@ -85,6 +85,13 @@ decisões nos ADRs.
 - O `headers.json` empacotado e o override em
   `%LOCALAPPDATA%\xl_utils\headers.json`, que só serviam à vinculação.
 
+### Fixed
+
+- Resultado acima do limite do Excel (como um Merge de 1.240.948 linhas) não
+  falha mais com “This sheet is too large!”: sai em vários arquivos
+  (`Merge_parte1.xlsx`, `Merge_parte2.xlsx`…), com até 1.000.000 de linhas
+  cada, no `output/`, no Salvar e no Drive.
+
 ## v0.3.0 — 2026-11-09
 
 ### Added
