@@ -38,10 +38,11 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | criar o primeiro plugin, passo a passo | [`plugins/primeiro-plugin.md`](plugins/primeiro-plugin.md) |
 | empacotar e testar um plugin | [`plugins/empacotar-testar.md`](plugins/empacotar-testar.md) |
 | ver o site público | [`index.html`](index.html) |
+| trocar banner ou capturas (README e site) | [`assets/`](assets/) e [`guide/setup.md` → Site público](guide/setup.md#site-público) |
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S22b-readme-e-site.md`](sessions/S22b-readme-e-site.md) |
+| ler a spec da próxima sessão | [`sessions/S23-release-0-4-0.md`](sessions/S23-release-0-4-0.md) |
 
 ## Por seção (atalho)
 
