@@ -304,7 +304,8 @@ def _drive_tooltip(drive: DriveSession | None) -> str:
     account = drive.active_account if drive is not None else None
     if account is None:
         return "Abrir do Drive"
-    return f"Abrir do Drive — {display_name(account)}"
+    nickname = drive.profile_for(account.email).nickname if drive else ""
+    return f"Abrir do Drive — {display_name(account, nickname=nickname)}"
 
 
 def _format_size(size: int) -> str:

@@ -21,6 +21,7 @@ from xl_utils.shared.drive import (
     FolderPermissionError,
 )
 from xl_utils.shared.drive_store import FolderGrant, FolderStore
+from xl_utils.shared.profiles import Profile
 from xl_utils.ui.components.result_panel import ResultPanel
 from xl_utils.ui.components.tool_layout import ToolLayout
 from xl_utils.ui.drive import DriveSaved, DriveSession
@@ -366,6 +367,9 @@ class _FakeDrive:
     @property
     def active_account(self) -> accounts.Account | None:
         return next((item for item in self.accounts if item.email == self.active), None)
+
+    def profile_for(self, _email: str) -> Profile:
+        return Profile()
 
     def subscribe(self, listener: object) -> None:
         self._listeners.append(listener)

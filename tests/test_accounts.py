@@ -39,6 +39,14 @@ def _account(
     )
 
 
+def test_account_key_names_the_account_file(store: accounts.AccountStore) -> None:
+    key = accounts.account_key(" Ana@Example.com ")
+
+    assert key == accounts.account_key("ana@example.com")
+    assert len(key) == 16
+    assert store.path_for("ana@example.com").stem == key
+
+
 def test_account_survives_a_round_trip(store: accounts.AccountStore) -> None:
     store.save(_account())
 

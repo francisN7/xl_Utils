@@ -1,4 +1,4 @@
-"""Rótulos de conta: e-mail curto, nome de exibição e avatar com a inicial."""
+"""Rótulos de conta: e-mail curto, nome de exibição e avatar (foto ou iniciais)."""
 
 from __future__ import annotations
 
@@ -45,13 +45,26 @@ def initials(account: Account) -> str:
     return "".join(part[0].upper() for part in parts[:2]) or "G"
 
 
-def display_name(account: Account, limit: int = EMAIL_LIMIT) -> str:
-    """Nome curto para o topo e o painel: o nome da conta ou o e-mail curto."""
-    return short_email(account.name.strip() or account.email, limit)
+def display_name(
+    account: Account,
+    limit: int = EMAIL_LIMIT,
+    *,
+    nickname: str = "",
+) -> str:
+    """Nome curto para o topo e o painel: apelido, nome da conta ou e-mail."""
+    return short_email(nickname.strip() or account.name.strip() or account.email, limit)
 
 
-def avatar(account: Account, *, radius: int = 14) -> ft.CircleAvatar:
-    """Círculo com as iniciais da conta, nas cores do tema."""
+def avatar(
+    account: Account,
+    *,
+    radius: int = 14,
+    photo: bytes | None = None,
+) -> ft.CircleAvatar:
+    """Círculo com a foto da conta; as iniciais ficam por baixo, de reserva.
+
+    Sem foto, ou se ela não carregar, aparecem as iniciais nas cores do tema.
+    """
     return ft.CircleAvatar(
         content=ft.Text(
             initials(account),
@@ -59,6 +72,7 @@ def avatar(account: Account, *, radius: int = 14) -> ft.CircleAvatar:
             weight=ft.FontWeight.W_600,
             color=theme.BACKGROUND,
         ),
+        foreground_image_src=photo or None,
         bgcolor=theme.PURPLE,
         radius=radius,
     )

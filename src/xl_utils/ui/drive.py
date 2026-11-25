@@ -21,6 +21,7 @@ from xl_utils.shared.drive import (
     token_provider,
 )
 from xl_utils.shared.drive_store import FolderGrant, FolderStore
+from xl_utils.shared.profiles import Profile, ProfileStore
 
 
 @dataclass(frozen=True, slots=True)
@@ -50,6 +51,7 @@ class DriveSession:
         client_factory: Callable[[Account], DriveClient] | None = None,
         cache_root: Path | None = None,
         folders: FolderStore | None = None,
+        profiles: ProfileStore | None = None,
     ) -> None:
         self._store = store or AccountStore()
         self._authorize = authorize or drive_auth.authorize
@@ -57,8 +59,10 @@ class DriveSession:
         self._client_factory = client_factory or _client_for
         self._cache_root = cache_root
         self._folders = folders or FolderStore(root=self._store.root)
+        self._profiles = profiles or ProfileStore(root=self._store.root)
         self._listeners: list[Callable[[], None]] = []
         self.accounts: list[Account] = []
+        self.profiles: dict[str, Profile] = {}
         self.active: str | None = None
         self.busy = False
         self.error: str | None = None
@@ -75,14 +79,19 @@ class DriveSession:
                 return account
         return None
 
+    def profile_for(self, email: str) -> Profile:
+        """Apelido e foto da conta; sem perfil gravado, um vazio."""
+        return self.profiles.get(email) or Profile()
+
     def subscribe(self, listener: Callable[[], None]) -> None:
         """Registra um redesenho para quando o estado mudar."""
         self._listeners.append(listener)
 
     def reload(self) -> None:
-        """Relê as contas e a selecionada; sem marca válida, vale a primeira."""
+        """Relê as contas, os perfis e a selecionada; sem marca, vale a primeira."""
         self.accounts = self._store.list()
         emails = [account.email for account in self.accounts]
+        self.profiles = {email: self._profiles.get(email) for email in emails}
         active = self._store.active()
         self.active = active if active in emails else (emails[0] if emails else None)
 
@@ -327,6 +336,17 @@ class DriveSession:
             self.error = None
         self.notify()
 
+    def save_profile(self, email: str, nickname: str, photo: bytes | None) -> None:
+        """Grava apelido e foto da conta e redesenha quem escuta."""
+        try:
+            self._profiles.save(email, nickname, photo)
+            self.error = None
+        except OSError:
+            # Sem o caminho na mensagem: ele leva o hash da conta, não ajuda.
+            self.error = "Não foi possível gravar o perfil da conta."
+        self.reload()
+        self.notify()
+
     def switch(self, email: str) -> None:
         """Seleciona outra conta sem apagar nenhuma."""
         try:
@@ -340,15 +360,21 @@ class DriveSession:
     def logout(self) -> None:
         """Remove só a conta selecionada e seleciona a primeira que sobrar.
 
-        As demais contas e as cópias já abertas do Drive continuam intactas.
+        Apelido e foto da conta saem junto. As demais contas e as cópias já
+        abertas do Drive continuam intactas.
         """
         if self.active is None or self.busy:
             return
+        email = self.active
         self.error = None
         try:
-            self._store.remove(self.active)
+            self._store.remove(email)
         except accounts.AccountsError as error:
             self.error = str(error)
+        try:
+            self._profiles.remove(email)
+        except OSError:
+            self.error = self.error or "Não foi possível apagar o perfil da conta."
         remaining = self._store.list()
         if remaining:
             self._store.set_active(remaining[0].email)

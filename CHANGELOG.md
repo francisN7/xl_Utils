@@ -32,6 +32,12 @@ decisões nos ADRs.
 
 ### Changed
 
+- **Foto e apelido da conta** (ADR 0031): a engrenagem no painel de perfis
+  abre “Configurar conta”. Lá dá para escolher uma foto do disco (PNG, JPEG ou
+  WebP, recortada no centro e reduzida a 256 px) e um apelido de até 16
+  caracteres. A foto vai para o avatar (sem foto, as iniciais) e o apelido
+  substitui o nome no topo, no painel e no tooltip de “Abrir do Drive”. Sair
+  apaga os dois junto com a conta.
 - **Login do Drive no Linux** (ADR 0030): fora do Windows o token da conta vai
   para o chaveiro do sistema (KWallet ou GNOME Keyring), em vez de o login
   falhar com “A proteção de tokens do Drive só existe no Windows.” O Windows

@@ -274,6 +274,8 @@ A gravação usa o caminho inverso. `drive_pick` aceita `folders=True`: pede
 `allow_folder_selection=true` e restringe o seletor ao MIME de pasta. `drive.py`
 cria o arquivo por upload multipart, lista nomes para não sobrescrever e devolve
 `webViewLink`; `drive_store.py` guarda `drive/folders.json` por conta e pasta.
+`profiles.py` guarda o perfil local de cada conta em `drive/profiles/` (apelido
+em JSON e foto em PNG 256 px, nomeados pelo hash do e-mail; ADR 0031).
 `ui/drive.py` resolve a conta e a pasta, gera o `.xlsx` em memória e grava fora
 da UI thread; `ToolLayout` mostra o diálogo de concessão quando a pasta ainda
 não foi autorizada e cai na raiz se o usuário recusar. Ver o adendo da S9c ao

@@ -157,7 +157,8 @@ app — plugin é código confiável, sem sandbox.
 faz o Picker de arquivo e de pasta; `drive.py` é o cliente REST (leitura,
 `files.create` multipart, nomes livres e `webViewLink`); `drive_cache.py` grava
 a cópia local e o manifesto de origem; `drive_store.py` guarda as pastas
-autorizadas por conta. `ui/drive.py` é o estado compartilhado e o
+autorizadas por conta; `profiles.py` guarda o apelido e a foto (PNG 256 px)
+de cada conta. `ui/drive.py` é o estado compartilhado e o
 `DriveSession.save_to_drive` roda fora da UI thread. `ToolLayout` decide entre
 “Salvar em output/” e “Salvar no Drive” e mostra o diálogo de concessão.
 
@@ -209,6 +210,7 @@ nada é sobrescrito.
 | mudar o aviso de formato | `core/mime.py` + `ui/components/tool_layout.py` |
 | mudar a barra de progresso | `shared/progress.py` + `ui/components/result_panel.py` |
 | mudar o log ao vivo ou o cancelamento | `shared/progress.py` + `ui/components/tool_layout.py` + páginas |
+| mudar o painel de perfis, a foto ou o apelido | `ui/components/top_menu.py` + `account_settings.py` + `account_label.py` + `shared/profiles.py` |
 | mudar tema ou preferência salva | `ui/theme.py` + `shared/settings.py` + `ui/components/sidebar.py` |
 
 ## Invariantes

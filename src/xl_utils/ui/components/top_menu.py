@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import contextlib
+from collections.abc import Callable
 
 import flet as ft
 
 from xl_utils.shared.accounts import Account
+from xl_utils.shared.profiles import Profile
 from xl_utils.ui import theme
 from xl_utils.ui.components.account_label import avatar, display_name, email_text
+from xl_utils.ui.components.account_settings import AccountSettings
 from xl_utils.ui.components.client_import import ClientImport
 from xl_utils.ui.drive import DriveSession
 
@@ -20,8 +23,9 @@ TRIGGER_NAME_LIMIT = 16
 class TopMenu:
     """Avatar e nome da conta selecionada; o clique abre o painel de perfis.
 
-    O painel mostra a conta selecionada, as outras numa lista retrátil e, fixos
-    embaixo, “Adicionar conta” e “Sair”. O ``PopupMenuItem`` do Flet não tem
+    O painel mostra a conta selecionada (com a engrenagem que abre foto e
+    apelido), as outras numa lista retrátil e, fixos embaixo, “Adicionar
+    conta” e “Sair”. O ``PopupMenuItem`` do Flet não tem
     submenu; por isso o painel é um ``SubmenuButton`` dentro de um ``MenuBar``
     transparente (ADR 0029).
     """
@@ -34,6 +38,7 @@ class TopMenu:
     ) -> None:
         self._session = session
         self._importer = importer
+        self._settings = AccountSettings(session)
         self._submenu = ft.SubmenuButton(alignment_offset=ft.Offset(0, 6))
         self._bar = ft.MenuBar(controls=[self._submenu])
         self._build()
@@ -48,6 +53,11 @@ class TopMenu:
     def trigger(self) -> ft.Control:
         """Conteúdo do botão do topo (avatar e nome, ou “Entrar com Google”)."""
         return self._submenu.content
+
+    @property
+    def settings(self) -> AccountSettings:
+        """Diálogo de foto e apelido aberto pela engrenagem."""
+        return self._settings
 
     @property
     def panel(self) -> list[ft.Control]:
@@ -97,11 +107,16 @@ class TopMenu:
                 spacing=8,
                 tight=True,
             )
+        profile = session.profile_for(account.email)
         return ft.Row(
             controls=[
-                avatar(account),
+                avatar(account, photo=profile.photo),
                 ft.Text(
-                    display_name(account, TRIGGER_NAME_LIMIT),
+                    display_name(
+                        account,
+                        TRIGGER_NAME_LIMIT,
+                        nickname=profile.nickname,
+                    ),
                     size=theme.FONT_SM,
                     color=theme.TEXT,
                     max_lines=1,
@@ -133,7 +148,9 @@ class TopMenu:
             )
             return controls
 
-        controls.append(_header(account))
+        controls.append(
+            _header(account, session.profile_for(account.email), self._open_settings)
+        )
         others = [item for item in session.accounts if item.email != account.email]
         if others:
             controls.append(
@@ -162,7 +179,11 @@ class TopMenu:
     def _other(self, account: Account) -> ft.MenuItemButton:
         return ft.MenuItemButton(
             content=email_text(account.email),
-            leading=avatar(account, radius=12),
+            leading=avatar(
+                account,
+                radius=12,
+                photo=self._session.profile_for(account.email).photo,
+            ),
             on_click=lambda _event, email=account.email: self._switch(email),
             width=PANEL_WIDTH,
         )
@@ -200,6 +221,14 @@ class TopMenu:
         if await self._importer.pick(page):
             await self._session.connect()
 
+    def _open_settings(self, _event: object = None) -> None:
+        """Abre foto e apelido da conta selecionada; o painel já fechou."""
+        page = self._page()
+        account = self._session.active_account
+        if page is None or account is None or self._session.busy:
+            return
+        self._settings.open(page, account)
+
     def _switch(self, email: str) -> None:
         self._session.switch(email)
 
@@ -212,16 +241,24 @@ class TopMenu:
             self._bar.update()
 
 
-def _header(account: Account) -> ft.Control:
-    """Conta selecionada: avatar grande, nome e e-mail."""
+def _header(
+    account: Account,
+    profile: Profile,
+    on_settings: Callable[..., None],
+) -> ft.Control:
+    """Conta selecionada: avatar grande, nome, e-mail e a engrenagem.
+
+    A engrenagem é um ``MenuItemButton``: ao clicar ele fecha o painel antes de
+    o diálogo abrir (o ``SubmenuButton`` não tem ``close()``).
+    """
     return ft.Container(
         content=ft.Row(
             controls=[
-                avatar(account, radius=20),
+                avatar(account, radius=20, photo=profile.photo),
                 ft.Column(
                     controls=[
                         ft.Text(
-                            display_name(account),
+                            display_name(account, nickname=profile.nickname),
                             size=theme.FONT_MD,
                             weight=ft.FontWeight.W_600,
                             color=theme.TEXT,
@@ -234,10 +271,26 @@ def _header(account: Account) -> ft.Control:
                     tight=True,
                     expand=True,
                 ),
+                ft.MenuItemButton(
+                    content=ft.Icon(
+                        ft.Icons.SETTINGS_OUTLINED,
+                        color=theme.SUBTLE_TEXT,
+                        size=18,
+                    ),
+                    tooltip="Configurar conta",
+                    semantic_label="Configurar conta",
+                    on_click=on_settings,
+                    style=ft.ButtonStyle(
+                        padding=ft.Padding.all(6),
+                        shape=ft.CircleBorder(),
+                        overlay_color=theme.SELECTED_BG,
+                    ),
+                ),
             ],
             spacing=12,
+            vertical_alignment=ft.CrossAxisAlignment.START,
         ),
-        padding=ft.Padding.symmetric(horizontal=14, vertical=10),
+        padding=ft.Padding(left=14, top=10, right=6, bottom=10),
         width=PANEL_WIDTH,
     )
 

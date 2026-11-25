@@ -8,6 +8,7 @@ from pathlib import Path
 import flet as ft
 
 from xl_utils.shared.accounts import Account
+from xl_utils.shared.profiles import Profile
 from xl_utils.ui.components.file_input import FileInput
 
 
@@ -26,11 +27,15 @@ class _FakeSession:
         self.error = error
         self.paths = paths or []
         self.calls: list[tuple[str, bool]] = []
+        self.nicknames: dict[str, str] = {}
         self._listeners: list[object] = []
 
     @property
     def active_account(self) -> Account | None:
         return next((item for item in self.accounts if item.email == self.active), None)
+
+    def profile_for(self, email: str) -> Profile:
+        return Profile(nickname=self.nicknames.get(email, ""))
 
     def subscribe(self, listener: object) -> None:
         self._listeners.append(listener)
@@ -161,6 +166,14 @@ def test_tooltip_names_the_selected_account() -> None:
     session.notify()
 
     assert control._drive_button.tooltip == "Abrir do Drive — Zeca"
+
+
+def test_tooltip_uses_the_nickname_when_there_is_one() -> None:
+    session = _FakeSession([_account("ana@example.com", "Ana Souza")])
+    session.nicknames["ana@example.com"] = "Trabalho"
+    control, _ = _input(session)
+
+    assert control._drive_button.tooltip == "Abrir do Drive — Trabalho"
 
 
 def test_drive_error_lands_in_the_hint() -> None:

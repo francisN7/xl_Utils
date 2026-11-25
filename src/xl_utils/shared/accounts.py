@@ -168,6 +168,12 @@ def _dpapi(data: bytes, *, protect: bool) -> bytes:
         kernel32.LocalFree(ctypes.cast(blob_out.data, ctypes.c_void_p))
 
 
+def account_key(email: str) -> str:
+    """Hash curto e estável do e-mail: nomeia os arquivos da conta sem expô-lo."""
+    digest = hashlib.sha256(email.strip().lower().encode("utf-8")).hexdigest()
+    return digest[:16]
+
+
 def default_root() -> Path:
     """Devolve ``%LOCALAPPDATA%/xl_utils/drive`` ou o equivalente em casa."""
     local = os.environ.get("LOCALAPPDATA")
@@ -206,8 +212,7 @@ class AccountStore:
 
     def path_for(self, email: str) -> Path:
         """Caminho estável da conta, sem usar o e-mail como nome de arquivo."""
-        digest = hashlib.sha256(email.strip().lower().encode("utf-8")).hexdigest()
-        return self.accounts_dir / f"{digest[:16]}.json"
+        return self.accounts_dir / f"{account_key(email)}.json"
 
     def list(self) -> list[Account]:
         """Devolve as contas legíveis em ordem de e-mail; ignora arquivo corrompido."""
@@ -258,7 +263,7 @@ class AccountStore:
 
     def _key(self, email: str) -> str:
         """Chave do token no chaveiro: o mesmo hash do nome do arquivo."""
-        return self.path_for(email).stem
+        return account_key(email)
 
     def active(self) -> str | None:
         """Devolve o e-mail selecionado, ou ``None`` se ele não existe mais."""
@@ -318,10 +323,12 @@ def _text(value: Any) -> str:
 
 
 def _write_atomic(path: Path, data: dict[str, Any]) -> None:
+    write_atomic(path, json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8"))
+
+
+def write_atomic(path: Path, data: bytes) -> None:
+    """Grava num ``.tmp`` ao lado e troca de uma vez: quem lê nunca vê metade."""
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f"{path.name}.tmp")
-    temporary.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
+    temporary.write_bytes(data)
     os.replace(temporary, path)

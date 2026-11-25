@@ -1,11 +1,15 @@
 """Painel de perfis do Drive no canto superior direito (headless)."""
 
 import asyncio
+import io
+from types import SimpleNamespace
 
 import flet as ft
 import pytest
+from PIL import Image
 
 from xl_utils.shared import accounts, drive_cache
+from xl_utils.shared.profiles import PHOTO_MAX_BYTES, Profile, ProfileStore
 from xl_utils.ui import theme
 from xl_utils.ui.components.top_menu import TopMenu
 from xl_utils.ui.drive import DriveSession
@@ -83,9 +87,46 @@ def _others(menu: TopMenu) -> ft.ExpansionTile | None:
 class _FakePage:
     def __init__(self) -> None:
         self.tasks: list[tuple[object, tuple[object, ...]]] = []
+        self.dialogs: list[ft.AlertDialog] = []
+        self.services: list[object] = []
+        self.width = 1200
 
     def run_task(self, handler: object, *args: object) -> None:
         self.tasks.append((handler, args))
+
+    def show_dialog(self, dialog: ft.AlertDialog) -> None:
+        self.dialogs.append(dialog)
+
+    def pop_dialog(self) -> None:
+        self.dialogs.pop()
+
+
+class _FakePicker:
+    def __init__(self, *files: SimpleNamespace) -> None:
+        self.files = list(files)
+
+    async def pick_files(self, **_options: object) -> list[SimpleNamespace]:
+        return self.files
+
+
+def _png(size: tuple[int, int] = (300, 300)) -> bytes:
+    buffer = io.BytesIO()
+    Image.new("RGB", size, "green").save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+def _gear(menu: TopMenu) -> ft.MenuItemButton:
+    row = menu.panel[0].content
+    return next(
+        control for control in row.controls if isinstance(control, ft.MenuItemButton)
+    )
+
+
+def _open_settings(menu: TopMenu) -> _FakePage:
+    page = _FakePage()
+    menu._page = lambda: page  # type: ignore[method-assign]
+    _gear(menu).on_click(None)
+    return page
 
 
 class _FakeImporter:
@@ -270,3 +311,186 @@ def test_refresh_follows_the_current_theme(store: accounts.AccountStore) -> None
         theme.apply("dark")
         menu.refresh()
     assert menu.control.controls[0].menu_style.bgcolor == theme.DARK["SURFACE"]
+
+
+def test_header_has_a_gear_that_closes_the_panel(store: accounts.AccountStore) -> None:
+    menu = TopMenu(_login(store, "ana@example.com"))
+
+    gear = _gear(menu)
+
+    assert gear.content.icon == ft.Icons.SETTINGS_OUTLINED
+    assert gear.tooltip == "Configurar conta"
+    assert gear.close_on_click is True
+
+
+def test_gear_opens_the_settings_of_the_selected_account(
+    store: accounts.AccountStore,
+) -> None:
+    menu = TopMenu(_login(store, "ana@example.com", "zeca@example.com"))
+
+    page = _open_settings(menu)
+
+    assert page.dialogs == [menu.settings.dialog]
+    assert "zeca@example.com" in _texts(menu.settings.dialog.content)
+    assert menu.settings.nickname_field.value == ""
+    assert menu.settings.nickname_field.hint_text == "Zeca"
+
+
+def test_nickname_replaces_the_name_on_top_and_in_the_header(
+    store: accounts.AccountStore,
+) -> None:
+    session = _login(store, "ana@example.com")
+    menu = TopMenu(session)
+
+    session.save_profile("ana@example.com", "Escritório Centro", None)
+
+    assert _texts(menu.trigger) == ["A", "Escritório Centr"]
+    assert _texts(menu.panel[0]) == ["A", "Escritório Centr", "ana@example.com"]
+
+    session.save_profile("ana@example.com", "", None)
+
+    assert _texts(menu.trigger) == ["A", "Ana"]
+
+
+def test_photo_goes_to_every_avatar_with_initials_underneath(
+    store: accounts.AccountStore,
+) -> None:
+    session = _login(store, "zeca@example.com", "ana@example.com")
+    photo = _png()
+    session.save_profile("zeca@example.com", "", photo)
+    menu = TopMenu(session)
+
+    trigger_avatar = menu.trigger.controls[0]
+    other_avatar = _others(menu).controls[0].leading
+
+    assert trigger_avatar.foreground_image_src is None
+    assert other_avatar.foreground_image_src == photo
+    assert _texts(other_avatar) == ["Z"]
+
+    session.switch("zeca@example.com")
+
+    assert menu.trigger.controls[0].foreground_image_src == photo
+    assert menu.panel[0].content.controls[0].foreground_image_src == photo
+
+
+def test_leave_erases_only_the_selected_profile(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    session = _login(store, "ana@example.com", "zeca@example.com")
+    session.save_profile("ana@example.com", "Ana", _png())
+    session.save_profile("zeca@example.com", "Zeca", _png())
+    menu = TopMenu(session)
+
+    _action(menu, "Sair").on_click(None)
+
+    profiles = ProfileStore(tmp_path)
+    assert profiles.get("zeca@example.com") == Profile()
+    assert profiles.get("ana@example.com").nickname == "Ana"
+    assert not profiles.photo_path("zeca@example.com").exists()
+
+
+def test_cancel_writes_nothing(store: accounts.AccountStore, tmp_path) -> None:
+    menu = TopMenu(_login(store, "ana@example.com"))
+    page = _open_settings(menu)
+    settings = menu.settings
+    settings._picker = _FakePicker(SimpleNamespace(size=10, bytes=_png(), path=None))
+    asyncio.run(settings.choose(page))
+    settings.nickname_field.value = "Trabalho"
+
+    settings.cancel(page)
+
+    assert page.dialogs == []
+    assert not (tmp_path / "profiles").exists()
+    assert _texts(menu.trigger) == ["A", "Ana"]
+
+
+def test_save_writes_photo_and_nickname(store: accounts.AccountStore) -> None:
+    session = _login(store, "ana@example.com")
+    menu = TopMenu(session)
+    page = _open_settings(menu)
+    settings = menu.settings
+    settings._picker = _FakePicker(
+        SimpleNamespace(size=10, bytes=_png((600, 300)), path=None)
+    )
+
+    asyncio.run(settings.choose(page))
+    settings.nickname_field.value = "  Trabalho  "
+    settings.save(page)
+
+    profile = session.profile_for("ana@example.com")
+    assert page.dialogs == []
+    assert profile.nickname == "Trabalho"
+    assert Image.open(io.BytesIO(profile.photo)).size == (256, 256)
+    assert menu.trigger.controls[0].foreground_image_src == profile.photo
+
+
+def test_remove_photo_then_save_goes_back_to_initials(
+    store: accounts.AccountStore,
+) -> None:
+    session = _login(store, "ana@example.com")
+    session.save_profile("ana@example.com", "", _png())
+    menu = TopMenu(session)
+    page = _open_settings(menu)
+
+    menu.settings.remove_photo()
+    menu.settings.save(page)
+
+    assert session.profile_for("ana@example.com").photo is None
+    assert menu.trigger.controls[0].foreground_image_src is None
+
+
+@pytest.mark.parametrize(
+    ("picked", "message"),
+    [
+        (SimpleNamespace(size=PHOTO_MAX_BYTES + 1, bytes=b"x", path=None), "MB"),
+        (SimpleNamespace(size=5, bytes=b"texto", path=None), "imagem"),
+    ],
+    ids=["grande", "invalida"],
+)
+def test_bad_photo_shows_a_message_and_keeps_the_draft(
+    store: accounts.AccountStore,
+    picked: SimpleNamespace,
+    message: str,
+) -> None:
+    menu = TopMenu(_login(store, "ana@example.com"))
+    page = _open_settings(menu)
+    settings = menu.settings
+    settings._picker = _FakePicker(picked)
+
+    asyncio.run(settings.choose(page))
+
+    assert settings.photo is None
+    assert message in settings._message.value
+    assert settings._message.visible is True
+    assert settings._message.color == theme.RED
+
+
+def test_photo_is_read_from_the_path_when_bytes_are_missing(
+    store: accounts.AccountStore,
+    tmp_path,
+) -> None:
+    source = tmp_path / "foto.png"
+    source.write_bytes(_png())
+    menu = TopMenu(_login(store, "ana@example.com"))
+    page = _open_settings(menu)
+    settings = menu.settings
+    settings._picker = _FakePicker(
+        SimpleNamespace(size=10, bytes=None, path=str(source))
+    )
+
+    asyncio.run(settings.choose(page))
+
+    assert settings.photo is not None
+    assert source.read_bytes() == _png()
+
+
+def test_dialog_width_follows_the_window(store: accounts.AccountStore) -> None:
+    menu = TopMenu(_login(store, "ana@example.com"))
+    page = _FakePage()
+    page.width = 380
+    menu._page = lambda: page  # type: ignore[method-assign]
+
+    _gear(menu).on_click(None)
+
+    assert menu.settings.dialog.content.width == 284

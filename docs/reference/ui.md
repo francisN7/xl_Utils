@@ -162,8 +162,9 @@ linha também começa à esquerda. As quatro nativas cabem numa linha no desktop
 
 ## Drive
 
-O canto superior direito mostra a conta selecionada: avatar com as iniciais e
-o nome (sem nome, o e-mail curto). O clique abre o painel de perfis
+O canto superior direito mostra a conta selecionada: avatar (a foto escolhida
+ou as iniciais) e o apelido (sem apelido, o nome; sem nome, o e-mail curto). O
+clique abre o painel de perfis
 (`ui/components/top_menu.py`, estado em `ui/drive.py`). Não existe cartão do
 Drive no hub: entrar é uma ação do painel, como em qualquer app com “Entrar com
 Google”.
@@ -178,8 +179,16 @@ Google”.
   sobrar (ordem de e-mail); as outras contas e os arquivos já abertos ficam.
   E-mails longos aparecem truncados com `…`; o valor completo fica no tooltip,
   que surge depois de 3 s de hover.
+- **Engrenagem:** no canto do cabeçalho do painel, abre o diálogo
+  **Configurar conta** da conta selecionada (`ui/components/account_settings.py`).
+  Nele há a prévia do avatar, **Escolher foto** (PNG, JPEG ou WebP até 10 MB),
+  **Remover foto** e o **Apelido** (até 16 caracteres; vazio usa o nome do
+  Google). A foto é recortada no quadrado central, reduzida a 256 px e copiada
+  para `drive/profiles/`; o arquivo original não é tocado. Nada grava até
+  **Salvar**; **Cancelar** descarta. Foto inválida vira aviso em vermelho no
+  próprio diálogo. Sair apaga a foto e o apelido da conta (ADR 0031).
 - **Abrir do Drive:** o botão ao lado da dropzone abre direto na conta
-  selecionada, sem perguntar; o tooltip diz qual é.
+  selecionada, sem perguntar; o tooltip diz qual é, pelo apelido.
 - **Durante o login:** o topo e o painel mostram “Conectando ao Google…”. Se o
   usuário negar o acesso ou o navegador não responder em três minutos, a
   mensagem aparece no topo do painel e nada fica travado.

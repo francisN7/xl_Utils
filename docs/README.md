@@ -30,7 +30,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | ler a política de privacidade | [`privacy.html`](privacy.html) |
 | saber **por que** algo é assim | [`adr/`](adr/) |
 | ver o que mudou | [`../CHANGELOG.md`](../CHANGELOG.md) |
-| ler a spec da próxima sessão | [`sessions/S21b-config-da-conta.md`](sessions/S21b-config-da-conta.md) |
+| ler a spec da próxima sessão | [`sessions/S22-docs-para-quem-chega.md`](sessions/S22-docs-para-quem-chega.md) |
 
 ## Por seção (atalho)
 
@@ -78,6 +78,7 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | por que o plugin lê por `request.reader` e a API 1 saiu | `adr/0028-api-2-reader.md` | 70 |
 | por que o Drive tem painel de perfil e conta selecionada | `adr/0029-painel-de-perfis-do-drive.md` | 68 |
 | por que o token do Drive vai para o chaveiro fora do Windows | `adr/0030-token-no-chaveiro-fora-do-windows.md` | 53 |
+| por que a foto e o apelido da conta ficam em `drive/profiles/` | `adr/0031-perfil-local-da-conta.md` | 60 |
 
 ## Regras do mapa
 
