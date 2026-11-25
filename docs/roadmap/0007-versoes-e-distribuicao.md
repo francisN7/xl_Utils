@@ -1,8 +1,8 @@
 # Versão e distribuição — o que foi entregue (2026-11-09)
 
 Ciclo 0007 fechado. O detalhe completo está no Git; as decisões ficam nos ADRs.
-O ciclo anterior está em [`0006-backlog.md`](0006-backlog.md); o próximo começa
-em [`main.md`](../roadmap/main.md).
+O ciclo anterior está em [`0006-backlog.md`](0006-backlog.md); o próximo é
+o [`0008-plugins.md`](0008-plugins.md).
 
 | Sessão | Entrega | Estado |
 |---|---|---|

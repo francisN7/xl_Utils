@@ -2,7 +2,7 @@
 
 Ciclo 0006 fechado. O detalhe completo está no Git; as decisões ficam nos ADRs.
 O ciclo anterior está em [`0005-polimento.md`](0005-polimento.md); o próximo
-começa em [`main.md`](../roadmap/main.md).
+é o [`0007-versoes-e-distribuicao.md`](0007-versoes-e-distribuicao.md).
 
 | Sessão | Entrega | Estado |
 |---|---|---|
