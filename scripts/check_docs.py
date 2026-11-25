@@ -9,7 +9,10 @@ Nasceu do modelo da skill ``project-context-init``; aqui não há gêmeo ``.mjs`
 3. ``{{PLACEHOLDER}}`` esquecido em qualquer .md (exceto
    docs/sessions/_TEMPLATE.md);
 4. histórico disfarçado de referência ("## Cobertura da SXX") em
-   docs/reference/.
+   docs/reference/;
+5. cobertura de módulos: todo ``src/xl_utils/**/*.py`` (exceto
+   ``__init__.py``) aparece pelo caminho relativo a ``src/xl_utils/``
+   (ex.: ``shared/system.py``) em ``architecture.md`` ou ``code-tour.md``.
 
 Escopo: *.md na raiz e em docs/. Sem checagem de link nos históricos:
 CHANGELOG.md, docs/releases/, o corpo dos ADRs e docs/sessions/ (a spec cita
@@ -43,6 +46,8 @@ SKIP_LINKS = ["CHANGELOG.md", "docs/releases/", "docs/sessions/"]
 NO_PLACEHOLDER_CHECK = {"docs/sessions/_TEMPLATE.md"}
 BUDGETS = {"AGENTS.md": 100, "docs/state/CURRENT.md": 60}
 SESSION_MAX = 90
+PACKAGE = ROOT / "src" / "xl_utils"
+MODULE_DOCS = ("docs/reference/architecture.md", "docs/guide/code-tour.md")
 
 PLACEHOLDER = re.compile(r"\{\{[A-Z][A-Z0-9_/]*\}\}")
 LINK = re.compile(r"\]\(([^)\s]+)\)")
@@ -147,6 +152,22 @@ def check_reference_history(file: Path) -> None:
         errors.append(f'{rel}: heading de histórico -> "{match.group(0).strip()}"')
 
 
+def check_module_coverage() -> None:
+    if not PACKAGE.is_dir():
+        return
+    docs = "\n".join(
+        (ROOT / name).read_text(encoding="utf-8")
+        for name in MODULE_DOCS
+        if (ROOT / name).exists()
+    )
+    for module in sorted(PACKAGE.rglob("*.py")):
+        if module.name == "__init__.py" or "__pycache__" in module.parts:
+            continue
+        rel = module.relative_to(PACKAGE).as_posix()
+        if not re.search(rf"(?<![\w/]){re.escape(rel)}", docs):
+            errors.append(f"módulo sem citação em architecture/code-tour -> {rel}")
+
+
 def main() -> int:
     files = collect()
     for file in files:
@@ -154,6 +175,7 @@ def main() -> int:
         check_budget(file)
         check_placeholders(file)
         check_reference_history(file)
+    check_module_coverage()
 
     if errors:
         print(

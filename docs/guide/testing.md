@@ -18,10 +18,13 @@ uv run ruff check src tests
 - Use `tmp_path` para arquivos temporários e dados fictícios.
 - Cubra o caminho feliz e uma borda por função: arquivo vazio, extensão errada,
   planilha sem abas, nome de aba inválido.
-- A UI tem testes headless (`test_layout.py`, `test_merge_page.py`,
-  `test_theme.py`, `test_settings.py`, `test_ui_state.py`) para o que dá para
-  montar sem janela. O smoke manual continua para o visual: abrir o app e
-  executar a ferramenta com um arquivo real.
+- A UI tem testes headless para o que dá para montar sem janela (layout,
+  tema, navegação, menu do topo, quadro do merge); a lista completa, com o que
+  cada arquivo prova, está no
+  [code tour](code-tour.md#11-testes--tests). O smoke manual continua para o
+  visual: abrir o app e executar a ferramenta com um arquivo real.
+- `tests/conftest.py` troca o chaveiro real por um cofre em memória: nenhum
+  teste toca o token de verdade.
 
 ## Exemplo
 

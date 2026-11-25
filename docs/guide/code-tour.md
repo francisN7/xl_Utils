@@ -192,6 +192,28 @@ nada é sobrescrito.
 | `test_plugin_page.py` | tipos de opção, defaults, validação e permissões |
 | `test_plugins_ui.py` | lista, instalar/remover, execução e falha de import |
 | `test_plugin_examples.py` | os exemplos dos docs empacotam e executam |
+| `test_core.py` | ida e volta de leitura e gravação no core |
+| `test_sheets.py` | `filter_sheets` e a seleção padrão por ferramenta |
+| `test_all_str_bulk.py` | 1.000 linhas fictícias passam pelo pipeline sem perder nada |
+| `test_save_split.py` | aba acima de `ROW_LIMIT` sai em `_parte1`, `_parte2`… |
+| `test_log.py` | `RunLog` e o diagnóstico sem conteúdo de célula |
+| `test_app_args.py` | `--web` e `--port` do app |
+| `test_home.py` | cartões do Início e o e-mail curto |
+| `test_sidebar_navigation.py` | navegação por `id` e Plugins no rodapé |
+| `test_sidebar_icon.py` | ícone do app no dev, no executável e na janela |
+| `test_top_menu.py` | painel de perfis: abrir, trocar, sair e engrenagem |
+| `test_file_input_drive.py` | botão do Drive ao lado da dropzone |
+| `test_accounts.py` | contas, conta selecionada e cofre (DPAPI ou chaveiro) |
+| `test_drive_auth.py` | importação do cliente OAuth e login sem vazar segredo |
+| `test_drive_flow.py` | login de ponta a ponta contra um Google falso |
+| `test_drive_cache.py` | cópia local do Drive com nome seguro e limpeza |
+| `test_profiles.py` | apelido e foto em `drive/profiles/` |
+| `test_plugin_manifest.py` | validação pura do `plugin.toml` |
+| `test_plugin_package.py` | inspeção, hash, extração e empacotamento |
+| `test_plugin_install.py` | instalação atômica, descoberta e remoção |
+| `test_plugin_controller.py` | request montado pelo host e resultado validado |
+| `test_plugin_reader.py` | `request.reader` igual às ferramentas nativas |
+| `test_plugin_cli.py` | o CLI de autoria de ponta a ponta |
 
 ## Onde mexer para…
 

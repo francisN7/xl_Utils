@@ -6,6 +6,14 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 > (≤60) + a spec da sessão (≤90). Tudo além disso é consulta pontual. Se a
 > informação não está aqui, ela vive no Git (`git log`, `git show`) ou num ADR.
 
+## Quem lê o quê
+
+| Público | Documentos |
+|---|---|
+| 🤖 agente | `AGENTS.md`, `state/CURRENT.md`, `sessions/` (spec da vez) |
+| 🤝 ambos | este mapa, `guide/`, `reference/`, `plugins/`, `roadmap/`, `adr/` |
+| 👤 pessoas | `README.md`, `CHANGELOG.md`, `SECURITY.md`, o site (`index.html`) |
+
 ## Por pergunta
 
 | Você quer… | Leia |
@@ -36,8 +44,9 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 
 | Preciso de… | Vá direto a | ~linhas |
 |---|---|---|
-| camadas e fluxo de dados | `reference/architecture.md` → **Camadas** | 30 |
+| camadas e fluxo de dados (diagramas) | `reference/architecture.md` → **Camadas** e **Fluxo de dados** | 60 |
 | mapa dos módulos do core | `reference/architecture.md` → **Mapa do core** | 20 |
+| papel de cada módulo fora do core | `reference/architecture.md` → **Mapa dos módulos** | 55 |
 | ordem de leitura do código | `guide/code-tour.md` → **As paradas** | 90 |
 | limites conhecidos da leitura | `reference/architecture.md` → **Limites conhecidos** | 10 |
 | pipeline de leitura segura | `reference/architecture.md` → **Leitura segura** | 20 |
@@ -48,7 +57,8 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 | criar, empacotar e testar um plugin | `plugins/primeiro-plugin.md` → **Empacotar** | 40 |
 | carregamento e ciclo de vida do plugin | `reference/architecture.md` → **Plugins** | 15 |
 | comandos do dia a dia | `guide/setup.md` → **Rodando** | 15 |
-| como escrever teste | `guide/testing.md` → **Testes** | 20 |
+| como escrever teste | `guide/testing.md` → **O que testar** | 20 |
+| o que cada arquivo de teste prova | `guide/code-tour.md` → **11. Testes** | 50 |
 | por que Flet, uv e Python 3.15 | `adr/0001-stack-ui-e-ambiente.md` | 35 |
 | por que core/controllers/ui | `adr/0002-arquitetura-core-ui.md` | 35 |
 | por que sidebar + Início | `adr/0003-ui-sidebar-e-inicio.md` | 30 |
@@ -98,4 +108,6 @@ Este arquivo é o índice. A regra é **abrir a seção, não o arquivo inteiro*
 `CHANGELOG.md`, os ADRs e os ciclos fechados em `roadmap/NNNN-*.md` registram o
 passado: nomes de documentos e sessões citados neles podem não existir mais. O
 check de docs valida os documentos vivos, ignora o corpo do CHANGELOG, das specs
-de sessão e dos ADRs, e confere os índices, inclusive `adr/README.md`.
+de sessão e dos ADRs, e confere os índices, inclusive `adr/README.md`. Ele
+também exige que todo módulo de `src/xl_utils/` apareça em
+`reference/architecture.md` ou `guide/code-tour.md`.

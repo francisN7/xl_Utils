@@ -78,14 +78,17 @@ uv run python scripts/check_docs.py
 
 ```text
 src/xl_utils/
-  app.py       shell Flet e navegação
-  core/        regras puras (io, mime, paths, text, tools)
-  controllers/ orquestração entre UI e core
-  ui/          páginas, componentes e tema
-  configs/     modelo do cliente OAuth do Drive (padrão)
-  shared/      log, config, progresso e abertura de pasta
-tests/         testes do core e da UI (headless)
-docs/          documentação e memória entre sessões
+  app.py         shell Flet e navegação
+  plugin_cli.py  CLI de autoria de plugins (xl-utils-plugin)
+  core/          regras puras: io, mime, paths, text, save, tools/, plugins/
+  controllers/   ponte entre UI e core
+  ui/            páginas, componentes, tema e estado do Drive
+  configs/       modelo do cliente OAuth do Drive (padrão, não estado)
+  shared/        log, progresso, preferências, contas e Drive, plugins
+tests/           testes do core e da UI (headless)
+scripts/         check de docs, build Windows, CLI de plugin e amostras
+assets/          ícones do app
+docs/            documentação e memória entre sessões
 ```
 
 ## Documentação

@@ -90,6 +90,9 @@ parte desta versão.
 
 ## Layout depois de instalar
 
+No Windows, a raiz é `%LOCALAPPDATA%\xl_utils\plugins\`; no Linux,
+`~/.xl_utils/plugins/`.
+
 ```text
 %LOCALAPPDATA%\xl_utils\plugins\
   autor.ferramenta\

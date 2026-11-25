@@ -71,10 +71,13 @@ remover. Abrir a ferramenta também não lê planilha; a leitura começa no cliq
 | `top_menu` | Painel de perfil no canto superior direito: conta selecionada, outras contas, adicionar e sair. |
 | `file_input` | Dropzone clicável + seletor nativo, lista de arquivos, remover e resetar. |
 | `sheet_selector` | Chips por aba, “Todas”/“Limpar” e contador “N de M”. |
-| `options_panel` | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
+| `OptionsPanel` (em `tool_layout`) | Controles específicos; aparece só quando há opção editável e guarda o valor no `ToolState`. |
 | `result_panel` | Status, caminho de saída, abrir pasta, log e prévia. |
 | `preview_table` | Primeiras linhas do resultado, somente leitura. |
 | `tool_layout` | Cabeçalho, cartões, barra de ação, estados e a área de tela cheia; aceita entradas rotuladas no lugar da lista única. |
+| `account_label` | Nome de exibição, e-mail curto e avatar (foto ou iniciais) de uma conta. |
+| `account_settings` | Diálogo “Configurar conta”: foto e apelido. |
+| `client_import` | Seletor do JSON do cliente OAuth no primeiro login. |
 
 ### Entrada de arquivos
 
@@ -299,7 +302,6 @@ abaixo de `FONT_XS`.
 | Formato desconhecido | Linha vermelha na entrada; Executar mostra “Não foi possível identificar o formato”. |
 | Sem abas | Aviso “Selecione ao menos uma aba” e nenhuma execução. |
 | Executando | Status amarelo, barra indeterminada e log de etapas crescendo. |
-| Já processada | `AlertDialog` de reexecução; “Continuar” recalcula sem repetir o protocolo. |
 | Sucesso | Status verde, caminho, “Abrir pasta” e prévia. |
 | Erro | Status vermelho, título tipado, mensagem original e diagnóstico copiável. |
 

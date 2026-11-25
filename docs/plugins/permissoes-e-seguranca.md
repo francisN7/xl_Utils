@@ -25,9 +25,9 @@ um mecanismo de bloqueio. Um plugin que declara `network = false` e abre um
 socket não é impedido pelo host; ele quebra a promessa e deve ser tratado como
 não confiável.
 
-A UI da S14 deve mostrar as permissões no momento de instalar ou abrir o plugin.
-Nesta sessão, o validador só confere tipo e valor; a exibição vem com a área
-“Plugins”.
+A área **Plugins** mostra as permissões declaradas antes de confirmar a
+instalação, junto com o aviso de que são avisos, não sandbox. O validador
+confere tipo e valor; o comportamento real do código não é verificado.
 
 ## O que o instalador garante
 

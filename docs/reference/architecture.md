@@ -16,6 +16,41 @@ guiada, comece pelo [`guide/code-tour.md`](../guide/code-tour.md).
 
 Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 
+```mermaid
+flowchart LR
+    subgraph UI["ui/ — Flet"]
+        pages["pages/ + registry.py"]
+        components["components/ (ToolLayout, painéis, menu)"]
+        drive_ui["drive.py (DriveSession)"]
+    end
+    subgraph CTRL["controllers/"]
+        tools_ctrl["all_str · cnj · cut · merge"]
+        plugins_ctrl["plugins.py"]
+    end
+    subgraph CORE["core/ — regra pura, sem Flet"]
+        io["io · mime · paths · text · save"]
+        rules["tools/ (all_str, sheets, cnj, cut, merge)"]
+        contract["plugins/ (manifesto, pacote, página)"]
+    end
+    subgraph SHARED["shared/ — serviços"]
+        infra["log · progress · settings · system"]
+        drive["accounts · drive* · profiles"]
+        plug["plugins/ (install, loader, reader, api)"]
+    end
+    pages --> components --> CTRL
+    tools_ctrl --> rules --> io
+    plugins_ctrl --> plug --> contract
+    plug --> rules
+    components --> infra
+    drive_ui --> drive
+    components --> drive_ui
+    drive --> io
+```
+
+As setas mostram quem importa quem: `core/` não importa ninguém de fora dele;
+`shared/` pode usar o core (o `reader` dos plugins lê pelo `prepare_workbook`);
+a UI é a única camada que conhece o Flet.
+
 ## Mapa do core
 
 | Módulo | Papel | Superfície principal |
@@ -23,7 +58,7 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 | `core/io.py` | lê e grava cada formato | `read_workbook`, `read_html_tables`, `list_sheets`, `read_headers`, `save_workbook`, `dump_workbook` |
 | `core/mime.py` | decide o formato pelo conteúdo | `detect_suffix`, `resolve_suffix`, `check_format`, `FormatCheck` |
 | `core/paths.py` | caminhos e nomes seguros | `unique_path`, `free_name`, `default_output_dir`, `safe_file_part` |
-| `core/save.py` | grava só depois da escolha | `SaveItem`, `save_chosen`, `save_to_output`, `save_item` |
+| `core/save.py` | grava só depois da escolha | `SaveItem`, `save_chosen`, `save_to_output`, `save_item`, `split_item`, `ROW_LIMIT` |
 | `core/text.py` | limpeza de texto | `remove_emojis` |
 | `core/tools/all_str.py` | pipeline de leitura | `prepare_workbook` |
 | `core/tools/sheets.py` | seleção de abas | `filter_sheets`, `default_selection` |
@@ -33,6 +68,61 @@ Uma ferramenta = um módulo em `core/tools/` + um controller + uma página.
 | `core/plugins/manifest.py` | manifesto de plugin | `parse_manifest`, `PluginManifest`, `OptionSpec` |
 | `core/plugins/package.py` | pacote `.tar.xz` | `inspect_package`, `extract_package`, `build_package`, `verify_sidecar` |
 | `core/plugins/page.py` | página declarativa | `PageSpec`, `validate`, `coerce`, `describe_permissions` |
+| `core/plugins/errors.py` | erros do contrato | `PluginError`, `ManifestError`, `PackageError`, `InstallError` |
+
+## Mapa dos módulos
+
+Tudo o que não é core, com o caminho relativo a `src/xl_utils/`. O check de docs
+falha se um módulo novo não aparecer aqui ou no code tour.
+
+| Módulo | Papel |
+|---|---|
+| `__main__.py` | `python -m xl_utils` chama `app.run` |
+| `app.py` | shell Flet: sidebar, topo, hub e troca de página (`--web`, `--port`) |
+| `plugin_cli.py` | CLI `xl-utils-plugin`: `pack`, `check`, `install`, `list`, `uninstall` |
+| `controllers/all_str.py` | pipeline de texto → `AllStrOutcome` |
+| `controllers/cnj.py` | extração de CNJ → `CnjOutcome` |
+| `controllers/cut.py` | recorte → `CutOutcome` (um `SaveItem` por bloco) |
+| `controllers/merge.py` | mesclagem → `MergeOutcome`; `inspect_columns` lê só cabeçalhos |
+| `controllers/plugins.py` | monta o `PluginRequest`, chama `run` e valida o `PluginResult` |
+| `shared/log.py` | `RunLog` e `build_diagnostics` |
+| `shared/progress.py` | `ProgressReporter`, `ProgressEvent`, `CancelToken` |
+| `shared/settings.py` | preferência de tema em `settings.json` |
+| `shared/system.py` | abrir pasta e URL no sistema operacional |
+| `shared/accounts.py` | contas do Drive, cofre do token (DPAPI ou chaveiro) e conta selecionada |
+| `shared/drive_auth.py` | cliente OAuth, importação do JSON e login no navegador |
+| `shared/drive_pick.py` | Picker de apps desktop (arquivo e pasta) |
+| `shared/drive.py` | cliente REST da Drive API (ler, exportar, criar) |
+| `shared/drive_cache.py` | cópia local do arquivo aberto e `_origins.json` |
+| `shared/drive_store.py` | pastas concedidas por conta (`folders.json`) |
+| `shared/profiles.py` | apelido e foto locais de cada conta |
+| `shared/plugins/api.py` | API pública do plugin: `PluginRequest`, `PluginResult`, `ReadError` |
+| `shared/plugins/install.py` | instalar, descobrir e remover plugins |
+| `shared/plugins/loader.py` | importa `lib/` no primeiro Executar |
+| `shared/plugins/reader.py` | `WorkbookReader`: leitura dos plugins pelo pipeline nativo |
+| `ui/state.py` | `ToolState`, estado de cada ferramenta entre navegações |
+| `ui/theme.py` | tokens Dracula/Alucard, `apply` e `restyle` |
+| `ui/assets.py` | acha `assets/` no dev e no executável |
+| `ui/drive.py` | `DriveSession`: estado do Drive, login, abrir e salvar fora da UI thread |
+| `ui/pages/registry.py` | `TOOLS` e `FOOTER_PAGES`: a lista do que a navegação mostra |
+| `ui/pages/home.py` | hub com um cartão por ferramenta |
+| `ui/pages/all_str.py` | página do Tratamento de Texto |
+| `ui/pages/cnj.py` | página do Extrair CNJs |
+| `ui/pages/cut.py` | página do Recortar Planilha e suas opções |
+| `ui/pages/merge.py` | página do Mesclar Planilhas e o quadro de colunas |
+| `ui/pages/batch.py` | auxiliares das ferramentas de lote |
+| `ui/pages/plugins.py` | área Plugins: lista, instala, remove e abre |
+| `ui/pages/plugin_tool.py` | página declarativa montada do manifesto |
+| `ui/components/tool_layout.py` | `ToolLayout`, `OptionsPanel` e `OverlayHost`: o ciclo de uma ferramenta |
+| `ui/components/file_input.py` | dropzone, lista de arquivos e botão do Drive |
+| `ui/components/sheet_selector.py` | chips de abas, “Todas”/“Limpar” |
+| `ui/components/result_panel.py` | status, salvar, log e prévia |
+| `ui/components/preview_table.py` | prévia somente leitura |
+| `ui/components/sidebar.py` | barra lateral, rodapé e troca de tema |
+| `ui/components/top_menu.py` | painel de perfis do Drive |
+| `ui/components/account_label.py` | nome, e-mail curto e avatar de uma conta |
+| `ui/components/account_settings.py` | diálogo “Configurar conta” |
+| `ui/components/client_import.py` | seletor do JSON do cliente OAuth |
 
 Erros tipados: `WorkbookReadError` (leitura) e `SaveError` (gravação), além
 de `ValueError` para seleção ou regra inválida. O contrato de plugins usa `PluginError`, `ManifestError`,
@@ -52,16 +142,17 @@ Guia do autor: [`../plugins/README.md`](../plugins/README.md).
 
 ## Fluxo de dados
 
-```text
-arquivo escolhido
-  → controller
-  → all_str.prepare_workbook (leitura segura + emojis)
-  → sheets.filter_sheets (abas escolhidas)
-  → regra da ferramenta em core/tools/
-  → SaveItem em memória (sem escrever)
-  → result panel (prévia e “Pronto para salvar”)
-  → escolha do usuário
-  → core/save.py grava e devolve o caminho real
+```mermaid
+flowchart TD
+    A["arquivo escolhido<br/>(local ou cópia do Drive)"] --> B["controller"]
+    B --> C["all_str.prepare_workbook<br/>leitura segura + emojis"]
+    C --> D["sheets.filter_sheets<br/>abas escolhidas"]
+    D --> E["regra em core/tools/"]
+    E --> F["SaveItem em memória<br/>(nada gravado)"]
+    F --> G["ResultPanel<br/>prévia e “Pronto para salvar”"]
+    G --> H{"escolha do usuário"}
+    H -->|Salvar / output/| I["core/save.py<br/>grava, divide em _parteN"]
+    H -->|Salvar no Drive| J["ui/drive.py → shared/drive.py<br/>upload na pasta de origem"]
 ```
 
 ## Leitura segura
@@ -164,6 +255,12 @@ apagar a prévia.
 normalizado para `.xlsx` — com nomes saneados (limite de 31 caracteres e
 caracteres inválidos do Excel). O arquivo de origem nunca é alterado e nada é
 criado antes da escolha do usuário.
+
+Aba com mais de `ROW_LIMIT` (1.000.000) linhas faz `split_item` quebrar o
+`SaveItem` em partes, cada uma com o cabeçalho e até esse limite, gravadas como
+`<nome>_parte1.xlsx`, `<nome>_parte2.xlsx`…; vale para `output/`, para o
+arquivo escolhido e para o Drive. O limite fica abaixo do teto do Excel
+(1.048.576) de propósito.
 
 Para o Google Drive, `core/io.dump_workbook` gera os mesmos bytes em memória,
 sem tocar no disco; `core/paths.free_name` aplica a mesma convenção `_001` a um
@@ -325,10 +422,10 @@ quando arquivos ou abas mudam.
 
 ## Testes
 
-O core é testado com `pytest` e `tmp_path`; a UI tem testes headless para
-layout, tema, estado e quadro do merge (`test_layout.py`, `test_merge_page.py`,
-`test_theme.py`, `test_settings.py`, `test_ui_state.py`), além do smoke manual
-para o visual. O teste funcional do `all_str` gera 1.000 linhas fictícias em
+O core é testado com `pytest` e `tmp_path`; a UI tem testes headless (layout,
+tema, navegação, menu do topo, quadro do merge), além do smoke manual para o
+visual. A lista completa, com o que cada arquivo prova, está no
+[code tour](../guide/code-tour.md#11-testes--tests). O teste funcional do `all_str` gera 1.000 linhas fictícias em
 memória, roda em CSV e XLSX e confere zeros à esquerda, numeração CNJ-like,
 remoção de emojis e quebras de linha.
 

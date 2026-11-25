@@ -2,8 +2,8 @@
 
 Um plugin é um pacote local que acrescenta uma página de ferramenta ao
 xl_Utils. Ele não é baixado sozinho: você escolhe o arquivo, o app valida,
-instala em `%LOCALAPPDATA%/xl_utils/plugins/` e só executa o código quando a
-ferramenta é aberta.
+instala em `%LOCALAPPDATA%/xl_utils/plugins/` (no Linux, `~/.xl_utils/plugins/`)
+e só executa o código no primeiro Executar.
 
 > **Estado:** a área “Plugins” lista, instala e remove pacotes; a ferramenta é
 > montada a partir do manifesto e o `lib/` só é importado no primeiro

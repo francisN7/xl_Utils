@@ -13,7 +13,7 @@ chama `run(request)` é o app, na área Plugins.
 |---|---|
 | `pack <pasta> -o <pacote.tar.xz>` | valida a pasta e grava o pacote + sidecar |
 | `check <pacote.tar.xz>` | confere sidecar, manifesto, caminhos e limites |
-| `install <pacote.tar.xz>` | instala em `%LOCALAPPDATA%/xl_utils/plugins/` |
+| `install <pacote.tar.xz>` | instala em `%LOCALAPPDATA%/xl_utils/plugins/` (Linux: `~/.xl_utils/plugins/`) |
 | `list [--root <pasta>]` | lista válidos e inválidos |
 | `uninstall <id> [--root <pasta>]` | remove o plugin, inclusive `data/` |
 
@@ -87,7 +87,8 @@ CLI: veja [`primeiro-plugin.md`](primeiro-plugin.md#7-erros-de-código).
 ## Repositório privado e CI
 
 O plugin pode viver num repositório separado, inclusive privado. O CI precisa
-do pacote `xl-utils` para rodar o CLI; instale-o do Git com um token de leitura:
+do pacote `xl-utils` para rodar o CLI; o repositório do app é público, então
+ele instala direto do Git, sem token:
 
 ```yaml
 name: plugin
@@ -103,11 +104,9 @@ jobs:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
       - name: Instalar o xl_Utils
-        env:
-          TOKEN: ${{ secrets.XL_UTILS_TOKEN }}
         run: |
           uv venv
-          uv pip install "xl-utils @ git+https://x-access-token:$env:TOKEN@github.com/SEU_USUARIO/xl_Utils"
+          uv pip install "xl-utils @ git+https://github.com/francisN7/xl_Utils"
       - name: Empacotar e conferir
         run: |
           uv run xl-utils-plugin pack . -o build/plugin.tar.xz
@@ -120,8 +119,8 @@ jobs:
             build/plugin.tar.xz.sha256
 ```
 
-- `XL_UTILS_TOKEN` é um fine-grained token com leitura no repositório do app.
-  Nunca escreva o token no `pyproject.toml` nem no workflow em texto puro.
+- Para fixar a versão do host, acrescente `@v0.3.0` (ou outra tag) ao fim da
+  URL do Git.
 - O job não abre o app: valida o pacote e publica o `.tar.xz` com o sidecar.
 - Para um teste real de execução, instale em `.tmp/plugins` com `--root` e abra
   o app manualmente; o CI não tem a UI.

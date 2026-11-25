@@ -2,8 +2,9 @@
 
 ## Versões suportadas
 
-Apenas a versão atual da branch `main` recebe correções. O projeto está em
-`0.1.x` e ainda não publica releases.
+Só a última release publicada em
+[Releases](https://github.com/francisN7/xl_Utils/releases) e a branch `main`
+recebem correções. A branch `legacy` não recebe manutenção.
 
 ## Como relatar
 
@@ -23,12 +24,18 @@ pessoais.
 
 ## Escopo
 
-- Leitura de `.xlsx`, `.xls`, `.csv` e `.html` e gravação de saídas.
-- Aplicativo desktop local. A única chamada de rede é o login OAuth do Google
-  Drive (S9a), sempre em `https://` para domínios do Google e com retorno em
-  `127.0.0.1`; a leitura e a gravação de planilhas no Drive ainda não existem.
-- Tokens do Drive e o segredo do cliente OAuth protegidos por DPAPI no Windows;
-  o repositório nunca carrega cliente OAuth, token ou conta real.
+- Leitura de `.xlsx`, `.xlsm`, `.xls`, `.csv` e `.html` e gravação de saídas.
+- Aplicativo desktop local. A rede só é usada pelo Google Drive, que é
+  opcional: login OAuth, Picker, download e upload, sempre em `https://` para
+  domínios do Google e com retorno em `127.0.0.1`. O escopo é `drive.file`: o
+  app só enxerga o que criou ou o que o usuário escolheu.
+- Token do Drive protegido por DPAPI no Windows e pelo chaveiro do sistema no
+  Linux (ADR 0030); o segredo do cliente OAuth também usa DPAPI no Windows. O
+  repositório nunca carrega cliente OAuth, token ou conta real.
+- Instalação de plugins: validação do pacote `.tar.xz` (caminhos, binários,
+  limites e SHA-256). O plugin em si roda no mesmo processo, sem sandbox; o que
+  ele faz depois de instalado é responsabilidade de quem o instala (ver
+  [`docs/plugins/permissoes-e-seguranca.md`](docs/plugins/permissoes-e-seguranca.md)).
 
 ## Fora de escopo
 
