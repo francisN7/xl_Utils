@@ -24,6 +24,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | [`0006-backlog.md`](0006-backlog.md) | fechado | vinculação, tela cheia e Drive |
 | [`0007-versoes-e-distribuicao.md`](0007-versoes-e-distribuicao.md) | fechado | versão e distribuição |
 | [`0008-plugins.md`](0008-plugins.md) | fechado | plugins |
+| [`0009-investigacoes-de-ui.md`](0009-investigacoes-de-ui.md) | fechado | investigações de UI e release 0.4.0 |
 
 ## Ciclos fechados
 
@@ -37,6 +38,7 @@ Status: `[ ]` pendente · `[~]` em andamento · `[x]` concluída.
 | [`0006-backlog.md`](0006-backlog.md) | Backlog | 2026-11-08 |
 | [`0007-versoes-e-distribuicao.md`](0007-versoes-e-distribuicao.md) | Versão e distribuição | 2026-11-09 |
 | [`0008-plugins.md`](0008-plugins.md) | Plugins | 2026-11-11 |
+| [`0009-investigacoes-de-ui.md`](0009-investigacoes-de-ui.md) | Investigações de UI | 2026-11-25 |
 
 ## Convenção de nomes
 

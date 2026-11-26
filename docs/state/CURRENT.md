@@ -4,21 +4,21 @@
 
 ## Sessão
 
-- **Última concluída:** S23b — Workflow de release no Actions
-- **Próxima:** S23c — Release 0.4.0 (`docs/sessions/S23c-release-0-4-0.md`)
-- **Ciclo:** 0009 — Investigações de UI
-- **Retorno:** `ea233c2` — S23a: encerra a sessão (roadmap, CURRENT e spec)
+- **Última concluída:** S23c — Release 0.4.0 (fecha o ciclo 0009)
+- **Próxima:** S24 — Picker JS do Drive (`docs/sessions/S24-seletor-do-drive.md`)
+- **Ciclo:** 0010 — Drive e ajuda no app (0009 em `docs/roadmap/0009-investigacoes-de-ui.md`)
+- **Retorno:** `5060dc2` — S23b: encerra a sessão (roadmap, CURRENT e spec)
 - **Decisões:** ADRs 0015–0032 (adendos: 0019 S22b, 0021 S23b; 0032: AppImage).
 
 ## Pronto
 
+- S23c: `v0.4.0` publicada (Latest) com instalador, AppImage e `SHA256SUMS.txt`.
 - S23b: `release.yml` manual (`confirmar=build`) gera instalador e AppImage com smoke test.
-- S23a: AppImage por `scripts/build_linux.sh`; validado no CachyOS e no Ubuntu limpo.
 
 ## Próximo passo
 
-Executar a S23c: 0.4.0, CHANGELOG, disparo do `release.yml`, release Windows e
-Linux e fechar o ciclo 0009 (push, disparo e `gh release` com o dono).
+Abrir o ciclo 0010 com `uv lock --upgrade` (Manutenção do roadmap; subir o
+Flet exige conferir o patch do `flet-cli`) e executar a S24.
 
 ## Arquivos-chave
 

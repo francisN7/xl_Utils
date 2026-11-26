@@ -1,7 +1,7 @@
 # S24 — Picker JavaScript do Drive (implementação)
 
-> **Backlog:** spec reescrita após o ADR 0026 (S16). Entra depois da 0.4.0 se
-> o dono priorizar. **Arquivo local continua no seletor nativo do sistema
+> **Ciclo 0010:** primeira sessão, depois da 0.4.0. Spec escrita após o ADR
+> 0026 (S16). **Arquivo local continua no seletor nativo do sistema
 > operacional.** O seletor do Drive em Flet foi descartado.
 
 ## Objetivo

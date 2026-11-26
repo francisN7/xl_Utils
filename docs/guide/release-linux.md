@@ -108,8 +108,7 @@ cp /w/*.AppImage /tmp/a && /tmp/a --appimage-extract-and-run
 
 O AppImage entra na mesma release do instalador Windows. Publique os dois
 `SHA256SUMS.txt` ou junte os dois num só. Os arquivos podem vir do build local
-ou do artefato do workflow (**Build no CI**). A release 0.4.0 (S23c) segue
-este guia.
+ou do artefato do workflow (**Build no CI**), como na 0.4.0.
 
 ```bash
 gh release upload v<versão> \
